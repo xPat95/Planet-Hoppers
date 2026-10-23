@@ -1,0 +1,13 @@
+# Archivos temporales del sistema operativo
+.DS_Store
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Archivos temporales y de respaldo del editor
+*~
+*.swp
+*.swo
+*.tmp
+*.temp
