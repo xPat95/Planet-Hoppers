@@ -1,0 +1,4696 @@
+{
+  "geometry_and_hierarchy_unchanged": true,
+  "mesh_count": 141,
+  "vertices": 52712,
+  "faces": 39534,
+  "materials": [
+    "MC_Dirt",
+    "MC_Grass_Side",
+    "MC_Grass_Top",
+    "MC_Oak_Leaves",
+    "MC_Oak_Log",
+    "MC_Sand",
+    "MC_Snow",
+    "MC_Stone",
+    "MC_Water",
+    "MC_Water_Deep",
+    "MC_Water_Shallow"
+  ],
+  "missing_textures": [],
+  "water_source": [
+    "water_still.png",
+    [
+      16,
+      512
+    ]
+  ],
+  "water_frame": "Primer fotograma superior, 16x16; sin animacion; alpha del shader 1.",
+  "grass_side": "Textura ya coloreada; se conserva sin tinte para no alterar tierra.",
+  "missing_log_end": "No existe oak_log_top; se reutiliza oak_log en los extremos.",
+  "original_texture_sha256": {
+    "dirt.png": "67197d5371efc3ca1638217c38349665dbd5a977b47bfb20075c858dff87d510",
+    "grass_block_side.png": "76a677640eb91d6a9aed844bc66e329b1894f89e241a0071333b6678c0854580",
+    "grass_block_top.png": "52f44b64ce884a13dfe35e4b4da2e35898b790dd4d7a5ea536f1b0c0d56d29b4",
+    "oak_leaves.png": "69c9c7048695e014aee6b8a2c4cb080607bd7a2a5291c06218b8134cbfcdc04f",
+    "oak_log.png": "61735859c9c9ea82601191a77c6f256d93619cbaf7cad998a3ed5762877a34e6",
+    "sand.png": "3be385d7e4402f24327dacbf7557d622e7d0cef4650e582457d144d90476f106",
+    "snow.png": "a9ca00fc88b23dce0d8e9ee2677d17e8b760a766dfc96ab4b301112908dc88cf",
+    "stone.png": "b5e10adc72442bfb257ce7ba0b9bbe36475a0c8cdfec89b80dc9517203ff3e9f",
+    "water_still.png": "683df6ad9c23a50b7ce9323a5fe231aa79f94a63c6d750f3cf87a1fd44422551"
+  },
+  "geometry_signatures": {
+    "Ocean_Back_Water": {
+      "geometry": "d63e39a64f7c3bb230b3c3aa699e43449df3da07188c1aff9ba492e078b10729",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Water"
+      ]
+    },
+    "Ocean_Back_WaterDark": {
+      "geometry": "adbd939009a72af41b1697d7bd5ff9728e6f1a31882f4198d05da2b9f2199a18",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Water"
+      ]
+    },
+    "Ocean_Back_WaterLight": {
+      "geometry": "7c85f1c3cadae4170bf2ea772ad0ca3ed7474f754d9fd0bc7c509ae4ba002ef0",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Water"
+      ]
+    },
+    "Ocean_Bottom_Water": {
+      "geometry": "15eff859ba538b0d20f587640a8a8c2ee030f6c696f59ae2b658c2d53d555ef9",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Water"
+      ]
+    },
+    "Ocean_Bottom_WaterDark": {
+      "geometry": "54262c8cddea571f6bbbd0f8cd03bac95b399dec366ae59e49ab3e88c6034da5",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Water"
+      ]
+    },
+    "Ocean_Bottom_WaterLight": {
+      "geometry": "44a7b57936211b84a345a840dbd14ed6acda6700a10da9ade868fd551ad4ac85",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Water"
+      ]
+    },
+    "Ocean_Front_Water": {
+      "geometry": "f6f48c9b6ca6ab1ec16ed8fc7d9af64e43310755f4cb9f6ff18de8d53f1bece0",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Water"
+      ]
+    },
+    "Ocean_Front_WaterDark": {
+      "geometry": "9caa32165de83b4106bb7d9be1b159fd8c0aa96c34e4224c41ce1f9fb5efcfc3",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Water"
+      ]
+    },
+    "Ocean_Front_WaterLight": {
+      "geometry": "f289cfc6d256aa07406e9d007244ffc0713fa2cc6d70673b74030267c037e2cc",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Water"
+      ]
+    },
+    "Ocean_Left_Water": {
+      "geometry": "542b037647bd5ccef93a5a0bd3eba182e7eb68756fefffcbf03bea61a4ebfc99",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Water"
+      ]
+    },
+    "Ocean_Left_WaterDark": {
+      "geometry": "69f681070c08a9c6dd84ace3cfa33dcbd9738896a0d4879a641ea123ce13ae69",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Water"
+      ]
+    },
+    "Ocean_Left_WaterLight": {
+      "geometry": "30b10eddd9e47bc6a8a09e971a5ca8b9e7d652253abaf439b927108537036fbb",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Water"
+      ]
+    },
+    "Ocean_Right_Water": {
+      "geometry": "33d1fc8e567b497ddfc8492ec08a2c3bf1c6ac1e1567704424e72afe8476ed74",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Water"
+      ]
+    },
+    "Ocean_Right_WaterDark": {
+      "geometry": "df2ea63da51d7ab792456c9d1afc4c196444b79e539bc7d66ed832ea2a3841f3",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Water"
+      ]
+    },
+    "Ocean_Right_WaterLight": {
+      "geometry": "45be63388dc5970006b52e7885b0b9352a94ceb88b4729b220816deadb09f196",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Water"
+      ]
+    },
+    "Ocean_Top_Water": {
+      "geometry": "830a572e3752db736177eb8d28fa3f32e84d306080852f6c3b5855a922f11cb5",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Water"
+      ]
+    },
+    "Ocean_Top_WaterDark": {
+      "geometry": "0ed7bc86c676548a490e8196eb9f507c84416b60f32423a1c11bc46cd739014f",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Water"
+      ]
+    },
+    "Ocean_Top_WaterLight": {
+      "geometry": "d9d1738a844c9d0626b930e5dda0f723c64bc3a6dd5280e6a6d26b398517fb19",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Water"
+      ]
+    },
+    "Planet_Core_Cube_Stone": {
+      "geometry": "3aa0263e18a579ccc4ff51b3430e10e8fb257d4cf271eed83bc4ade5758eba4a",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Planet_Base"
+      ]
+    },
+    "Rock_Terraces_Stone": {
+      "geometry": "36f725352650695b9430a721f100444fa98d96cf225a525838837d836aa3b684",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Mountain"
+      ]
+    },
+    "Rock_Terraces_StoneLight": {
+      "geometry": "c970d76d21896a36ccb921418525538df2f9aaaf83170dcf6226c19b3799077a",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Mountain"
+      ]
+    },
+    "Snow_Caps_Snow": {
+      "geometry": "ef2d287c4d1395a28cb0fb0e013e1a10de746c7c3e0fec0883454c66f01dcdc8",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Mountain"
+      ]
+    },
+    "Soil_Back_Dirt": {
+      "geometry": "10f6e0aa5aad40e11ca5c0669b74cd28212e743c9d50389ceb784b88bfbdaf4b",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Terrain"
+      ]
+    },
+    "Soil_Bottom_Dirt": {
+      "geometry": "848aca2b16d3bbd950427cd303d12180483c02381e8ceaf35d339872287b680a",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Terrain"
+      ]
+    },
+    "Soil_Front_Dirt": {
+      "geometry": "80cb466ba3a1cdba4b6099170dfef17d78e887f33f8978e7be869cf691722ede",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Terrain"
+      ]
+    },
+    "Soil_Left_Dirt": {
+      "geometry": "518c51c0c60b38868297408341ae5ab36232788ee67ebe1c1efff1287596cbff",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Terrain"
+      ]
+    },
+    "Soil_Right_Dirt": {
+      "geometry": "a5eb14eb8133cb99601b85859431336e66676ac363ec311877f6e5b4462a78e7",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Terrain"
+      ]
+    },
+    "Soil_Top_Dirt": {
+      "geometry": "f930058c14ebf643c3bce04e940a58047f771accbe00765532fcbee8deb55c46",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Terrain"
+      ]
+    },
+    "Surface_Back_Grass": {
+      "geometry": "1bcf700c9955487c2d43e4cdec480bf3654b3957efee9d47a31db6bcd2a35112",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Terrain"
+      ]
+    },
+    "Surface_Back_GrassDark": {
+      "geometry": "35e584d57be0dfad4bc5ad65edefe935e5bdff2cc5e2f16a752eb09976dca17f",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Terrain"
+      ]
+    },
+    "Surface_Back_GrassLight": {
+      "geometry": "2823951d67a2fbd3d25e58779e0634debb8519dc0a5440f887a994a0e367cd85",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Terrain"
+      ]
+    },
+    "Surface_Back_Sand": {
+      "geometry": "9aeb92a3face42256753c49c87557556a37973487b7ba18d12d3fc34967829fe",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Terrain"
+      ]
+    },
+    "Surface_Bottom_Grass": {
+      "geometry": "4986c4cceb8c646d08bcc0c7e126c24846232e90b31fb986fdd160a2e2c15c8b",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Terrain"
+      ]
+    },
+    "Surface_Bottom_GrassDark": {
+      "geometry": "4fc9dc5a3caae71c93c23f1db638ddcbe9ed548e94caea76efe9ce73053f83ee",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Terrain"
+      ]
+    },
+    "Surface_Bottom_GrassLight": {
+      "geometry": "a4d67b6c7991b5ba84c4b3548a3f29cc2d1b0968f3fee27fd933c5e7abf50891",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Terrain"
+      ]
+    },
+    "Surface_Bottom_Sand": {
+      "geometry": "c7960ef5a4e061f42fafbfe64af82b66406c23fc94e4eba3c73bec305f309b5a",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Terrain"
+      ]
+    },
+    "Surface_Front_Grass": {
+      "geometry": "467f912ff8bb69e98cb4d40e23a96349c14a9c6813fbb899080c3acc8fbe256a",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Terrain"
+      ]
+    },
+    "Surface_Front_GrassDark": {
+      "geometry": "9642e2b2021fdd8940e0628949c200b315e388bd610c12c64718869e81ca09ef",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Terrain"
+      ]
+    },
+    "Surface_Front_GrassLight": {
+      "geometry": "615b0f6ad8e05cce84d6d9cf9cd84a79a8165f5fc64b5bc8f5d03666a8c36ce6",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Terrain"
+      ]
+    },
+    "Surface_Front_Sand": {
+      "geometry": "ccf611d8b7893e7cf5c971bccfaf7809939f89dd560791065a894646e4ee06d2",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Terrain"
+      ]
+    },
+    "Surface_Left_Grass": {
+      "geometry": "7381f5d943654ca09ca4f4075f4ed088b13285211526681ef4386d6c22f2f635",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Terrain"
+      ]
+    },
+    "Surface_Left_GrassDark": {
+      "geometry": "c797a746a4418de71fbd458d09886294f4f6e0ac346efaac1a0dad5cfb520c2d",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Terrain"
+      ]
+    },
+    "Surface_Left_GrassLight": {
+      "geometry": "39135689225e362bc3e4968350c56767ce06595d539b6080e047e8ebdc55fe32",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Terrain"
+      ]
+    },
+    "Surface_Left_Sand": {
+      "geometry": "398194b61ba1d1a3bbc7d3a9f802ec054d95988fbbf66c735e256f768fca9e44",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Terrain"
+      ]
+    },
+    "Surface_Right_Grass": {
+      "geometry": "381b94d32b3275e7891b18115460431f6fcbc1021ac661d514f753114312033f",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Terrain"
+      ]
+    },
+    "Surface_Right_GrassDark": {
+      "geometry": "0b80998799cc6b561b505f525b7d038d6c1659cb76d6e0ad727a2f4ec193e6ea",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Terrain"
+      ]
+    },
+    "Surface_Right_GrassLight": {
+      "geometry": "351a10a98aa8f2588b67c18971628f3a0177ca9da377846cd17d79f76a297b0c",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Terrain"
+      ]
+    },
+    "Surface_Right_Sand": {
+      "geometry": "375cc4aaa653966f92d6aed4d21c5e6cdb8f7066dd97c3ed042fdecf008e0316",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Terrain"
+      ]
+    },
+    "Surface_Top_Grass": {
+      "geometry": "ae8ea57557c8299f24a5c869ed8b6ff55e6c6b245f213439f13d8632fe71bfd8",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Terrain"
+      ]
+    },
+    "Surface_Top_GrassDark": {
+      "geometry": "378feb080517db8a234fc3e0a081ede99ef51fe5eac242a4b2c19976421254d1",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Terrain"
+      ]
+    },
+    "Surface_Top_GrassLight": {
+      "geometry": "7c4975fc515cd096757e82729968f8d3adc1691a515877ae33cd25ba4ee65cf7",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Terrain"
+      ]
+    },
+    "Surface_Top_Sand": {
+      "geometry": "3a4cb75d45103e95d84f15d39c8b628fefc14c4b33b3982fe78870136345768a",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Terrain"
+      ]
+    },
+    "Tree_Back_01_Canopy_Leaves": {
+      "geometry": "d1a8cc284a7a142f727f2f728d642876abe6b84df137fe9349dc8e1d827a88dd",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Back_01_Canopy_LeavesLight": {
+      "geometry": "3144b87530aea921932bfabc712ae2aa266b5a66496006f67ea5b4f2a7d281b8",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Back_01_Trunk_Wood": {
+      "geometry": "0e8373e9428c66f5ad847d6f913bf168d8404ac238a7dfa4fb84b2eb02993bed",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Back_02_Canopy_Leaves": {
+      "geometry": "efbe9e6740bd6ead47af5f8a4d6a3e9c54c5e760a820d6443e667c93e00dee5a",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Back_02_Canopy_LeavesLight": {
+      "geometry": "0f2fe5f5ece683455f8c54f6670711103a820cb16d7aa0af262edf23f75b16cf",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Back_02_Trunk_Wood": {
+      "geometry": "345fba7390aab729daf1620218373a09d58137782a536916f532931145c5c31b",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Back_03_Canopy_Leaves": {
+      "geometry": "ac6308424d9729c7100df46567dc97a2020dccc5b62e4502844ed720799e1b51",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Back_03_Canopy_LeavesLight": {
+      "geometry": "2ca33218590b4ffb5253feccb804d3d3667363ae2a811bb6415689cb2af0916e",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Back_03_Trunk_Wood": {
+      "geometry": "6fdbf32474c9064f7707bbd3bec05ffd55799c42fc226c297efca3403c50f4c4",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Back_04_Canopy_Leaves": {
+      "geometry": "391547f8969ed96aac0938541fa417e1a323e1b297a3dd0833c198033feae0b5",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Back_04_Canopy_LeavesLight": {
+      "geometry": "8d466af2c425d10beab0e99cc68181b911cd6c35c0fd280366c317249cc3b3ab",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Back_04_Trunk_Wood": {
+      "geometry": "a4570a01b70da1935a838d21f11a5ca5b4214d72d697163906f802c8ac895ce7",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Front_01_Canopy_Leaves": {
+      "geometry": "a95c94c42d68bb22e228a90d5a91f0f4bc04f59fa568fd1643589e3c7221882a",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Front_01_Canopy_LeavesLight": {
+      "geometry": "f824af63c758d13771f9089993a3c718848712acd6c6abf1b07958503897a6da",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Front_01_Trunk_Wood": {
+      "geometry": "3b8b4479d4bdc86885e526673f2bb0a95866f0190291c8632c13a1c7a18c1068",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Front_02_Canopy_Leaves": {
+      "geometry": "6c3d0a3c6419eaa0ccfaf7537ce81365ab096d709054b0d9d9c73c683005e508",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Front_02_Canopy_LeavesLight": {
+      "geometry": "25d4ac6267f98e840b84e800e601920d1eb33d81cf4b398ec21a7da1972de399",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Front_02_Trunk_Wood": {
+      "geometry": "a811b5c01edf4dfeffda45c21400a0be393d3a96ecc1a4feaa9b6a8b3f336ac7",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Front_03_Canopy_Leaves": {
+      "geometry": "91a50aae606152aac9d983ff37c792492bdfe8cfe639480f78687323cd75cf6b",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Front_03_Canopy_LeavesLight": {
+      "geometry": "e138401765641794dc11e8477ea07a48833ab6288c64efbbca42bf997ff156cd",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Front_03_Trunk_Wood": {
+      "geometry": "13c5555c90af4544e2dcb1119b0760f37ab96b67a6c8bc4e83694b2e189cd1f5",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Front_04_Canopy_Leaves": {
+      "geometry": "0abf2de814943a77a6f315a9739903888de8844c86733cdf92bde61c1b375c95",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Front_04_Canopy_LeavesLight": {
+      "geometry": "6bb881d13a76ca508219400722d61593fd92ea84b4e76b19d914be8379017ba8",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Front_04_Trunk_Wood": {
+      "geometry": "5e304247a14fab7e99f68e8ce541cd810484557b1c9abbf1ae1892b7074b4508",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Left_01_Canopy_Leaves": {
+      "geometry": "0af053aa400c707625fd8892faa739c2f608a8b14471743a3130152da779f63b",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Left_01_Canopy_LeavesLight": {
+      "geometry": "5b57318680360bf5bbc1099c8308eb975c1352140c7da36f1a0f824d68c159e7",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Left_01_Trunk_Wood": {
+      "geometry": "ebb2e7a89f8f5da8e5d1e4b96093107dd8725738a6cdc0f1613503c7ad13aa4e",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Left_02_Canopy_Leaves": {
+      "geometry": "5a4f7d2d0a290837889e1dc9ffff35930de4b6a148d8d1f5a80de503c63c9fd3",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Left_02_Canopy_LeavesLight": {
+      "geometry": "204672cb20962f6590d9cc4d4bc7d4418b78097d40bc9cf450011affe7e23029",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Left_02_Trunk_Wood": {
+      "geometry": "c1cc9655098efd016cf25a524d84977f92aac2052bdbb3f4902d0a3ef66682b7",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Left_03_Canopy_Leaves": {
+      "geometry": "1bd84e9bd66ac3721b61670d019c49b22c590172d89f80ad49b4b1e6c4594606",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Left_03_Canopy_LeavesLight": {
+      "geometry": "436f3de9910494c8e8d36c1784b9bc7e2ec17d902d59f1357e387cf634347c2e",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Left_03_Trunk_Wood": {
+      "geometry": "0d51ccd9d5291c344cd5beb413c9714b7af6483cc970165489fe2446829fdd76",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Left_04_Canopy_Leaves": {
+      "geometry": "a1754b4e4f80832b8a87164b79e2923ec834a935e6225aeb2cd59c7a03f14ef1",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Left_04_Canopy_LeavesLight": {
+      "geometry": "6096c8b8593688b90ecac5ffe3f7a1c6aa0a1c28a5453e32e48b5835db658a3f",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Left_04_Trunk_Wood": {
+      "geometry": "2d0212e792204b1f2ded3e8a830f4e4a08fe6e0e830bab467b8d70826ffee97c",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Right_01_Canopy_Leaves": {
+      "geometry": "acbf5f81899bd76a99a5582e8d6491749795c6e7367edf7d2283017162d7b154",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Right_01_Canopy_LeavesLight": {
+      "geometry": "dce22bc96fecec557532c654613ce7815b349a2e69207857346b3a9e494bae9a",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Right_01_Trunk_Wood": {
+      "geometry": "cc775e83335a7aa5dea9336242d2f6701dd6d0c7cc922b8d325c90bf63892080",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Right_02_Canopy_Leaves": {
+      "geometry": "2d016d1cb04c3200a9d89dea652c4aab71277d2152f7680bd0d625c6c41b83b6",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Right_02_Canopy_LeavesLight": {
+      "geometry": "b4481d2d8021b7e4b90f3b34d5b604f53add66a6855d294a1e5bab16592c2485",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Right_02_Trunk_Wood": {
+      "geometry": "fd940bfd2d95531f5e901987f083b6c3b519c9b070a56e5de283fccd36a21e58",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Right_03_Canopy_Leaves": {
+      "geometry": "7434b5a65ccf937b3f697f26c6a27d863a19d7c16be74fc1664f2fd8cabd8541",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Right_03_Canopy_LeavesLight": {
+      "geometry": "d28b2947c340209e6b7bc21f35dc2ec362e9ec574fd560433f02112e05b96588",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Right_03_Trunk_Wood": {
+      "geometry": "281d85a3904ff390dfd217afef3392f95457e5c11d9269075d494f1a89afb07f",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Right_04_Canopy_Leaves": {
+      "geometry": "3d5cb575c822aa9de1ff23bde5dc2df2bf39d318976db0232445ac2c80fbc4ac",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Right_04_Canopy_LeavesLight": {
+      "geometry": "16aaea9e792557d8975ae5d2d441e3461f8cfefbe6552ac92895a170977b4b07",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Right_04_Trunk_Wood": {
+      "geometry": "c3050bd7a903a2c9fe8e350b8b29ac2db7843e7b66f2ffefc1f472acd53b0c2f",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_01_Canopy_Leaves": {
+      "geometry": "43d900c12ceb8b99331a4a0928b9b9f233587ad78fe8bf8dfba2d341a6e9faa3",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_01_Canopy_LeavesLight": {
+      "geometry": "42d774d11302e96b4cde98585a8bf629062ca2cd1fdb3c83a04c47ee3c799148",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_01_Trunk_Wood": {
+      "geometry": "e4d615c681d7d919bd5fbdcd5c5711b324dafbae275968d809b5c4a559042a3b",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_02_Canopy_Leaves": {
+      "geometry": "a4fd22b6979632b72efdc681607eafaf4ce177475d44b1c104b887656c8ca1a9",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_02_Canopy_LeavesLight": {
+      "geometry": "39a3d014bad37b6ed911bd83dfd58be4d0aa026e6b46ac5657262a2ee8cc218e",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_02_Trunk_Wood": {
+      "geometry": "63bd9a57fc9f196946af9c79f8df208bf589c1577133073dc8c29a2e8e7aa684",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_03_Canopy_Leaves": {
+      "geometry": "9b457d11ec1b5198138d94cfa5232d4805955c7bb625c8cd8884377aee44d313",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_03_Canopy_LeavesLight": {
+      "geometry": "dd4b6dffb7cab32549ac749448e433f2b8d6ec8a8af96104ef734f28da86b080",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_03_Trunk_Wood": {
+      "geometry": "dd5bfc2b4118acc78a789cc1abc6ea22d02f5a90c81d77196fba75be1e4e6797",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_04_Canopy_Leaves": {
+      "geometry": "08487f5cffce1f65caf14f3c25db1f462c5dd55f42d7abfb1c78baeae9601dc9",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_04_Canopy_LeavesLight": {
+      "geometry": "563e3b27c8396bef34da5a089be553ed5eb02a1a4126c1fc6a768a35953e6aac",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_04_Trunk_Wood": {
+      "geometry": "c046b2238fba21ce7ed0b08915fa4fb746c081ba66fdc7678bf568c6866e4182",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_05_Canopy_Leaves": {
+      "geometry": "617c0053ff9a3cdf1e2d45eabc533f9aad7040459d00cd1a3362d08b98e4f65f",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_05_Canopy_LeavesLight": {
+      "geometry": "0d03962531850c9218905b15568693260c246f87e2c59adcefe5d41a596b8370",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_05_Trunk_Wood": {
+      "geometry": "d4f2f3f03a2cd40702a1596ef7be9654230717b8df827107efd1f0884d659e43",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_06_Canopy_Leaves": {
+      "geometry": "5ff17339cad4f32088dff48ca39c9f02da3b98799fc25f80cd174db019eee007",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_06_Canopy_LeavesLight": {
+      "geometry": "542a596c40ade6a08314831fe2087be4dd4ec12fd2d65dd5d4de5a3558149825",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_06_Trunk_Wood": {
+      "geometry": "f4756b88f281d8a62e29bfb10fc0eba6a3672c28b5211b6e8e700ae11d03d9f3",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_07_Canopy_Leaves": {
+      "geometry": "b83972bee4abd98fc8725956e2779c55b7b78d46b724ad3eec96613defa32de6",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_07_Canopy_LeavesLight": {
+      "geometry": "a6acc90b39b27819e4128d6a3bab8203f4848576e8ea748e22f258d406631418",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_07_Trunk_Wood": {
+      "geometry": "a6c90249e3d42ea3e42c18542af6bdc0d9e20aed79c2bdb176bd6bccd4ce36d9",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_08_Canopy_Leaves": {
+      "geometry": "1fc804e20708f018772f012ad5fd923bbc28a72ee67d02dc0765cc6c71abf5f9",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_08_Canopy_LeavesLight": {
+      "geometry": "40bdacb90c2442c8474d8237791cfd3df8b95991c1d5a8dbfb6fdfe7d35930f4",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_08_Trunk_Wood": {
+      "geometry": "0b0f6f2551e67fda99b5e5aef3d2faa0f43c21a8062f249c98e0c2a7f2b14cb9",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_09_Canopy_Leaves": {
+      "geometry": "1ceb6c32360c6fc88812c4ad8cb9d2a3dfec72b724b8408640f91d13cfa11c83",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_09_Canopy_LeavesLight": {
+      "geometry": "ba387078a37356d9f39b4169eca4f2fa67aaf22df5a8faed71f2d33ba5a1b99a",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_09_Trunk_Wood": {
+      "geometry": "5528d4316ea64a64fa9e6988adf9bd08a032929a6f9c8444f30f8287655a4235",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_10_Canopy_Leaves": {
+      "geometry": "5eec0bea8312cf9d3978b4f54c0eefc6b90c34224dfcb410c3ea833054d59283",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_10_Canopy_LeavesLight": {
+      "geometry": "e8f64fd52d147e86932624551e71bc18f555e91e50575dd25169412e7589910f",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_10_Trunk_Wood": {
+      "geometry": "cdd88954861620c2ffcd91d7af9971b4e3ba14f4a9b15272b8e7307ada7819b4",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_11_Canopy_Leaves": {
+      "geometry": "14477a424b55cc7a95bb78cea223a130bea4197cc4fcd71ff61efb3a217b8a23",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_11_Canopy_LeavesLight": {
+      "geometry": "32185b2cc65cd335899c31d633e6494eea34e18599141d8fa1de51d017ffa93c",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_11_Trunk_Wood": {
+      "geometry": "e54d9ae8869be5837ca9f9f3eedeec9ed85fbc1926f9fe311a86fac6ed66764a",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_12_Canopy_Leaves": {
+      "geometry": "7f90aae40313043747e306a359758e80c81dcd53424da48ef1f1782caf0695e6",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_12_Canopy_LeavesLight": {
+      "geometry": "d1e6c5bdacdff3a8cd885a809912e6da2956a1dc0e8fd54672802ac90ee045a4",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_12_Trunk_Wood": {
+      "geometry": "5680885a34848057b229f91956e994687f9f5aff4126d126dfa4585c9d1833a5",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_13_Canopy_Leaves": {
+      "geometry": "6e7559b46a18c7f1b5fd285759552f1df5f4d8ba79616c769a42f527ea3d22a2",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_13_Canopy_LeavesLight": {
+      "geometry": "cd7e681c21650e374eb021c6a1a3d38b5aa65fa4c2c4aa4177f84fd52e040634",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Tree_Top_13_Trunk_Wood": {
+      "geometry": "47c7888bb41229c14dcd871c9e6d5641a2d8ab4d9b98b050bc7ee6aea3b45607",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Trees"
+      ]
+    },
+    "Waterfall_Front_WaterLight": {
+      "geometry": "0d1fbfb696aad5182d6a14053db8f51ee5682801f62df92f93ae0fe6314555a5",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Water"
+      ]
+    },
+    "Waterfall_Pool_WaterLight": {
+      "geometry": "7af3bdd85f558ab0ad9331b550e2a961fd0d8d342babeb6041d0d38343f31a53",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "parent": "Minecraft_Planet_ROOT",
+      "collections": [
+        "Water"
+      ]
+    }
+  }
+}

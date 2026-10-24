@@ -1,0 +1,521 @@
+{
+  "file": "C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\assets\\models\\planets\\minecraft\\minecraft_planet_textured_v02.blend",
+  "blender": "5.4.0 Alpha",
+  "reopened": true,
+  "planet_meshes": 141,
+  "root_plus_meshes": 142,
+  "scene_objects": 147,
+  "file_objects": 150,
+  "vertices": 52712,
+  "polygons": 39534,
+  "triangles": 79068,
+  "materials": 11,
+  "material_slots": 177,
+  "triangles_if_six_similar_planets": 474408,
+  "root_location": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "root_rotation": [
+    0.0,
+    -0.0,
+    0.0
+  ],
+  "root_scale": [
+    1.0,
+    1.0,
+    1.0
+  ],
+  "cube_center": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "bbox_min": [
+    -16.850000381469727,
+    -16.850000381469727,
+    -14.050000190734863
+  ],
+  "bbox_max": [
+    16.350000381469727,
+    17.350000381469727,
+    16.850000381469727
+  ],
+  "bbox_center": [
+    -0.25,
+    0.25,
+    1.4000000953674316
+  ],
+  "vertex_average_not_volume_centroid": [
+    -0.02265745869517272,
+    0.165921229070245,
+    1.1704052338597988
+  ],
+  "transform_max_errors": {
+    "translate": 0.0,
+    "scale": 0.0,
+    "rotate": 5.960464477539063e-08
+  },
+  "transforms_restored": true,
+  "scene_meshes_outside_root": [],
+  "uv_missing": [],
+  "uv_degenerate_faces": 0,
+  "coincident_face_groups": 12474,
+  "coincident_face_instances": 24948,
+  "coincident_examples": [
+    [
+      [
+        "Ocean_Back_Water",
+        1
+      ],
+      [
+        "Ocean_Back_WaterDark",
+        21
+      ]
+    ],
+    [
+      [
+        "Ocean_Back_Water",
+        2
+      ],
+      [
+        "Ocean_Back_WaterDark",
+        34
+      ]
+    ],
+    [
+      [
+        "Ocean_Back_Water",
+        3
+      ],
+      [
+        "Ocean_Back_Water",
+        7
+      ]
+    ],
+    [
+      [
+        "Ocean_Back_Water",
+        8
+      ],
+      [
+        "Ocean_Back_Water",
+        142
+      ]
+    ],
+    [
+      [
+        "Ocean_Back_Water",
+        9
+      ],
+      [
+        "Ocean_Back_Water",
+        13
+      ]
+    ]
+  ],
+  "images": [
+    {
+      "name": "dirt.png",
+      "size": [
+        16,
+        16
+      ],
+      "packed": true,
+      "path": "//..\\..\\..\\textures\\planets\\minecraft\\dirt.png",
+      "file_exists": true
+    },
+    {
+      "name": "grass_block_side.png",
+      "size": [
+        16,
+        16
+      ],
+      "packed": true,
+      "path": "//..\\..\\..\\textures\\planets\\minecraft\\grass_block_side.png",
+      "file_exists": true
+    },
+    {
+      "name": "grass_block_top.png",
+      "size": [
+        16,
+        16
+      ],
+      "packed": true,
+      "path": "//..\\..\\..\\textures\\planets\\minecraft\\grass_block_top.png",
+      "file_exists": true
+    },
+    {
+      "name": "oak_leaves.png",
+      "size": [
+        16,
+        16
+      ],
+      "packed": true,
+      "path": "//..\\..\\..\\textures\\planets\\minecraft\\oak_leaves.png",
+      "file_exists": true
+    },
+    {
+      "name": "oak_log.png",
+      "size": [
+        16,
+        16
+      ],
+      "packed": true,
+      "path": "//..\\..\\..\\textures\\planets\\minecraft\\oak_log.png",
+      "file_exists": true
+    },
+    {
+      "name": "sand.png",
+      "size": [
+        16,
+        16
+      ],
+      "packed": true,
+      "path": "//..\\..\\..\\textures\\planets\\minecraft\\sand.png",
+      "file_exists": true
+    },
+    {
+      "name": "snow.png",
+      "size": [
+        16,
+        16
+      ],
+      "packed": true,
+      "path": "//..\\..\\..\\textures\\planets\\minecraft\\snow.png",
+      "file_exists": true
+    },
+    {
+      "name": "stone.png",
+      "size": [
+        16,
+        16
+      ],
+      "packed": true,
+      "path": "//..\\..\\..\\textures\\planets\\minecraft\\stone.png",
+      "file_exists": true
+    },
+    {
+      "name": "water_static_frame_00",
+      "size": [
+        16,
+        16
+      ],
+      "packed": true,
+      "path": "//..\\..\\..\\textures\\planets\\minecraft\\water_static_frame_00.png",
+      "file_exists": true
+    }
+  ],
+  "materials_detail": [
+    {
+      "name": "MC_Dirt",
+      "surface_method": "DITHERED",
+      "backface_culling": false,
+      "nodes": [
+        [
+          "OUTPUT_MATERIAL",
+          null
+        ],
+        [
+          "BSDF_PRINCIPLED",
+          null
+        ],
+        [
+          "TEX_IMAGE",
+          null
+        ],
+        [
+          "UVMAP",
+          null
+        ]
+      ],
+      "slots": 24
+    },
+    {
+      "name": "MC_Grass_Side",
+      "surface_method": "DITHERED",
+      "backface_culling": false,
+      "nodes": [
+        [
+          "OUTPUT_MATERIAL",
+          null
+        ],
+        [
+          "BSDF_PRINCIPLED",
+          null
+        ],
+        [
+          "TEX_IMAGE",
+          null
+        ],
+        [
+          "UVMAP",
+          null
+        ]
+      ],
+      "slots": 18
+    },
+    {
+      "name": "MC_Grass_Top",
+      "surface_method": "DITHERED",
+      "backface_culling": false,
+      "nodes": [
+        [
+          "OUTPUT_MATERIAL",
+          null
+        ],
+        [
+          "BSDF_PRINCIPLED",
+          null
+        ],
+        [
+          "TEX_IMAGE",
+          null
+        ],
+        [
+          "UVMAP",
+          null
+        ],
+        [
+          "MIX_RGB",
+          "MULTIPLY"
+        ]
+      ],
+      "slots": 18
+    },
+    {
+      "name": "MC_Oak_Leaves",
+      "surface_method": "DITHERED",
+      "backface_culling": false,
+      "nodes": [
+        [
+          "OUTPUT_MATERIAL",
+          null
+        ],
+        [
+          "BSDF_PRINCIPLED",
+          null
+        ],
+        [
+          "TEX_IMAGE",
+          null
+        ],
+        [
+          "UVMAP",
+          null
+        ],
+        [
+          "MIX_RGB",
+          "MULTIPLY"
+        ]
+      ],
+      "slots": 58
+    },
+    {
+      "name": "MC_Oak_Log",
+      "surface_method": "DITHERED",
+      "backface_culling": false,
+      "nodes": [
+        [
+          "OUTPUT_MATERIAL",
+          null
+        ],
+        [
+          "BSDF_PRINCIPLED",
+          null
+        ],
+        [
+          "TEX_IMAGE",
+          null
+        ],
+        [
+          "UVMAP",
+          null
+        ]
+      ],
+      "slots": 29
+    },
+    {
+      "name": "MC_Sand",
+      "surface_method": "DITHERED",
+      "backface_culling": false,
+      "nodes": [
+        [
+          "OUTPUT_MATERIAL",
+          null
+        ],
+        [
+          "BSDF_PRINCIPLED",
+          null
+        ],
+        [
+          "TEX_IMAGE",
+          null
+        ],
+        [
+          "UVMAP",
+          null
+        ]
+      ],
+      "slots": 6
+    },
+    {
+      "name": "MC_Snow",
+      "surface_method": "DITHERED",
+      "backface_culling": false,
+      "nodes": [
+        [
+          "OUTPUT_MATERIAL",
+          null
+        ],
+        [
+          "BSDF_PRINCIPLED",
+          null
+        ],
+        [
+          "TEX_IMAGE",
+          null
+        ],
+        [
+          "UVMAP",
+          null
+        ]
+      ],
+      "slots": 1
+    },
+    {
+      "name": "MC_Stone",
+      "surface_method": "DITHERED",
+      "backface_culling": false,
+      "nodes": [
+        [
+          "OUTPUT_MATERIAL",
+          null
+        ],
+        [
+          "BSDF_PRINCIPLED",
+          null
+        ],
+        [
+          "TEX_IMAGE",
+          null
+        ],
+        [
+          "UVMAP",
+          null
+        ]
+      ],
+      "slots": 3
+    },
+    {
+      "name": "MC_Water",
+      "surface_method": "DITHERED",
+      "backface_culling": false,
+      "nodes": [
+        [
+          "OUTPUT_MATERIAL",
+          null
+        ],
+        [
+          "BSDF_PRINCIPLED",
+          null
+        ],
+        [
+          "TEX_IMAGE",
+          null
+        ],
+        [
+          "UVMAP",
+          null
+        ],
+        [
+          "MIX_RGB",
+          "MULTIPLY"
+        ]
+      ],
+      "slots": 6
+    },
+    {
+      "name": "MC_Water_Deep",
+      "surface_method": "DITHERED",
+      "backface_culling": false,
+      "nodes": [
+        [
+          "OUTPUT_MATERIAL",
+          null
+        ],
+        [
+          "BSDF_PRINCIPLED",
+          null
+        ],
+        [
+          "TEX_IMAGE",
+          null
+        ],
+        [
+          "UVMAP",
+          null
+        ],
+        [
+          "MIX_RGB",
+          "MULTIPLY"
+        ]
+      ],
+      "slots": 6
+    },
+    {
+      "name": "MC_Water_Shallow",
+      "surface_method": "DITHERED",
+      "backface_culling": false,
+      "nodes": [
+        [
+          "OUTPUT_MATERIAL",
+          null
+        ],
+        [
+          "BSDF_PRINCIPLED",
+          null
+        ],
+        [
+          "TEX_IMAGE",
+          null
+        ],
+        [
+          "UVMAP",
+          null
+        ],
+        [
+          "MIX_RGB",
+          "MULTIPLY"
+        ]
+      ],
+      "slots": 8
+    }
+  ],
+  "linked_libraries": [],
+  "modifiers": [],
+  "constraints": [],
+  "other_scenes": [
+    [
+      "Scene",
+      3
+    ]
+  ],
+  "portability_update": {
+    "backup": "minecraft_planet_textured_v02_before_portability.blend",
+    "only_resource_paths_changed": true,
+    "appearance_geometry_uv_material_invariant": "d1de8239e0a6cec0b9cc1033659c2f4aa5b1d3061282f44c053bbbc8b4b8ea6e",
+    "packed_resource_hashes": {
+      "dirt.png": "67197d5371efc3ca1638217c38349665dbd5a977b47bfb20075c858dff87d510",
+      "grass_block_side.png": "76a677640eb91d6a9aed844bc66e329b1894f89e241a0071333b6678c0854580",
+      "grass_block_top.png": "52f44b64ce884a13dfe35e4b4da2e35898b790dd4d7a5ea536f1b0c0d56d29b4",
+      "oak_leaves.png": "69c9c7048695e014aee6b8a2c4cb080607bd7a2a5291c06218b8134cbfcdc04f",
+      "oak_log.png": "61735859c9c9ea82601191a77c6f256d93619cbaf7cad998a3ed5762877a34e6",
+      "sand.png": "3be385d7e4402f24327dacbf7557d622e7d0cef4650e582457d144d90476f106",
+      "snow.png": "a9ca00fc88b23dce0d8e9ee2677d17e8b760a766dfc96ab4b301112908dc88cf",
+      "stone.png": "b5e10adc72442bfb257ce7ba0b9bbe36475a0c8cdfec89b80dc9517203ff3e9f",
+      "water_static_frame_00": "145364bb4046d6a8f94185e3da316487eab930b96815d0e91489a8cd8c91c51c"
+    }
+  }
+}

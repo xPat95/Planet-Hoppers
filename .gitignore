@@ -11,3 +11,7 @@ Desktop.ini
 *.swo
 *.tmp
 *.temp
+
+# Respaldos locales del planeta Minecraft; conservar fuera del commit
+/assets/models/planets/minecraft/backups/
+/assets/models/planets/minecraft/*.blend[0-9]*
