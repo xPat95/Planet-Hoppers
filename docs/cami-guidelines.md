@@ -7,7 +7,7 @@ Las reglas generales de carpetas, identificadores y separación de módulos est�
 | Franquicia | Identificador | Planeta | Nave | Personajes abducidos | Estado de la guía |
 | --- | --- | --- | --- | --- | --- |
 | Smiling Friends | `smilingfriends` | Definido (sección 1) | Definida (1.7) | Pim y Charlie | En diseño |
-| Halloween | `halloween` | Pendiente | Pendiente | Ghost Face | Sin empezar |
+| Halloween | `halloween` | Definido (sección 2) | Definida (2.6) | Ghost Face | En diseño |
 
 ---
 
@@ -16,6 +16,7 @@ Las reglas generales de carpetas, identificadores y separación de módulos est�
 Vienen del enunciado del proyecto final (Software Renderer). Aplican a todo lo de esta guía.
 
 - **Renderizador por software propio.** raylib solo sirve para la ventana, la entrada y mostrar el framebuffer. Nada de dibujo 3D, modelos, cámara, materiales ni shaders de GPU de raylib. Cada triángulo cuesta CPU: **modelos low-poly**. El estilo plano de la serie ayuda.
+- **Convenciones del equipo (tomadas del planeta Minecraft de Pablo):** los modelos se hacen en **Blender** (`.blend` en `assets/models/planets/<franquicia>/`, con todo colgado de un objeto `<Franquicia>_Planet_ROOT` en el origen), los scripts van en `tools/blender/<franquicia>/` y las capturas en `docs/references/<franquicia>/`. Ese planeta tiene ~79 000 triángulos y su revisión técnica ya advierte que es pesado: **los planetas de Cami deben quedar muy por debajo de eso**.
 - **Todo se ve desde la nave.** No se aterriza ni se camina. Cada zona y cada personaje debe **reconocerse al acercarse y rodear el planeta en vuelo**, sin cambio de escena. Por eso la escala es exagerada: si algo no se lee desde la órbita cercana, no sirve.
 - **El planeta orbita el sol y rota sobre su eje** en función del tiempo transcurrido, no de los cuadros dibujados.
 - **Puntos que este planeta puede aportar** (menú del curso):
@@ -144,6 +145,8 @@ Todos se colocan a escala exagerada en su zona y deben leerse desde la nave.
 | Nave (OVNI) | `assets/models/ships/smilingfriends/` |
 | Texturas del planeta | `assets/textures/planets/` |
 | Texturas de personajes | `assets/textures/characters/` |
+| Capturas y referencias | `docs/references/smilingfriends/` |
+| Scripts de Blender | `tools/blender/smilingfriends/` |
 
 Cada elemento grande se modela **por separado** (edificio, cada bosque, infierno, Spamtopia, pueblo), para ajustar su escala y posición sobre el disco sin rehacer el planeta. Los elementos repetidos (Shmaloogles, casas, árboles, multitud) son **un solo modelo instanciado** por la distribución procedural.
 
@@ -179,6 +182,107 @@ No quedan decisiones abiertas para el diseño del planeta de Smiling Friends.
 
 ---
 
-## 2. Halloween
+## 2. Halloween / Horror
 
-**Pendiente.** Personaje abducido: Ghost Face. Minijuego: escapar de personajes de terror. El planeta y la nave se documentarán aquí con la misma estructura de la sección 1.
+Personaje abducido: **Ghost Face**. Minijuego: escapar de personajes de terror. Este planeta es **más simple** que el de Smiling Friends: pocas zonas, modelos repetidos y un rasgo central fuerte. **Tiene que dar terror genuino**, no ser "Halloween bonito": nada de calabazas sonrientes ni colores de dulces.
+
+### 2.1 Concepto del planeta
+
+**La Tierra después del apocalipsis**, convertida en una **cara humana sufriendo**.
+
+- **Forma:** esfera **deformada para formar una cara humana** (no una calavera): frente con el ceño contraído, cuencas de los ojos hundidas, nariz en relieve, pómulos y una **boca muy abierta, gritando de dolor**. La cara ocupa un hemisferio entero.
+- **Superficie:** continentes reconocibles pero **quemados y destruidos**: negros, grises y café ceniza. Los océanos están secos o son oscuros.
+- **Grietas de lava:** grietas con **luz naranja y roja adentro**. Siguen las líneas de la cara (contorno de ojos y boca, arrugas de dolor en la frente, surcos de las mejillas) y la hacen **legible desde lejos, brillando en la oscuridad**.
+- **Lectura desde lejos:** una cara humana gritando que brilla desde dentro. **Lectura de cerca:** las zonas de horror sobre la superficie.
+
+Pautas para que dé miedo de verdad:
+
+1. **Expresión de dolor, no de enojo ni caricatura:** cejas levantadas hacia el centro, ojos hundidos y vacíos, boca estirada hacia abajo. Las proporciones son de rostro real.
+2. **Los ojos y la boca son lo más oscuro y lo más brillante a la vez:** cavidades negras con lava al fondo, como si el planeta ardiera por dentro.
+3. **Iluminación lateral o desde abajo** (la lava ilumina hacia arriba), nunca una luz plana de frente.
+4. **Paleta limitada:** negro, gris, café ceniza y el naranja/rojo de la lava. Nada más brilla.
+
+### 2.2 Zonas
+
+| Zona | Qué debe mostrarse | Ubicación |
+| --- | --- | --- |
+| Cara humana | Ojos, nariz y boca formados por la deformación, con las grietas de lava. | **Hemisferio frontal.** Se deja limpio, sin zonas encima. |
+| Zombies y cementerio | Cementerio de lápidas y cruces torcidas de donde **salen los zombies**, y calles en ruinas **llenas de zombies** alrededor. | Costado izquierdo de la cabeza. |
+| Payasos | Payasos **destruyendo cosas**: volcando y quemando carros y rompiendo edificios y juegos de feria. Payasos sucios y siniestros, no de fiesta infantil. | Costado derecho de la cabeza. |
+| Ritual de brujas | Brujas típicas (sombrero puntiagudo, capa) en círculo alrededor de un caldero o fogata, haciendo un ritual. | Coronilla (parte de arriba). |
+| Satanás destruyendo la ciudad | Satanás gigante, estilo *This Is the End*, **comiéndose y aplastando carros** entre edificios destruidos. | Nuca (parte de atrás), como sorpresa al rodear el planeta. |
+
+```text
+                    [ Ritual de brujas ]
+                         coronilla
+
+  [ Zombies +          ( CARA HUMANA )          [ Payasos ]
+    cementerio ]      frente, con lava          costado derecho
+    costado izq.
+
+                       nuca (atrás):
+                 [ Satanás comiendo carros ]
+```
+
+Reglas:
+
+1. **La cara manda.** Ninguna zona tapa los ojos, la nariz ni la boca.
+2. **Las zonas se reparten alrededor de la cabeza** (costados, coronilla y nuca): al rodear el planeta siempre aparece algo nuevo.
+3. **Los carros son un solo modelo** que se reutiliza en la zona de payasos y en la de Satanás.
+4. Este Satanás es de **otra película y otro diseño** que el de Smiling Friends; no se reutiliza ese modelo.
+5. **No se agregan más zonas** al planeta.
+
+### 2.3 Personajes y modelos
+
+| Modelo | Dónde | Cantidad |
+| --- | --- | --- |
+| Zombie | Cementerio y calles | **Muchos**, distribución procedural con semilla. |
+| Lápida / cruz | Cementerio | Muchas, distribución procedural. |
+| Payaso | Zona de payasos | Varios. |
+| Bruja | Ritual | Un círculo de 5 a 7. |
+| Caldero / fogata | Ritual | 1. |
+| Satanás | Nuca | 1, gigante. |
+| Carro | Payasos y Satanás | Varios, volteados y destrozados. |
+| Edificio en ruinas | Calles, payasos y Satanás | Varios. |
+| Ghost Face | *Por decidir* (2.7). | 1. |
+
+### 2.4 Lo técnico y los puntos
+
+Este planeta cubre justo lo que el disco de Smiling Friends no puede:
+
+| Característica del menú | Cómo la cubre este planeta | Puntos |
+| --- | --- | --- |
+| Planeta distinguible | Tierra apocalíptica con cara humana. | 10 |
+| **Deformación de geometría** | La esfera se deforma con una función: desplazamientos suaves hacia dentro (ojos, boca) y hacia fuera (frente, nariz, pómulos), más ruido para terreno irregular y destruido. | 10 |
+| **Posición y orientación sobre superficie curva** | Zombies, lápidas, payasos y brujas parados correctamente sobre la esfera mientras rota (el disco de Smiling Friends no cubre este punto). | 5 |
+| Distribución procedural con semilla | Zombies y lápidas. | 10 (una sola vez en el proyecto) |
+| Shader animado | Lava de las grietas que **pulsa y fluye** con el tiempo. | 8 |
+| Shaders propios | Lava; superficie quemada (posible mapeo de normales para grietas y relieve). | 6 c/u |
+
+**Nota:** los máximos del menú son **para todo el proyecto**, no por planeta. Los 4 tipos de modelo (20 pts) ya los cubre Smiling Friends, así que los modelos de este planeta se hacen por diseño, no por puntos. Lo mismo con los shaders: máximo 4 en todo el proyecto. Hay que coordinarlo con el equipo para no duplicar esfuerzo.
+
+### 2.5 Recursos y carpetas
+
+| Recurso | Carpeta |
+| --- | --- |
+| Planeta y zonas | `assets/models/planets/halloween/` |
+| Personajes | `assets/models/characters/halloween/` |
+| Nave de zombies | `assets/models/ships/halloween/` |
+| Texturas | `assets/textures/planets/halloween/`, `assets/textures/characters/` |
+| Capturas y referencias | `docs/references/halloween/` |
+| Scripts de Blender | `tools/blender/halloween/` |
+
+### 2.6 Nave: nave de cuerpos
+
+Una nave **formada por zombies**: literalmente cuerpos sobre cuerpos, amontonados y entrelazados, que dan la forma de una nave. Tiene que dar miedo.
+
+- **Silueta clara de nave** desde lejos (forma de flecha o de nave de combate), para que se lea como nave y no como un montón informe.
+- **De cerca se notan los cuerpos:** brazos colgando y estirándose, cabezas, torsos retorcidos y manos aferradas a otras.
+- **Colores de carne podrida:** gris verdoso, morado, café y rojo oscuro. Sin brillo metálico.
+- **Propulsión:** brillo rojo/naranja de lava saliendo por detrás, conectado visualmente con el planeta.
+- **Low-poly:** se arma con **un solo modelo de zombie** (el mismo del planeta, o una versión aún más simple) **repetido y rotado** muchas veces sobre una forma base de nave. No se esculpe cada cuerpo.
+- La abducción de Ghost Face también sale de esta nave.
+
+### 2.7 Decisiones abiertas
+
+- [ ] Si Ghost Face se ve en el planeta antes de la abducción, y dónde.
