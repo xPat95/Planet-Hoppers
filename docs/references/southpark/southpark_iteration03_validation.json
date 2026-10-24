@@ -1,0 +1,30 @@
+{
+  "iteration": 3,
+  "buildings": 160,
+  "planet_objects": 496,
+  "mesh_objects": 494,
+  "unique_meshes": 226,
+  "triangles": 98328,
+  "vertices": 83476,
+  "materials": 28,
+  "sphere_geometry_unchanged": true,
+  "footing_gap_range": [
+    -0.009993884412207166,
+    -0.009669003151728361
+  ],
+  "radial_min_dot": 0.9999998906960172,
+  "root_tests": {
+    "translate": 1.9073486328125e-06,
+    "scale": 1.9073486328125e-06,
+    "rotate": 1.9073486328125e-06
+  },
+  "unparented_meshes": [],
+  "snowfx_empty": true,
+  "animated_objects": [],
+  "font_objects": [],
+  "building_footprint_overlaps": [],
+  "important_tree_building_contacts": [],
+  "important_tree_road_contacts": [],
+  "reopened_successfully": true,
+  "source_scripts_relative": true
+}

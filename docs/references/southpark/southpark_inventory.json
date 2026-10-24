@@ -1,0 +1,1167 @@
+{
+  "radius": 22.0,
+  "seed": 702,
+  "buildings": [
+    {
+      "id": "SP_B001",
+      "label": "Casa del barrio central 01",
+      "x": 528,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_central",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B001_House"
+    },
+    {
+      "id": "SP_B002",
+      "label": "Casa del barrio central 02",
+      "x": 557,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_central",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B002_House"
+    },
+    {
+      "id": "SP_B003",
+      "label": "Casa del barrio central 03",
+      "x": 586,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_central",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B003_House"
+    },
+    {
+      "id": "SP_B004",
+      "label": "Casa del barrio central 04",
+      "x": 616,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_central",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B004_House"
+    },
+    {
+      "id": "SP_B005",
+      "label": "Casa del barrio central 05",
+      "x": 647,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_central",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B005_House"
+    },
+    {
+      "id": "SP_B006",
+      "label": "Casa del barrio central 06",
+      "x": 676,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_central",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B006_House"
+    },
+    {
+      "id": "SP_B007",
+      "label": "Casa del barrio central 07",
+      "x": 708,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_central",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B007_House"
+    },
+    {
+      "id": "SP_B008",
+      "label": "Casa del barrio central 08",
+      "x": 738,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_central",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B008_House"
+    },
+    {
+      "id": "SP_B009",
+      "label": "Casa del barrio central 09",
+      "x": 775,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_central",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B009_House"
+    },
+    {
+      "id": "SP_B010",
+      "label": "Casa del barrio central 10",
+      "x": 805,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_central",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B010_House"
+    },
+    {
+      "id": "SP_B011",
+      "label": "Casa del barrio central 11",
+      "x": 839,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_central",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B011_House"
+    },
+    {
+      "id": "SP_B012",
+      "label": "Casa del barrio central 12",
+      "x": 869,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_central",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B012_House"
+    },
+    {
+      "id": "SP_B013",
+      "label": "Casa del barrio central 13",
+      "x": 897,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_central",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B013_House"
+    },
+    {
+      "id": "SP_B014",
+      "label": "Casa del barrio oriental 01",
+      "x": 1034,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_east",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B014_House"
+    },
+    {
+      "id": "SP_B015",
+      "label": "Casa del barrio oriental 02",
+      "x": 1062,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_east",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B015_House"
+    },
+    {
+      "id": "SP_B016",
+      "label": "Casa del barrio oriental 03",
+      "x": 1146,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_east",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B016_House"
+    },
+    {
+      "id": "SP_B017",
+      "label": "Casa del barrio oriental 04",
+      "x": 1175,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_east",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B017_House"
+    },
+    {
+      "id": "SP_B018",
+      "label": "Casa del barrio oriental 05",
+      "x": 1208,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_east",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B018_House"
+    },
+    {
+      "id": "SP_B019",
+      "label": "Casa del barrio oriental 06",
+      "x": 1235,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_east",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B019_House"
+    },
+    {
+      "id": "SP_B020",
+      "label": "Casa del barrio oriental 07",
+      "x": 1273,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_east",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B020_House"
+    },
+    {
+      "id": "SP_B021",
+      "label": "Casa del barrio oriental 08",
+      "x": 1305,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_east",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B021_House"
+    },
+    {
+      "id": "SP_B022",
+      "label": "Casa del barrio oriental 09",
+      "x": 1354,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_east",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B022_House"
+    },
+    {
+      "id": "SP_B023",
+      "label": "Casa del barrio oriental 10",
+      "x": 1382,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_east",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B023_House"
+    },
+    {
+      "id": "SP_B024",
+      "label": "Casa de segunda hilera central 01",
+      "x": 584,
+      "y": 304,
+      "kind": "house",
+      "sector": "residential_central_back",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B024_House"
+    },
+    {
+      "id": "SP_B025",
+      "label": "Casa de segunda hilera central 02",
+      "x": 664,
+      "y": 304,
+      "kind": "house",
+      "sector": "residential_central_back",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B025_House"
+    },
+    {
+      "id": "SP_B026",
+      "label": "Casa de segunda hilera central 03",
+      "x": 745,
+      "y": 304,
+      "kind": "house",
+      "sector": "residential_central_back",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B026_House"
+    },
+    {
+      "id": "SP_B027",
+      "label": "Casa de segunda hilera central 04",
+      "x": 786,
+      "y": 304,
+      "kind": "house",
+      "sector": "residential_central_back",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B027_House"
+    },
+    {
+      "id": "SP_B028",
+      "label": "Casa de segunda hilera central 05",
+      "x": 844,
+      "y": 304,
+      "kind": "house",
+      "sector": "residential_central_back",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B028_House"
+    },
+    {
+      "id": "SP_B029",
+      "label": "Casa de segunda hilera central 06",
+      "x": 887,
+      "y": 304,
+      "kind": "house",
+      "sector": "residential_central_back",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B029_House"
+    },
+    {
+      "id": "SP_B030",
+      "label": "Casa de segunda hilera oriental 01",
+      "x": 1030,
+      "y": 304,
+      "kind": "house",
+      "sector": "residential_east_back",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B030_House"
+    },
+    {
+      "id": "SP_B031",
+      "label": "Casa de segunda hilera oriental 02",
+      "x": 1100,
+      "y": 304,
+      "kind": "house",
+      "sector": "residential_east_back",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B031_House"
+    },
+    {
+      "id": "SP_B032",
+      "label": "Casa de segunda hilera oriental 03",
+      "x": 1146,
+      "y": 304,
+      "kind": "house",
+      "sector": "residential_east_back",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B032_House"
+    },
+    {
+      "id": "SP_B033",
+      "label": "Casa de segunda hilera oriental 04",
+      "x": 1202,
+      "y": 304,
+      "kind": "house",
+      "sector": "residential_east_back",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B033_House"
+    },
+    {
+      "id": "SP_B034",
+      "label": "Casa de segunda hilera oriental 05",
+      "x": 1248,
+      "y": 304,
+      "kind": "house",
+      "sector": "residential_east_back",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B034_House"
+    },
+    {
+      "id": "SP_B035",
+      "label": "Casa del sector noreste 01",
+      "x": 1138,
+      "y": 168,
+      "kind": "house",
+      "sector": "residential_northeast",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B035_House"
+    },
+    {
+      "id": "SP_B036",
+      "label": "Casa del sector noreste 02",
+      "x": 1162,
+      "y": 168,
+      "kind": "house",
+      "sector": "residential_northeast",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B036_House"
+    },
+    {
+      "id": "SP_B037",
+      "label": "Casa del sector noreste 03",
+      "x": 1188,
+      "y": 168,
+      "kind": "house",
+      "sector": "residential_northeast",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B037_House"
+    },
+    {
+      "id": "SP_B038",
+      "label": "Casa del sector noreste 04",
+      "x": 1210,
+      "y": 168,
+      "kind": "house",
+      "sector": "residential_northeast",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B038_House"
+    },
+    {
+      "id": "SP_B039",
+      "label": "Comercio del sector oeste 01",
+      "x": 286,
+      "y": 180,
+      "kind": "shop",
+      "sector": "commercial_west",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B039_Shop"
+    },
+    {
+      "id": "SP_B040",
+      "label": "Comercio del sector oeste 02",
+      "x": 340,
+      "y": 180,
+      "kind": "shop",
+      "sector": "commercial_west",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B040_Shop"
+    },
+    {
+      "id": "SP_B041",
+      "label": "Comercio del sector oeste 03",
+      "x": 405,
+      "y": 180,
+      "kind": "shop",
+      "sector": "commercial_west",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B041_Shop"
+    },
+    {
+      "id": "SP_B042",
+      "label": "Comercio del sector oeste 04",
+      "x": 484,
+      "y": 180,
+      "kind": "shop",
+      "sector": "commercial_west",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B042_Shop"
+    },
+    {
+      "id": "SP_B043",
+      "label": "Local del corredor comercial 01",
+      "x": 835,
+      "y": 261,
+      "kind": "shop",
+      "sector": "commercial_center",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B043_Shop"
+    },
+    {
+      "id": "SP_B044",
+      "label": "Local del corredor comercial 02",
+      "x": 867,
+      "y": 261,
+      "kind": "shop",
+      "sector": "commercial_center",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B044_Shop"
+    },
+    {
+      "id": "SP_B045",
+      "label": "Local del corredor comercial 03",
+      "x": 900,
+      "y": 261,
+      "kind": "shop",
+      "sector": "commercial_center",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B045_Shop"
+    },
+    {
+      "id": "SP_B046",
+      "label": "Local del corredor comercial 04",
+      "x": 927,
+      "y": 261,
+      "kind": "shop",
+      "sector": "commercial_center",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B046_Shop"
+    },
+    {
+      "id": "SP_B047",
+      "label": "Local del corredor comercial 05",
+      "x": 958,
+      "y": 261,
+      "kind": "shop",
+      "sector": "commercial_center",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B047_Shop"
+    },
+    {
+      "id": "SP_B048",
+      "label": "Local del corredor comercial 06",
+      "x": 989,
+      "y": 261,
+      "kind": "shop",
+      "sector": "commercial_center",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B048_Shop"
+    },
+    {
+      "id": "SP_B049",
+      "label": "Local del corredor comercial 07",
+      "x": 1018,
+      "y": 261,
+      "kind": "shop",
+      "sector": "commercial_center",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B049_Shop"
+    },
+    {
+      "id": "SP_B050",
+      "label": "Local del corredor comercial 08",
+      "x": 1058,
+      "y": 261,
+      "kind": "shop",
+      "sector": "commercial_center",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B050_Shop"
+    },
+    {
+      "id": "SP_B051",
+      "label": "Local del corredor comercial 09",
+      "x": 1153,
+      "y": 261,
+      "kind": "shop",
+      "sector": "commercial_center",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B051_Shop"
+    },
+    {
+      "id": "SP_B052",
+      "label": "Local del corredor comercial 10",
+      "x": 1199,
+      "y": 261,
+      "kind": "shop",
+      "sector": "commercial_center",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B052_Shop"
+    },
+    {
+      "id": "SP_B053",
+      "label": "Comercio al noreste 01",
+      "x": 1385,
+      "y": 208,
+      "kind": "shop",
+      "sector": "commercial_northeast",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B053_Shop"
+    },
+    {
+      "id": "SP_B054",
+      "label": "Comercio al noreste 02",
+      "x": 1450,
+      "y": 208,
+      "kind": "shop",
+      "sector": "commercial_northeast",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B054_Shop"
+    },
+    {
+      "id": "SP_B055",
+      "label": "Comercio al noreste 03",
+      "x": 1482,
+      "y": 208,
+      "kind": "shop",
+      "sector": "commercial_northeast",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B055_Shop"
+    },
+    {
+      "id": "SP_B056",
+      "label": "Comercio al noreste 04",
+      "x": 1513,
+      "y": 208,
+      "kind": "shop",
+      "sector": "commercial_northeast",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B056_Shop"
+    },
+    {
+      "id": "SP_B057",
+      "label": "Comercio del corredor oriental 01",
+      "x": 1290,
+      "y": 260,
+      "kind": "shop",
+      "sector": "commercial_east",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B057_Shop"
+    },
+    {
+      "id": "SP_B058",
+      "label": "Comercio del corredor oriental 02",
+      "x": 1320,
+      "y": 260,
+      "kind": "shop",
+      "sector": "commercial_east",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B058_Shop"
+    },
+    {
+      "id": "SP_B059",
+      "label": "Comercio del corredor oriental 03",
+      "x": 1390,
+      "y": 260,
+      "kind": "shop",
+      "sector": "commercial_east",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B059_Shop"
+    },
+    {
+      "id": "SP_B060",
+      "label": "Comercio del corredor oriental 04",
+      "x": 1420,
+      "y": 260,
+      "kind": "shop",
+      "sector": "commercial_east",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B060_Shop"
+    },
+    {
+      "id": "SP_B061",
+      "label": "Comercio del corredor oriental 05",
+      "x": 1450,
+      "y": 260,
+      "kind": "shop",
+      "sector": "commercial_east",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B061_Shop"
+    },
+    {
+      "id": "SP_B062",
+      "label": "Comercio del corredor oriental 06",
+      "x": 1480,
+      "y": 260,
+      "kind": "shop",
+      "sector": "commercial_east",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B062_Shop"
+    },
+    {
+      "id": "SP_B063",
+      "label": "Escuela amarilla y roja del suroeste",
+      "x": 235,
+      "y": 329,
+      "kind": "school",
+      "sector": "landmarks",
+      "palette": "Yellow",
+      "dimensions": [
+        5.2,
+        1.7,
+        2.0
+      ],
+      "object": "SP_B063_School"
+    },
+    {
+      "id": "SP_B064",
+      "label": "Edificio rectangular de varias plantas del oeste",
+      "x": 416,
+      "y": 245,
+      "kind": "office",
+      "sector": "public",
+      "palette": "Salmon",
+      "dimensions": [
+        3.7,
+        1.65,
+        2.8
+      ],
+      "object": "SP_B064_Office"
+    },
+    {
+      "id": "SP_B065",
+      "label": "Construccion ancha junto a la escuela",
+      "x": 390,
+      "y": 321,
+      "kind": "garage",
+      "sector": "public",
+      "palette": "Salmon",
+      "dimensions": [
+        3.0,
+        1.5,
+        1.15
+      ],
+      "object": "SP_B065_Garage"
+    },
+    {
+      "id": "SP_B066",
+      "label": "Edificio civico con cupula",
+      "x": 596,
+      "y": 246,
+      "kind": "civic",
+      "sector": "landmarks",
+      "palette": "Cream",
+      "dimensions": [
+        2.3,
+        1.8,
+        1.55
+      ],
+      "object": "SP_B066_Civic"
+    },
+    {
+      "id": "SP_B067",
+      "label": "Gran edificio amarillo con estacionamiento",
+      "x": 850,
+      "y": 160,
+      "kind": "mall",
+      "sector": "landmarks",
+      "palette": "Yellow",
+      "dimensions": [
+        8.4,
+        2.4,
+        1.85
+      ],
+      "object": "SP_B067_Mall"
+    },
+    {
+      "id": "SP_B068",
+      "label": "Torre pagoda roja del sector oeste",
+      "x": 450,
+      "y": 159,
+      "kind": "pagoda",
+      "sector": "landmarks",
+      "palette": "Red",
+      "dimensions": [
+        1.1,
+        1.1,
+        3.7
+      ],
+      "object": "SP_B068_Pagoda"
+    },
+    {
+      "id": "SP_B069",
+      "label": "Granero rojo del oeste",
+      "x": 242,
+      "y": 242,
+      "kind": "barn",
+      "sector": "landmarks",
+      "palette": "Red",
+      "dimensions": [
+        1.7,
+        1.7,
+        1.8
+      ],
+      "object": "SP_B069_Barn"
+    },
+    {
+      "id": "SP_B070",
+      "label": "Pabellon pequeno junto al edificio civico",
+      "x": 655,
+      "y": 250,
+      "kind": "pavilion",
+      "sector": "public",
+      "palette": "Teal",
+      "dimensions": [
+        1.3,
+        1.0,
+        0.95
+      ],
+      "object": "SP_B070_Pavilion"
+    },
+    {
+      "id": "SP_B071",
+      "label": "Edificio naranja del corredor noreste",
+      "x": 1324,
+      "y": 201,
+      "kind": "restaurant",
+      "sector": "commercial_northeast",
+      "palette": "Yellow",
+      "dimensions": [
+        3.1,
+        1.6,
+        1.55
+      ],
+      "object": "SP_B071_Restaurant"
+    }
+  ],
+  "building_count": 71,
+  "houses": 38,
+  "trees": 220,
+  "mountains": [
+    {
+      "object": "Mountain_01",
+      "x": 60,
+      "y": 113.01122455183676,
+      "height": 6.078904665444557
+    },
+    {
+      "object": "Mountain_02",
+      "x": 170,
+      "y": 107.1090029323597,
+      "height": 3.9336850524012945
+    },
+    {
+      "object": "Mountain_03",
+      "x": 280,
+      "y": 107.17385849379993,
+      "height": 6.183759471410701
+    },
+    {
+      "object": "Mountain_04",
+      "x": 390,
+      "y": 109.20010614648217,
+      "height": 5.544103054474419
+    },
+    {
+      "object": "Mountain_05",
+      "x": 500,
+      "y": 107.83846187121897,
+      "height": 5.401115714414671
+    },
+    {
+      "object": "Mountain_06",
+      "x": 610,
+      "y": 105.93916510902696,
+      "height": 4.610329239250086
+    },
+    {
+      "object": "Mountain_07",
+      "x": 720,
+      "y": 107.52732819365157,
+      "height": 4.351473202897094
+    },
+    {
+      "object": "Mountain_08",
+      "x": 830,
+      "y": 112.73861619606895,
+      "height": 4.152570396270145
+    },
+    {
+      "object": "Mountain_09",
+      "x": 940,
+      "y": 103.68946459329979,
+      "height": 5.97820143618914
+    },
+    {
+      "object": "Mountain_10",
+      "x": 1050,
+      "y": 101.73769753225868,
+      "height": 3.920867810960731
+    },
+    {
+      "object": "Mountain_11",
+      "x": 1160,
+      "y": 101.85541432222166,
+      "height": 5.065853064381126
+    },
+    {
+      "object": "Mountain_12",
+      "x": 1270,
+      "y": 102.69136791054069,
+      "height": 5.224835163209943
+    },
+    {
+      "object": "Mountain_13",
+      "x": 1380,
+      "y": 105.32619953089198,
+      "height": 5.783021444719695
+    },
+    {
+      "object": "Mountain_14",
+      "x": 1490,
+      "y": 111.63511918056746,
+      "height": 6.38041919708578
+    }
+  ],
+  "roads": [
+    {
+      "name": "North_Avenue",
+      "reference_points": [
+        [
+          235,
+          202
+        ],
+        [
+          1266,
+          202
+        ],
+        [
+          1266,
+          228
+        ],
+        [
+          1540,
+          228
+        ],
+        [
+          1540,
+          281
+        ]
+      ]
+    },
+    {
+      "name": "Central_Avenue",
+      "reference_points": [
+        [
+          145,
+          284
+        ],
+        [
+          1420,
+          284
+        ],
+        [
+          1420,
+          360
+        ]
+      ]
+    },
+    {
+      "name": "Residential_Avenue",
+      "reference_points": [
+        [
+          185,
+          360
+        ],
+        [
+          1454,
+          360
+        ]
+      ]
+    },
+    {
+      "name": "West_Link",
+      "reference_points": [
+        [
+          185,
+          284
+        ],
+        [
+          185,
+          360
+        ]
+      ]
+    },
+    {
+      "name": "Civic_Link",
+      "reference_points": [
+        [
+          475,
+          202
+        ],
+        [
+          475,
+          360
+        ]
+      ]
+    },
+    {
+      "name": "East_Link",
+      "reference_points": [
+        [
+          930,
+          284
+        ],
+        [
+          930,
+          360
+        ]
+      ]
+    },
+    {
+      "name": "Eastern_Link",
+      "reference_points": [
+        [
+          1266,
+          228
+        ],
+        [
+          1266,
+          284
+        ]
+      ]
+    },
+    {
+      "name": "Back_Road",
+      "reference_points": [
+        [
+          1454,
+          360
+        ],
+        [
+          1520,
+          360
+        ],
+        [
+          1570,
+          323
+        ],
+        [
+          1615,
+          280
+        ],
+        [
+          1700,
+          280
+        ],
+        [
+          1745,
+          284
+        ]
+      ]
+    },
+    {
+      "name": "Town_Entrance",
+      "reference_points": [
+        [
+          680,
+          202
+        ],
+        [
+          680,
+          165
+        ]
+      ]
+    }
+  ],
+  "coverage_note": "Objetivo de cobertura aproximada del mapa: se priorizan los volumenes principales. La imagen no permite confirmar un denominador preciso ni un porcentaje exacto; el inventario enumera construcciones representadas, no anexos ni decoracion.",
+  "generic_labels": true,
+  "map_transform": "longitud=(x-800)/1600*360; latitud=(280-y)*0.35 grados; normal radial local.",
+  "omitted": "Edificios minimos de los extremos, anexos ambiguos, detalles interiores, vehiculos, rotulos ilegibles, limites exactos de parcelas y el simbolo de Canada al extremo superior derecho.",
+  "sign_reference_xy": [
+    650,
+    164
+  ]
+}

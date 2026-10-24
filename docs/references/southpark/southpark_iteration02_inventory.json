@@ -1,0 +1,5601 @@
+{
+  "iteration": 2,
+  "buildings_before": 71,
+  "buildings_after": 160,
+  "new_buildings": 89,
+  "original_buildings_preserved": 71,
+  "sphere_geometry_sha256": "3c356f2950c2c6641e43ccddfb8ab045b62d6dccb69ae3c16c76d9bb4741a9b4",
+  "sphere_geometry_unchanged": true,
+  "original_road_geometry_unchanged": true,
+  "added_roads": [
+    "Infill_Main",
+    "Infill_West_Link",
+    "Infill_East_Link",
+    "South_Neighborhood",
+    "South_West_Link",
+    "South_East_Link"
+  ],
+  "buildings": [
+    {
+      "id": "SP_B063",
+      "label": "Escuela amarilla y roja del suroeste",
+      "x": 240,
+      "y": 329,
+      "kind": "school",
+      "sector": "landmarks",
+      "palette": "Yellow",
+      "dimensions": [
+        5.2,
+        1.7,
+        2.0
+      ],
+      "object": "SP_B063_School",
+      "scale_xyz": [
+        1.38,
+        1.45,
+        1.88
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B064",
+      "label": "Edificio rectangular de varias plantas del oeste",
+      "x": 416,
+      "y": 245,
+      "kind": "office",
+      "sector": "public",
+      "palette": "Salmon",
+      "dimensions": [
+        3.7,
+        1.65,
+        2.8
+      ],
+      "object": "SP_B064_Office",
+      "scale_xyz": [
+        1.28,
+        1.32,
+        1.75
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B065",
+      "label": "Construccion ancha junto a la escuela",
+      "x": 390,
+      "y": 321,
+      "kind": "garage",
+      "sector": "public",
+      "palette": "Salmon",
+      "dimensions": [
+        3.0,
+        1.5,
+        1.15
+      ],
+      "object": "SP_B065_Garage",
+      "scale_xyz": [
+        1.27,
+        1.35,
+        1.65
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B066",
+      "label": "Edificio civico con cupula",
+      "x": 596,
+      "y": 246,
+      "kind": "civic",
+      "sector": "landmarks",
+      "palette": "Cream",
+      "dimensions": [
+        2.3,
+        1.8,
+        1.55
+      ],
+      "object": "SP_B066_Civic",
+      "scale_xyz": [
+        1.4,
+        1.4,
+        1.6
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B067",
+      "label": "Gran edificio amarillo con estacionamiento",
+      "x": 850,
+      "y": 160,
+      "kind": "mall",
+      "sector": "landmarks",
+      "palette": "Yellow",
+      "dimensions": [
+        8.4,
+        2.4,
+        1.85
+      ],
+      "object": "SP_B067_Mall",
+      "scale_xyz": [
+        1.15,
+        1.2,
+        1.72
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B068",
+      "label": "Torre pagoda roja del sector oeste",
+      "x": 450,
+      "y": 159,
+      "kind": "pagoda",
+      "sector": "landmarks",
+      "palette": "Red",
+      "dimensions": [
+        1.1,
+        1.1,
+        3.7
+      ],
+      "object": "SP_B068_Pagoda",
+      "scale_xyz": [
+        1.3,
+        1.3,
+        1.55
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B069",
+      "label": "Granero rojo del oeste",
+      "x": 242,
+      "y": 242,
+      "kind": "barn",
+      "sector": "landmarks",
+      "palette": "Red",
+      "dimensions": [
+        1.7,
+        1.7,
+        1.8
+      ],
+      "object": "SP_B069_Barn",
+      "scale_xyz": [
+        1.38,
+        1.38,
+        1.68
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B070",
+      "label": "Pabellon pequeno junto al edificio civico",
+      "x": 655,
+      "y": 250,
+      "kind": "pavilion",
+      "sector": "public",
+      "palette": "Teal",
+      "dimensions": [
+        1.3,
+        1.0,
+        0.95
+      ],
+      "object": "SP_B070_Pavilion",
+      "scale_xyz": [
+        1.36,
+        1.36,
+        1.7
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B071",
+      "label": "Edificio naranja del corredor noreste",
+      "x": 1324,
+      "y": 201,
+      "kind": "restaurant",
+      "sector": "commercial_northeast",
+      "palette": "Yellow",
+      "dimensions": [
+        3.1,
+        1.6,
+        1.55
+      ],
+      "object": "SP_B071_Restaurant",
+      "scale_xyz": [
+        1.18,
+        1.28,
+        1.75
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B001",
+      "label": "Casa del barrio central 01",
+      "x": 505.0,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_central",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B001_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B002",
+      "label": "Casa del barrio central 02",
+      "x": 537.5,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_central",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B002_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B003",
+      "label": "Casa del barrio central 03",
+      "x": 570.0,
+      "y": 334,
+      "kind": "house",
+      "sector": "residential_central",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B003_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B004",
+      "label": "Casa del barrio central 04",
+      "x": 602.5,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_central",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B004_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B005",
+      "label": "Casa del barrio central 05",
+      "x": 635.0,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_central",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B005_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B006",
+      "label": "Casa del barrio central 06",
+      "x": 672.5,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_central",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B006_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B007",
+      "label": "Casa del barrio central 07",
+      "x": 705.0,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_central",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B007_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B008",
+      "label": "Casa del barrio central 08",
+      "x": 737.5,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_central",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B008_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B009",
+      "label": "Casa del barrio central 09",
+      "x": 770.0,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_central",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B009_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B010",
+      "label": "Casa del barrio central 10",
+      "x": 802.5,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_central",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B010_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B011",
+      "label": "Casa del barrio central 11",
+      "x": 840.0,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_central",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B011_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B012",
+      "label": "Casa del barrio central 12",
+      "x": 872.5,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_central",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B012_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B013",
+      "label": "Casa del barrio central 13",
+      "x": 905.0,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_central",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B013_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B014",
+      "label": "Casa del barrio oriental 01",
+      "x": 1034,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_east",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B014_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B015",
+      "label": "Casa del barrio oriental 02",
+      "x": 1067,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_east",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B015_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B016",
+      "label": "Casa del barrio oriental 03",
+      "x": 1146,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_east",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B016_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B017",
+      "label": "Casa del barrio oriental 04",
+      "x": 1180,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_east",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B017_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B018",
+      "label": "Casa del barrio oriental 05",
+      "x": 1213,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_east",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B018_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B019",
+      "label": "Casa del barrio oriental 06",
+      "x": 1251,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_east",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B019_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B020",
+      "label": "Casa del barrio oriental 07",
+      "x": 1283,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_east",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B020_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B021",
+      "label": "Casa del barrio oriental 08",
+      "x": 1315,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_east",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B021_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B022",
+      "label": "Casa del barrio oriental 09",
+      "x": 1354,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_east",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B022_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B023",
+      "label": "Casa del barrio oriental 10",
+      "x": 1387,
+      "y": 338,
+      "kind": "house",
+      "sector": "residential_east",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B023_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B024",
+      "label": "Casa de segunda hilera central 01",
+      "x": 584,
+      "y": 305,
+      "kind": "house",
+      "sector": "residential_central_back",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B024_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B025",
+      "label": "Casa de segunda hilera central 02",
+      "x": 664,
+      "y": 305,
+      "kind": "house",
+      "sector": "residential_central_back",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B025_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B026",
+      "label": "Casa de segunda hilera central 03",
+      "x": 745,
+      "y": 305,
+      "kind": "house",
+      "sector": "residential_central_back",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B026_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B027",
+      "label": "Casa de segunda hilera central 04",
+      "x": 786,
+      "y": 305,
+      "kind": "house",
+      "sector": "residential_central_back",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B027_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B028",
+      "label": "Casa de segunda hilera central 05",
+      "x": 844,
+      "y": 305,
+      "kind": "house",
+      "sector": "residential_central_back",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B028_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B029",
+      "label": "Casa de segunda hilera central 06",
+      "x": 887,
+      "y": 305,
+      "kind": "house",
+      "sector": "residential_central_back",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B029_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B030",
+      "label": "Casa de segunda hilera oriental 01",
+      "x": 1030,
+      "y": 305,
+      "kind": "house",
+      "sector": "residential_east_back",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B030_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B031",
+      "label": "Casa de segunda hilera oriental 02",
+      "x": 1100,
+      "y": 305,
+      "kind": "house",
+      "sector": "residential_east_back",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B031_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B032",
+      "label": "Casa de segunda hilera oriental 03",
+      "x": 1146,
+      "y": 305,
+      "kind": "house",
+      "sector": "residential_east_back",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B032_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B033",
+      "label": "Casa de segunda hilera oriental 04",
+      "x": 1202,
+      "y": 305,
+      "kind": "house",
+      "sector": "residential_east_back",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B033_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B034",
+      "label": "Casa de segunda hilera oriental 05",
+      "x": 1248,
+      "y": 305,
+      "kind": "house",
+      "sector": "residential_east_back",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B034_House",
+      "scale_xyz": [
+        1.27,
+        1.4,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B035",
+      "label": "Casa del sector noreste 01",
+      "x": 1110,
+      "y": 168,
+      "kind": "house",
+      "sector": "residential_northeast",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B035_House",
+      "scale_xyz": [
+        1.24,
+        1.38,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B036",
+      "label": "Casa del sector noreste 02",
+      "x": 1152,
+      "y": 168,
+      "kind": "house",
+      "sector": "residential_northeast",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B036_House",
+      "scale_xyz": [
+        1.24,
+        1.38,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B037",
+      "label": "Casa del sector noreste 03",
+      "x": 1194,
+      "y": 168,
+      "kind": "house",
+      "sector": "residential_northeast",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B037_House",
+      "scale_xyz": [
+        1.24,
+        1.38,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B038",
+      "label": "Casa del sector noreste 04",
+      "x": 1236,
+      "y": 168,
+      "kind": "house",
+      "sector": "residential_northeast",
+      "palette": null,
+      "dimensions": "casa simplificada, techo inclinado, nieve, ventanas y porche",
+      "object": "SP_B038_House",
+      "scale_xyz": [
+        1.24,
+        1.38,
+        1.9
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B039",
+      "label": "Comercio del sector oeste 01",
+      "x": 286,
+      "y": 180,
+      "kind": "shop",
+      "sector": "commercial_west",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B039_Shop",
+      "scale_xyz": [
+        1.18,
+        1.3,
+        1.88
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B040",
+      "label": "Comercio del sector oeste 02",
+      "x": 340,
+      "y": 180,
+      "kind": "shop",
+      "sector": "commercial_west",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B040_Shop",
+      "scale_xyz": [
+        1.18,
+        1.3,
+        1.88
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B041",
+      "label": "Comercio del sector oeste 03",
+      "x": 405,
+      "y": 180,
+      "kind": "shop",
+      "sector": "commercial_west",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B041_Shop",
+      "scale_xyz": [
+        1.18,
+        1.3,
+        1.88
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B042",
+      "label": "Comercio del sector oeste 04",
+      "x": 484,
+      "y": 184,
+      "kind": "shop",
+      "sector": "commercial_west",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B042_Shop",
+      "scale_xyz": [
+        1.18,
+        1.3,
+        1.88
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B043",
+      "label": "Local del corredor comercial 01",
+      "x": 835,
+      "y": 261,
+      "kind": "shop",
+      "sector": "commercial_center",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B043_Shop",
+      "scale_xyz": [
+        1.18,
+        1.3,
+        1.88
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B044",
+      "label": "Local del corredor comercial 02",
+      "x": 867,
+      "y": 261,
+      "kind": "shop",
+      "sector": "commercial_center",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B044_Shop",
+      "scale_xyz": [
+        1.18,
+        1.3,
+        1.88
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B045",
+      "label": "Local del corredor comercial 03",
+      "x": 900,
+      "y": 261,
+      "kind": "shop",
+      "sector": "commercial_center",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B045_Shop",
+      "scale_xyz": [
+        1.18,
+        1.3,
+        1.88
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B046",
+      "label": "Local del corredor comercial 04",
+      "x": 932,
+      "y": 261,
+      "kind": "shop",
+      "sector": "commercial_center",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B046_Shop",
+      "scale_xyz": [
+        1.18,
+        1.3,
+        1.88
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B047",
+      "label": "Local del corredor comercial 05",
+      "x": 963,
+      "y": 261,
+      "kind": "shop",
+      "sector": "commercial_center",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B047_Shop",
+      "scale_xyz": [
+        1.18,
+        1.3,
+        1.88
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B048",
+      "label": "Local del corredor comercial 06",
+      "x": 994,
+      "y": 261,
+      "kind": "shop",
+      "sector": "commercial_center",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B048_Shop",
+      "scale_xyz": [
+        1.18,
+        1.3,
+        1.88
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B049",
+      "label": "Local del corredor comercial 07",
+      "x": 1023,
+      "y": 261,
+      "kind": "shop",
+      "sector": "commercial_center",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B049_Shop",
+      "scale_xyz": [
+        1.18,
+        1.3,
+        1.88
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B050",
+      "label": "Local del corredor comercial 08",
+      "x": 1058,
+      "y": 261,
+      "kind": "shop",
+      "sector": "commercial_center",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B050_Shop",
+      "scale_xyz": [
+        1.18,
+        1.3,
+        1.88
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B051",
+      "label": "Local del corredor comercial 09",
+      "x": 1153,
+      "y": 261,
+      "kind": "shop",
+      "sector": "commercial_center",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B051_Shop",
+      "scale_xyz": [
+        1.18,
+        1.3,
+        1.88
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B052",
+      "label": "Local del corredor comercial 10",
+      "x": 1199,
+      "y": 261,
+      "kind": "shop",
+      "sector": "commercial_center",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B052_Shop",
+      "scale_xyz": [
+        1.18,
+        1.3,
+        1.88
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B053",
+      "label": "Comercio al noreste 01",
+      "x": 1385,
+      "y": 208,
+      "kind": "shop",
+      "sector": "commercial_northeast",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B053_Shop",
+      "scale_xyz": [
+        1.18,
+        1.3,
+        1.88
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B054",
+      "label": "Comercio al noreste 02",
+      "x": 1450,
+      "y": 208,
+      "kind": "shop",
+      "sector": "commercial_northeast",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B054_Shop",
+      "scale_xyz": [
+        1.18,
+        1.3,
+        1.88
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B055",
+      "label": "Comercio al noreste 03",
+      "x": 1482,
+      "y": 208,
+      "kind": "shop",
+      "sector": "commercial_northeast",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B055_Shop",
+      "scale_xyz": [
+        1.18,
+        1.3,
+        1.88
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B056",
+      "label": "Comercio al noreste 04",
+      "x": 1513,
+      "y": 212,
+      "kind": "shop",
+      "sector": "commercial_northeast",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B056_Shop",
+      "scale_xyz": [
+        1.18,
+        1.3,
+        1.88
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B057",
+      "label": "Comercio del corredor oriental 01",
+      "x": 1290,
+      "y": 260,
+      "kind": "shop",
+      "sector": "commercial_east",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B057_Shop",
+      "scale_xyz": [
+        1.18,
+        1.3,
+        1.88
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B058",
+      "label": "Comercio del corredor oriental 02",
+      "x": 1320,
+      "y": 260,
+      "kind": "shop",
+      "sector": "commercial_east",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B058_Shop",
+      "scale_xyz": [
+        1.18,
+        1.3,
+        1.88
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B059",
+      "label": "Comercio del corredor oriental 03",
+      "x": 1390,
+      "y": 260,
+      "kind": "shop",
+      "sector": "commercial_east",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B059_Shop",
+      "scale_xyz": [
+        1.18,
+        1.3,
+        1.88
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B060",
+      "label": "Comercio del corredor oriental 04",
+      "x": 1420,
+      "y": 260,
+      "kind": "shop",
+      "sector": "commercial_east",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B060_Shop",
+      "scale_xyz": [
+        1.18,
+        1.3,
+        1.88
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B061",
+      "label": "Comercio del corredor oriental 05",
+      "x": 1450,
+      "y": 260,
+      "kind": "shop",
+      "sector": "commercial_east",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B061_Shop",
+      "scale_xyz": [
+        1.18,
+        1.3,
+        1.88
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B062",
+      "label": "Comercio del corredor oriental 06",
+      "x": 1480,
+      "y": 260,
+      "kind": "shop",
+      "sector": "commercial_east",
+      "palette": null,
+      "dimensions": [
+        1.7,
+        1.3,
+        1.25
+      ],
+      "object": "SP_B062_Shop",
+      "scale_xyz": [
+        1.18,
+        1.3,
+        1.88
+      ],
+      "source": "v1_preserved"
+    },
+    {
+      "id": "SP_B072",
+      "object": "SP_B072_House",
+      "label": "Relleno reinterpretado del barrio: infill_north_block",
+      "x": 730,
+      "y": 220,
+      "kind": "house",
+      "sector": "infill_north_block",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B073",
+      "object": "SP_B073_House",
+      "label": "Relleno reinterpretado del barrio: infill_north_block",
+      "x": 769,
+      "y": 220,
+      "kind": "house",
+      "sector": "infill_north_block",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B074",
+      "object": "SP_B074_House",
+      "label": "Relleno reinterpretado del barrio: infill_north_block",
+      "x": 808,
+      "y": 220,
+      "kind": "house",
+      "sector": "infill_north_block",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B075",
+      "object": "SP_B075_House",
+      "label": "Relleno reinterpretado del barrio: infill_north_block",
+      "x": 847,
+      "y": 220,
+      "kind": "house",
+      "sector": "infill_north_block",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B076",
+      "object": "SP_B076_House",
+      "label": "Relleno reinterpretado del barrio: infill_north_block",
+      "x": 886,
+      "y": 220,
+      "kind": "house",
+      "sector": "infill_north_block",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B077",
+      "object": "SP_B077_House",
+      "label": "Relleno reinterpretado del barrio: infill_north_block",
+      "x": 925,
+      "y": 220,
+      "kind": "house",
+      "sector": "infill_north_block",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B078",
+      "object": "SP_B078_House",
+      "label": "Relleno reinterpretado del barrio: infill_north_block",
+      "x": 964,
+      "y": 220,
+      "kind": "house",
+      "sector": "infill_north_block",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B079",
+      "object": "SP_B079_House",
+      "label": "Relleno reinterpretado del barrio: infill_north_block",
+      "x": 1003,
+      "y": 220,
+      "kind": "house",
+      "sector": "infill_north_block",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B080",
+      "object": "SP_B080_House",
+      "label": "Relleno reinterpretado del barrio: infill_north_block",
+      "x": 1042,
+      "y": 220,
+      "kind": "house",
+      "sector": "infill_north_block",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B081",
+      "object": "SP_B081_House",
+      "label": "Relleno reinterpretado del barrio: infill_north_block",
+      "x": 1081,
+      "y": 220,
+      "kind": "house",
+      "sector": "infill_north_block",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B082",
+      "object": "SP_B082_House",
+      "label": "Relleno reinterpretado del barrio: infill_north_block",
+      "x": 1120,
+      "y": 220,
+      "kind": "house",
+      "sector": "infill_north_block",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B083",
+      "object": "SP_B083_House",
+      "label": "Relleno reinterpretado del barrio: infill_north_block",
+      "x": 1159,
+      "y": 220,
+      "kind": "house",
+      "sector": "infill_north_block",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B084",
+      "object": "SP_B084_House",
+      "label": "Relleno reinterpretado del barrio: infill_north_block",
+      "x": 1198,
+      "y": 220,
+      "kind": "house",
+      "sector": "infill_north_block",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B085",
+      "object": "SP_B085_House",
+      "label": "Relleno reinterpretado del barrio: infill_central_back",
+      "x": 525,
+      "y": 305,
+      "kind": "house",
+      "sector": "infill_central_back",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B086",
+      "object": "SP_B086_House",
+      "label": "Relleno reinterpretado del barrio: infill_central_back",
+      "x": 616,
+      "y": 305,
+      "kind": "house",
+      "sector": "infill_central_back",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B087",
+      "object": "SP_B087_House",
+      "label": "Relleno reinterpretado del barrio: infill_central_back",
+      "x": 693,
+      "y": 305,
+      "kind": "house",
+      "sector": "infill_central_back",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B088",
+      "object": "SP_B088_House",
+      "label": "Relleno reinterpretado del barrio: infill_east_back",
+      "x": 992,
+      "y": 305,
+      "kind": "house",
+      "sector": "infill_east_back",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B089",
+      "object": "SP_B089_House",
+      "label": "Relleno reinterpretado del barrio: infill_east_back",
+      "x": 1067,
+      "y": 305,
+      "kind": "house",
+      "sector": "infill_east_back",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B090",
+      "object": "SP_B090_House",
+      "label": "Relleno reinterpretado del barrio: infill_east_back",
+      "x": 1282,
+      "y": 305,
+      "kind": "house",
+      "sector": "infill_east_back",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B091",
+      "object": "SP_B091_House",
+      "label": "Relleno reinterpretado del barrio: infill_east_back",
+      "x": 1312,
+      "y": 305,
+      "kind": "house",
+      "sector": "infill_east_back",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B092",
+      "object": "SP_B092_House",
+      "label": "Relleno reinterpretado del barrio: infill_east_back",
+      "x": 1352,
+      "y": 305,
+      "kind": "house",
+      "sector": "infill_east_back",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B093",
+      "object": "SP_B093_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_front",
+      "x": 520,
+      "y": 379,
+      "kind": "house",
+      "sector": "infill_south_front",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B094",
+      "object": "SP_B094_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_front",
+      "x": 560,
+      "y": 379,
+      "kind": "house",
+      "sector": "infill_south_front",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B095",
+      "object": "SP_B095_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_front",
+      "x": 600,
+      "y": 379,
+      "kind": "house",
+      "sector": "infill_south_front",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B096",
+      "object": "SP_B096_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_front",
+      "x": 640,
+      "y": 379,
+      "kind": "house",
+      "sector": "infill_south_front",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B097",
+      "object": "SP_B097_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_front",
+      "x": 680,
+      "y": 379,
+      "kind": "house",
+      "sector": "infill_south_front",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B098",
+      "object": "SP_B098_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_front",
+      "x": 720,
+      "y": 379,
+      "kind": "house",
+      "sector": "infill_south_front",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B099",
+      "object": "SP_B099_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_front",
+      "x": 760,
+      "y": 379,
+      "kind": "house",
+      "sector": "infill_south_front",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B100",
+      "object": "SP_B100_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_front",
+      "x": 800,
+      "y": 379,
+      "kind": "house",
+      "sector": "infill_south_front",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B101",
+      "object": "SP_B101_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_front",
+      "x": 840,
+      "y": 379,
+      "kind": "house",
+      "sector": "infill_south_front",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B102",
+      "object": "SP_B102_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_front",
+      "x": 880,
+      "y": 379,
+      "kind": "house",
+      "sector": "infill_south_front",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B103",
+      "object": "SP_B103_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_front",
+      "x": 920,
+      "y": 379,
+      "kind": "house",
+      "sector": "infill_south_front",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B104",
+      "object": "SP_B104_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_front",
+      "x": 960,
+      "y": 379,
+      "kind": "house",
+      "sector": "infill_south_front",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B105",
+      "object": "SP_B105_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_front",
+      "x": 1000,
+      "y": 379,
+      "kind": "house",
+      "sector": "infill_south_front",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B106",
+      "object": "SP_B106_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_front",
+      "x": 1040,
+      "y": 379,
+      "kind": "house",
+      "sector": "infill_south_front",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B107",
+      "object": "SP_B107_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_front",
+      "x": 1080,
+      "y": 379,
+      "kind": "house",
+      "sector": "infill_south_front",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B108",
+      "object": "SP_B108_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_front",
+      "x": 1120,
+      "y": 379,
+      "kind": "house",
+      "sector": "infill_south_front",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B109",
+      "object": "SP_B109_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_front",
+      "x": 1160,
+      "y": 379,
+      "kind": "house",
+      "sector": "infill_south_front",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B110",
+      "object": "SP_B110_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_front",
+      "x": 1200,
+      "y": 379,
+      "kind": "house",
+      "sector": "infill_south_front",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B111",
+      "object": "SP_B111_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_front",
+      "x": 1240,
+      "y": 379,
+      "kind": "house",
+      "sector": "infill_south_front",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B112",
+      "object": "SP_B112_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_front",
+      "x": 1280,
+      "y": 379,
+      "kind": "house",
+      "sector": "infill_south_front",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B113",
+      "object": "SP_B113_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_front",
+      "x": 1320,
+      "y": 379,
+      "kind": "house",
+      "sector": "infill_south_front",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B114",
+      "object": "SP_B114_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_front",
+      "x": 1360,
+      "y": 379,
+      "kind": "house",
+      "sector": "infill_south_front",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B115",
+      "object": "SP_B115_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_back",
+      "x": 520,
+      "y": 422,
+      "kind": "house",
+      "sector": "infill_south_back",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B116",
+      "object": "SP_B116_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_back",
+      "x": 569,
+      "y": 422,
+      "kind": "house",
+      "sector": "infill_south_back",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B117",
+      "object": "SP_B117_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_back",
+      "x": 618,
+      "y": 422,
+      "kind": "house",
+      "sector": "infill_south_back",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B118",
+      "object": "SP_B118_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_back",
+      "x": 668,
+      "y": 422,
+      "kind": "house",
+      "sector": "infill_south_back",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B119",
+      "object": "SP_B119_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_back",
+      "x": 740,
+      "y": 422,
+      "kind": "house",
+      "sector": "infill_south_back",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B120",
+      "object": "SP_B120_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_back",
+      "x": 789,
+      "y": 422,
+      "kind": "house",
+      "sector": "infill_south_back",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B121",
+      "object": "SP_B121_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_back",
+      "x": 838,
+      "y": 422,
+      "kind": "house",
+      "sector": "infill_south_back",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B122",
+      "object": "SP_B122_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_back",
+      "x": 888,
+      "y": 422,
+      "kind": "house",
+      "sector": "infill_south_back",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B123",
+      "object": "SP_B123_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_back",
+      "x": 960,
+      "y": 422,
+      "kind": "house",
+      "sector": "infill_south_back",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B124",
+      "object": "SP_B124_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_back",
+      "x": 1009,
+      "y": 422,
+      "kind": "house",
+      "sector": "infill_south_back",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B125",
+      "object": "SP_B125_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_back",
+      "x": 1058,
+      "y": 422,
+      "kind": "house",
+      "sector": "infill_south_back",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B126",
+      "object": "SP_B126_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_back",
+      "x": 1108,
+      "y": 422,
+      "kind": "house",
+      "sector": "infill_south_back",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B127",
+      "object": "SP_B127_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_back",
+      "x": 1180,
+      "y": 422,
+      "kind": "house",
+      "sector": "infill_south_back",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B128",
+      "object": "SP_B128_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_back",
+      "x": 1229,
+      "y": 422,
+      "kind": "house",
+      "sector": "infill_south_back",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B129",
+      "object": "SP_B129_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_back",
+      "x": 1278,
+      "y": 422,
+      "kind": "house",
+      "sector": "infill_south_back",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B130",
+      "object": "SP_B130_House",
+      "label": "Relleno reinterpretado del barrio: infill_south_back",
+      "x": 1328,
+      "y": 422,
+      "kind": "house",
+      "sector": "infill_south_back",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B131",
+      "object": "SP_B131_Shop",
+      "label": "Relleno reinterpretado del barrio: infill_main_street",
+      "x": 206,
+      "y": 258,
+      "kind": "shop",
+      "sector": "infill_main_street",
+      "scale_xyz": [
+        1.15,
+        1.24,
+        1.82
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B132",
+      "object": "SP_B132_Shop",
+      "label": "Relleno reinterpretado del barrio: infill_main_street",
+      "x": 275,
+      "y": 258,
+      "kind": "shop",
+      "sector": "infill_main_street",
+      "scale_xyz": [
+        1.15,
+        1.24,
+        1.82
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B133",
+      "object": "SP_B133_Shop",
+      "label": "Relleno reinterpretado del barrio: infill_main_street",
+      "x": 313,
+      "y": 258,
+      "kind": "shop",
+      "sector": "infill_main_street",
+      "scale_xyz": [
+        1.15,
+        1.24,
+        1.82
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B134",
+      "object": "SP_B134_Shop",
+      "label": "Relleno reinterpretado del barrio: infill_main_street",
+      "x": 350,
+      "y": 258,
+      "kind": "shop",
+      "sector": "infill_main_street",
+      "scale_xyz": [
+        1.15,
+        1.24,
+        1.82
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B135",
+      "object": "SP_B135_Shop",
+      "label": "Relleno reinterpretado del barrio: infill_main_street",
+      "x": 530,
+      "y": 258,
+      "kind": "shop",
+      "sector": "infill_main_street",
+      "scale_xyz": [
+        1.15,
+        1.24,
+        1.82
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B136",
+      "object": "SP_B136_Shop",
+      "label": "Relleno reinterpretado del barrio: infill_main_street",
+      "x": 558,
+      "y": 258,
+      "kind": "shop",
+      "sector": "infill_main_street",
+      "scale_xyz": [
+        1.15,
+        1.24,
+        1.82
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B137",
+      "object": "SP_B137_Shop",
+      "label": "Relleno reinterpretado del barrio: infill_main_street",
+      "x": 720,
+      "y": 258,
+      "kind": "shop",
+      "sector": "infill_main_street",
+      "scale_xyz": [
+        1.15,
+        1.24,
+        1.82
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B138",
+      "object": "SP_B138_Shop",
+      "label": "Relleno reinterpretado del barrio: infill_main_street",
+      "x": 760,
+      "y": 258,
+      "kind": "shop",
+      "sector": "infill_main_street",
+      "scale_xyz": [
+        1.15,
+        1.24,
+        1.82
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B139",
+      "object": "SP_B139_Shop",
+      "label": "Relleno reinterpretado del barrio: infill_main_street",
+      "x": 795,
+      "y": 258,
+      "kind": "shop",
+      "sector": "infill_main_street",
+      "scale_xyz": [
+        1.15,
+        1.24,
+        1.82
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B140",
+      "object": "SP_B140_House",
+      "label": "Relleno reinterpretado del barrio: infill_west_block",
+      "x": 225,
+      "y": 219,
+      "kind": "house",
+      "sector": "infill_west_block",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B141",
+      "object": "SP_B141_House",
+      "label": "Relleno reinterpretado del barrio: infill_west_block",
+      "x": 275,
+      "y": 219,
+      "kind": "house",
+      "sector": "infill_west_block",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B142",
+      "object": "SP_B142_House",
+      "label": "Relleno reinterpretado del barrio: infill_west_block",
+      "x": 325,
+      "y": 219,
+      "kind": "house",
+      "sector": "infill_west_block",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B143",
+      "object": "SP_B143_House",
+      "label": "Relleno reinterpretado del barrio: infill_west_block",
+      "x": 365,
+      "y": 219,
+      "kind": "house",
+      "sector": "infill_west_block",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B144",
+      "object": "SP_B144_House",
+      "label": "Relleno reinterpretado del barrio: infill_west_block",
+      "x": 530,
+      "y": 219,
+      "kind": "house",
+      "sector": "infill_west_block",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B145",
+      "object": "SP_B145_House",
+      "label": "Relleno reinterpretado del barrio: infill_west_block",
+      "x": 575,
+      "y": 219,
+      "kind": "house",
+      "sector": "infill_west_block",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B146",
+      "object": "SP_B146_House",
+      "label": "Relleno reinterpretado del barrio: infill_north_avenue",
+      "x": 520,
+      "y": 177,
+      "kind": "house",
+      "sector": "infill_north_avenue",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B147",
+      "object": "SP_B147_House",
+      "label": "Relleno reinterpretado del barrio: infill_north_avenue",
+      "x": 565,
+      "y": 177,
+      "kind": "house",
+      "sector": "infill_north_avenue",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B148",
+      "object": "SP_B148_House",
+      "label": "Relleno reinterpretado del barrio: infill_north_avenue",
+      "x": 735,
+      "y": 177,
+      "kind": "house",
+      "sector": "infill_north_avenue",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B149",
+      "object": "SP_B149_House",
+      "label": "Relleno reinterpretado del barrio: infill_north_avenue",
+      "x": 980,
+      "y": 177,
+      "kind": "house",
+      "sector": "infill_north_avenue",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B150",
+      "object": "SP_B150_House",
+      "label": "Relleno reinterpretado del barrio: infill_north_avenue",
+      "x": 1020,
+      "y": 177,
+      "kind": "house",
+      "sector": "infill_north_avenue",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B151",
+      "object": "SP_B151_House",
+      "label": "Relleno reinterpretado del barrio: infill_north_avenue",
+      "x": 1060,
+      "y": 177,
+      "kind": "house",
+      "sector": "infill_north_avenue",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B152",
+      "object": "SP_B152_House",
+      "label": "Relleno reinterpretado del barrio: infill_back_neighborhood",
+      "x": 1460,
+      "y": 316,
+      "kind": "house",
+      "sector": "infill_back_neighborhood",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B153",
+      "object": "SP_B153_House",
+      "label": "Relleno reinterpretado del barrio: infill_back_neighborhood",
+      "x": 1505,
+      "y": 316,
+      "kind": "house",
+      "sector": "infill_back_neighborhood",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B154",
+      "object": "SP_B154_House",
+      "label": "Relleno reinterpretado del barrio: infill_back_neighborhood",
+      "x": 1550,
+      "y": 308,
+      "kind": "house",
+      "sector": "infill_back_neighborhood",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B155",
+      "object": "SP_B155_House",
+      "label": "Relleno reinterpretado del barrio: infill_back_neighborhood",
+      "x": 1605,
+      "y": 324,
+      "kind": "house",
+      "sector": "infill_back_neighborhood",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B156",
+      "object": "SP_B156_House",
+      "label": "Relleno reinterpretado del barrio: infill_west_residential",
+      "x": 230,
+      "y": 379,
+      "kind": "house",
+      "sector": "infill_west_residential",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B157",
+      "object": "SP_B157_House",
+      "label": "Relleno reinterpretado del barrio: infill_west_residential",
+      "x": 275,
+      "y": 379,
+      "kind": "house",
+      "sector": "infill_west_residential",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B158",
+      "object": "SP_B158_House",
+      "label": "Relleno reinterpretado del barrio: infill_west_residential",
+      "x": 320,
+      "y": 379,
+      "kind": "house",
+      "sector": "infill_west_residential",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B159",
+      "object": "SP_B159_House",
+      "label": "Relleno reinterpretado del barrio: infill_west_residential",
+      "x": 365,
+      "y": 379,
+      "kind": "house",
+      "sector": "infill_west_residential",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    },
+    {
+      "id": "SP_B160",
+      "object": "SP_B160_House",
+      "label": "Relleno reinterpretado del barrio: infill_west_residential",
+      "x": 410,
+      "y": 379,
+      "kind": "house",
+      "sector": "infill_west_residential",
+      "scale_xyz": [
+        1.22,
+        1.34,
+        1.78
+      ],
+      "source": "v2_neighborhood_infill"
+    }
+  ],
+  "mountains": [
+    {
+      "object": "Mountain_01",
+      "x": 200,
+      "y": 156,
+      "scale": [
+        1.100000023841858,
+        0.8199999928474426,
+        0.7200000286102295
+      ]
+    },
+    {
+      "object": "Mountain_02",
+      "x": 300,
+      "y": 126,
+      "scale": [
+        1.2100000381469727,
+        0.9399999976158142,
+        0.8199999928474426
+      ]
+    },
+    {
+      "object": "Mountain_03",
+      "x": 380,
+      "y": 100,
+      "scale": [
+        1.3200000524520874,
+        1.059999942779541,
+        0.9200000166893005
+      ]
+    },
+    {
+      "object": "Mountain_04",
+      "x": 480,
+      "y": 115,
+      "scale": [
+        1.100000023841858,
+        1.1799999475479126,
+        1.0199999809265137
+      ]
+    },
+    {
+      "object": "Mountain_05",
+      "x": 560,
+      "y": 142,
+      "scale": [
+        1.2100000381469727,
+        0.8199999928474426,
+        1.1200000047683716
+      ]
+    },
+    {
+      "object": "Mountain_06",
+      "x": 660,
+      "y": 117,
+      "scale": [
+        1.3200000524520874,
+        0.9399999976158142,
+        0.7200000286102295
+      ]
+    },
+    {
+      "object": "Mountain_07",
+      "x": 750,
+      "y": 90,
+      "scale": [
+        1.100000023841858,
+        1.059999942779541,
+        0.8199999928474426
+      ]
+    },
+    {
+      "object": "Mountain_08",
+      "x": 820,
+      "y": 60,
+      "scale": [
+        1.2100000381469727,
+        1.1799999475479126,
+        0.9200000166893005
+      ]
+    },
+    {
+      "object": "Mountain_09",
+      "x": 940,
+      "y": 83,
+      "scale": [
+        1.3200000524520874,
+        0.8199999928474426,
+        1.0199999809265137
+      ]
+    },
+    {
+      "object": "Mountain_10",
+      "x": 1030,
+      "y": 110,
+      "scale": [
+        1.100000023841858,
+        0.9399999976158142,
+        1.1200000047683716
+      ]
+    },
+    {
+      "object": "Mountain_11",
+      "x": 1150,
+      "y": 103,
+      "scale": [
+        1.2100000381469727,
+        1.059999942779541,
+        0.7200000286102295
+      ]
+    },
+    {
+      "object": "Mountain_12",
+      "x": 1260,
+      "y": 120,
+      "scale": [
+        1.3200000524520874,
+        1.1799999475479126,
+        0.8199999928474426
+      ]
+    },
+    {
+      "object": "Mountain_13",
+      "x": 1360,
+      "y": 144,
+      "scale": [
+        1.100000023841858,
+        0.8199999928474426,
+        0.9200000166893005
+      ]
+    },
+    {
+      "object": "Mountain_14",
+      "x": 1080,
+      "y": 65,
+      "scale": [
+        1.2100000381469727,
+        0.9399999976158142,
+        1.0199999809265137
+      ]
+    }
+  ],
+  "trees": [
+    {
+      "object": "Pine_001",
+      "x": 127.6491864126582,
+      "y": 205.20287276777563,
+      "position": [
+        -9.438654899597168,
+        17.225017547607422,
+        9.655884742736816
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_002",
+      "x": 936.0359478105229,
+      "y": 142.69582839533368,
+      "position": [
+        7.493765354156494,
+        -12.667182922363281,
+        16.378215789794922
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_003",
+      "x": 887.0110634785106,
+      "y": 140.39899464623218,
+      "position": [
+        4.859999656677246,
+        -13.66545295715332,
+        16.602968215942383
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_004",
+      "x": 1432.990412749474,
+      "y": 166.96078768469616,
+      "position": [
+        10.339914321899414,
+        13.437731742858887,
+        14.008675575256348
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_005",
+      "x": 1024.0631442845056,
+      "y": 136.81850479048327,
+      "position": [
+        10.864152908325195,
+        -8.983072280883789,
+        16.86791229248047
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_006",
+      "x": 148.01476810330996,
+      "y": 382.3294133357288,
+      "position": [
+        -9.789840698242188,
+        14.901724815368652,
+        -12.86650562286377
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_007",
+      "x": 118.21200367432591,
+      "y": 403.78320942255505,
+      "position": [
+        -7.154321193695068,
+        14.28828239440918,
+        -15.07087516784668
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_008",
+      "x": 425.0149996740849,
+      "y": 408.6663594937429,
+      "position": [
+        -15.469291687011719,
+        -1.5245124101638794,
+        -15.562271118164062
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_009",
+      "x": 837.8166181975317,
+      "y": 481.813845655787,
+      "position": [
+        1.0813101530075073,
+        -7.22767448425293,
+        -20.792865753173828
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_010",
+      "x": 1123.4362756250364,
+      "y": 451.7802103844404,
+      "position": [
+        10.46019172668457,
+        -3.243340015411377,
+        -19.062963485717773
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_011",
+      "x": 1507.6286908102124,
+      "y": 391.3246287620486,
+      "position": [
+        6.08228874206543,
+        16.025602340698242,
+        -13.862502098083496
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_012",
+      "x": 93.21132230078447,
+      "y": 290.7243687664745,
+      "position": [
+        -7.8251051902771,
+        20.414325714111328,
+        -1.4343085289001465
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_013",
+      "x": 239.50175845773174,
+      "y": 459.3471932821146,
+      "position": [
+        -8.125962257385254,
+        5.9281840324401855,
+        -19.54793357849121
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_014",
+      "x": 1393.8262192433658,
+      "y": 240.2465400543664,
+      "position": [
+        15.46756362915039,
+        14.735173225402832,
+        5.292193412780762
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_015",
+      "x": 286.98863378514227,
+      "y": 433.2494030964988,
+      "position": [
+        -11.78743839263916,
+        5.604036331176758,
+        -17.727144241333008
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_016",
+      "x": 485.9015480141354,
+      "y": 481.30944514274375,
+      "position": [
+        -6.948857307434082,
+        -2.4372475147247314,
+        -20.74697494506836
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_017",
+      "x": 1423.3193227803886,
+      "y": 472.70562722024545,
+      "position": [
+        5.392027854919434,
+        6.482483386993408,
+        -20.303178787231445
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_018",
+      "x": 29.672650434098298,
+      "y": 407.89014961191043,
+      "position": [
+        -1.8104546070098877,
+        15.466767311096191,
+        -15.443289756774902
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_019",
+      "x": 1471.581168827948,
+      "y": 187.03519902586606,
+      "position": [
+        8.976682662963867,
+        16.265098571777344,
+        11.852540016174316
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_020",
+      "x": 352.5027566937575,
+      "y": 154.9398381641025,
+      "position": [
+        -15.673539161682129,
+        2.957828998565674,
+        15.28022289276123
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_021",
+      "x": 1409.9144603957895,
+      "y": 159.630678827873,
+      "position": [
+        11.068986892700195,
+        11.966296195983887,
+        14.743993759155273
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_022",
+      "x": 1499.6841051314211,
+      "y": 165.56950425494807,
+      "position": [
+        6.479691505432129,
+        15.588635444641113,
+        14.190893173217773
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_023",
+      "x": 121.53960752458855,
+      "y": 380.6080929022467,
+      "position": [
+        -8.241647720336914,
+        15.936213493347168,
+        -12.662162780761719
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_024",
+      "x": 1458.719787180895,
+      "y": 155.22819034822183,
+      "position": [
+        8.388687133789062,
+        13.535870552062988,
+        15.201913833618164
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_025",
+      "x": 73.81332627165304,
+      "y": 360.789312054173,
+      "position": [
+        -5.514817714691162,
+        18.489660263061523,
+        -10.37874984741211
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_026",
+      "x": 394.5120939216063,
+      "y": 397.723847525408,
+      "position": [
+        -16.540998458862305,
+        0.3565295338630676,
+        -14.485620498657227
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_027",
+      "x": 745.0421235320139,
+      "y": 452.1571470594005,
+      "position": [
+        -2.3359375,
+        -10.655021667480469,
+        -19.089038848876953
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_028",
+      "x": 1084.8739158912192,
+      "y": 455.0934886493958,
+      "position": [
+        9.506046295166016,
+        -4.616578578948975,
+        -19.288610458374023
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_029",
+      "x": 1537.3339621195357,
+      "y": 410.5368905173322,
+      "position": [
+        3.7444074153900146,
+        14.907265663146973,
+        -15.743919372558594
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_030",
+      "x": 537.6789043236002,
+      "y": 446.7515735332719,
+      "position": [
+        -9.894906997680664,
+        -5.940231800079346,
+        -18.732608795166016
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_031",
+      "x": 497.41823888592455,
+      "y": 231.4273225490413,
+      "position": [
+        -19.553359985351562,
+        -7.867974281311035,
+        6.444053649902344
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_032",
+      "x": 231.22462949598935,
+      "y": 468.47480902046357,
+      "position": [
+        -7.053965091705322,
+        5.506099224090576,
+        -20.06676483154297
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_033",
+      "x": 216.01111107092785,
+      "y": 429.92539121899773,
+      "position": [
+        -10.056469917297363,
+        8.865190505981445,
+        -17.454723358154297
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_034",
+      "x": 417.8263475309687,
+      "y": 464.8988667390906,
+      "position": [
+        -9.389395713806152,
+        -0.6583701372146606,
+        -19.92533302307129
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_035",
+      "x": 1484.122952535882,
+      "y": 441.4789343112843,
+      "position": [
+        5.342357158660889,
+        10.918448448181152,
+        -18.377059936523438
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_036",
+      "x": -17.80932000641063,
+      "y": 405.76433315914807,
+      "position": [
+        1.1032304763793945,
+        15.748897552490234,
+        -15.255133628845215
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_037",
+      "x": 1055.951564398288,
+      "y": 155.48987139052548,
+      "position": [
+        13.43520736694336,
+        -8.529826164245605,
+        15.14355754852295
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_038",
+      "x": 971.2916485812391,
+      "y": 150.77122280854485,
+      "position": [
+        9.651238441467285,
+        -12.115628242492676,
+        15.61473274230957
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_039",
+      "x": 999.169744474067,
+      "y": 151.34062116739315,
+      "position": [
+        10.947818756103516,
+        -11.019441604614258,
+        15.549981117248535
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_040",
+      "x": 381.75748804678415,
+      "y": 404.74004562422346,
+      "position": [
+        -15.870414733886719,
+        1.1388764381408691,
+        -15.183337211608887
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_041",
+      "x": 91.72649828812713,
+      "y": 396.1694819539307,
+      "position": [
+        -5.86649227142334,
+        15.57579517364502,
+        -14.295509338378906
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_042",
+      "x": 418.4780730105226,
+      "y": 424.2604127316881,
+      "position": [
+        -13.961359977722168,
+        -1.014863133430481,
+        -16.9758243560791
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_043",
+      "x": 155.18296825632575,
+      "y": 365.5599832198358,
+      "position": [
+        -10.905414581298828,
+        15.623148918151855,
+        -10.976232528686523
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_044",
+      "x": 416.73646627766465,
+      "y": 439.39559682906156,
+      "position": [
+        -12.35070514678955,
+        -0.8129079937934875,
+        -18.204944610595703
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_045",
+      "x": 776.5149703879123,
+      "y": 477.1231486250248,
+      "position": [
+        -0.7273136973381042,
+        -7.863882541656494,
+        -20.566146850585938
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_046",
+      "x": 1195.8642172266584,
+      "y": 448.42194458658213,
+      "position": [
+        11.330582618713379,
+        -0.1840382218360901,
+        -18.82079315185547
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_047",
+      "x": 1487.3924294498397,
+      "y": 408.1524537448244,
+      "position": [
+        6.692348957061768,
+        14.134331703186035,
+        -15.558788299560547
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_048",
+      "x": 93.87234802158613,
+      "y": 308.01433961749916,
+      "position": [
+        -7.7795939445495605,
+        20.13901710510254,
+        -3.7310843467712402
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_049",
+      "x": 182.74934600369292,
+      "y": 443.4237968367732,
+      "position": [
+        -7.832873821258545,
+        8.973109245300293,
+        -18.480981826782227
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_050",
+      "x": 133.49647365028005,
+      "y": 447.08232011671885,
+      "position": [
+        -5.751015663146973,
+        9.946330070495605,
+        -18.73325538635254
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_051",
+      "x": 416.501615875733,
+      "y": 474.8724883194084,
+      "position": [
+        -8.167978286743164,
+        -0.5300409197807312,
+        -20.469919204711914
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_052",
+      "x": 456.0331243472628,
+      "y": 473.51498342601855,
+      "position": [
+        -8.147881507873535,
+        -1.8223801851272583,
+        -20.388086318969727
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_053",
+      "x": 1344.9345056292375,
+      "y": 448.52756520075104,
+      "position": [
+        9.551620483398438,
+        6.110927104949951,
+        -18.860107421875
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_054",
+      "x": 131.13244825929368,
+      "y": 220.95407890680443,
+      "position": [
+        -10.082111358642578,
+        17.81658935546875,
+        7.721662521362305
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_055",
+      "x": 187.55754218951748,
+      "y": 209.08059985022646,
+      "position": [
+        -13.326342582702637,
+        14.696678161621094,
+        9.176037788391113
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_056",
+      "x": 1057.595248778169,
+      "y": 139.89209771160398,
+      "position": [
+        12.212997436523438,
+        -7.643706321716309,
+        16.5963134765625
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_057",
+      "x": 58.62696837382025,
+      "y": 387.02647488857673,
+      "position": [
+        -3.9697275161743164,
+        16.9368953704834,
+        -13.328701972961426
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_058",
+      "x": 1461.6560806789864,
+      "y": 174.06095529804347,
+      "position": [
+        9.082046508789062,
+        15.039224624633789,
+        13.276878356933594
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_059",
+      "x": 1414.5220715246842,
+      "y": 187.40368508986057,
+      "position": [
+        12.352763175964355,
+        13.848597526550293,
+        11.780795097351074
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_060",
+      "x": 1435.426476103087,
+      "y": 156.428559233531,
+      "position": [
+        9.648869514465332,
+        12.790987968444824,
+        15.072157859802246
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_061",
+      "x": 723.2273855261357,
+      "y": 457.49929310462556,
+      "position": [
+        -3.0523841381073,
+        -9.815860748291016,
+        -19.434900283813477
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_062",
+      "x": 461.7778473716015,
+      "y": 408.2249075354322,
+      "position": [
+        -15.136399269104004,
+        -3.745884895324707,
+        -15.527145385742188
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_063",
+      "x": 1272.9756507553366,
+      "y": 471.153583933111,
+      "position": [
+        8.278741836547852,
+        2.439631462097168,
+        -20.23811912536621
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_064",
+      "x": 1120.5869750505751,
+      "y": 440.56159991797034,
+      "position": [
+        11.636852264404297,
+        -3.7514090538024902,
+        -18.261484146118164
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_065",
+      "x": 1491.054561917154,
+      "y": 377.9990360924743,
+      "position": [
+        7.566580295562744,
+        16.593578338623047,
+        -12.440502166748047
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_066",
+      "x": 503.01501048898973,
+      "y": 239.60033814860356,
+      "position": [
+        -19.638526916503906,
+        -8.408310890197754,
+        5.38178825378418
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_067",
+      "x": 1429.2058574991256,
+      "y": 239.66894269978906,
+      "position": [
+        13.283125877380371,
+        16.74190902709961,
+        5.374395847320557
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_068",
+      "x": 45.276313194571586,
+      "y": 421.4348050033652,
+      "position": [
+        -2.5208003520965576,
+        14.02804183959961,
+        -16.6890926361084
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_069",
+      "x": 150.44648224823817,
+      "y": 462.7560580671427,
+      "position": [
+        -5.371377944946289,
+        8.008402824401855,
+        -19.740001678466797
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_070",
+      "x": 1399.1184027557385,
+      "y": 426.25905334050947,
+      "position": [
+        9.811391830444336,
+        9.743691444396973,
+        -17.192350387573242
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_071",
+      "x": 1515.6026284751467,
+      "y": 461.0962959463878,
+      "position": [
+        3.2101244926452637,
+        9.32848072052002,
+        -19.68669319152832
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_072",
+      "x": 7.000282918476003,
+      "y": 419.0760794695197,
+      "position": [
+        -0.39841991662979126,
+        14.48958969116211,
+        -16.485822677612305
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_073",
+      "x": 164.53885508201714,
+      "y": 202.50096163058697,
+      "position": [
+        -11.713963508605957,
+        15.53296947479248,
+        9.966104507446289
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_074",
+      "x": 270.2013853410352,
+      "y": 157.20012726976185,
+      "position": [
+        -14.03255844116211,
+        7.844038963317871,
+        14.980712890625
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_075",
+      "x": 854.3223651339198,
+      "y": 134.43506792137458,
+      "position": [
+        2.940788745880127,
+        -13.575837135314941,
+        17.121623992919922
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_076",
+      "x": 1473.85196637149,
+      "y": 164.32733145125448,
+      "position": [
+        7.96511173248291,
+        14.741429328918457,
+        14.303336143493652
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_077",
+      "x": 1438.452772186334,
+      "y": 178.1074712074778,
+      "position": [
+        10.593618392944336,
+        14.396103858947754,
+        12.82583999633789
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_078",
+      "x": 1361.0160286423663,
+      "y": 180.6891273165004,
+      "position": [
+        14.552202224731445,
+        10.661763191223145,
+        12.518865585327148
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_079",
+      "x": 119.67269194626896,
+      "y": 360.2527563823233,
+      "position": [
+        -8.768189430236816,
+        17.26335906982422,
+        -10.333580017089844
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_080",
+      "x": 373.8599114283692,
+      "y": 415.1164664483798,
+      "position": [
+        -14.8425931930542,
+        1.5289944410324097,
+        -16.164653778076172
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_081",
+      "x": 835.4140775745132,
+      "y": 464.4208428609784,
+      "position": [
+        1.3120592832565308,
+        -9.373571395874023,
+        -19.885913848876953
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_082",
+      "x": 1550.8367832225706,
+      "y": 394.34696131332646,
+      "position": [
+        3.229933500289917,
+        16.521522521972656,
+        -14.13637924194336
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_083",
+      "x": 1560.6844946634378,
+      "y": 410.69592624952907,
+      "position": [
+        2.3585751056671143,
+        15.155000686645508,
+        -15.740784645080566
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_084",
+      "x": 184.68824445398891,
+      "y": 454.3145316688632,
+      "position": [
+        -7.06524658203125,
+        7.970418930053711,
+        -19.223018646240234
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_085",
+      "x": 239.6971420201373,
+      "y": 446.13999417820355,
+      "position": [
+        -9.383265495300293,
+        6.83440637588501,
+        -18.685260772705078
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_086",
+      "x": 1451.9843021128472,
+      "y": 443.3437751518564,
+      "position": [
+        6.559921741485596,
+        9.985184669494629,
+        -18.517412185668945
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_087",
+      "x": 551.7923026246476,
+      "y": 459.0213935110237,
+      "position": [
+        -8.35731315612793,
+        -5.66966438293457,
+        -19.530881881713867
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_088",
+      "x": 398.8563903078775,
+      "y": 453.54878250347497,
+      "position": [
+        -10.765405654907227,
+        0.048347167670726776,
+        -19.21697235107422
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_089",
+      "x": 1421.8104567578876,
+      "y": 457.9040106550426,
+      "position": [
+        6.596428394317627,
+        7.835551738739014,
+        -19.4813175201416
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_090",
+      "x": 87.75230887129399,
+      "y": 414.05927447227515,
+      "position": [
+        -5.06471061706543,
+        14.110824584960938,
+        -16.03266716003418
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_091",
+      "x": 1448.5934866338753,
+      "y": 162.86753258055828,
+      "position": [
+        9.304137229919434,
+        13.759493827819824,
+        14.43696403503418
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_092",
+      "x": 1226.6286419508294,
+      "y": 470.3006629225363,
+      "position": [
+        8.691555976867676,
+        0.9122071862220764,
+        -20.200380325317383
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_093",
+      "x": 838.3060147831051,
+      "y": 445.0348952641809,
+      "position": [
+        1.7590737342834473,
+        -11.60550308227539,
+        -18.612489700317383
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_094",
+      "x": 114.60576646228256,
+      "y": 394.2325371369517,
+      "position": [
+        -7.319467067718506,
+        15.150290489196777,
+        -14.109169006347656
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_095",
+      "x": 799.833254236366,
+      "y": 452.1060227238965,
+      "position": [
+        -0.007151515688747168,
+        -10.921526908874512,
+        -19.098735809326172
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_096",
+      "x": 1388.2488418878672,
+      "y": 174.2195177225052,
+      "position": [
+        12.959158897399902,
+        11.815096855163574,
+        13.225982666015625
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_097",
+      "x": 859.9088788914539,
+      "y": 449.83883032905993,
+      "position": [
+        2.6089022159576416,
+        -10.884015083312988,
+        -18.958093643188477
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_098",
+      "x": 454.2671685901426,
+      "y": 418.77770079605347,
+      "position": [
+        -14.231112480163574,
+        -3.0795044898986816,
+        -16.499486923217773
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_099",
+      "x": 1181.7939221586798,
+      "y": 460.06396057621134,
+      "position": [
+        9.951009750366211,
+        -0.7126631140708923,
+        -19.59890365600586
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_100",
+      "x": 1466.6045324167007,
+      "y": 408.4167040526102,
+      "position": [
+        7.816607475280762,
+        13.531135559082031,
+        -15.597098350524902
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_101",
+      "x": 1446.0343923647436,
+      "y": 395.50489841519914,
+      "position": [
+        9.566474914550781,
+        13.84553337097168,
+        -14.336161613464355
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_102",
+      "x": 16.987203582929208,
+      "y": 436.312814748413,
+      "position": [
+        -0.8461623191833496,
+        12.66563606262207,
+        -17.934490203857422
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_103",
+      "x": 255.99603345225785,
+      "y": 432.66501132628684,
+      "position": [
+        -11.072778701782227,
+        7.027241230010986,
+        -17.67971420288086
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_104",
+      "x": 1458.8992330687554,
+      "y": 240.29301711850647,
+      "position": [
+        11.268662452697754,
+        18.21160888671875,
+        5.298912525177002
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_105",
+      "x": 482.46437596626845,
+      "y": 454.35476883561876,
+      "position": [
+        -10.11033821105957,
+        -3.3935658931732178,
+        -19.25873374938965
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_106",
+      "x": 491.10691421192735,
+      "y": 155.91738047614032,
+      "position": [
+        -14.988215446472168,
+        -5.603582382202148,
+        15.147132873535156
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_107",
+      "x": 1521.2772745760353,
+      "y": 376.97939028302073,
+      "position": [
+        5.560181140899658,
+        17.409116744995117,
+        -12.300430297851562
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_108",
+      "x": 147.19028221502512,
+      "y": 226.46977174649908,
+      "position": [
+        -11.314031600952148,
+        17.343900680541992,
+        7.023582458496094
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_109",
+      "x": 111.88498368674372,
+      "y": 213.67128152702944,
+      "position": [
+        -8.563027381896973,
+        18.218713760375977,
+        8.634309768676758
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_110",
+      "x": 722.3851895280217,
+      "y": 470.8975411420737,
+      "position": [
+        -2.599031686782837,
+        -8.261507034301758,
+        -20.220674514770508
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_111",
+      "x": 79.81252620108609,
+      "y": 372.4676002422067,
+      "position": [
+        -5.70789909362793,
+        17.61121368408203,
+        -11.732307434082031
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_112",
+      "x": 915.3171152607606,
+      "y": 136.42528564743895,
+      "position": [
+        6.163441181182861,
+        -12.667016983032227,
+        16.938371658325195
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_113",
+      "x": 104.69506120001287,
+      "y": 377.1342020474999,
+      "position": [
+        -7.269853115081787,
+        16.674619674682617,
+        -12.268238067626953
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_114",
+      "x": 1577.7145269179814,
+      "y": 386.044789553083,
+      "position": [
+        1.5296047925949097,
+        17.43358612060547,
+        -13.243098258972168
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_115",
+      "x": 50.26566708660412,
+      "y": 291.8935590091808,
+      "position": [
+        -4.2898712158203125,
+        21.449661254882812,
+        -1.5920592546463013
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_116",
+      "x": 103.33343073036048,
+      "y": 301.28182525875206,
+      "position": [
+        -8.575607299804688,
+        19.96024513244629,
+        -2.84027099609375
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_117",
+      "x": 791.7595828537845,
+      "y": 486.05082363691645,
+      "position": [
+        -0.2190232127904892,
+        -6.765960216522217,
+        -20.98105812072754
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_118",
+      "x": 74.29414815052894,
+      "y": 426.4948304284948,
+      "position": [
+        -3.9508705139160156,
+        13.155436515808105,
+        -17.12877082824707
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_119",
+      "x": 55.5839633112242,
+      "y": 310.7911353571258,
+      "position": [
+        -4.6616926193237305,
+        21.016441345214844,
+        -4.097545623779297
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_120",
+      "x": 161.93661291537376,
+      "y": 216.38368087487612,
+      "position": [
+        -12.014164924621582,
+        16.274354934692383,
+        8.282200813293457
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_121",
+      "x": 493.58587055022014,
+      "y": 246.85916434294757,
+      "position": [
+        -20.15544319152832,
+        -7.759891986846924,
+        4.433079242706299
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_122",
+      "x": 191.10422135894206,
+      "y": 429.6625516148172,
+      "position": [
+        -9.158841133117676,
+        9.822186470031738,
+        -17.42756462097168
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_123",
+      "x": 1377.1946682839064,
+      "y": 450.50020595294205,
+      "position": [
+        8.530824661254883,
+        7.12498664855957,
+        -19.001842498779297
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_124",
+      "x": -1.6950618582589243,
+      "y": 410.7289551980202,
+      "position": [
+        0.1019287258386612,
+        15.31245231628418,
+        -15.721837997436523
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_125",
+      "x": 1421.5621817802742,
+      "y": 434.3100442075898,
+      "position": [
+        8.356110572814941,
+        9.906166076660156,
+        -17.843225479125977
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_126",
+      "x": 1420.3900675565515,
+      "y": 201.0045480986751,
+      "position": [
+        12.628891944885254,
+        14.832478523254395,
+        10.205144882202148
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_127",
+      "x": 1396.1195170568164,
+      "y": 166.61076367730254,
+      "position": [
+        12.135960578918457,
+        11.771613121032715,
+        14.029742240905762
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_128",
+      "x": 372.70191076391654,
+      "y": 183.05391012683356,
+      "position": [
+        -18.261451721191406,
+        1.9651490449905396,
+        12.356524467468262
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_129",
+      "x": 1544.4030793950874,
+      "y": 367.6114938873018,
+      "position": [
+        4.097690582275391,
+        18.469289779663086,
+        -11.2168607711792
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_130",
+      "x": 63.548573160551875,
+      "y": 378.131292257521,
+      "position": [
+        -4.467988014221191,
+        17.530624389648438,
+        -12.362142562866211
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_131",
+      "x": 735.8677208701392,
+      "y": 482.930906059431,
+      "position": [
+        -1.7838107347488403,
+        -6.932531833648682,
+        -20.8198299407959
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_132",
+      "x": 1217.4203066952232,
+      "y": 487.6348287825037,
+      "position": [
+        6.548630714416504,
+        0.44868794083595276,
+        -21.038555145263672
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_133",
+      "x": 697.4199682695191,
+      "y": 462.2512474510129,
+      "position": [
+        -3.806140899658203,
+        -8.931791305541992,
+        -19.720699310302734
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_134",
+      "x": 1495.0653276610597,
+      "y": 189.20780439443251,
+      "position": [
+        7.51164436340332,
+        17.1850528717041,
+        11.618306159973145
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_135",
+      "x": 506.67982918267336,
+      "y": 471.0916080818736,
+      "position": [
+        -7.891444683074951,
+        -3.513986349105835,
+        -20.235031127929688
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_136",
+      "x": 1134.7127622790185,
+      "y": 464.6021834010497,
+      "position": [
+        9.123149871826172,
+        -2.391648530960083,
+        -19.87217903137207
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_137",
+      "x": 73.96336050195922,
+      "y": 305.06365423004075,
+      "position": [
+        -6.201659202575684,
+        20.747814178466797,
+        -3.3416197299957275
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_138",
+      "x": -10.579567293357243,
+      "y": 424.84031224037045,
+      "position": [
+        0.5779812932014465,
+        13.903881072998047,
+        -16.998329162597656
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_139",
+      "x": 538.2980332680222,
+      "y": 478.3155072753992,
+      "position": [
+        -6.616884231567383,
+        -3.9942469596862793,
+        -20.573991775512695
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_140",
+      "x": 1361.72838834877,
+      "y": 465.20863333819625,
+      "position": [
+        7.530584812164307,
+        5.549771785736084,
+        -19.90041732788086
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_141",
+      "x": 506.7200826692045,
+      "y": 440.6804826903422,
+      "position": [
+        -11.173930168151855,
+        -4.9777631759643555,
+        -18.299097061157227
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_142",
+      "x": 170.88351485512828,
+      "y": 224.7937125199039,
+      "position": [
+        -12.826446533203125,
+        16.1546688079834,
+        7.232598781585693
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_143",
+      "x": 1444.3467330031012,
+      "y": 426.2117356488425,
+      "position": [
+        7.939192771911621,
+        11.32908821105957,
+        -17.190088272094727
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_144",
+      "x": 59.04159580785782,
+      "y": 403.64908345080767,
+      "position": [
+        -3.6686055660247803,
+        15.538237571716309,
+        -15.033075332641602
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_145",
+      "x": 31.934710687065362,
+      "y": 289.97828648032475,
+      "position": [
+        -2.740462303161621,
+        21.737812042236328,
+        -1.3371483087539673
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_146",
+      "x": 479.6923545471769,
+      "y": 422.8314052363226,
+      "position": [
+        -13.464247703552246,
+        -4.356822490692139,
+        -16.859838485717773
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_147",
+      "x": 1025.7962209458876,
+      "y": 146.8058343504,
+      "position": [
+        11.697208404541016,
+        -9.538599967956543,
+        15.970807075500488
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_148",
+      "x": 449.2809797505787,
+      "y": 442.5748439470908,
+      "position": [
+        -11.797996520996094,
+        -2.3121562004089355,
+        -18.443208694458008
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_149",
+      "x": 991.2987533755394,
+      "y": 138.79890507056913,
+      "position": [
+        9.76391315460205,
+        -10.455059051513672,
+        16.702327728271484
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_150",
+      "x": 1167.0311487500057,
+      "y": 488.33621189273964,
+      "position": [
+        6.4186625480651855,
+        -0.8356882333755493,
+        -21.063398361206055
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_151",
+      "x": 87.19906935251615,
+      "y": 403.9539894764444,
+      "position": [
+        -5.35468864440918,
+        15.021291732788086,
+        -15.071990966796875
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_152",
+      "x": 1254.733618745423,
+      "y": 479.9577634348952,
+      "position": [
+        7.362099647521973,
+        1.6072252988815308,
+        -20.686994552612305
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_153",
+      "x": 795.7948428830454,
+      "y": 464.7810591196113,
+      "position": [
+        -0.15553466975688934,
+        -9.417716979980469,
+        -19.9021053314209
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_154",
+      "x": 1282.5861382386236,
+      "y": 461.2873675512554,
+      "position": [
+        9.31759262084961,
+        3.132436513900757,
+        -19.673494338989258
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_155",
+      "x": 1478.878461007415,
+      "y": 394.5949230062746,
+      "position": [
+        7.733060359954834,
+        15.013154029846191,
+        -14.224922180175781
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_156",
+      "x": 67.17295888452486,
+      "y": 290.7771492654887,
+      "position": [
+        -5.703391075134277,
+        21.117313385009766,
+        -1.4421305656433105
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_157",
+      "x": 1411.4218028739583,
+      "y": 239.50397484777918,
+      "position": [
+        14.405451774597168,
+        15.75935173034668,
+        5.392224311828613
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_158",
+      "x": 442.9240118632283,
+      "y": 483.8539555641696,
+      "position": [
+        -6.949838638305664,
+        -1.1827027797698975,
+        -20.88626480102539
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_159",
+      "x": 585.0241729571943,
+      "y": 451.9145419513735,
+      "position": [
+        -8.174066543579102,
+        -7.265045166015625,
+        -19.072250366210938
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_160",
+      "x": 22.810590709962817,
+      "y": 391.2382511112082,
+      "position": [
+        -1.5251367092132568,
+        16.980426788330078,
+        -13.773043632507324
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_161",
+      "x": 1458.5601223290478,
+      "y": 471.39469998142323,
+      "position": [
+        4.534583568572998,
+        7.306705951690674,
+        -20.247365951538086
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_162",
+      "x": 881.217909409999,
+      "y": 456.4283472418477,
+      "position": [
+        3.268173933029175,
+        -9.897090911865234,
+        -19.397586822509766
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_163",
+      "x": 135.57711992256515,
+      "y": 395.42443518281266,
+      "position": [
+        -8.496237754821777,
+        14.4209566116333,
+        -14.244155883789062
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_164",
+      "x": 1239.367205797751,
+      "y": 455.3043747886465,
+      "position": [
+        10.412559509277344,
+        1.6226738691329956,
+        -19.293655395507812
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_165",
+      "x": 378.42181745575147,
+      "y": 436.1980549016672,
+      "position": [
+        -12.683505058288574,
+        1.0773460865020752,
+        -17.957664489746094
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_166",
+      "x": 103.16023952831517,
+      "y": 365.887526011965,
+      "position": [
+        -7.481787204742432,
+        17.447021484375,
+        -10.986967086791992
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_167",
+      "x": 1189.3435111365488,
+      "y": 468.76355265835383,
+      "position": [
+        8.920167922973633,
+        -0.37350866198539734,
+        -20.116086959838867
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_168",
+      "x": 1421.0433279342976,
+      "y": 175.24161755670323,
+      "position": [
+        11.3975191116333,
+        13.456029891967773,
+        13.127652168273926
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_169",
+      "x": 523.5743697464346,
+      "y": 237.892851674619,
+      "position": [
+        -18.811723709106445,
+        -9.920073509216309,
+        5.5941948890686035
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_170",
+      "x": 311.3635981319365,
+      "y": 453.52869902982104,
+      "position": [
+        -10.11550235748291,
+        3.6703877449035645,
+        -19.203060150146484
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_171",
+      "x": 579.946387797162,
+      "y": 478.8945084992946,
+      "position": [
+        -5.817307949066162,
+        -4.96633243560791,
+        -20.58162498474121
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_172",
+      "x": 1108.4540558786075,
+      "y": 471.57947459241853,
+      "position": [
+        8.027856826782227,
+        -3.017127275466919,
+        -20.25592803955078
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_173",
+      "x": 1373.2421765245986,
+      "y": 437.81957105459327,
+      "position": [
+        9.765922546386719,
+        7.902501106262207,
+        -18.100263595581055
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_174",
+      "x": 311.84909776270854,
+      "y": 160.20402454847726,
+      "position": [
+        -15.424660682678223,
+        5.563546657562256,
+        14.727280616760254
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_175",
+      "x": 51.61672769315494,
+      "y": 432.13566970230636,
+      "position": [
+        -2.645307779312134,
+        12.871235847473145,
+        -17.595327377319336
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_176",
+      "x": 206.83699939466274,
+      "y": 438.45646042029216,
+      "position": [
+        -9.052956581115723,
+        8.57943344116211,
+        -18.12029266357422
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_177",
+      "x": 142.80558708409484,
+      "y": 434.1895096757258,
+      "position": [
+        -6.877282619476318,
+        10.950053215026855,
+        -17.775480270385742
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_178",
+      "x": 46.29731990094564,
+      "y": 396.6939149512538,
+      "position": [
+        -2.9982779026031494,
+        16.309242248535156,
+        -14.335341453552246
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_179",
+      "x": 1411.9185141384605,
+      "y": 445.0811785207001,
+      "position": [
+        7.908838748931885,
+        8.686115264892578,
+        -18.638769149780273
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_180",
+      "x": 766.4745887799518,
+      "y": 441.41960611135465,
+      "position": [
+        -1.5923776626586914,
+        -12.025211334228516,
+        -18.324527740478516
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_181",
+      "x": 146.1418095433054,
+      "y": 207.63292251286276,
+      "position": [
+        -10.730940818786621,
+        16.5989990234375,
+        9.355189323425293
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_182",
+      "x": 853.8631601128059,
+      "y": 471.84943443562275,
+      "position": [
+        1.7960903644561768,
+        -8.364328384399414,
+        -20.299243927001953
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_183",
+      "x": 1020.8729223544957,
+      "y": 155.59840344499256,
+      "position": [
+        12.145157814025879,
+        -10.301152229309082,
+        15.134086608886719
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_184",
+      "x": 73.54698614370037,
+      "y": 396.58218230504997,
+      "position": [
+        -4.7277960777282715,
+        15.911735534667969,
+        -14.329998970031738
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_185",
+      "x": 1078.150080130388,
+      "y": 142.94249698347113,
+      "position": [
+        13.06204605102539,
+        -6.775416374206543,
+        16.325237274169922
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_186",
+      "x": 387.6656014271003,
+      "y": 425.4682151162128,
+      "position": [
+        -13.856592178344727,
+        0.6716980934143066,
+        -17.079002380371094
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_187",
+      "x": 1268.9279300186122,
+      "y": 449.27055778986846,
+      "position": [
+        10.830975532531738,
+        3.005483865737915,
+        -18.889163970947266
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_188",
+      "x": 554.1676998971586,
+      "y": 235.47427319332135,
+      "position": [
+        -17.37226676940918,
+        -12.023626327514648,
+        5.89249324798584
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_189",
+      "x": 477.5103979219356,
+      "y": 464.5630750727857,
+      "position": [
+        -9.011065483093262,
+        -2.8307793140411377,
+        -19.88901710510254
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_190",
+      "x": 1488.739706281743,
+      "y": 174.93533731285905,
+      "position": [
+        7.473438739776611,
+        16.00235939025879,
+        13.199319839477539
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_191",
+      "x": 156.9618940680686,
+      "y": 441.7298200781328,
+      "position": [
+        -6.994256973266602,
+        9.87234115600586,
+        -18.352693557739258
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_192",
+      "x": -5.7268424928504515,
+      "y": 397.6543664504857,
+      "position": [
+        0.3712960183620453,
+        16.507143020629883,
+        -14.44389533996582
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_193",
+      "x": 583.1982445380222,
+      "y": 467.04793576142475,
+      "position": [
+        -6.861349582672119,
+        -6.010805130004883,
+        -19.98532485961914
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_194",
+      "x": 1470.074222911995,
+      "y": 459.738080617542,
+      "position": [
+        4.8964033126831055,
+        8.749137878417969,
+        -19.599693298339844
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_195",
+      "x": 1475.9416394768532,
+      "y": 430.8128530859125,
+      "position": [
+        6.242310047149658,
+        11.783141136169434,
+        -17.557687759399414
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_196",
+      "x": 1550.2962408050164,
+      "y": 377.1081725814778,
+      "position": [
+        3.535080909729004,
+        17.880739212036133,
+        -12.28853988647461
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_197",
+      "x": 10.981198485044889,
+      "y": 401.7498638715486,
+      "position": [
+        -0.6957883834838867,
+        16.12494468688965,
+        -14.847918510437012
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_198",
+      "x": 99.10264712470348,
+      "y": 351.1416267544614,
+      "position": [
+        -7.54503059387207,
+        18.398426055908203,
+        -9.230319023132324
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_199",
+      "x": 1165.410194058221,
+      "y": 442.02863347537203,
+      "position": [
+        11.942631721496582,
+        -1.6322648525238037,
+        -18.35694122314453
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_200",
+      "x": 1444.2936837376012,
+      "y": 373.04562007283107,
+      "position": [
+        10.706280708312988,
+        15.270903587341309,
+        -11.911612510681152
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_201",
+      "x": 1563.6096320805,
+      "y": 372.1153050750626,
+      "position": [
+        2.6456594467163086,
+        18.38726234436035,
+        -11.716606140136719
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_202",
+      "x": 22.81823431813208,
+      "y": 425.79592981057544,
+      "position": [
+        -1.2356905937194824,
+        13.75318431854248,
+        -17.069581985473633
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_203",
+      "x": 1485.169354908435,
+      "y": 156.64299424363142,
+      "position": [
+        7.00407600402832,
+        14.464849472045898,
+        15.078804969787598
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_204",
+      "x": 372.26891925231115,
+      "y": 161.9848039857928,
+      "position": [
+        -16.5134220123291,
+        1.8054492473602295,
+        14.596578598022461
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_205",
+      "x": 1529.0458919210355,
+      "y": 389.62352624795597,
+      "position": [
+        4.74714994430542,
+        16.593887329101562,
+        -13.664186477661133
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_206",
+      "x": 442.75569561928137,
+      "y": 397.26258366932547,
+      "position": [
+        -16.357759475708008,
+        -2.7725908756256104,
+        -14.443714141845703
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_207",
+      "x": 1392.6947099760102,
+      "y": 460.3586126504892,
+      "position": [
+        7.2309346199035645,
+        6.827517509460449,
+        -19.62415885925293
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_208",
+      "x": 1190.1588917074687,
+      "y": 479.8794519206425,
+      "position": [
+        7.543522834777832,
+        -0.2916717827320099,
+        -20.6937198638916
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_209",
+      "x": 832.6118115337388,
+      "y": 139.9611237199588,
+      "position": [
+        1.8473951816558838,
+        -14.346355438232422,
+        16.647846221923828
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_210",
+      "x": 145.0694872425526,
+      "y": 195.56490223227487,
+      "position": [
+        -10.262821197509766,
+        16.022480010986328,
+        10.788168907165527
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_211",
+      "x": 1447.3977241558405,
+      "y": 454.0448546632157,
+      "position": [
+        6.037423610687256,
+        8.838759422302246,
+        -19.243574142456055
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_212",
+      "x": 260.9555126179785,
+      "y": 452.9834455589867,
+      "position": [
+        -9.244234085083008,
+        5.617270469665527,
+        -19.15361976623535
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_213",
+      "x": 538.4381664837517,
+      "y": 237.7113505072397,
+      "position": [
+        -18.172544479370117,
+        -10.983407974243164,
+        5.610633850097656
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_214",
+      "x": 1544.4854423008958,
+      "y": 357.0580753165975,
+      "position": [
+        4.240236759185791,
+        19.141056060791016,
+        -9.976507186889648
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_215",
+      "x": 182.70841159676615,
+      "y": 198.96919990043693,
+      "position": [
+        -12.646940231323242,
+        14.49266242980957,
+        10.383275032043457
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    },
+    {
+      "object": "Pine_216",
+      "x": 79.13010972654787,
+      "y": 268.77825352994876,
+      "position": [
+        -6.688286781311035,
+        20.826234817504883,
+        1.5017998218536377
+      ],
+      "canopy": 0.627,
+      "scale": 1.1
+    },
+    {
+      "object": "Pine_217",
+      "x": 292.97719277014454,
+      "y": 442.26148900334994,
+      "position": [
+        -11.005860328674316,
+        4.918580055236816,
+        -18.415918350219727
+      ],
+      "canopy": 0.66975,
+      "scale": 1.175
+    },
+    {
+      "object": "Pine_218",
+      "x": 1591.5132649705922,
+      "y": 370.2213928433323,
+      "position": [
+        0.6224850416183472,
+        18.67099952697754,
+        -11.48274040222168
+      ],
+      "canopy": 0.7124999999999999,
+      "scale": 1.25
+    },
+    {
+      "object": "Pine_219",
+      "x": 1465.0779826317812,
+      "y": 373.28807093812986,
+      "position": [
+        9.409357070922852,
+        16.0651798248291,
+        -11.929924011230469
+      ],
+      "canopy": 0.7552500000000001,
+      "scale": 1.3250000000000002
+    },
+    {
+      "object": "Pine_220",
+      "x": 137.01279269217088,
+      "y": 358.6527910196864,
+      "position": [
+        -9.981788635253906,
+        16.726097106933594,
+        -10.151991844177246
+      ],
+      "canopy": 0.798,
+      "scale": 1.4000000000000001
+    }
+  ],
+  "rejected_infill_slots": [
+    [
+      563,
+      305,
+      "infill_central_back"
+    ],
+    [
+      638,
+      305,
+      "infill_central_back"
+    ],
+    [
+      715,
+      305,
+      "infill_central_back"
+    ],
+    [
+      753,
+      305,
+      "infill_central_back"
+    ],
+    [
+      791,
+      305,
+      "infill_central_back"
+    ],
+    [
+      829,
+      305,
+      "infill_central_back"
+    ],
+    [
+      867,
+      305,
+      "infill_central_back"
+    ],
+    [
+      905,
+      305,
+      "infill_central_back"
+    ],
+    [
+      1032,
+      305,
+      "infill_east_back"
+    ],
+    [
+      1112,
+      305,
+      "infill_east_back"
+    ],
+    [
+      1152,
+      305,
+      "infill_east_back"
+    ],
+    [
+      1192,
+      305,
+      "infill_east_back"
+    ],
+    [
+      1232,
+      305,
+      "infill_east_back"
+    ],
+    [
+      696,
+      422,
+      "infill_south_back"
+    ],
+    [
+      916,
+      422,
+      "infill_south_back"
+    ],
+    [
+      1136,
+      422,
+      "infill_south_back"
+    ],
+    [
+      1356,
+      422,
+      "infill_south_back"
+    ],
+    [
+      1120,
+      215,
+      "infill_east_north"
+    ],
+    [
+      1165,
+      215,
+      "infill_east_north"
+    ],
+    [
+      1208,
+      215,
+      "infill_east_north"
+    ],
+    [
+      1260,
+      215,
+      "infill_east_north"
+    ],
+    [
+      1310,
+      215,
+      "infill_east_north"
+    ],
+    [
+      1360,
+      215,
+      "infill_east_north"
+    ],
+    [
+      1410,
+      215,
+      "infill_east_north"
+    ]
+  ],
+  "reference_note": "Las adiciones son relleno interpretado de los barrios del mapa, no nuevos lugares famosos identificados ni una certificacion de cobertura del 80%."
+}

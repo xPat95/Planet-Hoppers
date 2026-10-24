@@ -15,3 +15,7 @@ Desktop.ini
 # Respaldos locales del planeta Minecraft; conservar fuera del commit
 /assets/models/planets/minecraft/backups/
 /assets/models/planets/minecraft/*.blend[0-9]*
+
+# Copia local previa al refinamiento del planeta South Park
+/docs/references/southpark/backups/
+/assets/models/planets/southpark/*.blend[0-9]*

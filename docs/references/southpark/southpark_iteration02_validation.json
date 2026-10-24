@@ -1,0 +1,28 @@
+{
+  "buildings": 160,
+  "mesh_objects": 437,
+  "planet_objects": 439,
+  "triangles": 80354,
+  "vertices": 68215,
+  "unique_meshes": 218,
+  "materials": 28,
+  "radial_alignment_min_dot": 0.9999998807907104,
+  "foundation_radial_gap_range": [
+    -0.009993884412207166,
+    0.0659809343520088
+  ],
+  "transform_tests_max_errors": {
+    "translation": 1.9073486328125e-06,
+    "rotation": 2.384185791015625e-06,
+    "scale": 3.814697265625e-06
+  },
+  "sphere_unchanged": true,
+  "snowfx_empty": true,
+  "has_animation": false,
+  "building_footprint_overlaps": [],
+  "conservative_mountain_building_contacts": [],
+  "foundation_bottom_radial_gap_range": [
+    -0.009993884412207166,
+    -0.009669003151728361
+  ]
+}

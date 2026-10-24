@@ -1,0 +1,26 @@
+{
+  "buildings": 71,
+  "mesh_objects": 335,
+  "unique_meshes": 86,
+  "total_objects_in_planet": 337,
+  "vertices_instances": 47103,
+  "triangles_instances": 55214,
+  "triangles_unique": 33722,
+  "materials_used": 28,
+  "radial_alignment_min_dot": 0.9999999105930328,
+  "road_surface_offset_minmax": [
+    0.0349966985098078,
+    0.07200232258938755
+  ],
+  "root_transform_tests": {
+    "translation": 4.76837158203125e-07,
+    "rotation": 1.9073486328125e-06,
+    "scale": 1.9073486328125e-06
+  },
+  "root_restored": true,
+  "unparented_meshes": [],
+  "snowfx_collection_empty": true,
+  "shared_pine_instances": 220,
+  "snow_particles": false,
+  "exported": false
+}
