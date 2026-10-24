@@ -1,6 +1,8 @@
 # Planet Hoppers
 
-Proyecto universitario de Gráficas por Computadora: un videojuego 3D de exploración espacial en un sistema solar ficticio con seis planetas inspirados en Minecraft, South Park, Smiling Friends, Halloween, Halo y Star Wars.
+Proyecto universitario de Gráficas por Computadora: un videojuego 3D de exploración espacial en un sistema solar ficticio con seis planetas inspirados en Minecraft, South Park, Smiling Friends, Halloween, Un Show Más (Regular Show) y Star Wars.
+
+La estación espacial, el desbloqueo de naves y las demás mecánicas descritas están **planificadas, pero todavía no implementadas**.
 
 ## Objetivo general
 
@@ -9,14 +11,24 @@ Desarrollar una experiencia que integre modelado 3D, navegación, órbitas, rota
 ## Flujo del juego
 
 1. **Menú principal:** introducción espacial con el título Planet Hoppers.
-2. **Selección de nave:** elección entre seis naves temáticas, una por franquicia, sobre una plataforma iluminada y giratoria.
+2. **Selección inicial:** elección libre de una única nave entre las seis temáticas, sobre una plataforma iluminada y giratoria. Esa nave queda desbloqueada y activa; las otras cinco permanecen bloqueadas.
 3. **Animación inicial:** la nave elegida abduce mediante un haz de luz a los personajes de su franquicia.
-4. **Sistema solar:** aparición en un entorno 3D con un sol central y seis planetas con órbitas y rotación propia.
-5. **Exploración:** pilotaje libre para acercarse a cada planeta.
+4. **Sistema solar:** aparición en un entorno 3D con un sol central, seis planetas con órbitas y rotación propia y una estación espacial interactiva.
+5. **Exploración:** pilotaje libre para acercarse a cada planeta o entrar al hangar de la estación espacial. Allí se puede cambiar voluntariamente entre naves desbloqueadas.
 6. **Misiones:** un botón de visita aparece por proximidad y permite iniciar el minijuego del planeta. Predominarán el raycasting y la exploración en primera persona; Star Wars será un minijuego estilo Galaga sin raycasting.
-7. **Recompensas:** completar cada minijuego entrega su token. Perder devuelve al jugador al sistema solar para volver a intentarlo.
-8. **Final desbloqueable:** reunir los seis tokens habilita terminar el juego; el sol se transforma en un agujero negro que absorbe los planetas y la nave.
+7. **Recompensas:** la primera victoria de cada minijuego entrega su token y desbloquea la nave de la franquicia si seguía bloqueada. Solo un nuevo desbloqueo activa su animación de abducción. El regreso al sistema solar conserva la nave usada antes de entrar al minijuego. Perder permite regresar y reintentar sin obtener recompensas.
+8. **Final desbloqueable:** reunir los seis tokens habilita terminar el juego independientemente de la nave activa; el sol se transforma en un agujero negro que absorbe los planetas y la nave.
 9. **Animación final:** devolución de los personajes abducidos a su lugar de origen.
+
+## Progreso y estación espacial
+
+El progreso distingue tres conceptos: **planetas o misiones completados**, que determinan los tokens obtenidos; **naves desbloqueadas**, disponibles en la estación; y **nave activa**, utilizada para explorar. Elegir una nave inicial no completa su planeta ni entrega su token.
+
+Si se completa por primera vez el planeta de la nave inicial, se obtiene su token, pero no hay otro desbloqueo ni una segunda abducción. Los minijuegos pueden repetirse: las victorias posteriores no duplican tokens, desbloqueos ni animaciones.
+
+Al acercarse a la estación, el jugador puede interactuar para entrar al hangar. Se muestran las seis naves con su estado de bloqueo; solo las desbloqueadas se pueden seleccionar. Al salir, la exploración continúa con la nave seleccionada. Después de la selección inicial, **los cambios de nave solo ocurren por elección voluntaria en la estación espacial**; completar un minijuego nunca cambia automáticamente la nave activa.
+
+Por ejemplo, al empezar con South Park y ganar Halloween, se recibe el token de Halloween, se desbloquea su nave y se reproduce la abducción de Ghost Face. Se regresa con South Park; la estación permite elegir entre South Park y Halloween, mientras las otras cuatro siguen bloqueadas.
 
 ## Franquicias y responsables
 
@@ -26,10 +38,12 @@ Desarrollar una experiencia que integre modelado 3D, navegación, órbitas, rota
 | South Park | Stan, Kyle, Kenny y Cartman | Recorrer South Park y resolver un puzzle relacionado con Kenny | Pablo |
 | Smiling Friends | Pim y Charlie | Hacer reír a personajes eligiendo chistes | Cami |
 | Halloween | Ghost Face | Escapar de personajes de terror | Cami |
-| Halo | Master Chief | Disparar a enemigos y acumular puntos | Norman |
+| Un Show Más (Regular Show) | Pendientes de definir | Shooter en primera persona con raycasting: disparar a enemigos y acumular puntos | Norman |
 | Star Wars | Baby Yoda | Minijuego estilo Galaga, sin raycasting | Norman |
 
-Los sistemas generales son trabajo compartido de los tres integrantes. Ver [distribución de responsabilidades](docs/responsibilities.md).
+La nave y los personajes de abducción de Un Show Más están pendientes de definir; no se han decidido enemigos ni modelos. Su identificador interno es `regularshow` y seguirá las mismas reglas de tokens, desbloqueo y abducción que las demás franquicias.
+
+Los sistemas generales son trabajo compartido de los tres integrantes. La estación espacial queda como funcionalidad compartida, pendiente de asignación. Ver [distribución de responsabilidades](docs/responsibilities.md).
 
 ## Estructura del repositorio
 
@@ -41,6 +55,7 @@ Planet-Hoppers/
 │   │   ├── ships/
 │   │   ├── characters/
 │   │   └── environment/
+│   │       └── spaceStation/
 │   ├── textures/
 │   │   ├── planets/
 │   │   ├── ships/
@@ -59,6 +74,7 @@ Planet-Hoppers/
 │   ├── core/
 │   ├── scenes/
 │   ├── solarSystem/
+│   ├── spaceStation/
 │   ├── ships/
 │   ├── characters/
 │   ├── graphics/
@@ -72,7 +88,7 @@ Planet-Hoppers/
 │   │   ├── southpark/
 │   │   ├── smilingfriends/
 │   │   ├── halloween/
-│   │   ├── halo/
+│   │   ├── regularshow/
 │   │   └── starwars/
 │   ├── gameplay/
 │   └── ui/
@@ -86,22 +102,24 @@ Planet-Hoppers/
 └── .gitignore
 ```
 
-Cada una de las carpetas `assets/models/planets/`, `assets/models/ships/` y `assets/models/characters/` contiene seis subcarpetas: `minecraft/`, `southpark/`, `smilingfriends/`, `halloween/`, `halo/` y `starwars/`. Las carpetas vacías se conservan en Git mediante `.gitkeep`.
+Cada una de las carpetas `assets/models/planets/`, `assets/models/ships/` y `assets/models/characters/` contiene seis subcarpetas: `minecraft/`, `southpark/`, `smilingfriends/`, `halloween/`, `regularshow/` y `starwars/`. Las carpetas vacías se conservan en Git mediante `.gitkeep`.
 
 | Carpeta | Responsabilidad |
 | --- | --- |
 | `assets/` | Modelos, texturas, audio, fuentes e imágenes de interfaz. Los modelos de personajes se organizan por franquicia en `assets/models/characters/`. |
 | `src/core/` | Inicialización, renderizado general, administración de escenas, entrada y estado global. |
-| `src/scenes/` | Composición de menú, selección de naves, sistema solar, minijuegos y final. |
+| `src/scenes/` | Composición de menú, selección de naves, sistema solar, estación espacial, minijuegos y final, con sus transiciones. |
 | `src/solarSystem/` | Sol, planetas, órbitas, rotación e interacción por proximidad. |
-| `src/ships/` | Definición, selección, movimiento, controles y cámara de las naves. |
-| `src/characters/` | Carga y manejo compartido de personajes y animaciones de abducción y devolución, sin modelos ni lógica duplicada por franquicia. |
+| `src/spaceStation/` | Interacción con la estación, entrada al hangar y coordinación de selección y cambio entre naves desbloqueadas. |
+| `assets/models/environment/spaceStation/` | Modelos 3D y recursos geométricos de la estación espacial. |
+| `src/ships/` | Naves disponibles, bloqueo y desbloqueo, nave activa, movimiento, controles y cámara. |
+| `src/characters/` | Carga y manejo compartido de personajes; abducción inicial y por nuevo desbloqueo, y devolución final, sin modelos ni lógica duplicada por franquicia. |
 | `src/graphics/` | Shaders, iluminación, materiales y efectos visuales, separados del movimiento y gameplay. |
 | `src/minigames/common/` | Raycasting, controles y colisiones reutilizables. |
 | `src/minigames/[franquicia]/` | Reglas y lógica exclusivas de cada minijuego. |
-| `src/gameplay/` | Misiones, tokens, recompensas, progreso, victoria y derrota. |
-| `src/ui/` | Botones, menús, indicadores y HUD. |
-| `config/` | Parámetros del juego y asociaciones entre naves y personajes. |
+| `src/gameplay/` | Misiones completadas, tokens y recompensas únicas; coordinación de desbloqueos, progreso, victoria y derrota. |
+| `src/ui/` | Botones, menús, indicadores, HUD e interfaces de estación con estados de bloqueo y desbloqueo. |
+| `config/` | Parámetros del juego y asociaciones entre franquicias, naves, personajes y minijuegos. |
 | `docs/` | Arquitectura, organización del equipo y planificación. |
 | `tests/` | Futuras pruebas de los módulos. |
 
@@ -116,8 +134,8 @@ Consultar las reglas de separación y la asociación entre naves y personajes en
 5. Navegación y órbitas.
 6. Personajes.
 7. Minijuegos.
-8. Menús, selección y cambio de naves.
-9. Recompensas, condiciones de victoria y derrota.
+8. Menús, selección de naves y estación espacial.
+9. Recompensas y progreso, con condiciones de victoria y derrota.
 10. Agujero negro y final.
 
 El [plan de desarrollo](docs/development-plan.md) describe las diez etapas y su estado inicial.
