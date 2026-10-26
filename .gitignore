@@ -19,3 +19,7 @@ Desktop.ini
 # Copia local previa al refinamiento del planeta South Park
 /docs/references/southpark/backups/
 /assets/models/planets/southpark/*.blend[0-9]*
+
+# Respaldos automáticos de Blender del planeta Smiling Friends
+/assets/models/planets/smilingfriends/*.blend[0-9]*
+/assets/models/characters/smilingfriends/*.blend[0-9]*
