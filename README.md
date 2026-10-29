@@ -38,10 +38,10 @@ Por ejemplo, al empezar con South Park y ganar Halloween, se recibe el token de 
 | South Park | Stan, Kyle, Kenny y Cartman | Recorrer South Park y resolver un puzzle relacionado con Kenny | Pablo |
 | Smiling Friends | Pim y Charlie | Hacer reír a personajes eligiendo chistes | Cami |
 | Halloween | Ghost Face | Escapar de personajes de terror | Cami |
-| Un Show Más (Regular Show) | Pendientes de definir | Shooter en primera persona con raycasting: disparar a enemigos y acumular puntos | Norman |
+| Un Show Más (Regular Show) | Mordecai y Rigby | Shooter en primera persona con raycasting: disparar a enemigos y acumular puntos | Norman |
 | Star Wars | Baby Yoda | Minijuego estilo Galaga, sin raycasting | Norman |
 
-La nave y los personajes de abducción de Un Show Más están pendientes de definir; no se han decidido enemigos ni modelos. Su identificador interno es `regularshow` y seguirá las mismas reglas de tokens, desbloqueo y abducción que las demás franquicias.
+La nave de Un Show Más es el carrito de golf con alas de cartón; sus personajes son Mordecai y Rigby. Los recursos están modelados; los enemigos y la implementación del minijuego siguen pendientes. Su identificador interno es `regularshow` y seguirá las mismas reglas de tokens, desbloqueo y abducción que las demás franquicias.
 
 Los sistemas generales son trabajo compartido de los tres integrantes. La estación espacial queda como funcionalidad compartida, pendiente de asignación. Ver [distribución de responsabilidades](docs/responsibilities.md).
 
@@ -160,3 +160,12 @@ Los siguientes recursos son **planetas del sistema solar**. Sus archivos Blender
 | Smiling Friends | [Smiling Friends](assets/models/planets/smilingfriends/README.md) | [Organización](assets/models/planets/smilingfriends/README.md) |
 | Estrella de la Muerte | [Planeta de Star Wars](assets/models/planets/starwars/README.md) | [Revisión](docs/planets/starwars.md) |
 | Domo Espacial | [Planeta de Regular Show](assets/models/planets/regularshow/README.md) | [Revisión](docs/planets/regularshow.md) |
+
+
+## Naves disponibles como recursos
+
+Los siguientes modelos son naves, independientes de los planetas. Los controles, desbloqueos y animaciones de juego siguen pendientes.
+
+| Temática | Nave o variante | Recursos |
+| --- | --- | --- |
+| `regularshow` | Carrito de Regular Show | [Fuente y exportaciones](assets/models/ships/regularshow/golfcart/README.md) |

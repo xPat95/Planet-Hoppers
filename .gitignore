@@ -33,3 +33,8 @@ Desktop.ini
 /assets/models/planets/regularshow/*.blend[0-9]*
 /assets/models/planets/regularshow/backups/
 /tools/blender/regularshow/__pycache__/
+
+# Respaldos y temporales de nave regularshow_golfcart
+/assets/models/ships/regularshow/golfcart/*.blend[0-9]*
+/assets/models/ships/regularshow/golfcart/backups/
+/tools/blender/regularshow/ships/golfcart/__pycache__/

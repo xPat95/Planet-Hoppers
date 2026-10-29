@@ -26,7 +26,7 @@ Esta arquitectura organiza el trabajo sin elegir lenguaje, motor gráfico, libre
 | `assets/ui/backgrounds/` | Imágenes de fondo de la interfaz. |
 | `config/` | Parámetros generales y asociaciones entre franquicias, naves, personajes, minijuegos y recursos. |
 
-Los directorios de modelos de planetas, naves y personajes usan los mismos identificadores: `minecraft`, `southpark`, `smilingfriends`, `halloween`, `regularshow` y `starwars`. `regularshow` corresponde a Un Show Más (Regular Show); su nave y sus personajes de abducción están pendientes de definir, sin decisiones sobre enemigos ni modelos.
+Los directorios de modelos de planetas, naves y personajes usan los mismos identificadores: `minecraft`, `southpark`, `smilingfriends`, `halloween`, `regularshow` y `starwars`. `regularshow` corresponde a Un Show Más (Regular Show); su nave es el carrito de golf con alas de cartón y sus personajes son Mordecai y Rigby. Sus recursos están modelados; los enemigos y la lógica de juego siguen pendientes.
 
 ## Módulos del juego
 
@@ -64,7 +64,7 @@ La configuración asociará el identificador de cada nave con su franquicia, los
 | `southpark` | Stan, Kyle, Kenny y Cartman | `assets/models/characters/southpark/` |
 | `smilingfriends` | Pim y Charlie | `assets/models/characters/smilingfriends/` |
 | `halloween` | Ghost Face | `assets/models/characters/halloween/` |
-| `regularshow` | Pendientes de definir | `assets/models/characters/regularshow/` |
+| `regularshow` | Mordecai y Rigby | `assets/models/characters/regularshow/` |
 | `starwars` | Baby Yoda | `assets/models/characters/starwars/` |
 
 Al seleccionar la nave inicial o desbloquear una nueva nave, la escena consultará esa asociación en `config/` y entregará al módulo `src/characters/` las referencias de los personajes. El mismo módulo cargará uno o varios personajes y ejecutará la secuencia común de abducción con los parámetros necesarios de posición, escala y animación. El estado del juego conservará las asociaciones y los orígenes necesarios para coordinar la devolución final, independientemente de los cambios de nave activa.
