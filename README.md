@@ -169,3 +169,4 @@ Los siguientes modelos son naves, independientes de los planetas. Los controles,
 | Temática | Nave o variante | Recursos |
 | --- | --- | --- |
 | `regularshow` | Carrito de Regular Show | [Fuente y exportaciones](assets/models/ships/regularshow/golfcart/README.md) |
+| `starwars` | Caza Naboo N-1 | [Fuente y exportaciones](assets/models/ships/starwars/naboo/README.md) |

@@ -1,0 +1,56 @@
+{
+  "asset_id": "naboo_n1",
+  "role": "ship",
+  "franchise": "starwars",
+  "source_sha256": "6739835e1c55181638c5fd19a183d6b15d7cea5556233a138b7aa69d30a9f8ae",
+  "exports": {
+    "near": {
+      "meshes": 46,
+      "triangles": 140408,
+      "degenerate_triangles": 0,
+      "bounds": [
+        [
+          -4.001296043395996,
+          4.001296043395996
+        ],
+        [
+          -7.349999904632568,
+          7.349999904632568
+        ],
+        [
+          -0.7556478977203369,
+          0.7556478977203369
+        ]
+      ],
+      "reimport": "OK"
+    },
+    "far": {
+      "meshes": 46,
+      "triangles": 43071,
+      "degenerate_triangles": 0,
+      "bounds": [
+        [
+          -4.001166820526123,
+          4.001166820526123
+        ],
+        [
+          -7.350013732910156,
+          7.35000467300415
+        ],
+        [
+          -0.7556641101837158,
+          0.7556477785110474
+        ]
+      ],
+      "reimport": "OK"
+    }
+  },
+  "characters": {},
+  "scale_factor": 1.0,
+  "source_unchanged": true,
+  "origin_shift": [
+    0.0,
+    2.3499999046325684,
+    0.32935190200805664
+  ]
+}

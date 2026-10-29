@@ -1,0 +1,14 @@
+{
+  "id": "naboo_n1",
+  "role": "ship",
+  "franchise": "starwars",
+  "variant": "naboo",
+  "source": "assets/models/ships/starwars/naboo/naboo_n1_royal_ship.blend",
+  "root": "Naboo_N1_ROOT",
+  "collection": "NAVE STAR WARS | Naboo N-1 Episodio I",
+  "near": "assets/models/ships/starwars/naboo/exports/naboo_n1_royal_ship_near.glb",
+  "far": "assets/models/ships/starwars/naboo/exports/naboo_n1_royal_ship_far.glb",
+  "obj": "assets/models/ships/starwars/naboo/exports/naboo_n1_royal_ship.obj",
+  "audit": "docs/references/starwars/ships/naboo/integration_audit.json",
+  "characters": []
+}
