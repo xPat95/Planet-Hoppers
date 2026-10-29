@@ -1,0 +1,244 @@
+# Blender 5.2.3 LTS MTL File: 'starwars_death_star_planet.blend'
+# www.blender.org
+
+newmtl DS_|_Aro_mecanizado
+Ns 324.899994
+Ka 0.320000 0.320000 0.320000
+Kd 0.183350 0.187150 0.190000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+
+newmtl DS_|_Blindaje_00
+Ns 115.599983
+Ka 0.420000 0.420000 0.420000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd ../../../../textures/planets/starwars/blindaje_00.png
+map_Bump -bm 0.016 ../../../../textures/planets/starwars/microrelieve.png
+
+newmtl DS_|_Blindaje_01
+Ns 115.599983
+Ka 0.420000 0.420000 0.420000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd ../../../../textures/planets/starwars/blindaje_01.png
+map_Bump -bm 0.016 ../../../../textures/planets/starwars/microrelieve.png
+
+newmtl DS_|_Blindaje_02
+Ns 115.599983
+Ka 0.420000 0.420000 0.420000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd ../../../../textures/planets/starwars/blindaje_02.png
+map_Bump -bm 0.016 ../../../../textures/planets/starwars/microrelieve.png
+
+newmtl DS_|_Blindaje_03
+Ns 115.599983
+Ka 0.420000 0.420000 0.420000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd ../../../../textures/planets/starwars/blindaje_03.png
+map_Bump -bm 0.016 ../../../../textures/planets/starwars/microrelieve.png
+
+newmtl DS_|_Blindaje_04
+Ns 115.599983
+Ka 0.420000 0.420000 0.420000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd ../../../../textures/planets/starwars/blindaje_04.png
+map_Bump -bm 0.016 ../../../../textures/planets/starwars/microrelieve.png
+
+newmtl DS_|_Blindaje_05
+Ns 115.599983
+Ka 0.420000 0.420000 0.420000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd ../../../../textures/planets/starwars/blindaje_05.png
+map_Bump -bm 0.016 ../../../../textures/planets/starwars/microrelieve.png
+
+newmtl DS_|_Blindaje_06
+Ns 115.599983
+Ka 0.420000 0.420000 0.420000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd ../../../../textures/planets/starwars/blindaje_06.png
+map_Bump -bm 0.016 ../../../../textures/planets/starwars/microrelieve.png
+
+newmtl DS_|_Blindaje_07
+Ns 115.599983
+Ka 0.420000 0.420000 0.420000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd ../../../../textures/planets/starwars/blindaje_07.png
+map_Bump -bm 0.016 ../../../../textures/planets/starwars/microrelieve.png
+
+newmtl DS_|_Blindaje_08
+Ns 115.599983
+Ka 0.420000 0.420000 0.420000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd ../../../../textures/planets/starwars/blindaje_08.png
+map_Bump -bm 0.016 ../../../../textures/planets/starwars/microrelieve.png
+
+newmtl DS_|_Blindaje_09
+Ns 115.599983
+Ka 0.420000 0.420000 0.420000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd ../../../../textures/planets/starwars/blindaje_09.png
+map_Bump -bm 0.016 ../../../../textures/planets/starwars/microrelieve.png
+
+newmtl DS_|_Blindaje_10
+Ns 115.599983
+Ka 0.420000 0.420000 0.420000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd ../../../../textures/planets/starwars/blindaje_10.png
+map_Bump -bm 0.016 ../../../../textures/planets/starwars/microrelieve.png
+
+newmtl DS_|_Blindaje_11
+Ns 115.599983
+Ka 0.420000 0.420000 0.420000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd ../../../../textures/planets/starwars/blindaje_11.png
+map_Bump -bm 0.016 ../../../../textures/planets/starwars/microrelieve.png
+
+newmtl DS_|_Canales_negros
+Ns 39.999996
+Ka 0.300000 0.300000 0.300000
+Kd 0.018000 0.023000 0.031000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+
+newmtl DS_|_Fisuras_del_reflector
+Ns 52.900009
+Ka 0.400000 0.400000 0.400000
+Kd 0.025000 0.031000 0.043000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+
+newmtl DS_|_Interior_de_las_juntas
+Ns 48.400013
+Ka 0.380000 0.380000 0.380000
+Kd 0.082025 0.083725 0.085000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+
+newmtl DS_|_Luces_de_hangares
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.590000 0.690000 0.820000
+Ks 0.500000 0.500000 0.500000
+Ke 1.062000 1.242000 1.476000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl DS_|_Maquinaria_clara
+Ns 152.099991
+Ka 0.500000 0.500000 0.500000
+Kd 0.310000 0.325000 0.340000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+
+newmtl DS_|_Maquinaria_gris
+Ns 144.399994
+Ka 0.550000 0.550000 0.550000
+Kd 0.200000 0.215000 0.235000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+
+newmtl DS_|_Mecanismos_oscuros
+Ns 129.600006
+Ka 0.550000 0.550000 0.550000
+Kd 0.075000 0.083000 0.096000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+
+newmtl DS_|_Reflector_gris
+Ns 176.400024
+Ka 0.320000 0.320000 0.320000
+Kd 0.197825 0.201925 0.205000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+
+newmtl DS_|_Reflector_panel_claro
+Ns 159.999985
+Ka 0.320000 0.320000 0.320000
+Kd 0.233530 0.238370 0.242000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+
+newmtl DS_|_Reflector_panel_oscuro
+Ns 115.599983
+Ka 0.320000 0.320000 0.320000
+Kd 0.170805 0.174345 0.177000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3

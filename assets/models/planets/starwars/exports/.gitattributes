@@ -1,0 +1,3 @@
+*.obj -diff -text
+*.glb -diff -text
+*.mtl text eol=lf

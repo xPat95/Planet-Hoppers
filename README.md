@@ -146,4 +146,16 @@ El [plan de desarrollo](docs/development-plan.md) describe las diez etapas y su 
 
 ## Instrucciones de ejecución
 
-**Pendiente de implementación**. Esta entrega contiene únicamente la estructura de carpetas y documentación; todavía no hay un juego ejecutable ni dependencias que instalar.
+**Pendiente de implementación**. Esta entrega contiene estructura, documentación y modelos de planetas; todavía no hay un juego ejecutable ni dependencias del juego que instalar.
+
+
+## Planetas disponibles para integración
+
+Los siguientes recursos son **planetas del sistema solar**. Sus archivos Blender son las fuentes editables; las exportaciones de juego y sus límites están documentados por franquicia.
+
+| Planeta | Fuente editable | Revisión técnica |
+| --- | --- | --- |
+| Minecraft | [Minecraft](assets/models/planets/minecraft/README.md) | [Revisión](docs/references/minecraft/technical_review_v02.md) |
+| South Park | [South Park](assets/models/planets/southpark/README.md) | [Revisión](docs/planets/southpark.md) |
+| Smiling Friends | [Smiling Friends](assets/models/planets/smilingfriends/README.md) | [Organización](assets/models/planets/smilingfriends/README.md) |
+| Estrella de la Muerte | [Planeta de Star Wars](assets/models/planets/starwars/README.md) | [Revisión](docs/planets/starwars.md) |
