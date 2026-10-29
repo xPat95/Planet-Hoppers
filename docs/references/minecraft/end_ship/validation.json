@@ -1,0 +1,58 @@
+{
+  "source_size_blocks": [
+    13,
+    24,
+    29
+  ],
+  "source_block_counts": {
+    "purpur_pillar": 97,
+    "purpur_block": 557,
+    "obsidian": 26,
+    "end_stone_bricks": 36,
+    "magenta_stained_glass": 7,
+    "purpur_stairs": 175,
+    "end_rod": 6,
+    "ladder": 14,
+    "purpur_slab": 7,
+    "chest": 2,
+    "brewing_stand": 1,
+    "dragon_wall_head": 1
+  },
+  "half_cells": 6854,
+  "objects": 14,
+  "mesh_objects": 9,
+  "faces": 8458,
+  "vertices": 8673,
+  "packed_images": [
+    "brewing_stand.png",
+    "brewing_stand_base.png",
+    "chest.png",
+    "end_rod.png",
+    "end_stone_bricks.png",
+    "ladder.png",
+    "obsidian.png",
+    "purple_stained_glass.png",
+    "purpur_block.png",
+    "purpur_pillar_side.png",
+    "purpur_pillar_top.png"
+  ],
+  "forward": "+Y",
+  "up": "+Z",
+  "origin": "Main deck centerline",
+  "adaptations": [
+    "Purple glass supplied by user replaces vanilla magenta glass",
+    "Dragon head obsidian placeholder with cubic silhouette",
+    "Interior chest UVs and brewing stand simplified; no loot, mobs, item frames or bottles",
+    "Structure data markers excluded"
+  ],
+  "checks": {
+    "reopened_successfully": true,
+    "packed_images": true,
+    "all_meshes_have_uv": true,
+    "all_meshes_parented": true,
+    "all_meshes_flat": true,
+    "no_modifiers": true,
+    "no_animation": true,
+    "no_missing_materials": true
+  }
+}
