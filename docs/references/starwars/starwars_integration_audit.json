@@ -1,0 +1,95 @@
+{
+  "planet": "starwars",
+  "role": "planet",
+  "source": {
+    "mesh_objects": 9,
+    "vertices": 1014252,
+    "triangles": 507082,
+    "zero_or_negligible_triangles": 1024,
+    "materials": 23,
+    "bounds": [
+      [
+        -10.026607513427734,
+        10.017854690551758
+      ],
+      [
+        -10.041534423828125,
+        10.025406837463379
+      ],
+      [
+        -10.01193904876709,
+        10.01291275024414
+      ]
+    ]
+  },
+  "source_geometry_sha256": "f287177fca902f2c844f7a7742a19c5a6cdc1722dbd427cbe856bf7adfccb970",
+  "source_geometry_preserved": true,
+  "runtime_scale": 2.2,
+  "near": {
+    "mesh_objects": 9,
+    "vertices": 315687,
+    "triangles": 506058,
+    "zero_or_negligible_triangles": 0,
+    "materials": 23,
+    "bounds": [
+      [
+        -22.058536529541016,
+        22.03927993774414
+      ],
+      [
+        -22.09137535095215,
+        22.05589485168457
+      ],
+      [
+        -22.02626609802246,
+        22.02840805053711
+      ]
+    ]
+  },
+  "far": {
+    "mesh_objects": 7,
+    "vertices": 40687,
+    "triangles": 69670,
+    "zero_or_negligible_triangles": 0,
+    "materials": 11,
+    "bounds": [
+      [
+        -22.03738021850586,
+        22.03738021850586
+      ],
+      [
+        -22.03738021850586,
+        22.03738021850586
+      ],
+      [
+        -21.925199508666992,
+        21.925199508666992
+      ]
+    ]
+  },
+  "removed_triangles": 1024,
+  "glb_near": {
+    "bytes": 51965508,
+    "embedded_images": 13,
+    "materials": 23,
+    "mesh_primitives": 30
+  },
+  "glb_far": {
+    "bytes": 3127164,
+    "embedded_images": 2,
+    "materials": 11,
+    "mesh_primitives": 15
+  },
+  "import_near": {
+    "bounds_max_error": 0.0,
+    "triangles": 506058,
+    "zero_triangles": 0
+  },
+  "import_far": {
+    "bounds_max_error": 0.0,
+    "triangles": 69670,
+    "zero_triangles": 0
+  },
+  "triangle_reduction_far": 0.8623,
+  "validation_limit": "Reimportado en Blender; motor, FPS, colisiones y seleccion de LOD en el juego pendientes."
+}

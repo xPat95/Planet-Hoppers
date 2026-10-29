@@ -23,3 +23,13 @@ Desktop.ini
 # Respaldos automáticos de Blender del planeta Smiling Friends
 /assets/models/planets/smilingfriends/*.blend[0-9]*
 /assets/models/characters/smilingfriends/*.blend[0-9]*
+
+# Respaldos locales del planeta starwars
+/assets/models/planets/starwars/*.blend[0-9]*
+/assets/models/planets/starwars/backups/
+/tools/blender/starwars/__pycache__/
+
+# Respaldos locales del planeta regularshow
+/assets/models/planets/regularshow/*.blend[0-9]*
+/assets/models/planets/regularshow/backups/
+/tools/blender/regularshow/__pycache__/
