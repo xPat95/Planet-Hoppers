@@ -1,0 +1,95 @@
+{
+  "planet": "regularshow",
+  "role": "planet",
+  "source": {
+    "mesh_objects": 56,
+    "vertices": 299702,
+    "triangles": 511318,
+    "zero_or_negligible_triangles": 5871,
+    "materials": 88,
+    "bounds": [
+      [
+        -7.340000152587891,
+        7.395573616027832
+      ],
+      [
+        -7.404056549072266,
+        8.609999656677246
+      ],
+      [
+        -5.889999866485596,
+        6.683657169342041
+      ]
+    ]
+  },
+  "source_geometry_sha256": "42baa95fb7a728d84f02a373baa0e8a518e49e810cac5ec2ee245c27aa0857e0",
+  "source_geometry_preserved": true,
+  "runtime_scale": 2.2,
+  "near": {
+    "mesh_objects": 56,
+    "vertices": 278640,
+    "triangles": 505230,
+    "zero_or_negligible_triangles": 0,
+    "materials": 88,
+    "bounds": [
+      [
+        -16.148000717163086,
+        16.270261764526367
+      ],
+      [
+        -16.288925170898438,
+        18.941999435424805
+      ],
+      [
+        -12.958000183105469,
+        14.704046249389648
+      ]
+    ]
+  },
+  "far": {
+    "mesh_objects": 56,
+    "vertices": 88694,
+    "triangles": 146297,
+    "zero_or_negligible_triangles": 0,
+    "materials": 88,
+    "bounds": [
+      [
+        -16.148000717163086,
+        16.270261764526367
+      ],
+      [
+        -16.288925170898438,
+        18.941999435424805
+      ],
+      [
+        -12.959138870239258,
+        14.704044342041016
+      ]
+    ]
+  },
+  "removed_triangles": 6088,
+  "glb_near": {
+    "bytes": 10411588,
+    "embedded_images": 0,
+    "materials": 83,
+    "mesh_primitives": 160
+  },
+  "glb_far": {
+    "bytes": 3589240,
+    "embedded_images": 0,
+    "materials": 83,
+    "mesh_primitives": 160
+  },
+  "import_near": {
+    "bounds_max_error": 0.0,
+    "triangles": 505230,
+    "zero_triangles": 0
+  },
+  "import_far": {
+    "bounds_max_error": 0.0,
+    "triangles": 146297,
+    "zero_triangles": 0
+  },
+  "triangle_reduction_far": 0.7104,
+  "validation_limit": "Reimportado en Blender; motor, FPS, colisiones y seleccion de LOD en el juego pendientes."
+}

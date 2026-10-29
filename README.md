@@ -159,3 +159,4 @@ Los siguientes recursos son **planetas del sistema solar**. Sus archivos Blender
 | South Park | [South Park](assets/models/planets/southpark/README.md) | [Revisión](docs/planets/southpark.md) |
 | Smiling Friends | [Smiling Friends](assets/models/planets/smilingfriends/README.md) | [Organización](assets/models/planets/smilingfriends/README.md) |
 | Estrella de la Muerte | [Planeta de Star Wars](assets/models/planets/starwars/README.md) | [Revisión](docs/planets/starwars.md) |
+| Domo Espacial | [Planeta de Regular Show](assets/models/planets/regularshow/README.md) | [Revisión](docs/planets/regularshow.md) |

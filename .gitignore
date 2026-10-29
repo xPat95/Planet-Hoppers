@@ -28,3 +28,8 @@ Desktop.ini
 /assets/models/planets/starwars/*.blend[0-9]*
 /assets/models/planets/starwars/backups/
 /tools/blender/starwars/__pycache__/
+
+# Respaldos locales del planeta regularshow
+/assets/models/planets/regularshow/*.blend[0-9]*
+/assets/models/planets/regularshow/backups/
+/tools/blender/regularshow/__pycache__/
