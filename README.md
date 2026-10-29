@@ -39,7 +39,7 @@ Por ejemplo, al empezar con South Park y ganar Halloween, se recibe el token de 
 | Smiling Friends | Pim y Charlie | Hacer reír a personajes eligiendo chistes | Cami |
 | Halloween | Ghost Face | Escapar de personajes de terror | Cami |
 | Un Show Más (Regular Show) | Mordecai y Rigby | Shooter en primera persona con raycasting: disparar a enemigos y acumular puntos | Norman |
-| Star Wars | Baby Yoda | Minijuego estilo Galaga, sin raycasting | Norman |
+| Star Wars | Grogu (Baby Yoda) | Minijuego estilo Galaga, sin raycasting | Norman |
 
 La nave de Un Show Más es el carrito de golf con alas de cartón; sus personajes son Mordecai y Rigby. Los recursos están modelados; los enemigos y la implementación del minijuego siguen pendientes. Su identificador interno es `regularshow` y seguirá las mismas reglas de tokens, desbloqueo y abducción que las demás franquicias.
 
@@ -170,3 +170,4 @@ Los siguientes modelos son naves, independientes de los planetas. Los controles,
 | --- | --- | --- |
 | `regularshow` | Carrito de Regular Show | [Fuente y exportaciones](assets/models/ships/regularshow/golfcart/README.md) |
 | `starwars` | Caza Naboo N-1 | [Fuente y exportaciones](assets/models/ships/starwars/naboo/README.md) |
+| `starwars` | N-1 del Mandaloriano | [Fuente y exportaciones](assets/models/ships/starwars/mandalorian/README.md) |

@@ -1,0 +1,25 @@
+{
+  "id": "mandalorian_n1",
+  "role": "ship",
+  "franchise": "starwars",
+  "variant": "mandalorian",
+  "source": "assets/models/ships/starwars/mandalorian/mandalorian_n1_ship.blend",
+  "root": "Mandalorian_N1_ROOT",
+  "collection": "NAVE STAR WARS | N1 Mandaloriano y Grogu",
+  "near": "assets/models/ships/starwars/mandalorian/exports/mandalorian_n1_ship_near.glb",
+  "far": "assets/models/ships/starwars/mandalorian/exports/mandalorian_n1_ship_far.glb",
+  "obj": "assets/models/ships/starwars/mandalorian/exports/mandalorian_n1_ship.obj",
+  "audit": "docs/references/starwars/ships/mandalorian/integration_audit.json",
+  "characters": [
+    {
+      "id": "din_djarin",
+      "root": "Din_Djarin_ROOT",
+      "glb": "assets/models/characters/starwars/din_djarin.glb"
+    },
+    {
+      "id": "grogu",
+      "root": "Grogu_ROOT",
+      "glb": "assets/models/characters/starwars/grogu.glb"
+    }
+  ]
+}

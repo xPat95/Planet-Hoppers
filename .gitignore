@@ -43,3 +43,8 @@ Desktop.ini
 /assets/models/ships/starwars/naboo/*.blend[0-9]*
 /assets/models/ships/starwars/naboo/backups/
 /tools/blender/starwars/ships/naboo/__pycache__/
+
+# Respaldos y temporales de nave mandalorian_n1
+/assets/models/ships/starwars/mandalorian/*.blend[0-9]*
+/assets/models/ships/starwars/mandalorian/backups/
+/tools/blender/starwars/ships/mandalorian/__pycache__/

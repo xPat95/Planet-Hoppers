@@ -65,7 +65,7 @@ La configuración asociará el identificador de cada nave con su franquicia, los
 | `smilingfriends` | Pim y Charlie | `assets/models/characters/smilingfriends/` |
 | `halloween` | Ghost Face | `assets/models/characters/halloween/` |
 | `regularshow` | Mordecai y Rigby | `assets/models/characters/regularshow/` |
-| `starwars` | Baby Yoda | `assets/models/characters/starwars/` |
+| `starwars` | Grogu (Baby Yoda); Din Djarin incluido en su variante N-1 | `assets/models/characters/starwars/` |
 
 Al seleccionar la nave inicial o desbloquear una nueva nave, la escena consultará esa asociación en `config/` y entregará al módulo `src/characters/` las referencias de los personajes. El mismo módulo cargará uno o varios personajes y ejecutará la secuencia común de abducción con los parámetros necesarios de posición, escala y animación. El estado del juego conservará las asociaciones y los orígenes necesarios para coordinar la devolución final, independientemente de los cambios de nave activa.
 
@@ -105,3 +105,8 @@ Gameplay centraliza las recompensas; ships conserva el estado de las naves; char
 - Coordinar desde escenas el inicio de una visita y el regreso al sistema solar tras una derrota o al terminar una misión.
 - Acordar antes de integrar qué información intercambian los módulos: nave activa, naves desbloqueadas, identificador de planeta, resultado de misión, nuevo desbloqueo y progreso. No usar el cambio de nave como efecto secundario de una recompensa. Los contratos concretos quedan pendientes de la elección tecnológica.
 - Documentar los cambios que afecten módulos compartidos y evitar dependencias circulares entre ellos.
+
+
+## Variantes visuales de naves de Star Wars
+
+Los recursos de Star Wars incluyen el N-1 real de Naboo (piloto y R2) y el N-1 reconstruido de Din Djarin (Din y Grogu en subcabina). Ambos pertenecen al mismo identificador `starwars`; no agregan otra temática, token ni desbloqueo. El formato de configuración y la selección entre variantes siguen pendientes del motor. Grogu y Din también se entregan como modelos independientes para el módulo compartido de personajes.
