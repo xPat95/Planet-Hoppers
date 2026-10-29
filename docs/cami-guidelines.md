@@ -25,7 +25,7 @@ Vienen del enunciado del proyecto final (Software Renderer). Aplican a todo lo d
 | --- | --- | --- |
 | Planeta distinguible | La Tierra plana de Smiling Friends. | 10 |
 | Tipos de modelo propio sobre el planeta (máx. 4) | **Elegidos:** edificio Smiling Friends, edificio Frowning Friends, casa Shmaloogle y pirámide de Spamtopia. | 20 |
-| Distribución procedural reproducible (semilla) | Shmaloogles y casas del pueblo, árboles de los bosques, multitud de Spamtopia. | 10 |
+| Distribución procedural reproducible (semilla) | Shmaloogles y casas del pueblo, árboles de los bosques y edificios de relleno de Spamtopia. | 10 |
 | Shaders propios distinguibles | Fuego del infierno, arcoíris psicodélico de Spamtopia, haz verde del OVNI, cascada del borde (ver 1.6). | hasta 24 |
 | Shader animado | Fuego del infierno o arcoíris de Spamtopia que cambian con el tiempo. | 8 |
 | Niveles de detalle | Personajes y edificios simplificados a distancia. | 8 |
@@ -38,77 +38,64 @@ Vienen del enunciado del proyecto final (Software Renderer). Aplican a todo lo d
 
 ### 1.1 Concepto del planeta
 
-El planeta es **la Tierra plana**, tal como aparece en la serie: un disco con océanos y continentes, borde de hielo y agua que cae por la orilla.
+El planeta es **la Tierra plana**, tal como aparece en la serie: un disco con océano, islas, un borde de nubes y agua que cae por la orilla.
 
-- **Forma:** disco plano, no esfera. Los continentes siguen el mapa de la Tierra plana (polo norte al centro, Antártida como muro de hielo en el borde).
+- **Forma:** disco plano, no esfera. La tierra **no copia los continentes reales**: sigue el mapa propio de Cami (1.3.1), pensado para la serie.
 - **Sin relieve realista:** en lugar de montañas, cordilleras o nubes, la superficie está ocupada por **lugares y personajes de la serie**.
 - **Escala libre:** los elementos **no respetan proporciones reales**. Un edificio o un personaje puede medir lo que medio continente. La prioridad es que se reconozcan desde la nave.
 - **Estilo visual:** caricatura de la serie: colores sólidos, contornos negros gruesos, sombreado mínimo. Nada fotorrealista.
 
-### 1.2 Atracción principal: edificio de Smiling Friends Inc.
+### 1.2 Atracción principal: la calle de Smiling Friends Inc. y Frowning Friends
 
-Es el elemento más grande y el primero que se debe ver al acercarse.
+Es el elemento más grande y el primero que se debe ver al acercarse. Reproduce la escena de T1 EP7: los dos edificios **frente a frente, separados por la calle**.
 
-- Edificio con fachada de **cara sonriente amarilla gigante**: ojos blancos con pupilas negras, boca abierta negra y una puerta naranja pequeña en la base.
-- Lo acompaña un tramo de calle de la serie: el edificio **ASYLUM** a la izquierda, **TOILET EMPORIUM** a la derecha, banqueta, contenedor de basura y siluetas de la ciudad en tonos lilas.
-- **Ubicación:** al centro del disco (donde estaría el polo norte), como punto focal.
+- **Smiling Friends Inc.:** una **esfera amarilla gigante** (no un edificio con fachada), con la cara pintada (ojos blancos con contorno negro, pupilas, sonrisa negra abierta) y puerta naranja pequeña en la base. Está junto al centro del disco, como en el boceto.
+- **Frowning Friends Inc.:** **esfera azul más pequeña**, con ojos blancos y ceño fruncido, al otro lado de la calle y mirando a Smiling Friends. Es más pequeña para no tapar el punto central.
+- **La calle:** calle recta con línea central discontinua, banquetas, árboles y **edificios a los dos lados**. Del lado de Smiling Friends: **RON'S DELI** (rosa con toldo a rayas), **ASYLUM** (gris claro con ventanas turquesa), **TOILET EMPORIUM** (rosado con ventanas en arco), **ANTIQUE STORE** y, en los extremos, edificios más pequeños. Detrás de la esfera, un muro de ladrillo que la une con sus vecinos; delante, un contenedor y una parada de autobús. Del lado de Frowning Friends: un edificio bajo a cada lado de la esfera azul (lila y ladrillo) y dos más pequeños hacia cada extremo, como en el boceto. Los letreros son texto 3D.
+- **Ubicación:** centro del disco, sobre una isla de esquinas redondeadas. La calle corre de oeste a este: Smiling Friends al norte y Frowning Friends al sur. La calle es parte de la carretera que cruza el mapa (1.3.1).
 
 ### 1.3 Zonas del planeta
 
 | Zona | Episodio | Qué debe mostrarse | Ubicación (ver mapa 1.3.1) |
 | --- | --- | --- | --- |
-| Smiling Friends Inc. | Toda la serie | Edificio con cara sonriente y su calle (1.2). | Centro del disco, en una isla-ciudad sobre el Ártico. |
-| Frowning Friends Inc. | T1 EP7 "Frowning Friends" | Su edificio, versión opuesta del de Smiling Friends: cara de ceño fruncido y colores apagados. | Asia (Siberia), frío y gris, mirando al edificio principal desde el otro lado del centro. |
-| Enchanted Forest | T1 EP6 "Enchanted Forest" | Bosque de fantasía: colores saturados y árboles mágicos. | Sudamérica (Amazonas). |
-| Bosque y casa de Mr. Frog | T1 EP2 "Mr. Frog" | Bosque con la casa de Mr. Frog. | Europa (Francia), guiño a "Le Voyage Incroyable de Monsieur Grenouille" (T3 EP2). |
-| Bosque del demonio | T1 EP4 "A Silly Halloween Special" | Bosque oscuro y nocturno donde se pierde Pim, con el Forest Demon visible entre los árboles. | Norteamérica (bosques de Canadá). |
+| Calle central: Smiling Friends Inc. y Frowning Friends Inc. | Toda la serie y T1 EP7 "Frowning Friends" | Las dos esferas frente a frente y la calle con sus edificios (1.2), rodeadas de árboles. | Centro del disco. |
+| Spamtopia | T2 EP7 "The Magical Red Jewel (aka Tyler Gets Fired)" | Al salir de la ciudad, el suelo pasa en degradado del pasto a la **arena del desierto** (letrero **SPAMTOPIA**, montañas naranjas y cactus) y luego al **verde brillante de Spamtopia**, donde la carretera se vuelve **arcoíris** y hay faroles rosas. Spamtopia se siente **llena de edificios psicodélicos simples** (pirámides, triángulos invertidos, cúpulas, paletas, losas, torres, picos y tubos en colores neón): importa la sensación de lugar lleno, no el detalle. Sin rey ni multitud. | Noroeste. La carretera sale de la calle central, cruza el desierto y Spamtopia en curva y se pierde por el borde del disco. |
+| Casa de Mr. Frog | T1 EP2 "Mr. Frog" | Península con un sendero de tierra que sube entre montañas grises y azules nevadas, arbustos y **pirámides amarillas**, hasta la cabaña redonda de techo cónico entre pinos oscuros. | Norte: península que sale de la tierra central, detrás de Smiling Friends. |
+| Shmaloogleville | T3 EP7 "Shmaloogles" | Pueblo rodeado por un **muro color ciruela**, con casas redondeadas magenta, verdes y moradas y muchos Shmaloogles azules. Se llega por la carretera, que entra en un **túnel** en una colina verde, y por un **puente** desde lo alto de la colina hasta el muro. | Este, contra el borde del disco. |
+| Castillo del mago | T3 EP7 "Shmaloogles" | Castillo oscuro de torres puntiagudas sobre rocas. | Sureste, debajo de Shmaloogleville y junto a la colina. |
+| Enchanted Forest | T1 EP6 "Enchanted Forest" | Isla con árboles esponjosos verdes y magenta y el **castillo amarillo** al centro. | Suroeste. Un puente de madera la une a la tierra central. |
+| Bosque del Forest Demon | T1 EP4 "A Silly Halloween Special" | Isla oscura con árboles morados y el Forest Demon (negro, con astas) al centro. | Sur. Un puente gris tipo escalera la une a la tierra central, del lado de Frowning Friends. |
+| Brasil | Brasil | Isla con forma de Sudamérica: el **Cristo Redentor** sobre un cerro y casitas en la ladera. | Sureste, aislada (sin puente). |
 | Infierno | T1 EP8 "Charlie Dies and Doesn't Come Back" | Fuego, rojos y naranjas, Satanás. | **Cara inferior del disco**, justo debajo del centro, con un resplandor rojo que asoma por el borde. |
-| Spamtopia | T2 EP7 "The Magical Red Jewel (aka Tyler Gets Fired)" | Desierto psicodélico: carreteras arcoíris, pirámides, formas geométricas y cactus de colores saturados. | África (Sahara y Egipto): el desierto con pirámides reales. |
-| Pueblo de los Shmaloogles (Shmaloogleville) | T3 EP7 "Shmaloogles" | Colinas verdes con casas redondeadas de colores (ventanas circulares, puertas en arco, tallos morados en espiral) y caminos de tierra amarilla. | Australia: continente aislado, como un reino aparte, **lejos de Spamtopia**. |
 
 Reglas de las zonas:
 
-1. **Los tres bosques deben distinguirse a simple vista:** Enchanted Forest luminoso y fantástico, el de Mr. Frog con tonos naturales y el del demonio oscuro y de noche.
-2. **Contraste entre Smiling y Frowning:** Frowning Friends es el reflejo de Smiling Friends: misma forma general y colores invertidos o apagados.
+1. **Los tres bosques deben distinguirse a simple vista:** los árboles verdes redondos de la tierra central, los pinos oscuros de Mr. Frog, los verdes y magenta del Enchanted Forest y los morados del Forest Demon.
+2. **Contraste entre Smiling y Frowning:** Frowning Friends es el reflejo de Smiling Friends: misma forma (esfera), pero azul, más pequeña y con ceño fruncido.
 3. **El infierno no ocupa la cara superior.** Descubrirlo al pasar por debajo del disco es la sorpresa del planeta.
 4. **Spamtopia contrasta con todo lo demás:** es la zona más saturada del disco; su suelo puede llevar un shader propio (1.6).
-5. Entre zonas puede quedar océano o continente simple, sin detalle.
+5. Las nubes de transición solo flotan sobre el océano: nunca tapan tierra ni zonas.
 
 #### 1.3.1 Mapa del disco
 
-No existe un mapa oficial del mundo de la serie, así que la distribución usa el **mapa clásico de la Tierra plana** (proyección azimutal: polo norte al centro, continentes alrededor, Antártida como muro de hielo en el borde). Cada zona va en el continente cuyo clima o paisaje real se parece al del episodio.
+El mapa es el boceto de Cami: [smilingfriends_layout_sketch.png](references/smilingfriends/smilingfriends_layout_sketch.png). El script lo usa como plano de coordenadas: el círculo del boceto es el borde del disco, y cada isla, camino y zona se ubica con las coordenadas de píxel del boceto (escalado a 2000 px de ancho). Para mover algo, se cambian sus coordenadas en el script.
 
 ```text
-                      Norteamérica
-                   [Bosque del demonio]
-                     (bosque nocturno)
-
- Sudamérica                                       Asia
- [Enchanted Forest]      ( ÁRTICO )          [Frowning Friends]
- (selva saturada)   [SMILING FRIENDS INC.]     (frío y gris)
-                         isla-ciudad
-
-         Europa                              Australia
-     [Mr. Frog]                          [Shmaloogleville]
-     (bosque natural)                     (colinas verdes)
-
-                       África
-                    [Spamtopia]
-                 (desierto + pirámides)
-
-  ~~~~~~~~~~ Antártida: muro de hielo + cascada en todo el borde ~~~~~~~~~~
-
-  Cara inferior, debajo del centro: [INFIERNO] con Satanás y Charlie
+                       N
+        [Spamtopia]         [Mr. Frog: península,
+     carretera curva y        sendero y cabaña]
+     figuras de colores
+            |
+ O   desierto y rey --- calle central: SMILING FRIENDS --- colina/túnel [SHMALOOGLEVILLE]  E
+                                      FROWNING FRIENDS        [castillo del mago]
+   [Enchanted Forest] =puente=  tierra central
+                                     || escalera
+                            [Bosque del Forest Demon]       [Brasil]
+                       S
+  Borde: nubes y cascada.   Cara inferior: INFIERNO.
 ```
 
-Criterios de la distribución:
-
-1. **Sentido geográfico:** el desierto de Spamtopia va en el Sahara (con pirámides), la selva fantástica en el Amazonas, el bosque oscuro en los bosques del norte, Shmaloogleville aislada en Australia y Frowning Friends en el frío de Siberia.
-2. **Sentido en la serie:** Smiling Friends es el centro de todo. Frowning Friends queda enfrente, como su reflejo, y Mr. Frog va en Europa por su episodio francés.
-3. **Sentido para la cámara:** las zonas quedan repartidas **alrededor del centro en ángulos distintos**. Al rodear el disco o mientras rota, siempre aparece una zona nueva y no hay dos zonas llamativas juntas.
-4. **Contraste de colores entre vecinos:** el bosque nocturno (oscuro) queda lejos de Spamtopia (neón), y los tres bosques no comparten continente.
-
-La forma de los continentes es simplificada (siluetas planas de caricatura); solo debe reconocerse que es la Tierra.
+Islas: tierra central (con la calle, el noroeste de Spamtopia, la península de Mr. Frog y el este de Shmaloogleville y el castillo), Enchanted Forest, Forest Demon y Brasil.
 
 ### 1.4 Personajes en el planeta
 
@@ -121,16 +108,14 @@ Todos se colocan a escala exagerada en su zona y deben leerse desde la nave.
 | Allan | Smiling Friends Inc. | Rojo. |
 | Glep | Smiling Friends Inc. | Verde y pequeño. |
 | The Boss (Mr. Boss) | Smiling Friends Inc. | |
-| Grim y Gnarly | Frowning Friends Inc. | **Solo los dos Frowning Friends**, sin más personajes en esa zona. |
+| Grim y Gnarly | Frente a Frowning Friends Inc., en la calle central. | **Solo los dos Frowning Friends**. |
 | Mr. Frog | Su bosque y su casa. | |
 | Mip | Enchanted Forest | Enano del bosque, antagonista del episodio. |
 | Forest Demon | Bosque del demonio | Solo "el demonio del bosque", sin nombre propio. |
 | Satanás y Charlie | Infierno | |
-| Oscar, rey de Spamtopia (Mr. Jester) | Spamtopia | **Único personaje con nombre** de la zona. |
-| Multitud de Spamtopia | Spamtopia | Alrededor del rey, **sacrificando a uno de ellos**: la víctima es otra criatura genérica como las de la multitud, levantada en alto. |
 | Shmaloogles | Shmaloogleville | **Muchos**, criaturas azules redondas; sin personajes con nombre. |
 
-**Estilo de la multitud de Spamtopia:** criaturas muy distintas entre sí (alargadas, triangulares, cuadradas, con muchos ojos), colores neón saturados (verde menta, rosa, morado, amarillo, naranja), ojos grandes, bocas abiertas gritando con dientes y brazos levantados. Para el renderizador se resuelve con **pocos modelos base simples** (3 o 4 siluetas) que la distribución procedural repite con distinto color, escala y rotación.
+**Spamtopia no lleva personajes** (decisión de Cami): la zona se enfoca en el lugar.
 
 **Personajes recurrentes extra** (Desmond, Gwimbly, etc.): solo si sobra tiempo al final.
 
@@ -148,7 +133,13 @@ Todos se colocan a escala exagerada en su zona y deben leerse desde la nave.
 | Capturas y referencias | `docs/references/smilingfriends/` |
 | Scripts de Blender | `tools/blender/smilingfriends/` |
 
-Cada elemento grande se modela **por separado** (edificio, cada bosque, infierno, Spamtopia, pueblo), para ajustar su escala y posición sobre el disco sin rehacer el planeta. Los elementos repetidos (Shmaloogles, casas, árboles, multitud) son **un solo modelo instanciado** por la distribución procedural.
+**Flujo de trabajo:** el planeta se genera con `tools/blender/smilingfriends/build_smilingfriends_planet.py` (Blender 5.2, semilla fija `SEED`). El script borra y recrea `smilingfriends_planet.blend` y las capturas `docs/references/smilingfriends/smilingfriends_<versión>_<vista>.png`. **No editar el `.blend` a mano:** cualquier cambio va al script, o se pierde en la siguiente ejecución.
+
+```text
+blender -b --factory-startup --python tools/blender/smilingfriends/build_smilingfriends_planet.py
+```
+
+Cada elemento grande se modela **por separado** (edificio, cada bosque, infierno, Spamtopia, pueblo), para ajustar su escala y posición sobre el disco sin rehacer el planeta. Los elementos repetidos (Shmaloogles, casas, árboles, edificios de Spamtopia) son **un solo modelo instanciado** por la distribución procedural.
 
 ### 1.6 Consideraciones técnicas
 
