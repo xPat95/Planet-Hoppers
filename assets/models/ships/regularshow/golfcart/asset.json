@@ -1,0 +1,25 @@
+{
+  "id": "regularshow_golfcart",
+  "role": "ship",
+  "franchise": "regularshow",
+  "variant": "golfcart",
+  "source": "assets/models/ships/regularshow/golfcart/regularshow_golfcart_ship.blend",
+  "root": "RegularShow_GolfCart_ROOT",
+  "collection": "NAVE REGULAR SHOW | Carrito de golf",
+  "near": "assets/models/ships/regularshow/golfcart/exports/regularshow_golfcart_ship_near.glb",
+  "far": "assets/models/ships/regularshow/golfcart/exports/regularshow_golfcart_ship_far.glb",
+  "obj": "assets/models/ships/regularshow/golfcart/exports/regularshow_golfcart_ship.obj",
+  "audit": "docs/references/regularshow/ships/golfcart/integration_audit.json",
+  "characters": [
+    {
+      "id": "mordecai",
+      "root": "Mordecai_ROOT",
+      "glb": "assets/models/characters/regularshow/mordecai.glb"
+    },
+    {
+      "id": "rigby",
+      "root": "Rigby_ROOT",
+      "glb": "assets/models/characters/regularshow/rigby.glb"
+    }
+  ]
+}

@@ -33,3 +33,18 @@ Desktop.ini
 /assets/models/planets/regularshow/*.blend[0-9]*
 /assets/models/planets/regularshow/backups/
 /tools/blender/regularshow/__pycache__/
+
+# Respaldos y temporales de nave regularshow_golfcart
+/assets/models/ships/regularshow/golfcart/*.blend[0-9]*
+/assets/models/ships/regularshow/golfcart/backups/
+/tools/blender/regularshow/ships/golfcart/__pycache__/
+
+# Respaldos y temporales de nave naboo_n1
+/assets/models/ships/starwars/naboo/*.blend[0-9]*
+/assets/models/ships/starwars/naboo/backups/
+/tools/blender/starwars/ships/naboo/__pycache__/
+
+# Respaldos y temporales de nave mandalorian_n1
+/assets/models/ships/starwars/mandalorian/*.blend[0-9]*
+/assets/models/ships/starwars/mandalorian/backups/
+/tools/blender/starwars/ships/mandalorian/__pycache__/
