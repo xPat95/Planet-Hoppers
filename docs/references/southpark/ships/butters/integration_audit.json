@@ -1,0 +1,58 @@
+{
+  "asset_id": "southpark_butters",
+  "role": "ship",
+  "franchise": "southpark",
+  "variant": "butters",
+  "source": "assets\\models\\ships\\southpark\\butters\\southpark_butters_ship.blend",
+  "source_sha256": "3557d4faa1d820b8459e65d81901f5a6a25f7ae29aec751af6f830f32a004259",
+  "source_unchanged": true,
+  "source_meshes": 206,
+  "export": "assets\\models\\ships\\southpark\\butters\\exports\\southpark_butters_ship.glb",
+  "export_stats": {
+    "meshes": 15,
+    "triangles": 10374,
+    "degenerate_triangles": 0,
+    "bounds": [
+      [
+        -2.088696241378784,
+        2.088696241378784
+      ],
+      [
+        -2.440000057220459,
+        2.630000114440918
+      ],
+      [
+        -1.4700000286102295,
+        1.9126654863357544
+      ]
+    ]
+  },
+  "reimport": "OK",
+  "reimport_stats": {
+    "meshes": 15,
+    "triangles": 10374,
+    "degenerate_triangles": 0,
+    "bounds": [
+      [
+        -2.088696241378784,
+        2.088696241378784
+      ],
+      [
+        -2.440000057220459,
+        2.630000114440918
+      ],
+      [
+        -1.4700000286102295,
+        1.9126654863357544
+      ]
+    ]
+  },
+  "packed_texture": true,
+  "closed_cabin_windows": 3,
+  "front_blender": "-Y",
+  "up_blender": "+Z",
+  "units": "metres",
+  "root": "SouthPark_Butters_ROOT",
+  "pivot": "Hull centre; glTF exporter converts axes to Y up",
+  "limits": "No engine, physics, collision, animation or runtime performance verification."
+}
