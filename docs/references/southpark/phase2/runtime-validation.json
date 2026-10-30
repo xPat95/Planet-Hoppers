@@ -1,0 +1,33 @@
+{
+  "frames": 90,
+  "manual_hardware_input_tested": false,
+  "model": {
+    "bounds_max": [
+      370.0,
+      23.196308135986328,
+      160.0
+    ],
+    "bounds_min": [
+      -350.0,
+      -1.0,
+      -175.0
+    ],
+    "draw_batches": 28,
+    "material_colors_match": true,
+    "original_primitives": 2734,
+    "source_materials": 27,
+    "triangles": 76212
+  },
+  "notes": "Real OpenGL render and raylib automation events. Physical keyboard/mouse and long play sessions require manual verification.",
+  "raylib_automation": {
+    "E_confirmations": 1,
+    "Escape_recapture": true,
+    "Escape_release": true,
+    "W_Shift": true,
+    "mouse_look": true,
+    "run_blocked_at_m": 2.4999046325683594
+  },
+  "render_mean_ms": 8.96886588235294,
+  "scene_solids": 395,
+  "status": "PASS"
+}

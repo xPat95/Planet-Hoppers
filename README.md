@@ -142,11 +142,17 @@ El [plan de desarrollo](docs/development-plan.md) describe las diez etapas y su 
 
 ## Tecnologías utilizadas
 
-**Pendiente de definir**. El equipo aún no ha elegido lenguaje, motor gráfico, librerías ni framework.
+La prueba independiente de South Park utiliza **Rust (edición 2021), raylib-rs 5.5.1 y serde/serde_json**. Renderiza el GLB real en 3D, con controlador FPS, colisiones y raycasting de interacción. La integración del juego completo y del sistema solar sigue pendiente.
 
 ## Instrucciones de ejecución
 
-**Pendiente de implementación**. Esta entrega contiene estructura, documentación y modelos de planetas; todavía no hay un juego ejecutable ni dependencias del juego que instalar.
+Desde la raíz del repositorio, con Rust/Cargo y las herramientas nativas de raylib instaladas:
+
+```powershell
+cargo run --locked --bin southpark
+```
+
+No requiere Blender ni teclado numérico para jugar. WASD mueve al jugador, mouse mira, Shift corre, E interactúa y Escape libera/recupera el cursor. Cerrar la ventana o Ctrl+Q termina la prueba. Ver [requisitos, configuración, pruebas y limitaciones de la fase 2](docs/minigames/southpark-phase2.md).
 
 
 ## Planetas disponibles para integración

@@ -1,6 +1,6 @@
 # Contrato del escenario de South Park
 
-Actualmente el repositorio no tiene motor, lenguaje de juego ni administrador de escenas implementado. Esta fase entrega recursos portables y un contrato de datos, sin introducir un framework en los módulos compartidos.
+La fase 1 entregó el contrato de recursos descrito abajo. La fase 2 lo consume desde Rust/raylib-rs: `mod.rs` compone el escenario y los objetos técnicos; `src/scenes/southpark_dev.rs` ofrece la ejecución independiente. El controlador FPS, las colisiones y la selección por rayo viven en `src/minigames/common/`. Todavía no existe un administrador global de escenas ni integración con el sistema solar. Ver [ejecución, configuración y verificación](../../../docs/minigames/southpark-phase2.md).
 
 El punto de entrada de recursos es `assets/models/minigames/southpark/southpark_town.scene.json`, identificador `southpark.save-kenny.environment`, esquema 1. Las rutas `blend` y `visual_asset` se resuelven respecto de ese manifiesto; `source` es una ruta de auditoría relativa a la raíz del repositorio. No se necesita cargar el planeta fuente durante el juego.
 

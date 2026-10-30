@@ -2,7 +2,9 @@
 
 ## Alcance inicial
 
-Esta arquitectura organiza el trabajo sin elegir lenguaje, motor gráfico, librerías ni formatos de configuración. Por ahora solo existen documentación y carpetas reservadas; las responsabilidades siguientes guiarán la implementación futura.
+La organización inicial se definió sin elegir motor. Desde la fase 2 de South Park existe una aplicación mínima Rust/raylib-rs: `src/bin/southpark.rs` inicia el anfitrión de desarrollo de `src/scenes/southpark_dev.rs`. El resto del juego y el sistema solar continúan pendientes.
+
+El controlador, la colisión continua contra AABB, el raycasting y la lectura del manifiesto están en `src/minigames/common/`; la escena y sus tres objetos de prueba están en `src/minigames/southpark/`. `src/graphics/` carga y agrupa las mallas en memoria y aplica iluminación. La configuración de desarrollo está en `config/southpark-dev.json`. Estos módulos no importan naves, progreso, personajes ni sistema solar. Ver [detalle de fase 2](minigames/southpark-phase2.md). Las responsabilidades siguientes siguen guiando las futuras implementaciones.
 
 ## Recursos y configuración
 
