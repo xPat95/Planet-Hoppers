@@ -17,6 +17,26 @@ pub fn select_target(
     direction: Vector3,
     range: f32,
 ) -> Option<usize> {
+    select_target_with(
+        targets,
+        world,
+        origin,
+        direction,
+        range,
+        |_, _, _, _, hit| Some(hit),
+    )
+}
+
+/// Optional narrow phase refines a broad AABB hit, e.g. an alpha-tested sprite.
+/// Both static props and animated targets share range, nearest-hit and occlusion.
+pub fn select_target_with(
+    targets: &[InteractionTarget],
+    world: &CollisionWorld,
+    origin: Vector3,
+    direction: Vector3,
+    range: f32,
+    exact_hit: impl Fn(usize, Vector3, Vector3, f32, f32) -> Option<f32>,
+) -> Option<usize> {
     if direction.dot(direction) < 1e-10 || !range.is_finite() || range <= 0.0 {
         return None;
     }
@@ -28,11 +48,13 @@ pub fn select_target(
             target
                 .bounds
                 .ray(origin, direction, range)
-                .map(|hit| (i, hit.distance))
+                .and_then(|hit| exact_hit(i, origin, direction, range, hit.distance))
+                .filter(|distance| distance.is_finite() && *distance >= 0.0 && *distance <= range)
+                .map(|distance| (i, distance))
         })
         .min_by(|a, b| a.1.total_cmp(&b.1))?;
     if world
-        .ray_distance(origin, direction, range)
+        .ray_distance_ignoring(origin, direction, range, Some(&targets[candidate.0].id))
         .is_some_and(|d| d < candidate.1 - 0.0001)
     {
         return None;

@@ -8,6 +8,8 @@ El controlador, la colisión continua contra AABB, el raycasting y la lectura de
 
 ## Recursos y configuración
 
+La fase 3 mantiene la separación: `src/minigames/southpark/kenny.rs` administra a Kenny y `navigation.rs` obtiene su red desde las calles del manifiesto. `src/graphics/billboard.rs` comparte la geometría del plano con la prueba de alfa del raycasting. `src/scenes/kenny_dialogue.rs` representa el diálogo; los estados `Closed`, `Invitation` y `Preparing` pertenecen a South Park. El FPS se detiene durante el diálogo y se retoma al cerrarlo. No se añaden dependencias ni sistemas de interacción paralelos. Ver [fase 3](minigames/southpark-phase3.md).
+
 | Carpeta | Responsabilidad |
 | --- | --- |
 | `assets/models/planets/` | Modelos de los seis planetas, separados por franquicia. |

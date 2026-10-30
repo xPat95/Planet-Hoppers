@@ -145,8 +145,18 @@ impl CollisionWorld {
         !self.obstacles.iter().any(|o| body.overlaps(o.bounds))
     }
     pub fn ray_distance(&self, origin: Vector3, direction: Vector3, max: f32) -> Option<f32> {
+        self.ray_distance_ignoring(origin, direction, max, None)
+    }
+    pub fn ray_distance_ignoring(
+        &self,
+        origin: Vector3,
+        direction: Vector3,
+        max: f32,
+        ignored: Option<&str>,
+    ) -> Option<f32> {
         self.obstacles
             .iter()
+            .filter(|o| Some(o.id.as_str()) != ignored)
             .filter_map(|o| o.bounds.ray(origin, direction, max).map(|h| h.distance))
             .min_by(f32::total_cmp)
     }
@@ -159,6 +169,16 @@ impl CollisionWorld {
         radius: f32,
         height: f32,
     ) -> Vector3 {
+        self.move_body_ignoring(feet, displacement, radius, height, None)
+    }
+    pub fn move_body_ignoring(
+        &self,
+        feet: Vector3,
+        displacement: Vector3,
+        radius: f32,
+        height: f32,
+        ignored: Option<&str>,
+    ) -> Vector3 {
         let half = Vector3::new(radius, height * 0.5, radius);
         let mut center = Vector3::new(feet.x, self.ground_y + half.y, feet.z);
         let mut remaining = Vector3::new(displacement.x, 0.0, displacement.z);
@@ -169,6 +189,7 @@ impl CollisionWorld {
             let hit = self
                 .obstacles
                 .iter()
+                .filter(|o| Some(o.id.as_str()) != ignored)
                 .filter_map(|o| o.bounds.expanded(half).ray(center, remaining, 1.0))
                 .filter(|h| remaining.dot(h.normal) < -1e-8)
                 .min_by(|a, b| a.distance.total_cmp(&b.distance));

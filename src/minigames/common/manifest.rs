@@ -26,6 +26,11 @@ pub struct Coordinates {
     pub gltf_up: String,
 }
 #[derive(Deserialize)]
+pub struct Road {
+    pub name: String,
+    pub points: Vec<[f32; 3]>,
+}
+#[derive(Deserialize)]
 pub struct SceneManifest {
     pub schema_version: u32,
     pub id: String,
@@ -33,6 +38,7 @@ pub struct SceneManifest {
     pub coordinates: Coordinates,
     pub spawn: Spawn,
     pub colliders: Vec<Collider>,
+    pub roads: Vec<Road>,
 }
 
 pub fn from_blender(p: [f32; 3]) -> Vector3 {

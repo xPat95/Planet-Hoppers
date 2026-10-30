@@ -142,7 +142,7 @@ El [plan de desarrollo](docs/development-plan.md) describe las diez etapas y su 
 
 ## Tecnologías utilizadas
 
-La prueba independiente de South Park utiliza **Rust (edición 2021), raylib-rs 5.5.1 y serde/serde_json**. Renderiza el GLB real en 3D, con controlador FPS, colisiones y raycasting de interacción. La integración del juego completo y del sistema solar sigue pendiente.
+La prueba independiente de South Park utiliza **Rust (edición 2021), raylib-rs 5.5.1 y serde/serde_json**. Renderiza el GLB real en 3D, con controlador FPS, colisiones, raycasting y Kenny como sprite con movimiento autónomo. La integración del juego completo y del sistema solar sigue pendiente.
 
 ## Instrucciones de ejecución
 
@@ -153,6 +153,8 @@ cargo run --locked --bin southpark
 ```
 
 No requiere Blender ni teclado numérico para jugar. WASD mueve al jugador, mouse mira, Shift corre, E interactúa y Escape libera/recupera el cursor. Cerrar la ventana o Ctrl+Q termina la prueba. Ver [requisitos, configuración, pruebas y limitaciones de la fase 2](docs/minigames/southpark-phase2.md).
+
+Kenny aparece cerca del jugador: acercarse, apuntarle y pulsar E abre **SAVE KENNY!**. Aceptar solo muestra una preparación; cancelar permite seguir explorando. F3 oculta su indicador de distancia. Ver [Kenny, rutas, diálogo y capturas de fase 3](docs/minigames/southpark-phase3.md).
 
 
 ## Planetas disponibles para integración

@@ -1,0 +1,20 @@
+{
+  "accepted_preparation_by_mouse": true,
+  "cancel_resumed_walk": true,
+  "closed_and_recaptured": true,
+  "dialogue_cursor_free": true,
+  "dialogue_opened_with_E": true,
+  "fps_frozen_during_dialogue": true,
+  "frames": 210,
+  "manual_hardware_input_tested": false,
+  "road_edges": 645,
+  "road_nodes": 638,
+  "status": "PASS",
+  "stopped_and_settled": true,
+  "texture": {
+    "height": 367,
+    "opaque_pixels": 566,
+    "transparent_pixels": 17087,
+    "width": 271
+  }
+}

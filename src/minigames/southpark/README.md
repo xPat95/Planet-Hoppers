@@ -1,5 +1,7 @@
 # Contrato del escenario de South Park
 
+La fase 3 añade `kenny.rs` (estado, movimiento y animación), `navigation.rs` (waypoints de las calles) y el diálogo de SAVE KENNY!. El billboard reutilizable está en `src/graphics/billboard.rs`; el raycasting común permite refinar el impacto con el alfa del PNG. No hay amenazas ni vidas. Ver [guía de fase 3](../../../docs/minigames/southpark-phase3.md).
+
 La fase 1 entregó el contrato de recursos descrito abajo. La fase 2 lo consume desde Rust/raylib-rs: `mod.rs` compone el escenario y los objetos técnicos; `src/scenes/southpark_dev.rs` ofrece la ejecución independiente. El controlador FPS, las colisiones y la selección por rayo viven en `src/minigames/common/`. Todavía no existe un administrador global de escenas ni integración con el sistema solar. Ver [ejecución, configuración y verificación](../../../docs/minigames/southpark-phase2.md).
 
 El punto de entrada de recursos es `assets/models/minigames/southpark/southpark_town.scene.json`, identificador `southpark.save-kenny.environment`, esquema 1. Las rutas `blend` y `visual_asset` se resuelven respecto de ese manifiesto; `source` es una ruta de auditoría relativa a la raíz del repositorio. No se necesita cargar el planeta fuente durante el juego.

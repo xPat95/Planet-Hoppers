@@ -9,5 +9,6 @@
     "fov_degrees": 65.0
   },
   "interaction_distance": 4.5,
-  "test_objects": true
+  "test_objects": true,
+  "kenny_hint": true
 }

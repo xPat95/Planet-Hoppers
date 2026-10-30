@@ -7,6 +7,17 @@ use crate::minigames::common::{
 use raylib::prelude::Vector3;
 use serde::Deserialize;
 use std::path::Path;
+pub mod kenny;
+pub mod navigation;
+use kenny::{Kenny, KENNY_ID};
+use navigation::RoadNetwork;
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum KennyDialogue {
+    Closed,
+    Invitation,
+    Preparing,
+}
 
 #[derive(Clone, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -14,6 +25,11 @@ pub struct DevConfig {
     pub player: FpsConfig,
     pub interaction_distance: f32,
     pub test_objects: bool,
+    #[serde(default = "default_hint")]
+    pub kenny_hint: bool,
+}
+fn default_hint() -> bool {
+    true
 }
 impl DevConfig {
     pub fn load(path: &Path) -> Result<Self, Box<dyn std::error::Error>> {
@@ -50,6 +66,11 @@ pub struct SouthParkScene {
     pub interaction_distance: f32,
     pub confirmation: Option<(String, f32)>,
     pub interaction_count: u32,
+    pub kenny: Kenny,
+    pub roads: RoadNetwork,
+    pub dialogue: KennyDialogue,
+    pub kenny_hint: bool,
+    kenny_obstacle: usize,
 }
 
 impl SouthParkScene {
@@ -101,6 +122,26 @@ impl SouthParkScene {
                 });
             }
         }
+        let roads = RoadNetwork::build(&manifest.roads, &world)?;
+        // The initial approach must not target the occupied player spawn.
+        world.obstacles.push(Obstacle {
+            id: "fps-player".into(),
+            bounds: world.body(player.feet, player.config.radius, player.config.body_height),
+        });
+        let kenny = Kenny::new(player.feet + Vector3::new(3.4, 0.0, -1.3), &roads, &world);
+        world.obstacles.pop();
+        let kenny = kenny?;
+        let kenny_obstacle = world.obstacles.len();
+        world.obstacles.push(Obstacle {
+            id: KENNY_ID.into(),
+            bounds: kenny.body(&world),
+        });
+        targets.push(InteractionTarget {
+            id: KENNY_ID.into(),
+            label: "Kenny".into(),
+            bounds: kenny.body(&world),
+            action: "talk-kenny".into(),
+        });
         Ok(Self {
             world,
             player,
@@ -108,10 +149,20 @@ impl SouthParkScene {
             interaction_distance: config.interaction_distance,
             confirmation: None,
             interaction_count: 0,
+            kenny,
+            roads,
+            dialogue: KennyDialogue::Closed,
+            kenny_hint: config.kenny_hint,
+            kenny_obstacle,
         })
     }
     pub fn interact(&mut self, index: usize) {
         if let Some(target) = self.targets.get(index) {
+            if target.action == "talk-kenny" {
+                self.dialogue = KennyDialogue::Invitation;
+                self.kenny.pause();
+                return;
+            }
             if target.action == "dev-confirm" {
                 self.interaction_count += 1;
                 let text = format!(
@@ -130,5 +181,34 @@ impl SouthParkScene {
                 self.confirmation = None;
             }
         }
+    }
+    pub fn update_kenny(&mut self, dt: f32) {
+        let player_body = self.world.body(
+            self.player.feet,
+            self.player.config.radius,
+            self.player.config.body_height,
+        );
+        self.world.obstacles.push(Obstacle {
+            id: "fps-player".into(),
+            bounds: player_body,
+        });
+        self.kenny.update(dt, &self.roads, &self.world);
+        self.world.obstacles.pop();
+        self.world.obstacles[self.kenny_obstacle].bounds = self.kenny.body(&self.world);
+    }
+    pub fn kenny_target(&self) -> usize {
+        self.targets
+            .iter()
+            .position(|t| t.id == KENNY_ID)
+            .expect("Kenny target is registered")
+    }
+    pub fn accept_challenge(&mut self) {
+        if self.dialogue == KennyDialogue::Invitation {
+            self.dialogue = KennyDialogue::Preparing;
+        }
+    }
+    pub fn close_dialogue(&mut self) {
+        self.dialogue = KennyDialogue::Closed;
+        self.kenny.resume();
     }
 }

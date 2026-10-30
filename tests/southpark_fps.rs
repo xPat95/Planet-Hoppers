@@ -87,7 +87,7 @@ fn spawn_is_clear_grounded_and_faces_east() {
     close(scene.player.eye().y, 1.7);
     close(scene.player.feet.y, 0.0);
     close(scene.player.direction().x, 1.0);
-    assert_eq!(scene.targets.len(), 3);
+    assert_eq!(scene.targets.len(), 4); // three temporary props and Kenny
 }
 
 #[test]
@@ -95,8 +95,9 @@ fn temporary_objects_can_be_removed_without_changing_world_assets() {
     let mut c = config();
     c.test_objects = false;
     let scene = SouthParkScene::load(&manifest(), c).unwrap();
-    assert!(scene.targets.is_empty());
-    assert_eq!(scene.world.obstacles.len(), 399);
+    assert_eq!(scene.targets.len(), 1);
+    assert_eq!(scene.targets[0].id, "southpark-kenny");
+    assert_eq!(scene.world.obstacles.len(), 400); // static scene and Kenny
 }
 
 #[test]
