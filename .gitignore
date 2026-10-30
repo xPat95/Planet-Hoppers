@@ -23,6 +23,7 @@ Desktop.ini
 # Respaldos automáticos de Blender del planeta Smiling Friends
 /assets/models/planets/smilingfriends/*.blend[0-9]*
 /assets/models/characters/smilingfriends/*.blend[0-9]*
+/assets/models/ships/smilingfriends/*.blend[0-9]*
 
 # Respaldos locales del planeta starwars
 /assets/models/planets/starwars/*.blend[0-9]*
