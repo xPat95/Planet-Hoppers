@@ -86,8 +86,20 @@ impl Kenny {
     pub fn resume(&mut self) {
         self.paused = false;
     }
-    pub fn body(&self, world: &CollisionWorld) -> Aabb {
-        world.body(self.feet, NPC_RADIUS, NPC_HEIGHT)
+    pub fn body(&self, _world: &CollisionWorld) -> Aabb {
+        Aabb::new(
+            self.feet - Vector3::new(NPC_RADIUS, 0.0, NPC_RADIUS),
+            self.feet + Vector3::new(NPC_RADIUS, NPC_HEIGHT, NPC_RADIUS),
+        )
+    }
+    /// Threat director owns validation of its staged corridor and vertical pose.
+    /// This does not implement damage, lives or automatic respawn.
+    pub(crate) fn event_pose(&mut self, position: Vector3, dt: f32) {
+        let movement =
+            Vector3::new(position.x - self.feet.x, 0.0, position.z - self.feet.z).length();
+        self.feet = position;
+        self.walking = movement > 0.00001;
+        self.animation.update(dt, movement);
     }
     pub fn request_danger_animation(&mut self, enabled: bool) {
         self.danger_animation_requested = enabled;

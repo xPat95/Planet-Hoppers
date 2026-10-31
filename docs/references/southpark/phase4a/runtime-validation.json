@@ -1,0 +1,51 @@
+{
+  "cases": [
+    {
+      "E_presses": 1,
+      "kind": "Bus",
+      "restart": "PASS",
+      "result": "Survived",
+      "return_to_exploration": "PASS"
+    },
+    {
+      "E_presses": 0,
+      "kind": "Bus",
+      "restart": "PASS",
+      "result": "Died",
+      "return_to_exploration": "PASS"
+    },
+    {
+      "E_presses": 3,
+      "kind": "Ufo",
+      "restart": "PASS",
+      "result": "Survived",
+      "return_to_exploration": "PASS"
+    },
+    {
+      "E_presses": 0,
+      "kind": "Ufo",
+      "restart": "PASS",
+      "result": "Died",
+      "return_to_exploration": "PASS"
+    },
+    {
+      "E_presses": 2,
+      "kind": "Sewer",
+      "restart": "PASS",
+      "result": "Survived",
+      "return_to_exploration": "PASS"
+    },
+    {
+      "E_presses": 0,
+      "kind": "Sewer",
+      "restart": "PASS",
+      "result": "Died",
+      "return_to_exploration": "PASS"
+    }
+  ],
+  "frames": 993,
+  "manual_hardware_input_tested": false,
+  "model_loading_and_dimensions": "PASS",
+  "note": "Real OpenGL and shared raycasting/E input; automated player placement, aiming and cinematic capture cameras.",
+  "status": "PASS"
+}

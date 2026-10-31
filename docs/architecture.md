@@ -8,6 +8,8 @@ El controlador, la colisión continua contra AABB, el raycasting y la lectura de
 
 ## Recursos y configuración
 
+La fase 4A añade `southpark/threats.rs` para lógica/estados/resultados y `graphics/threats.rs` para representar los recursos derivados. La escena anfitriona coordina entradas y objetivos del raycasting compartido; `scenes/threat_smoke.rs` prueba los seis resultados sin integrar vidas ni puntuación. Los temporizadores son específicos de cada evento. Ver [fase 4A](minigames/southpark-phase4a.md).
+
 La fase 3 mantiene la separación: `src/minigames/southpark/kenny.rs` administra a Kenny y `navigation.rs` obtiene su red desde las calles del manifiesto. `src/graphics/billboard.rs` comparte la geometría del plano con la prueba de alfa del raycasting. `src/scenes/kenny_dialogue.rs` representa el diálogo; los estados `Closed`, `Invitation` y `Preparing` pertenecen a South Park. El FPS se detiene durante el diálogo y se retoma al cerrarlo. No se añaden dependencias ni sistemas de interacción paralelos. Ver [fase 3](minigames/southpark-phase3.md).
 
 | Carpeta | Responsabilidad |

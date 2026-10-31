@@ -159,6 +159,8 @@ Kenny aparece cerca del jugador: acercarse, apuntarle y pulsar E abre **SAVE KEN
 
 ## Planetas disponibles para integración
 
+Pruebas de amenazas de South Park: **F5** autobús, **F6** OVNI, **F7** alcantarilla, **F8** reiniciar y **F9** volver al paseo. También: `cargo run --locked -- --threat bus` (o `ufo`, `sewer`). Ver [fase 4A: controles, recursos y validación](docs/minigames/southpark-phase4a.md).
+
 Los siguientes recursos son **planetas del sistema solar**. Sus archivos Blender son las fuentes editables; las exportaciones de juego y sus límites están documentados por franquicia.
 
 | Planeta | Fuente editable | Revisión técnica |

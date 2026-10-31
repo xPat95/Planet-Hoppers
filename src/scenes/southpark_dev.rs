@@ -1,8 +1,10 @@
 //! Standalone development host. No solar-system, progress or minigame rules.
 use super::kenny_dialogue::{self, DialogueAction};
+use crate::minigames::southpark::threats::{ThreatKind, PREFIX};
 use crate::{
     graphics::billboard::SpriteBillboard,
     graphics::resources::{save_frame, StaticModel},
+    graphics::threats::{draw_status, ThreatModels},
     minigames::{
         common::{
             fps::{CursorCapture, PlayerInput},
@@ -24,21 +26,35 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     let mut smoke = false;
     let mut kenny_smoke = false;
     let mut no_probes = false;
+    let mut initial_threat = None;
+    let mut threat_smoke = false;
     let mut args = std::env::args().skip(1);
     while let Some(arg) = args.next() {
         match arg.as_str() {
             "--smoke" => smoke = true,
+            "--smoke-threats" => {
+                smoke = true;
+                threat_smoke = true;
+                no_probes = true;
+            }
             "--smoke-kenny" => {
                 smoke = true;
                 kenny_smoke = true;
                 no_probes = true;
             }
             "--no-test-objects" => no_probes = true,
+            "--threat" => {
+                initial_threat = Some(
+                    ThreatKind::parse(&args.next().ok_or("--threat needs bus, ufo or sewer")?)
+                        .ok_or("Unknown threat: use bus, ufo or sewer")?,
+                );
+                no_probes = true;
+            }
             "--config" => {
                 config_path = PathBuf::from(args.next().ok_or("--config requires a JSON path")?)
             }
             "--help" | "-h" => {
-                println!("cargo run --bin southpark -- [--config PATH] [--no-test-objects] [--smoke] [--smoke-kenny]\nWASD: caminar | Shift: correr | mouse: mirar | E: interactuar / hablar con Kenny\nEsc: cursor / cerrar dialogo | Enter: aceptar / continuar\nF1: ayuda | F2: colisionadores | F3: indicador de Kenny | F12: captura | Ctrl+Q: salir");
+                println!("cargo run --bin southpark -- [--config PATH] [--no-test-objects] [--threat bus|ufo|sewer] [--smoke] [--smoke-kenny] [--smoke-threats]\nWASD: caminar | Shift: correr | mouse: mirar | E: interactuar\nEsc: cursor / cerrar dialogo | Enter: aceptar / continuar\nF5: autobús | F6: OVNI | F7: alcantarilla | F8: reiniciar | F9: explorar\nF1: ayuda | F2: colisionadores | F3: indicador Kenny | F12: captura | Ctrl+Q: salir");
                 return Ok(());
             }
             _ => return Err(format!("Unknown option: {arg}").into()),
@@ -48,7 +64,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     if no_probes {
         config.test_objects = false;
     }
-    if smoke && !kenny_smoke && !config.test_objects {
+    if smoke && !kenny_smoke && !threat_smoke && !config.test_objects {
         return Err("--smoke requires the three technical interaction objects".into());
     }
     let manifest_path = root.join("assets/models/minigames/southpark/southpark_town.scene.json");
@@ -58,7 +74,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         .size(1280, 800)
         .resizable()
         .msaa_4x()
-        .title("Planet-Hoppers | South Park | SAVE KENNY! - Fase 3")
+        .title("Planet-Hoppers | South Park | SAVE KENNY! - Fase 4A")
         .build();
     rl.set_exit_key(None);
     if smoke {
@@ -74,6 +90,14 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         &manifest.visual_path(&manifest_path)?,
         Some("SP_Snow"),
     )?;
+    let mut threat_models = ThreatModels::load(
+        &mut rl,
+        &thread,
+        &root.join("assets/models/minigames/southpark/threats"),
+    )?;
+    if let Some(kind) = initial_threat {
+        scene.start_threat(kind)?;
+    }
     // The repository's actual asset directory contains a space. Never move or
     // rewrite the sole source PNG to match a guessed path.
     let sprite = SpriteBillboard::load(
@@ -99,8 +123,10 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     {
         return Err("GLB and collision manifest use different bounds/coordinates".into());
     }
-    let captures = root.join(if kenny_smoke {
-        "docs/references/southpark/phase3"
+    let captures = root.join(if threat_smoke {
+        "docs/references/southpark/phase4a"
+    } else if kenny_smoke {
+        "target/southpark-kenny-smoke"
     } else {
         "target/southpark-smoke"
     });
@@ -119,6 +145,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     let initial_feet = scene.player.feet;
     let mut run_distance = 0.0;
     let mut render_times = Vec::new();
+    let mut threat_test = super::threat_smoke::ThreatSmoke::new();
     let mut dialogue_opened = false;
     let mut dialogue_paused = false;
     let mut cancelled_and_resumed = false;
@@ -132,7 +159,9 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     let kenny_start = scene.kenny.position();
     while !rl.window_should_close() {
         if smoke {
-            if kenny_smoke {
+            if threat_smoke {
+                threat_test.before_frame(&mut scene)?;
+            } else if kenny_smoke {
                 inject_kenny_input(&rl, frame);
                 if frame <= 40 || (109..=110).contains(&frame) {
                     let direction = (scene.kenny.position() + Vector3::up() * (NPC_HEIGHT * 0.5)
@@ -146,7 +175,9 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         let frame_start = Instant::now();
-        let dt = if smoke {
+        let dt = if threat_smoke {
+            0.1
+        } else if smoke {
             1.0 / 60.0
         } else {
             rl.get_frame_time().min(0.1)
@@ -158,6 +189,29 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
             break;
         }
         let mut input = PlayerInput::read(&rl);
+        if !smoke && scene.dialogue == KennyDialogue::Closed {
+            let requested = if rl.is_key_pressed(KeyboardKey::KEY_F5) {
+                Some(ThreatKind::Bus)
+            } else if rl.is_key_pressed(KeyboardKey::KEY_F6) {
+                Some(ThreatKind::Ufo)
+            } else if rl.is_key_pressed(KeyboardKey::KEY_F7) {
+                Some(ThreatKind::Sewer)
+            } else {
+                None
+            };
+            let action = if let Some(kind) = requested {
+                scene.start_threat(kind)
+            } else if rl.is_key_pressed(KeyboardKey::KEY_F8) {
+                scene.restart_threat()
+            } else if rl.is_key_pressed(KeyboardKey::KEY_F9) {
+                scene.clear_threat()
+            } else {
+                Ok(())
+            };
+            if let Err(message) = action {
+                scene.confirmation = Some((message, 4.0));
+            }
+        }
         let modal_at_start = scene.dialogue != KennyDialogue::Closed;
         if modal_at_start {
             match kenny_dialogue::input(&rl, scene.dialogue) {
@@ -190,7 +244,14 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
             recaptured = cursor.captured && rl.is_cursor_hidden();
         }
         scene.update_kenny(dt);
-        let camera = if smoke && !kenny_smoke && frame == 75 {
+        let threat_capture = if threat_smoke {
+            threat_test.capture(&scene)
+        } else {
+            None
+        };
+        let camera = if threat_capture.is_some() {
+            threat_test.camera(&scene)
+        } else if smoke && !kenny_smoke && !threat_smoke && frame == 75 {
             Camera3D::perspective(
                 Vector3::new(260.0, 260.0, 310.0),
                 Vector3::zero(),
@@ -210,9 +271,11 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         let pose = sprite.pose(
             scene.kenny.position(),
             camera.position,
-            scene.kenny.animation.roll(),
+            scene.kenny.animation.roll() + scene.threats.sprite_roll(),
             scene.kenny.animation.bounce(),
         );
+        let mut pose = pose;
+        pose.height *= scene.threats.sprite_height_scale();
         let kenny_index = scene.kenny_target();
         scene.targets[kenny_index].bounds = pose.bounds();
         let selected = if active {
@@ -221,12 +284,29 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 &scene.world,
                 scene.player.eye(),
                 scene.player.direction(),
-                scene.interaction_distance,
+                scene.interaction_distance.max(scene.threats.range()),
                 |index, origin, direction, range, broad| {
                     if index == kenny_index {
-                        sprite.hit(&pose, origin, direction, range)
+                        if scene.threats.owns_kenny() || !scene.threats.visible_kenny() {
+                            None
+                        } else {
+                            sprite.hit(
+                                &pose,
+                                origin,
+                                direction,
+                                range.min(scene.interaction_distance),
+                            )
+                        }
+                    } else if scene.targets[index].id.starts_with(PREFIX) {
+                        scene.threats.refine(
+                            &scene.targets[index].id,
+                            origin,
+                            direction,
+                            scene.threats.range(),
+                            broad,
+                        )
                     } else {
-                        Some(broad)
+                        (broad <= scene.interaction_distance).then_some(broad)
                     }
                 },
             )
@@ -299,7 +379,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 let mut view = d.begin_mode3D(camera);
                 model.draw(&mut view, camera.position);
                 for (index, target) in scene.targets.iter().enumerate() {
-                    if target.id == KENNY_ID {
+                    if target.id == KENNY_ID || target.id.starts_with(PREFIX) {
                         continue;
                     }
                     let color = [
@@ -337,10 +417,13 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                         );
                     }
                 }
-                sprite.draw(&mut view, &pose);
+                threat_models.draw(&mut view, camera.position, &scene.threats);
+                if scene.threats.visible_kenny() {
+                    sprite.draw(&mut view, &pose);
+                }
             }
             d.draw_text(
-                "SOUTH PARK - SAVE KENNY! / fase 3",
+                "SOUTH PARK - SAVE KENNY! / fase 4A",
                 16,
                 14,
                 20,
@@ -349,7 +432,11 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
             if !smoke {
                 d.draw_fps(width - 100, 14);
             }
-            if active && !(smoke && frame == 75) && !(kenny_smoke && frame == 195) {
+            if active
+                && threat_capture.is_none()
+                && !(smoke && frame == 75)
+                && !(kenny_smoke && frame == 195)
+            {
                 let color = if selected.is_some() {
                     Color::YELLOW
                 } else {
@@ -361,6 +448,8 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 if let Some(index) = selected {
                     let text = if index == kenny_index {
                         "[E] Hablar con Kenny".into()
+                    } else if scene.targets[index].id.starts_with(PREFIX) {
+                        format!("[E] {}", scene.targets[index].label)
                     } else {
                         format!("[E] Interactuar - {}", scene.targets[index].label)
                     };
@@ -424,12 +513,22 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
             if scene.dialogue != KennyDialogue::Closed {
                 kenny_dialogue::draw(&mut d, scene.dialogue, width, height);
             }
+            draw_status(&mut d, &scene.threats, width);
+            if help && scene.confirmation.is_none() {
+                d.draw_text(
+                    "F5 autobús | F6 OVNI | F7 alcantarilla | F8 reiniciar | F9 explorar",
+                    16,
+                    50,
+                    18,
+                    Color::DARKGRAY,
+                );
+            }
             if manual_capture {
                 let path = root.join("target/southpark.png");
                 save_frame(&path, width, height)?;
                 println!("Captura: {}", path.display());
             }
-            if smoke && !kenny_smoke && [0, 55, 65, 75].contains(&frame) {
+            if smoke && !kenny_smoke && !threat_smoke && [0, 55, 65, 75].contains(&frame) {
                 let name = match frame {
                     0 => "street.png",
                     55 => "cursor-released.png",
@@ -447,20 +546,43 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 };
                 save_frame(&captures.join(name), width, height)?;
             }
+            if let Some(name) = threat_capture {
+                save_frame(&captures.join(name), width, height)?;
+                threat_test.captured = true;
+            }
         }
         render_times.push(frame_start.elapsed().as_secs_f64() * 1000.0);
-        if smoke && !kenny_smoke && frame == 60 {
+        if smoke && !kenny_smoke && !threat_smoke && frame == 60 {
             scene.player.feet = initial_feet;
             scene.player.yaw = 0.0;
             scene.player.pitch = 0.0;
         }
         frame += 1;
-        if smoke && frame >= if kenny_smoke { 210 } else { 90 } {
+        if threat_smoke {
+            threat_test.after_frame(&mut scene)?;
+            if threat_test.done() {
+                break;
+            }
+            if frame > 1600 {
+                return Err("Threat graphical test timed out".into());
+            }
+        }
+        if smoke && !threat_smoke && frame >= if kenny_smoke { 210 } else { 90 } {
             break;
         }
     }
     rl.enable_cursor();
-    if kenny_smoke {
+    if threat_smoke {
+        if !threat_test.done() {
+            return Err("Threat test interrupted before all six cases".into());
+        }
+        let report = json!({"status":"PASS","cases":threat_test.results,"frames":frame,"model_loading_and_dimensions":"PASS","manual_hardware_input_tested":false,"note":"Real OpenGL and shared raycasting/E input; automated player placement, aiming and cinematic capture cameras."});
+        std::fs::write(
+            captures.join("runtime-validation.json"),
+            serde_json::to_string_pretty(&report)?,
+        )?;
+        println!("THREATS_SMOKE_PASS {report}");
+    } else if kenny_smoke {
         if !dialogue_opened
             || !dialogue_paused
             || !cancelled_and_resumed

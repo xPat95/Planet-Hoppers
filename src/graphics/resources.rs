@@ -243,6 +243,19 @@ impl StaticModel {
         })
     }
     pub fn draw(&mut self, draw: &mut RaylibMode3D<RaylibDrawHandle>, camera_position: Vector3) {
+        self.draw_at(draw, camera_position, Vector3::zero(), 0.0);
+    }
+    pub fn draw_at(
+        &mut self,
+        draw: &mut RaylibMode3D<RaylibDrawHandle>,
+        camera_position: Vector3,
+        position: Vector3,
+        yaw: f32,
+    ) {
+        let mut transform = Matrix::rotate_y(yaw);
+        transform.m12 = position.x;
+        transform.m13 = position.y;
+        transform.m14 = position.z;
         let location = self.shader.get_shader_location("cameraPosition");
         self.shader.set_shader_value(location, camera_position);
         for batch in &self.batches {
@@ -257,7 +270,7 @@ impl StaticModel {
             draw.draw_mesh(
                 &batch.mesh,
                 self.model.materials()[batch.material].clone(),
-                Matrix::identity(),
+                transform,
             );
             if batch.background {
                 unsafe {

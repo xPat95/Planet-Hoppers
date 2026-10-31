@@ -9,8 +9,10 @@ use serde::Deserialize;
 use std::path::Path;
 pub mod kenny;
 pub mod navigation;
+pub mod threats;
 use kenny::{Kenny, KENNY_ID};
 use navigation::RoadNetwork;
+use threats::{ThreatDirector, ThreatKind, PREFIX};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum KennyDialogue {
@@ -70,6 +72,7 @@ pub struct SouthParkScene {
     pub roads: RoadNetwork,
     pub dialogue: KennyDialogue,
     pub kenny_hint: bool,
+    pub threats: ThreatDirector,
     kenny_obstacle: usize,
 }
 
@@ -154,11 +157,22 @@ impl SouthParkScene {
             dialogue: KennyDialogue::Closed,
             kenny_hint: config.kenny_hint,
             kenny_obstacle,
+            threats: ThreatDirector::new(threats::ThreatConfig::load(Path::new(concat!(
+                env!("CARGO_MANIFEST_DIR"),
+                "/config/southpark-threats.json"
+            )))?),
         })
     }
     pub fn interact(&mut self, index: usize) {
         if let Some(target) = self.targets.get(index) {
+            if target.id.starts_with(PREFIX) {
+                self.threats.interact(&target.id, &mut self.kenny);
+                return;
+            }
             if target.action == "talk-kenny" {
+                if self.threats.owns_kenny() {
+                    return;
+                }
                 self.dialogue = KennyDialogue::Invitation;
                 self.kenny.pause();
                 return;
@@ -192,9 +206,15 @@ impl SouthParkScene {
             id: "fps-player".into(),
             bounds: player_body,
         });
-        self.kenny.update(dt, &self.roads, &self.world);
+        if self.threats.owns_kenny() {
+            self.threats.update(dt, &mut self.kenny);
+        } else {
+            self.kenny.update(dt, &self.roads, &self.world);
+            self.threats.update(dt, &mut self.kenny);
+        }
         self.world.obstacles.pop();
         self.world.obstacles[self.kenny_obstacle].bounds = self.kenny.body(&self.world);
+        self.sync_threats();
     }
     pub fn kenny_target(&self) -> usize {
         self.targets
@@ -210,5 +230,81 @@ impl SouthParkScene {
     pub fn close_dialogue(&mut self) {
         self.dialogue = KennyDialogue::Closed;
         self.kenny.resume();
+    }
+    fn sync_threats(&mut self) {
+        self.targets.retain(|t| !t.id.starts_with(PREFIX));
+        self.targets.extend(self.threats.targets());
+        self.world.obstacles.retain(|o| !o.id.starts_with(PREFIX));
+        self.world.obstacles.extend(self.threats.obstacles());
+        // Moving bus pushes a player standing in its lane to a checked roadside
+        // point. It cannot trap the FPS body inside its next-frame volume.
+        if !self.world.can_occupy(
+            self.player.feet,
+            self.player.config.radius,
+            self.player.config.body_height,
+        ) {
+            for dz in [-2.5, 2.5, -4.0, 4.0] {
+                let candidate = self.player.feet + Vector3::new(0.0, 0.0, dz);
+                if self.world.can_occupy(
+                    candidate,
+                    self.player.config.radius,
+                    self.player.config.body_height,
+                ) {
+                    self.player.feet = candidate;
+                    break;
+                }
+            }
+        }
+    }
+    pub fn start_threat(&mut self, kind: ThreatKind) -> Result<(), String> {
+        if self.dialogue != KennyDialogue::Closed {
+            return Err("Cierra el diálogo antes de activar una amenaza".into());
+        }
+        let mut clean = self.world.clone();
+        clean.obstacles.retain(|o| !o.id.starts_with(PREFIX));
+        clean.obstacles.push(Obstacle {
+            id: "fps-player".into(),
+            bounds: clean.body(
+                self.player.feet,
+                self.player.config.radius,
+                self.player.config.body_height,
+            ),
+        });
+        self.threats.start(kind, &mut self.kenny, &clean)?;
+        self.world.obstacles[self.kenny_obstacle].bounds = self.kenny.body(&self.world);
+        self.sync_threats();
+        Ok(())
+    }
+    pub fn restart_threat(&mut self) -> Result<(), String> {
+        let mut clean = self.world.clone();
+        clean.obstacles.retain(|o| !o.id.starts_with(PREFIX));
+        clean.obstacles.push(Obstacle {
+            id: "fps-player".into(),
+            bounds: clean.body(
+                self.player.feet,
+                self.player.config.radius,
+                self.player.config.body_height,
+            ),
+        });
+        self.threats.restart(&mut self.kenny, &clean)?;
+        self.world.obstacles[self.kenny_obstacle].bounds = self.kenny.body(&self.world);
+        self.sync_threats();
+        Ok(())
+    }
+    pub fn clear_threat(&mut self) -> Result<(), String> {
+        let mut clean = self.world.clone();
+        clean.obstacles.retain(|o| !o.id.starts_with(PREFIX));
+        clean.obstacles.push(Obstacle {
+            id: "fps-player".into(),
+            bounds: clean.body(
+                self.player.feet,
+                self.player.config.radius,
+                self.player.config.body_height,
+            ),
+        });
+        self.threats.clear(&mut self.kenny, &clean)?;
+        self.world.obstacles[self.kenny_obstacle].bounds = self.kenny.body(&self.world);
+        self.sync_threats();
+        Ok(())
     }
 }

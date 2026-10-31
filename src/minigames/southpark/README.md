@@ -1,5 +1,7 @@
 # Contrato del escenario de South Park
 
+La fase 4A incorpora `threats.rs`: un coordinador para autobús, OVNI y alcantarilla, resultados individuales y reinicio. Usa los mismos objetivos/raycasting y controla temporalmente al actor de fase 3. Ver [pruebas y controles](../../../docs/minigames/southpark-phase4a.md).
+
 La fase 3 añade `kenny.rs` (estado, movimiento y animación), `navigation.rs` (waypoints de las calles) y el diálogo de SAVE KENNY!. El billboard reutilizable está en `src/graphics/billboard.rs`; el raycasting común permite refinar el impacto con el alfa del PNG. No hay amenazas ni vidas. Ver [guía de fase 3](../../../docs/minigames/southpark-phase3.md).
 
 La fase 1 entregó el contrato de recursos descrito abajo. La fase 2 lo consume desde Rust/raylib-rs: `mod.rs` compone el escenario y los objetos técnicos; `src/scenes/southpark_dev.rs` ofrece la ejecución independiente. El controlador FPS, las colisiones y la selección por rayo viven en `src/minigames/common/`. Todavía no existe un administrador global de escenas ni integración con el sistema solar. Ver [ejecución, configuración y verificación](../../../docs/minigames/southpark-phase2.md).
