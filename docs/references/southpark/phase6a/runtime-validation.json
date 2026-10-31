@@ -1,0 +1,89 @@
+{
+  "audio": {
+    "loaded": {
+      "assets/audio/music/South Park/exploration.mp3": 860.3950805664062,
+      "assets/audio/music/South Park/save_kenny.mp3": 215.71917724609375,
+      "assets/audio/sfx/South Park/danger.mp3": 5.381229400634766,
+      "assets/audio/sfx/South Park/footsteps.mp3": 7.584000110626221,
+      "assets/audio/sfx/South Park/game_over.mp3": 3.082458257675171,
+      "assets/audio/sfx/South Park/success.mp3": 3.4079999923706055,
+      "assets/audio/sfx/South Park/they_killed_kenny.mp3": 3.3436734676361084,
+      "assets/audio/sfx/South Park/victory.mp3": 3.503999948501587
+    },
+    "music_transitions": [
+      "exploration",
+      "save_kenny",
+      "silent",
+      "save_kenny",
+      "silent",
+      "exploration",
+      "save_kenny",
+      "silent",
+      "save_kenny",
+      "silent",
+      "save_kenny",
+      "silent",
+      "exploration",
+      "save_kenny",
+      "silent",
+      "exploration"
+    ],
+    "plays": {
+      "danger": 9,
+      "game_over": 1,
+      "success": 5,
+      "they_killed_kenny": 3,
+      "victory": 1
+    },
+    "warnings": []
+  },
+  "automatic_progression": true,
+  "captures": [
+    "defeat.png",
+    "hud.png",
+    "kyle.png",
+    "lives.png",
+    "map-zoom.png",
+    "map.png",
+    "pause.png",
+    "search.png",
+    "stan.png",
+    "victory.png"
+  ],
+  "defeat": true,
+  "event_sites": [
+    "South_Neighborhood:80",
+    "Infill_Main:35",
+    "North_Avenue:-145",
+    "South_Neighborhood:80",
+    "Infill_Main:35",
+    "Residential_Avenue:-150",
+    "Infill_Main:35",
+    "Residential_Avenue:-150",
+    "South_Neighborhood:80"
+  ],
+  "five_distinct_successes": [
+    "Sewer",
+    "Snowman",
+    "Bus",
+    "Ufo",
+    "Piano"
+  ],
+  "kyle_switch_seconds": 2.180000066757202,
+  "manual_listening_verified": false,
+  "map_pause_resume_checks": 5,
+  "note": "Real renderer, native input events and shared raycasting; test player placement/aiming are automated.",
+  "pause_freezes_threat": true,
+  "physical_input_verified": false,
+  "portraits_loaded": 2,
+  "replay_reset": true,
+  "returned_to_exploration": true,
+  "status": "PASS",
+  "three_retries_same_pending_threat": [
+    "Piano",
+    "Piano",
+    "Piano"
+  ],
+  "victory": true,
+  "voice_duration_seconds": 3.3436734676361084
+}

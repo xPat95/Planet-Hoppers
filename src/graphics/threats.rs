@@ -148,7 +148,7 @@ impl ThreatModels {
                         ffi::rlDisableDepthMask();
                     }
                     view.draw_cylinder_ex(
-                        ThreatKind::Ufo.stage() + Vector3::up() * 0.1,
+                        event.stage(ThreatKind::Ufo) + Vector3::up() * 0.1,
                         event.ufo_position() - Vector3::up() * 0.5,
                         1.0,
                         0.45,

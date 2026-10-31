@@ -1,0 +1,260 @@
+{
+  "status": "PASS",
+  "automated_tests_passed": 82,
+  "translated_layout_results_tested": 50,
+  "checks": [
+    "cargo fmt --all -- --check",
+    "cargo check --locked",
+    "cargo build --locked",
+    "cargo test --locked",
+    "cargo clippy --all-targets --locked -- -D warnings",
+    "python tools/southpark/generate_map.py --check"
+  ],
+  "sites_per_threat": {
+    "Sewer": 5,
+    "Ufo": 5,
+    "Bus": 5,
+    "Snowman": 5,
+    "Piano": 5
+  },
+  "exploration_spawns": 9,
+  "map_metadata": {
+    "schema_version": 1,
+    "world_min": [
+      -350,
+      -175
+    ],
+    "world_max": [
+      370,
+      160
+    ],
+    "image_size": [
+      1024,
+      512
+    ],
+    "source": "assets\\models\\minigames\\southpark\\southpark_town.scene.json",
+    "source_sha256": "c781072e481a198a2f179b10113726b125a35161193260298474f60107949a6f",
+    "image_sha256": "39cb71d460499ff6fd45eb244915f4ceb427bbd4e5f8bbc00cf8da0ef2554acc",
+    "roads": 15,
+    "footprints": 395,
+    "axes": "world X right, world Z down; north = -Z; authoring (x,y,z) -> (x,z,-y)"
+  },
+  "dynamic_world_status": "PASS",
+  "map_frozen_state_and_cursor_checks": 5,
+  "map_zoom_and_drag_host_assertions": "PASS",
+  "fps": {
+    "frames": 90,
+    "manual_hardware_input_tested": false,
+    "model": {
+      "bounds_max": [
+        370,
+        23.196308135986328,
+        160
+      ],
+      "bounds_min": [
+        -350,
+        -1,
+        -175
+      ],
+      "draw_batches": 28,
+      "material_colors_match": true,
+      "original_primitives": 2734,
+      "source_materials": 27,
+      "triangles": 76212
+    },
+    "notes": "Real OpenGL render and raylib automation events. Physical keyboard/mouse and long play sessions require manual verification.",
+    "raylib_automation": {
+      "E_confirmations": 1,
+      "Escape_recapture": true,
+      "Escape_release": true,
+      "W_Shift": true,
+      "mouse_look": true,
+      "run_blocked_at_m": 2.4999046325683594
+    },
+    "render_mean_ms": 6.668367058823528,
+    "scene_solids": 395,
+    "status": "PASS"
+  },
+  "kenny": {
+    "accepted_preparation_by_mouse": true,
+    "cancel_resumed_walk": true,
+    "closed_and_recaptured": true,
+    "dialogue_cursor_free": true,
+    "dialogue_opened_with_E": true,
+    "fps_frozen_during_dialogue": true,
+    "frames": 210,
+    "manual_hardware_input_tested": false,
+    "road_edges": 645,
+    "road_nodes": 638,
+    "status": "PASS",
+    "stopped_and_settled": true,
+    "texture": {
+      "height": 367,
+      "opaque_pixels": 566,
+      "transparent_pixels": 17087,
+      "width": 271
+    }
+  },
+  "individual_threats": {
+    "cases": [
+      {
+        "E_presses": 1,
+        "kind": "Bus",
+        "restart": "PASS",
+        "result": "Survived",
+        "return_to_exploration": "PASS"
+      },
+      {
+        "E_presses": 0,
+        "kind": "Bus",
+        "restart": "PASS",
+        "result": "Died",
+        "return_to_exploration": "PASS"
+      },
+      {
+        "E_presses": 3,
+        "kind": "Ufo",
+        "restart": "PASS",
+        "result": "Survived",
+        "return_to_exploration": "PASS"
+      },
+      {
+        "E_presses": 0,
+        "kind": "Ufo",
+        "restart": "PASS",
+        "result": "Died",
+        "return_to_exploration": "PASS"
+      },
+      {
+        "E_presses": 2,
+        "kind": "Sewer",
+        "restart": "PASS",
+        "result": "Survived",
+        "return_to_exploration": "PASS"
+      },
+      {
+        "E_presses": 0,
+        "kind": "Sewer",
+        "restart": "PASS",
+        "result": "Died",
+        "return_to_exploration": "PASS"
+      },
+      {
+        "E_presses": 1,
+        "kind": "Piano",
+        "restart": "PASS",
+        "result": "Survived",
+        "return_to_exploration": "PASS"
+      },
+      {
+        "E_presses": 0,
+        "kind": "Piano",
+        "restart": "PASS",
+        "result": "Died",
+        "return_to_exploration": "PASS"
+      },
+      {
+        "E_presses": 3,
+        "kind": "Snowman",
+        "restart": "PASS",
+        "result": "Survived",
+        "return_to_exploration": "PASS"
+      },
+      {
+        "E_presses": 0,
+        "kind": "Snowman",
+        "restart": "PASS",
+        "result": "Died",
+        "return_to_exploration": "PASS"
+      }
+    ],
+    "frames": 1697,
+    "manual_hardware_input_tested": false,
+    "model_loading_and_dimensions": "PASS",
+    "note": "Real OpenGL and shared raycasting/E input; automated player placement, aiming and cinematic capture cameras.",
+    "status": "PASS"
+  },
+  "phase5_session": {
+    "audio": {
+      "loaded": {
+        "assets/audio/music/South Park/exploration.mp3": 860.3950805664062,
+        "assets/audio/music/South Park/save_kenny.mp3": 215.71917724609375,
+        "assets/audio/sfx/South Park/danger.mp3": 5.381229400634766,
+        "assets/audio/sfx/South Park/footsteps.mp3": 7.584000110626221,
+        "assets/audio/sfx/South Park/game_over.mp3": 3.082458257675171,
+        "assets/audio/sfx/South Park/success.mp3": 3.4079999923706055,
+        "assets/audio/sfx/South Park/they_killed_kenny.mp3": 3.3436734676361084,
+        "assets/audio/sfx/South Park/victory.mp3": 3.503999948501587
+      },
+      "music_transitions": [
+        "exploration",
+        "save_kenny",
+        "silent",
+        "save_kenny",
+        "exploration",
+        "save_kenny",
+        "silent",
+        "save_kenny",
+        "silent",
+        "save_kenny",
+        "silent",
+        "exploration",
+        "save_kenny",
+        "silent",
+        "exploration"
+      ],
+      "plays": {
+        "danger": 9,
+        "game_over": 1,
+        "success": 5,
+        "they_killed_kenny": 3,
+        "victory": 1
+      },
+      "warnings": []
+    },
+    "automatic_progression": false,
+    "captures": [
+      "briefing.png",
+      "defeat.png",
+      "hud.png",
+      "kyle.png",
+      "lives.png",
+      "pause.png",
+      "stan.png",
+      "victory.png"
+    ],
+    "defeat": true,
+    "event_sites": [],
+    "five_distinct_successes": [
+      "Snowman",
+      "Piano",
+      "Ufo",
+      "Bus",
+      "Sewer"
+    ],
+    "kyle_switch_seconds": 2.180000066757202,
+    "manual_listening_verified": false,
+    "map_pause_resume_checks": 0,
+    "note": "Real renderer, native input events and shared raycasting; test player placement/aiming are automated.",
+    "pause_freezes_threat": true,
+    "physical_input_verified": false,
+    "portraits_loaded": 2,
+    "replay_reset": true,
+    "returned_to_exploration": true,
+    "status": "PASS",
+    "three_retries_same_pending_threat": [
+      "Bus",
+      "Bus",
+      "Bus"
+    ],
+    "victory": true,
+    "voice_duration_seconds": 3.3436734676361084
+  },
+  "original_assets": {
+    "changed_files": [],
+    "protected_files": 87,
+    "algorithm": "SHA256"
+  },
+  "physical_input_verified": false,
+  "manual_listening_verified": false
+}

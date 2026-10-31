@@ -1,7 +1,9 @@
 //! Standalone host; match rules, UI and audio live in their own modules.
 use super::kenny_dialogue::{self, DialogueAction};
 use super::session_ui::{self, SessionAction, SessionUi};
+use super::world_map::WorldMap;
 use crate::minigames::southpark::threats::{ThreatKind, PREFIX};
+use crate::minigames::southpark::{locations::WorldLocations, session::SessionState};
 use crate::{
     audio::{AudioConfig, AudioController},
     minigames::southpark::session::{SaveKennySession, SessionConfig},
@@ -34,11 +36,17 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     let mut initial_threat = None;
     let mut threat_smoke = false;
     let mut session_smoke = false;
+    let mut world_smoke = false;
     let mut dev_threats = false;
     let mut muted = false;
     let mut args = std::env::args().skip(1);
     while let Some(arg) = args.next() {
         match arg.as_str() {
+            "--smoke-world" => {
+                world_smoke = true;
+                session_smoke = true;
+                no_probes = true;
+            }
             "--smoke" => smoke = true,
             "--smoke-session" => {
                 session_smoke = true;
@@ -76,6 +84,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 config_path = PathBuf::from(args.next().ok_or("--config requires a JSON path")?)
             }
             "--help" | "-h" => {
+                println!("M: mapa ampliado (pausa el mundo). Arrastrar: mover; rueda: zoom; R: jugador; M/Esc: cerrar.\n--smoke-world: prueba gráfica del mundo dinámico y los mapas.\ncargo run --bin southpark-locations: auditoría de zonas sin ventana.");
                 println!("Partida normal: hablá con Kenny y elegí Comenzar desafío. P: pausa / abandonar.\n--dev-threats: habilitar F5/F6/F7/F10/F11 para pruebas individuales.\n--smoke-session: partida automatizada con audio y capturas de fase 5.\n--mute: cargar y verificar audio con volúmenes en cero.");
                 println!("cargo run --bin southpark -- [--config PATH] [--no-test-objects] [--threat bus|ufo|sewer|piano|snowman] [--smoke] [--smoke-kenny] [--smoke-threats]\nWASD: caminar | Shift: correr | mouse: mirar | E: interactuar\nEsc: cursor / cerrar dialogo | Enter: aceptar / continuar\nF5: autobús | F6: OVNI | F7: alcantarilla | F10: piano | F11: nieve | F8: reiniciar | F9: explorar\nF1: ayuda | F2: colisionadores | F3: indicador Kenny | F12: captura | Ctrl+Q: salir");
                 return Ok(());
@@ -93,6 +102,19 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     let manifest_path = root.join("assets/models/minigames/southpark/southpark_town.scene.json");
     let manifest = SceneManifest::load(&manifest_path)?;
     let mut scene = SouthParkScene::load(&manifest, config)?;
+    let dynamic_mode = !smoke && !dev_threats && (!session_smoke || world_smoke);
+    let locations = if dynamic_mode {
+        Some(WorldLocations::build(
+            &manifest,
+            &scene.world,
+            &scene.roads,
+        )?)
+    } else {
+        None
+    };
+    if dynamic_mode {
+        scene.kenny_hint = false;
+    }
     let (mut rl, thread) = raylib::init()
         .size(1280, 800)
         .resizable()
@@ -140,6 +162,11 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     let mut seed = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)?
         .as_nanos() as u64;
+    if let Some(locations) = locations {
+        session.enable_world(locations, seed);
+        session.randomize_exploration(&mut scene)?;
+    }
+    let mut world_map = WorldMap::load(&mut rl, &thread, &root, &scene)?;
     unsafe {
         ffi::rlSetClipPlanes(0.05, 1500.0);
     }
@@ -182,8 +209,10 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     {
         return Err("GLB and collision manifest use different bounds/coordinates".into());
     }
-    let captures = root.join(if session_smoke {
-        "docs/references/southpark/phase5"
+    let captures = root.join(if world_smoke {
+        "docs/references/southpark/phase6a"
+    } else if session_smoke {
+        "target/southpark-session-smoke"
     } else if threat_smoke {
         "target/southpark-threats-smoke"
     } else if kenny_smoke {
@@ -197,7 +226,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     let mut cursor = CursorCapture::default();
     cursor.apply(&mut rl);
     let mut debug = false;
-    let mut help = true;
+    let mut help = dev_threats || smoke;
     let mut frame = 0;
     let mut released = false;
     let mut recaptured = false;
@@ -257,7 +286,21 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         let mut input = PlayerInput::read(&rl);
         let session_was_modal = session.blocks_controls();
         let had_dialogue = scene.dialogue != KennyDialogue::Closed;
-        if !smoke {
+        let map_was_open = session.state == SessionState::MapOpen;
+        if !smoke && !had_dialogue {
+            if map_was_open {
+                world_map.input(&rl, scene.player.feet);
+                if rl.is_key_pressed(KeyboardKey::KEY_M)
+                    || rl.is_key_pressed(KeyboardKey::KEY_ESCAPE)
+                {
+                    session.continue_match(&mut scene)?;
+                }
+            } else if rl.is_key_pressed(KeyboardKey::KEY_M) && session.open_map() {
+                world_map.view.fit();
+            }
+        }
+        let map_consumed = map_was_open || session.state == SessionState::MapOpen;
+        if !smoke && !map_consumed {
             let action = session_ui::input(&rl, &session);
             let result = match action {
                 SessionAction::Continue => session.continue_match(&mut scene),
@@ -371,6 +414,15 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
             scene.update_kenny(dt);
         } else if let Err(error) = session.update(dt, &mut scene, audio.voice_clock()) {
             session.error = Some(error);
+        }
+        // Automatic relocation/search transitions also leave modal input.
+        if (session_was_modal || had_dialogue)
+            && !session.blocks_controls()
+            && scene.dialogue == KennyDialogue::Closed
+            && !cursor.captured
+        {
+            cursor.captured = true;
+            cursor.apply(&mut rl);
         }
         audio.set_music(session.music());
         for cue in session.take_cues() {
@@ -600,6 +652,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                     d.draw_text(&text, x, height / 2 + 30, 22, Color::YELLOW);
                 }
             } else if !active
+                && !cursor.captured
                 && scene.dialogue == KennyDialogue::Closed
                 && !session.blocks_controls()
             {
@@ -618,19 +671,34 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 }
             }
             if help && !session.blocks_controls() {
-                d.draw_rectangle(0, height - 55, width, 55, Color::new(20, 30, 40, 210));
+                let help_x = if smoke { 16 } else { 220 };
+                d.draw_rectangle(
+                    help_x - 16,
+                    height - 55,
+                    width - help_x + 16,
+                    55,
+                    Color::new(20, 30, 40, 210),
+                );
                 d.draw_text(
-                    "WASD caminar | Shift correr | Mouse mirar | E interactuar | ESC cursor",
-                    16,
+                    if smoke {
+                        "WASD caminar | Shift correr | Mouse mirar | E interactuar | ESC cursor"
+                    } else {
+                        "WASD: mover | Mouse: mirar | E: usar"
+                    },
+                    help_x,
                     height - 48,
-                    18,
+                    if smoke { 18 } else { 14 },
                     Color::WHITE,
                 );
                 d.draw_text(
-                    "F1 ayuda | F2 colisiones | F3 Kenny | F12 captura | Ctrl+Q salir",
-                    16,
+                    if smoke {
+                        "F1 ayuda | F2 colisiones | F3 Kenny | F12 captura | Ctrl+Q salir"
+                    } else {
+                        "Shift: correr | M: mapa | P: pausa | Esc: cursor"
+                    },
+                    help_x,
                     height - 25,
-                    18,
+                    if smoke { 18 } else { 14 },
                     Color::LIGHTGRAY,
                 );
             }
@@ -657,6 +725,9 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 draw_status(&mut d, &scene.threats, width);
             }
             session_ui.draw(&mut d, &session, &scene.threats, width, height);
+            if scene.dialogue == KennyDialogue::Closed {
+                world_map.draw(&mut d, &scene, &session, width, height);
+            }
             if help && scene.confirmation.is_none() && (dev_threats || smoke) && !session.in_match()
             {
                 d.draw_text(
@@ -735,6 +806,9 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     }
     rl.enable_cursor();
     if session_smoke {
+        if world_smoke && !(world_map.zoomed && world_map.dragged) {
+            return Err("Map zoom/drag not exercised".into());
+        }
         session_test.finish(
             &scene,
             &session,

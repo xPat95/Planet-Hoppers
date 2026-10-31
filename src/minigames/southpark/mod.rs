@@ -8,6 +8,7 @@ use raylib::prelude::Vector3;
 use serde::Deserialize;
 use std::path::Path;
 pub mod kenny;
+pub mod locations;
 pub mod navigation;
 pub mod session;
 pub mod threats;
@@ -274,6 +275,12 @@ impl SouthParkScene {
         }
     }
     pub fn start_threat(&mut self, kind: ThreatKind) -> Result<(), String> {
+        self.start_threat_at(kind, Vector3::zero())
+    }
+    pub fn start_threat_at(&mut self, kind: ThreatKind, offset: Vector3) -> Result<(), String> {
+        if self.threats.running() {
+            return Err("Ya hay una amenaza en curso".into());
+        }
         if self.dialogue != KennyDialogue::Closed {
             return Err("Cierra el diálogo antes de activar una amenaza".into());
         }
@@ -287,11 +294,39 @@ impl SouthParkScene {
                 self.player.config.body_height,
             ),
         });
-        self.threats
-            .start(kind, &mut self.kenny, &clean, &self.roads)?;
+        let previous = self.threats.offset;
+        self.threats.offset = offset;
+        if let Err(error) = self
+            .threats
+            .start(kind, &mut self.kenny, &clean, &self.roads)
+        {
+            self.threats.offset = previous;
+            return Err(error);
+        }
         self.world.obstacles[self.kenny_obstacle].bounds = self.kenny.body(&self.world);
         self.sync_threats();
         Ok(())
+    }
+    pub fn relocate_kenny(&mut self, position: Vector3) -> bool {
+        if self
+            .world
+            .body(position, 0.28, 1.35)
+            .overlaps(self.world.body(
+                self.player.feet,
+                self.player.config.radius,
+                self.player.config.body_height,
+            ))
+        {
+            return false;
+        }
+        if !self.kenny.reposition_safe(position, &self.world) {
+            return false;
+        }
+        let bounds = self.kenny.body(&self.world);
+        self.world.obstacles[self.kenny_obstacle].bounds = bounds;
+        let index = self.kenny_target();
+        self.targets[index].bounds = bounds;
+        true
     }
     pub fn restart_threat(&mut self) -> Result<(), String> {
         let mut clean = self.world.clone();

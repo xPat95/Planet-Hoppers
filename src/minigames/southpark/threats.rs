@@ -150,6 +150,8 @@ impl ThreatConfig {
 }
 
 pub struct ThreatDirector {
+    /// Translation of the verified local layout; original dev layout is zero.
+    pub offset: Vector3,
     pub config: ThreatConfig,
     pub kind: Option<ThreatKind>,
     pub state: ThreatState,
@@ -182,6 +184,7 @@ impl Default for ThreatDirector {
 impl ThreatDirector {
     pub fn new(config: ThreatConfig) -> Self {
         Self {
+            offset: Vector3::zero(),
             config,
             kind: None,
             state: ThreatState::Inactive,
@@ -238,16 +241,29 @@ impl ThreatDirector {
         }
     }
     pub fn panel_position(&self) -> Vector3 {
-        Vector3::new(-33.0, 0.0, LANE_Z + 2.0)
+        Vector3::new(-33.0, 0.0, LANE_Z + 2.0) + self.offset
+    }
+    pub fn stage(&self, kind: ThreatKind) -> Vector3 {
+        kind.stage() + self.offset
+    }
+    pub fn hazard_position(&self) -> Vector3 {
+        match self.kind {
+            Some(ThreatKind::Bus) => self.bus_position(),
+            Some(ThreatKind::Ufo) => self.ufo_position(),
+            Some(ThreatKind::Sewer) => self.hole_position(),
+            Some(ThreatKind::Piano) => self.piano_impact(),
+            Some(ThreatKind::Snowman) => self.snow_position(),
+            None => self.stage(ThreatKind::Ufo),
+        }
     }
     pub fn piano_impact(&self) -> Vector3 {
-        Vector3::new(-12.0, 0.0, LANE_Z)
+        Vector3::new(-12.0, 0.0, LANE_Z) + self.offset
     }
     pub fn lock_position(&self) -> Vector3 {
-        Vector3::new(-32.0, 0.0, LANE_Z + 2.0)
+        Vector3::new(-32.0, 0.0, LANE_Z + 2.0) + self.offset
     }
     pub fn heater_position(&self, i: usize) -> Vector3 {
-        Vector3::new(-34.0 + 12.0 * i as f32, 0.0, LANE_Z + 2.0)
+        Vector3::new(-34.0 + 12.0 * i as f32, 0.0, LANE_Z + 2.0) + self.offset
     }
     pub fn piano_position(&self) -> Vector3 {
         let fall = if self.state == ThreatState::Resolving {
@@ -282,20 +298,20 @@ impl ThreatDirector {
         Vector3::new(1.0 + 0.35 * t, (1.0 - t).max(0.015), 1.0 + 0.35 * t)
     }
     pub fn cover_position(&self) -> Vector3 {
-        Vector3::new(-32.0, 0.0, LANE_Z + 2.0)
+        Vector3::new(-32.0, 0.0, LANE_Z + 2.0) + self.offset
     }
     pub fn hole_position(&self) -> Vector3 {
-        Vector3::new(-12.0, 0.0, LANE_Z)
+        Vector3::new(-12.0, 0.0, LANE_Z) + self.offset
     }
     pub fn ufo_position(&self) -> Vector3 {
-        ThreatKind::Ufo.stage() + Vector3::up() * (6.2 + (self.elapsed * 0.8).sin() * 0.10)
+        self.stage(ThreatKind::Ufo) + Vector3::up() * (6.2 + (self.elapsed * 0.8).sin() * 0.10)
     }
     pub fn light_position(&self, i: usize) -> Vector3 {
         let a = (30.0 + i as f32 * 120.0).to_radians();
         self.ufo_position() + Vector3::new(2.25 * a.cos(), -0.45, 2.25 * a.sin())
     }
     pub fn bus_position(&self) -> Vector3 {
-        ThreatKind::Bus.stage() + Vector3::new(48.0 - 52.85 * self.progress, 0.0, 0.0)
+        self.stage(ThreatKind::Bus) + Vector3::new(48.0 - 52.85 * self.progress, 0.0, 0.0)
     }
     pub fn bus_bounds(&self) -> Aabb {
         let p = self.bus_position();
@@ -351,7 +367,7 @@ impl ThreatDirector {
     /// Validate the whole staging corridor, not only the endpoint. Bus sweep is
     /// an expanded static AABB; these derived vehicle dimensions match Blender.
     pub fn validate_zone(&self, kind: ThreatKind, world: &CollisionWorld) -> Result<(), String> {
-        let origin = kind.stage();
+        let origin = self.stage(kind);
         let end = match kind {
             ThreatKind::Bus => origin - Vector3::right() * 8.0,
             ThreatKind::Sewer => self.hole_position(),
@@ -450,21 +466,21 @@ impl ThreatDirector {
         let mut chase_route = Vec::new();
         let mut initial_distance = 0.0;
         if kind == ThreatKind::Snowman {
-            let a = kind.stage() - Vector3::right() * self.config.snowman_gap;
-            chase_route = event_route(roads, &travel_world, a, kind.stage(), 1.05, 3.3)?;
+            let a = self.stage(kind) - Vector3::right() * self.config.snowman_gap;
+            chase_route = event_route(roads, &travel_world, a, self.stage(kind), 1.05, 3.3)?;
             initial_distance = route_length(&chase_route);
             let next = event_route(
                 roads,
                 &travel_world,
-                kind.stage(),
-                kind.stage() + Vector3::right() * 48.0,
+                self.stage(kind),
+                self.stage(kind) + Vector3::right() * 48.0,
                 1.05,
                 3.3,
             )?;
             chase_route.extend(next.into_iter().skip(1));
         }
         let original = kenny.position();
-        if !kenny.reposition_safe(kind.stage(), world) {
+        if !kenny.reposition_safe(self.stage(kind), world) {
             return Err("Event stage is occupied; step off the marked lane".into());
         }
         if self.saved_position.is_none() {
@@ -484,7 +500,7 @@ impl ThreatDirector {
         self.piano_locked = false;
         self.kenny_distance = initial_distance;
         self.snow_distance = 0.0;
-        self.snow_position = chase_route.first().copied().unwrap_or(kind.stage());
+        self.snow_position = chase_route.first().copied().unwrap_or(self.stage(kind));
         self.snow_yaw = -std::f32::consts::FRAC_PI_2;
         self.chase_route = chase_route;
         self.chase_world = Some(travel_world);
@@ -492,6 +508,115 @@ impl ThreatDirector {
         kenny.take_threat_contact();
         kenny.request_danger_animation(true);
         Ok(())
+    }
+    /// Catalog verification runs once, with the real static solids and road
+    /// graph. Every mechanism needs a reachable ground approach and clear ray.
+    pub fn validate_access(
+        &self,
+        kind: ThreatKind,
+        world: &CollisionWorld,
+        roads: &RoadNetwork,
+        entry: Vector3,
+    ) -> Result<Vec<Vector3>, String> {
+        self.validate_zone(kind, world)?;
+        let mut clean = world.clone();
+        clean
+            .obstacles
+            .retain(|o| o.id != KENNY_ID && o.id != "fps-player" && !o.id.starts_with(PREFIX));
+        let solid = |bounds: Aabb| clean.obstacles.iter().any(|o| bounds.overlaps(o.bounds));
+        if kind == ThreatKind::Ufo {
+            let p = self.stage(kind);
+            if solid(Aabb::new(
+                p + Vector3::new(-2.8, 0.0, -2.8),
+                p + Vector3::new(2.8, 7.8, 2.8),
+            )) {
+                return Err("UFO air/lift column obstructed".into());
+            }
+        }
+        if kind == ThreatKind::Sewer {
+            for p in [self.cover_position(), self.hole_position()] {
+                if solid(Aabb::new(
+                    p - Vector3::new(0.92, 0.0, 0.92),
+                    p + Vector3::new(0.92, 0.3, 0.92),
+                )) {
+                    return Err("Sewer surface obstructed".into());
+                }
+            }
+        }
+        clean.obstacles.extend(self.new_prop_obstacles(kind));
+        if kind == ThreatKind::Snowman {
+            event_route(
+                roads,
+                &clean,
+                self.stage(kind) - Vector3::right() * self.config.snowman_gap,
+                self.stage(kind),
+                1.05,
+                3.3,
+            )?;
+            event_route(
+                roads,
+                &clean,
+                self.stage(kind),
+                self.stage(kind) + Vector3::right() * 48.0,
+                1.05,
+                3.3,
+            )?;
+        }
+        let mut probe = Self::new(self.config.clone());
+        probe.offset = self.offset;
+        probe.kind = Some(kind);
+        probe.state = ThreatState::Active;
+        let mut targets = probe.targets();
+        if kind == ThreatKind::Sewer {
+            probe.carrying_lid = true;
+            targets.extend(probe.targets());
+        }
+        let mut approaches = Vec::new();
+        for target in targets {
+            let centre = target.bounds.center();
+            let mut found = None;
+            'candidates: for radius in [2.5, 4.0, 5.0] {
+                for i in 0..16 {
+                    let angle = i as f32 * std::f32::consts::TAU / 16.0;
+                    let p = Vector3::new(
+                        centre.x + radius * angle.cos(),
+                        clean.ground_y,
+                        centre.z + radius * angle.sin(),
+                    );
+                    if !clean.can_occupy(p, 0.35, 1.8) {
+                        continue;
+                    }
+                    let eye = p + Vector3::up() * 1.7;
+                    let delta = centre - eye;
+                    let distance = delta.length();
+                    let range = if kind == ThreatKind::Ufo {
+                        self.config.ufo_light_range
+                    } else {
+                        self.config.interaction_distance
+                    };
+                    if distance > range
+                        || clean
+                            .ray_distance_ignoring(
+                                eye,
+                                delta.normalized(),
+                                distance,
+                                Some(&target.id),
+                            )
+                            .is_some_and(|d| d < distance - 0.3)
+                    {
+                        continue;
+                    }
+                    if event_route(roads, &clean, entry, p, 0.35, 1.8).is_ok() {
+                        found = Some(p);
+                        break 'candidates;
+                    }
+                }
+            }
+            approaches.push(
+                found.ok_or_else(|| format!("No visible/reachable approach to {}", target.id))?,
+            );
+        }
+        Ok(approaches)
     }
     pub fn restart(
         &mut self,
@@ -601,7 +726,7 @@ impl ThreatDirector {
             return;
         };
         if self.state == ThreatState::Preparing {
-            kenny.event_pose(kind.stage(), dt);
+            kenny.event_pose(self.stage(kind), dt);
             if self.state_time >= self.config.preparation_seconds {
                 self.state = ThreatState::Active;
                 self.state_time = 0.0;
@@ -610,15 +735,15 @@ impl ThreatDirector {
             self.elapsed = (self.elapsed + dt).min(self.duration());
             self.progress = self.elapsed / self.duration();
             let p = match kind {
-                ThreatKind::Bus => kind.stage() - Vector3::right() * (8.0 * self.progress),
+                ThreatKind::Bus => self.stage(kind) - Vector3::right() * (8.0 * self.progress),
                 ThreatKind::Ufo => {
-                    kind.stage() + Vector3::up() * (self.config.ufo_max_lift * self.progress)
+                    self.stage(kind) + Vector3::up() * (self.config.ufo_max_lift * self.progress)
                 }
                 ThreatKind::Sewer => {
-                    kind.stage() + (self.hole_position() - kind.stage()) * self.progress
+                    self.stage(kind) + (self.hole_position() - self.stage(kind)) * self.progress
                 }
                 ThreatKind::Piano => {
-                    kind.stage() + (self.piano_impact() - kind.stage()) * self.progress
+                    self.stage(kind) + (self.piano_impact() - self.stage(kind)) * self.progress
                 }
                 ThreatKind::Snowman => {
                     self.kenny_distance = (self.kenny_distance + dt * self.config.kenny_flee_speed)

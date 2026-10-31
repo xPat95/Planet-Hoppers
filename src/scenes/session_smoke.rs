@@ -25,6 +25,11 @@ pub struct SessionSmoke {
     defeat: bool,
     replayed: bool,
     paused: bool,
+    mapped: Vec<ThreatKind>,
+    map_frame: u32,
+    map_frozen: Option<Vec<f32>>,
+    map_checks: usize,
+    zones: Vec<String>,
 }
 impl SessionSmoke {
     pub fn new() -> Self {
@@ -42,6 +47,11 @@ impl SessionSmoke {
             defeat: false,
             replayed: false,
             paused: false,
+            mapped: vec![],
+            map_frame: 0,
+            map_frozen: None,
+            map_checks: 0,
+            zones: vec![],
         }
     }
     pub fn done(&self) -> bool {
@@ -57,15 +67,63 @@ impl SessionSmoke {
             KeyboardKey::KEY_E,
             KeyboardKey::KEY_ENTER,
             KeyboardKey::KEY_P,
+            KeyboardKey::KEY_M,
+            KeyboardKey::KEY_ESCAPE,
+            KeyboardKey::KEY_R,
+            KeyboardKey::KEY_W,
         ] {
             event(1, [key as i32, 0, 0, 0]);
         }
         event(5, [0, 0, 0, 0]);
+        use SessionState::*;
+        if s.dynamic() && s.state == MapOpen {
+            self.map_frame += 1;
+            if self.map_frozen.as_ref() != Some(&snapshot(scene)) {
+                return Err("World/animation advanced while map open".into());
+            }
+            press(KeyboardKey::KEY_W);
+            if self.map_frame == 2 {
+                event(8, [0, 1, 0, 0]);
+            }
+            if (3..=4).contains(&self.map_frame) {
+                event(
+                    7,
+                    [
+                        rl.get_screen_width() / 2 + self.map_frame as i32 * 30,
+                        rl.get_screen_height() / 2 + 20,
+                        0,
+                        0,
+                    ],
+                );
+                event(6, [0, 0, 0, 0]);
+            }
+            if self.map_frame == 6 {
+                press(KeyboardKey::KEY_R);
+            }
+            if self.map_frame >= 8 {
+                press(if self.map_checks.is_multiple_of(2) {
+                    KeyboardKey::KEY_M
+                } else {
+                    KeyboardKey::KEY_ESCAPE
+                });
+            }
+            return Ok(());
+        }
         self.cooldown -= 0.1;
         if self.cooldown > 0.0 {
             return Ok(());
         }
-        use SessionState::*;
+        if s.dynamic()
+            && s.state == Active
+            && self.phase == 0
+            && !self.mapped.contains(&s.current())
+        {
+            self.mapped.push(s.current());
+            self.map_frame = 0;
+            self.map_frozen = Some(snapshot(scene));
+            press(KeyboardKey::KEY_M);
+            return Ok(());
+        }
         match self.phase {
             0 if s.state == Victory && s.elapsed > 0.4 => {
                 press(KeyboardKey::KEY_ENTER);
@@ -73,7 +131,15 @@ impl SessionSmoke {
                 self.cooldown = 0.4;
                 return Ok(());
             }
-            1 if s.state == Briefing => {
+            1 if s.dynamic() && s.state == Interlude => {
+                if s.lives != 3 || s.saves != 0 {
+                    return Err("Replay did not reset match".into());
+                }
+                self.replayed = true;
+                press(KeyboardKey::KEY_P);
+                return Ok(());
+            }
+            1 if s.state == Briefing || (s.dynamic() && s.state == Paused) => {
                 if s.lives != 3 || s.saves != 0 {
                     return Err("Replay did not reset match".into());
                 }
@@ -83,7 +149,7 @@ impl SessionSmoke {
                 self.cooldown = 0.4;
                 return Ok(());
             }
-            2 if s.state == Briefing => {
+            2 if s.state == Briefing || (s.dynamic() && s.state == Interlude) => {
                 self.phase = 3;
             }
             3 if s.state == Defeat && s.elapsed > 0.5 => {
@@ -92,7 +158,7 @@ impl SessionSmoke {
                 self.cooldown = 0.4;
                 return Ok(());
             }
-            4 if s.state == Briefing => {
+            4 if s.state == Briefing || (s.dynamic() && s.state == Interlude) => {
                 self.phase = 5;
             }
             5 if s.state == Preparing => {
@@ -119,6 +185,20 @@ impl SessionSmoke {
             }
             _ => {}
         }
+        if s.state == Searching {
+            if scene.threats.elapsed != 0.0 || scene.threats.state_time != 0.0 {
+                return Err("Search consumed mortal time".into());
+            }
+            if s.elapsed > 2.0 {
+                let p = scene.threats.stage(s.current()) + Vector3::new(-16.0, 0.0, -2.0);
+                if !scene.world.can_occupy(p, 0.35, 1.8) {
+                    return Err("World smoke entrance blocked".into());
+                }
+                scene.player.feet = p;
+                aim(scene, scene.kenny.position() + Vector3::up());
+            }
+            return Ok(());
+        }
         if s.state == Exploring {
             if scene.dialogue == KennyDialogue::Invitation {
                 press(KeyboardKey::KEY_ENTER);
@@ -139,7 +219,7 @@ impl SessionSmoke {
             }
             self.cooldown = 0.4;
         } else if (s.state == Briefing && s.elapsed > 0.5)
-            || (s.state == Success && s.elapsed > s.config.success_hold_seconds)
+            || (!s.dynamic() && s.state == Success && s.elapsed > s.config.success_hold_seconds)
         {
             press(KeyboardKey::KEY_ENTER);
             self.cooldown = 0.4;
@@ -153,7 +233,9 @@ impl SessionSmoke {
             }
             if let Some(target) = scene.threats.targets().into_iter().next() {
                 let feet = match s.current() {
-                    ThreatKind::Ufo => ThreatKind::Ufo.stage() - Vector3::right() * 5.0,
+                    ThreatKind::Ufo => {
+                        scene.threats.stage(ThreatKind::Ufo) - Vector3::right() * 5.0
+                    }
                     ThreatKind::Sewer if scene.threats.carrying_lid => {
                         scene.threats.hole_position() + Vector3::new(-2.0, 0.0, 2.0)
                     }
@@ -175,6 +257,10 @@ impl SessionSmoke {
     pub fn capture(&mut self, s: &SaveKennySession) -> Option<&'static str> {
         use SessionState::*;
         let name = match s.state {
+            MapOpen if self.map_frame >= 4 => "map-zoom.png",
+            MapOpen => "map.png",
+            Searching if s.lives == 2 => "lives.png",
+            Searching => "search.png",
             Briefing if s.lives == 2 => "lives.png",
             Briefing => "briefing.png",
             Active if s.elapsed > 1.0 => "hud.png",
@@ -195,6 +281,18 @@ impl SessionSmoke {
         s: &SaveKennySession,
         _audio: &AudioController,
     ) -> Result<(), String> {
+        if self.last_state == SessionState::MapOpen && s.state != SessionState::MapOpen {
+            if !unsafe { ffi::IsCursorHidden() } {
+                return Err("FPS cursor was not recaptured after map".into());
+            }
+            self.map_checks += 1;
+            self.map_frozen = None;
+        }
+        if s.state == SessionState::Searching && self.last_state != SessionState::Searching {
+            if let Some(site) = &s.site {
+                self.zones.push(site.id.clone());
+            }
+        }
         if self.last_state != s.state {
             println!(
                 "SESSION_TRACE phase={} {:?} {:?} lives={} saves={}",
@@ -268,7 +366,8 @@ impl SessionSmoke {
             || audio.audit.loaded.len() != 8
             || portraits != 2
             || !s.assert_exploration_clean(scene)
-            || self.captures.len() != 8
+            || self.captures.len() != if s.dynamic() { 10 } else { 8 }
+            || (s.dynamic() && self.map_checks != 5)
         {
             return Err(format!(
                 "Incomplete session smoke: passed={:?}, retries={:?}, audio={}, captures={:?}",
@@ -284,6 +383,7 @@ impl SessionSmoke {
             "returned_to_exploration":true,"portraits_loaded":portraits,"audio":audio.audit,
             "kyle_switch_seconds":s.config.kyle_switch_seconds,"voice_duration_seconds":audio.voice_duration(),
             "captures":self.captures,"manual_listening_verified":false,"physical_input_verified":false,
+            "map_pause_resume_checks":self.map_checks,"event_sites":self.zones,"automatic_progression":s.dynamic(),
             "note":"Real renderer, native input events and shared raycasting; test player placement/aiming are automated."});
         std::fs::write(
             out.join("runtime-validation.json"),
@@ -321,4 +421,26 @@ fn aim(scene: &mut SouthParkScene, p: Vector3) {
     let d = (p - scene.player.eye()).normalized();
     scene.player.yaw = d.z.atan2(d.x);
     scene.player.pitch = d.y.asin();
+}
+fn snapshot(s: &SouthParkScene) -> Vec<f32> {
+    let mut v = vec![
+        s.player.yaw,
+        s.player.pitch,
+        s.kenny.animation.phase,
+        s.kenny.animation.weight,
+        s.threats.elapsed,
+        s.threats.state_time,
+        s.threats.progress,
+    ];
+    for p in [
+        s.player.feet,
+        s.kenny.position(),
+        s.threats.bus_position(),
+        s.threats.ufo_position(),
+        s.threats.piano_position(),
+        s.threats.snow_position(),
+    ] {
+        v.extend([p.x, p.y, p.z]);
+    }
+    v
 }

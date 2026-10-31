@@ -1,0 +1,182 @@
+{
+  "sites": [
+    {
+      "id": "North_Avenue:-145",
+      "road": "North Avenue",
+      "offset": [
+        -117,
+        0,
+        0
+      ],
+      "centre": [
+        -145,
+        0,
+        -42.9
+      ],
+      "entry": [
+        -160.2,
+        0,
+        -42.9
+      ],
+      "compatible": [
+        "Bus",
+        "Ufo",
+        "Sewer",
+        "Piano",
+        "Snowman"
+      ]
+    },
+    {
+      "id": "Central_Avenue:-170",
+      "road": "Central Avenue",
+      "offset": [
+        -142,
+        0,
+        45.100002
+      ],
+      "centre": [
+        -170,
+        0,
+        2.2
+      ],
+      "entry": [
+        -185.2,
+        0,
+        2.2000008
+      ],
+      "compatible": [
+        "Bus",
+        "Ufo",
+        "Sewer",
+        "Piano",
+        "Snowman"
+      ]
+    },
+    {
+      "id": "Residential_Avenue:-150",
+      "road": "Residential Avenue",
+      "offset": [
+        -122,
+        0,
+        86.9
+      ],
+      "centre": [
+        -150,
+        0,
+        44
+      ],
+      "entry": [
+        -165.2,
+        0,
+        44
+      ],
+      "compatible": [
+        "Bus",
+        "Ufo",
+        "Sewer",
+        "Piano",
+        "Snowman"
+      ]
+    },
+    {
+      "id": "South_Neighborhood:80",
+      "road": "South Neighborhood",
+      "offset": [
+        108,
+        0,
+        109.450005
+      ],
+      "centre": [
+        80,
+        0,
+        66.55
+      ],
+      "entry": [
+        64.8,
+        0,
+        66.55
+      ],
+      "compatible": [
+        "Bus",
+        "Ufo",
+        "Sewer",
+        "Piano",
+        "Snowman"
+      ]
+    },
+    {
+      "id": "Infill_Main:35",
+      "road": "Infill Main",
+      "offset": [
+        63,
+        0,
+        19.800001
+      ],
+      "centre": [
+        35,
+        0,
+        -23.1
+      ],
+      "entry": [
+        19.8,
+        0,
+        -23.1
+      ],
+      "compatible": [
+        "Bus",
+        "Ufo",
+        "Sewer",
+        "Piano",
+        "Snowman"
+      ]
+    }
+  ],
+  "exploration_spawns": [
+    [
+      -145,
+      0,
+      -42.9
+    ],
+    [
+      -170,
+      0,
+      2.2
+    ],
+    [
+      -150,
+      0,
+      44
+    ],
+    [
+      80,
+      0,
+      66.55
+    ],
+    [
+      35,
+      0,
+      -23.1
+    ],
+    [
+      85,
+      0,
+      -42.9
+    ],
+    [
+      95,
+      0,
+      2.2
+    ],
+    [
+      100,
+      0,
+      44
+    ],
+    [
+      -60,
+      0,
+      66.55
+    ]
+  ],
+  "rejected": []
+}

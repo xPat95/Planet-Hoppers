@@ -154,7 +154,7 @@ cargo run --locked --bin southpark
 
 No requiere Blender ni teclado numérico para jugar. WASD mueve al jugador, mouse mira, Shift corre, E interactúa y Escape libera/recupera el cursor. Cerrar la ventana o Ctrl+Q termina la prueba. Ver [requisitos, configuración, pruebas y limitaciones de la fase 2](docs/minigames/southpark-phase2.md).
 
-Kenny aparece cerca del jugador: acercarse, apuntarle y pulsar E abre **SAVE KENNY!**. **Comenzar desafío** inicia una partida con tres vidas y cinco amenazas diferentes; cancelar permite seguir explorando. P pausa el desafío y permite abandonarlo. F3 oculta el indicador de Kenny. Ver [partida completa, HUD, audio y diálogos de fase 5](docs/minigames/southpark-phase5.md).
+Kenny aparece en distintos sectores del pueblo. Acercarse, apuntarle y pulsar E abre **SAVE KENNY!**. **Comenzar desafío** inicia una partida con tres vidas y cinco amenazas que avanzan automáticamente. El minimapa señala a Kenny durante la búsqueda; no corre tiempo mortal hasta llegar a la zona. **M** abre el mapa y pausa el mundo; rueda acerca, arrastrar desplaza, R recentra y M/Escape cierra. P permite pausar o abandonar; F3 activa una ayuda opcional de distancia. Ver [mundo dinámico, zonas y mapas de fase 6A](docs/minigames/southpark-phase6a.md) y [HUD, audio y diálogos de fase 5](docs/minigames/southpark-phase5.md).
 
 
 ## Planetas disponibles para integración

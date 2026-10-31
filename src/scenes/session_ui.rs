@@ -39,8 +39,18 @@ fn buttons(w: i32, h: i32) -> [Rectangle; 2] {
 pub fn input(rl: &RaylibHandle, session: &SaveKennySession) -> SessionAction {
     use SessionAction::*;
     use SessionState::*;
-    if matches!(session.state, Preparing | Active) && rl.is_key_pressed(KeyboardKey::KEY_P) {
+    if matches!(session.state, Preparing | Active | Searching | Interlude)
+        && rl.is_key_pressed(KeyboardKey::KEY_P)
+    {
         return Pause;
+    }
+    if session.dynamic()
+        && matches!(
+            session.state,
+            Success | Searching | Interlude | Relocating | MapOpen
+        )
+    {
+        return None;
     }
     if !matches!(
         session.state,
@@ -108,6 +118,20 @@ impl SessionUi {
         h: i32,
     ) {
         use SessionState::*;
+        if s.state == Relocating {
+            d.draw_rectangle(0, 0, w, h, Color::new(15, 30, 46, 255));
+            d.draw_text(
+                "Un momento en South Park...",
+                (w - 380) / 2,
+                h / 2 - 10,
+                24,
+                Color::WHITE,
+            );
+            if let Some(error) = &s.error {
+                wrapped(d, error, 24, h / 2 + 40, w - 48, 18, Color::ORANGE);
+            }
+            return;
+        }
         if s.state == Exploring {
             return;
         }
@@ -138,7 +162,16 @@ impl SessionUi {
             Color::WHITE,
         );
         d.draw_text(threat_name(s.current()), 28, 109, 20, Color::YELLOW);
-        let detail = if s.state == Preparing {
+        let detail = if s.state == Searching {
+            format!(
+                "Localizalo en el minimapa. {:.0} m | Sin tiempo mortal",
+                s.objective_distance
+            )
+        } else if s.state == Interlude {
+            "Explorá el pueblo. La próxima alerta llegará automáticamente.".into()
+        } else if s.state == Success && s.dynamic() {
+            "¡Kenny está a salvo! La partida continúa automáticamente.".into()
+        } else if s.state == Preparing {
             format!(
                 "Preparación: {:.1} s. Ubicá el mecanismo.",
                 event.remaining()
@@ -175,6 +208,12 @@ impl SessionUi {
             String::new()
         };
         d.draw_text(&detail, 28, 138, 16, Color::LIGHTGRAY);
+        if s.state == Searching {
+            d.draw_text("¡KENNY ESTÁ EN PELIGRO!", 28, 178, 24, Color::RED);
+            if let Some(site) = &s.site {
+                d.draw_text(&site.road, 28, 208, 18, Color::DARKBLUE);
+            }
+        }
         if s.state == DeathDialogue {
             self.death_dialogue(d, s, w, h);
             return;
@@ -183,13 +222,7 @@ impl SessionUi {
             return;
         }
         if !s.blocks_controls() {
-            d.draw_text(
-                "P: pausa / abandonar desafío",
-                w - 330,
-                h - 28,
-                16,
-                Color::WHITE,
-            );
+            d.draw_text("M: mapa | P: pausa", w - 230, 52, 14, Color::LIGHTGRAY);
             return;
         }
         let (title,body,left,right)=match s.state {
