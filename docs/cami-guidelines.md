@@ -179,25 +179,26 @@ Personaje abducido: **Ghost Face**. Minijuego: escapar de personajes de terror. 
 
 ### 2.1 Concepto del planeta
 
-**La Tierra después del apocalipsis**, convertida en una **cara humana sufriendo**.
+**La Tierra después del apocalipsis**, convertida en una **calavera de roca quemada**. Referencias de Cami: una calavera de caricatura (cráneo redondo, cuencas grandes, dientes abultados) y una calavera low-poly con ojos y dientes que brillan.
 
-- **Forma:** esfera **deformada para formar una cara humana** (no una calavera): frente con el ceño contraído, cuencas de los ojos hundidas, nariz en relieve, pómulos y una **boca muy abierta, gritando de dolor**. La cara ocupa un hemisferio entero.
-- **Superficie:** continentes reconocibles pero **quemados y destruidos**: negros, grises y café ceniza. Los océanos están secos o son oscuros.
-- **Grietas de lava:** grietas con **luz naranja y roja adentro**. Siguen las líneas de la cara (contorno de ojos y boca, arrugas de dolor en la frente, surcos de las mejillas) y la hacen **legible desde lejos, brillando en la oscuridad**.
-- **Lectura desde lejos:** una cara humana gritando que brilla desde dentro. **Lectura de cerca:** las zonas de horror sobre la superficie.
+- **Forma:** **calavera anatómicamente correcta** (proporciones de un cráneo real), gritando: bóveda ovalada, ceja de hueso que baja al centro, órbitas cuadradas redondeadas, separadas e inclinadas en V (enojo), nariz en pera con tabique, cornetes y espina nasal, pómulos, arcos cigomáticos, maxilar, mastoides, dientes de adulto en sus arcos y **mandíbula abierta**, girada sobre su articulación (cuerpo en U, rama, cóndilo y coronoides). La cara ocupa el hemisferio frontal.
+- **Hueca:** el cráneo es una cáscara gruesa (~4.5 unidades); las órbitas, la nariz y el foramen magnum la atraviesan para poder poner cosas adentro. Adentro hay roca negra verdosa con **venas que brillan en verde cálido y pasan a naranja en el centro**; ese brillo se ve por las aberturas. Cada órbita tiene una sola pared curva, con el borde biselado, que se angosta hasta la abertura al interior; sus paredes van en roca oscura, sin venas. Una ceja de hueso baja, más baja al centro, le da el ceño enojado. La boca abierta es el espacio entre los dientes.
+- **Superficie:** tiene que verse **rocosa, como un planeta de verdad**, no hueso liso: relieve irregular, cráteres y caras planas low-poly. Color **coral de tierra quemada** (no blanco) en **estratos horizontales de tonos muy cercanos, como el Gran Cañón**: nada de manchas que contrasten.
+- **Grietas de lava:** una red de grietas con **luz naranja adentro** que cubre el cráneo, como tierra reseca. Pocas y largas; la cara queda limpia (sin arrugas: un cráneo no tiene piel).
+- **Ojos, nariz y boca:** aberturas con borde oscuro por las que se ve el interior encendido.
+- **Lectura desde lejos:** una calavera que brilla desde dentro. **Lectura de cerca:** las zonas de horror sobre la superficie.
 
 Pautas para que dé miedo de verdad:
 
-1. **Expresión de dolor, no de enojo ni caricatura:** cejas levantadas hacia el centro, ojos hundidos y vacíos, boca estirada hacia abajo. Las proporciones son de rostro real.
-2. **Los ojos y la boca son lo más oscuro y lo más brillante a la vez:** cavidades negras con lava al fondo, como si el planeta ardiera por dentro.
-3. **Iluminación lateral o desde abajo** (la lava ilumina hacia arriba), nunca una luz plana de frente.
-4. **Paleta limitada:** negro, gris, café ceniza y el naranja/rojo de la lava. Nada más brilla.
+1. **Los ojos y la boca son lo más oscuro y lo más brillante a la vez:** cavidades negras con lava al fondo, como si el planeta ardiera por dentro.
+2. **Iluminación lateral o desde abajo** (la lava ilumina hacia arriba), nunca una luz plana de frente.
+3. **Paleta limitada y pareja:** arenisca coral y óxido en tonos vecinos, roca oscura en las cavidades, el naranja de las grietas de afuera y el verde del interior. Nada más brilla.
 
 ### 2.2 Zonas
 
 | Zona | Qué debe mostrarse | Ubicación |
 | --- | --- | --- |
-| Cara humana | Ojos, nariz y boca formados por la deformación, con las grietas de lava. | **Hemisferio frontal.** Se deja limpio, sin zonas encima. |
+| Calavera | Cráneo anatómico gritando: órbitas, nariz y boca abiertas, con lava adentro. | **Hemisferio frontal.** Se deja limpio, sin zonas encima. |
 | Zombies y cementerio | Cementerio de lápidas y cruces torcidas de donde **salen los zombies**, y calles en ruinas **llenas de zombies** alrededor. | Costado izquierdo de la cabeza. |
 | Payasos | Payasos **destruyendo cosas**: volcando y quemando carros y rompiendo edificios y juegos de feria. Payasos sucios y siniestros, no de fiesta infantil. | Costado derecho de la cabeza. |
 | Ritual de brujas | Brujas típicas (sombrero puntiagudo, capa) en círculo alrededor de un caldero o fogata, haciendo un ritual. | Coronilla (parte de arriba). |
@@ -207,7 +208,7 @@ Pautas para que dé miedo de verdad:
                     [ Ritual de brujas ]
                          coronilla
 
-  [ Zombies +          ( CARA HUMANA )          [ Payasos ]
+  [ Zombies +          (  CALAVERA  )           [ Payasos ]
     cementerio ]      frente, con lava          costado derecho
     costado izq.
 
@@ -217,7 +218,7 @@ Pautas para que dé miedo de verdad:
 
 Reglas:
 
-1. **La cara manda.** Ninguna zona tapa los ojos, la nariz ni la boca.
+1. **La calavera manda.** Ninguna zona tapa los ojos, la nariz ni la boca.
 2. **Las zonas se reparten alrededor de la cabeza** (costados, coronilla y nuca): al rodear el planeta siempre aparece algo nuevo.
 3. **Los carros son un solo modelo** que se reutiliza en la zona de payasos y en la de Satanás.
 4. Este Satanás es de **otra película y otro diseño** que el de Smiling Friends; no se reutiliza ese modelo.
@@ -243,8 +244,8 @@ Este planeta cubre justo lo que el disco de Smiling Friends no puede:
 
 | Característica del menú | Cómo la cubre este planeta | Puntos |
 | --- | --- | --- |
-| Planeta distinguible | Tierra apocalíptica con cara humana. | 10 |
-| **Deformación de geometría** | La esfera se deforma con una función: desplazamientos suaves hacia dentro (ojos, boca) y hacia fuera (frente, nariz, pómulos), más ruido para terreno irregular y destruido. | 10 |
+| Planeta distinguible | Tierra apocalíptica con forma de calavera. | 10 |
+| **Deformación de geometría** | La esfera se deforma con una función: desplazamientos hacia dentro (ojos, nariz, boca, mejillas) y hacia fuera (maxilar, mandíbula, dientes), más ruido para terreno irregular y destruido. | 10 |
 | **Posición y orientación sobre superficie curva** | Zombies, lápidas, payasos y brujas parados correctamente sobre la esfera mientras rota (el disco de Smiling Friends no cubre este punto). | 5 |
 | Distribución procedural con semilla | Zombies y lápidas. | 10 (una sola vez en el proyecto) |
 | Shader animado | Lava de las grietas que **pulsa y fluye** con el tiempo. | 8 |

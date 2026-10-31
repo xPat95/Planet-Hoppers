@@ -49,3 +49,6 @@ Desktop.ini
 /assets/models/ships/starwars/mandalorian/*.blend[0-9]*
 /assets/models/ships/starwars/mandalorian/backups/
 /tools/blender/starwars/ships/mandalorian/__pycache__/
+
+# Respaldos automáticos de Blender del planeta Halloween
+/assets/models/planets/halloween/*.blend[0-9]*
