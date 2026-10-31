@@ -252,7 +252,21 @@ impl StaticModel {
         position: Vector3,
         yaw: f32,
     ) {
-        let mut transform = Matrix::rotate_y(yaw);
+        self.draw_pose(draw, camera_position, position, yaw, 0.0, Vector3::one());
+    }
+    /// Controlled prop animation; model buffers/materials stay resident.
+    pub fn draw_pose(
+        &mut self,
+        draw: &mut RaylibMode3D<RaylibDrawHandle>,
+        camera_position: Vector3,
+        position: Vector3,
+        yaw: f32,
+        roll: f32,
+        scale: Vector3,
+    ) {
+        let mut transform = Matrix::scale(scale.x, scale.y, scale.z)
+            * Matrix::rotate_z(roll)
+            * Matrix::rotate_y(yaw);
         transform.m12 = position.x;
         transform.m13 = position.y;
         transform.m14 = position.z;

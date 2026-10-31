@@ -5,5 +5,13 @@
   "sewer_seconds": 18.0,
   "ufo_max_lift": 4.5,
   "interaction_distance": 4.5,
-  "ufo_light_range": 14.0
+  "ufo_light_range": 14.0,
+  "piano_seconds": 18.0,
+  "piano_drop_seconds": 0.65,
+  "piano_height": 6.5,
+  "snowman_speed": 1.85,
+  "kenny_flee_speed": 1.25,
+  "snowman_gap": 12.0,
+  "heater_slowdown": 0.07,
+  "melt_seconds": 2.0
 }

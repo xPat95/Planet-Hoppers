@@ -9,6 +9,11 @@ pub struct ThreatModels {
     sewer: StaticModel,
     lid: StaticModel,
     panel: StaticModel,
+    piano: StaticModel,
+    support: StaticModel,
+    lock: StaticModel,
+    snowman: StaticModel,
+    heater: StaticModel,
 }
 impl ThreatModels {
     pub fn load(
@@ -25,15 +30,27 @@ impl ThreatModels {
             sewer: load("sewer")?,
             lid: load("lid")?,
             panel: load("brake_panel")?,
+            piano: load("phase4b/piano")?,
+            support: load("phase4b/piano_support")?,
+            lock: load("phase4b/piano_lock")?,
+            snowman: load("phase4b/snowman")?,
+            heater: load("phase4b/heater")?,
         };
         let audit: serde_json::Value =
             serde_json::from_slice(&std::fs::read(directory.join("asset-audit.json"))?)?;
-        for (name, model) in [
-            ("bus", &result.bus),
-            ("ufo", &result.ufo),
-            ("sewer", &result.sewer),
-            ("lid", &result.lid),
-            ("brake_panel", &result.panel),
+        let audit4b: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(directory.join("phase4b/asset-audit.json"))?)?;
+        for (name, model, audit) in [
+            ("bus", &result.bus, &audit),
+            ("ufo", &result.ufo, &audit),
+            ("sewer", &result.sewer, &audit),
+            ("lid", &result.lid, &audit),
+            ("brake_panel", &result.panel, &audit),
+            ("piano", &result.piano, &audit4b),
+            ("piano_support", &result.support, &audit4b),
+            ("piano_lock", &result.lock, &audit4b),
+            ("snowman", &result.snowman, &audit4b),
+            ("heater", &result.heater, &audit4b),
         ] {
             let expected = &audit[name];
             if expected["triangles"].as_u64() != Some(model.audit.triangles as u64) {
@@ -75,6 +92,14 @@ impl ThreatModels {
             result.lid.audit.triangles,
             result.panel.audit.triangles
         );
+        println!(
+            "PHASE4B_MODELS_LOADED piano={} support={} lock={} snowman={} heater={}",
+            result.piano.audit.triangles,
+            result.support.audit.triangles,
+            result.lock.audit.triangles,
+            result.snowman.audit.triangles,
+            result.heater.audit.triangles
+        );
         Ok(result)
     }
     pub fn draw(
@@ -83,7 +108,7 @@ impl ThreatModels {
         camera: Vector3,
         event: &ThreatDirector,
     ) {
-        if event.state == ThreatState::Inactive {
+        if event.state == ThreatState::Inactive || event.released {
             return;
         }
         match event.kind {
@@ -150,6 +175,115 @@ impl ThreatModels {
                     view.draw_cube_wires(p + Vector3::up() * 0.16, 1.9, 0.25, 1.9, Color::YELLOW);
                 }
             }
+            Some(ThreatKind::Piano) => {
+                self.support
+                    .draw_at(view, camera, event.piano_impact(), 0.0);
+                self.piano.draw_pose(
+                    view,
+                    camera,
+                    event.piano_position(),
+                    0.0,
+                    event.piano_sway(),
+                    Vector3::one(),
+                );
+                self.lock.draw_at(view, camera, event.lock_position(), 0.0);
+                let color = if event.piano_locked {
+                    Color::GREEN
+                } else {
+                    Color::YELLOW
+                };
+                view.draw_sphere(
+                    event.lock_position() + Vector3::new(0.0, 1.35, -0.3),
+                    0.17,
+                    color,
+                );
+                if matches!(event.state, ThreatState::Preparing | ThreatState::Active) {
+                    let warning = if event.progress > 0.75 {
+                        Color::RED
+                    } else {
+                        Color::ORANGE
+                    };
+                    view.draw_cube_wires(
+                        event.piano_impact() + Vector3::up() * 0.06,
+                        4.6,
+                        0.1,
+                        3.0,
+                        warning,
+                    );
+                    view.draw_cylinder_ex(
+                        event.piano_impact() + Vector3::up() * 9.2,
+                        event.piano_position() + Vector3::up() * 1.7,
+                        0.04,
+                        0.04,
+                        6,
+                        warning,
+                    );
+                }
+                if event.piano_locked {
+                    view.draw_cylinder_ex(
+                        event.piano_impact() + Vector3::up() * 9.2,
+                        event.piano_position() + Vector3::up() * 1.7,
+                        0.04,
+                        0.04,
+                        6,
+                        Color::GREEN,
+                    );
+                }
+                if event.state == ThreatState::Failed && event.state_time < 0.7 {
+                    view.draw_cube_wires(
+                        event.piano_impact() + Vector3::up() * 0.15,
+                        4.6 + event.state_time * 2.0,
+                        0.2,
+                        3.0 + event.state_time * 2.0,
+                        Color::ORANGE,
+                    );
+                }
+            }
+            Some(ThreatKind::Snowman) => {
+                for i in 0..3 {
+                    let p = event.heater_position(i);
+                    self.heater.draw_at(view, camera, p, 0.0);
+                    let color = if event.heaters[i] {
+                        Color::ORANGE
+                    } else {
+                        Color::DARKGRAY
+                    };
+                    view.draw_cube(p + Vector3::new(0.0, 0.9, -0.245), 0.5, 0.55, 0.015, color);
+                    view.draw_sphere(
+                        p + Vector3::new(0.0, 1.32, -0.3),
+                        0.065,
+                        if event.heaters[i] {
+                            Color::GREEN
+                        } else {
+                            Color::RED
+                        },
+                    );
+                }
+                if event.state == ThreatState::Succeeded {
+                    view.draw_cylinder(
+                        event.snow_position() + Vector3::up() * 0.025,
+                        1.0,
+                        1.0,
+                        0.045,
+                        20,
+                        Color::SKYBLUE,
+                    );
+                } else {
+                    let sway = if event.state == ThreatState::Active {
+                        (event.elapsed * 4.0).sin() * 0.045
+                    } else {
+                        0.0
+                    };
+                    self.snowman.draw_pose(
+                        view,
+                        camera,
+                        event.snow_position(),
+                        event.snow_yaw,
+                        sway,
+                        event.snow_scale(),
+                    );
+                }
+            }
             None => {}
         }
     }
@@ -194,6 +328,31 @@ pub fn draw_status(d: &mut RaylibDrawHandle, event: &ThreatDirector, width: i32)
             140,
             20,
             Color::YELLOW,
+        );
+    }
+    if event.kind == Some(ThreatKind::Snowman) {
+        d.draw_text(
+            &format!(
+                "Calefactores: {}/3",
+                event.heaters.iter().filter(|on| **on).count()
+            ),
+            18,
+            140,
+            20,
+            Color::YELLOW,
+        );
+    }
+    if event.kind == Some(ThreatKind::Piano) && event.state == ThreatState::Active {
+        d.draw_text(
+            if event.progress > 0.75 {
+                "¡El cable está por romperse! Busca el seguro amarillo a nivel del suelo."
+            } else {
+                "Peligro sobre la calle. Seguro amarillo junto a la acera."
+            },
+            18,
+            140,
+            18,
+            Color::ORANGE,
         );
     }
     if let Some(result) = event.result {

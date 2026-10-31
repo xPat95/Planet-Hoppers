@@ -161,6 +161,8 @@ Kenny aparece cerca del jugador: acercarse, apuntarle y pulsar E abre **SAVE KEN
 
 Pruebas de amenazas de South Park: **F5** autobús, **F6** OVNI, **F7** alcantarilla, **F8** reiniciar y **F9** volver al paseo. También: `cargo run --locked -- --threat bus` (o `ufo`, `sewer`). Ver [fase 4A: controles, recursos y validación](docs/minigames/southpark-phase4a.md).
 
+La fase 4B agrega **F10** piano y **F11** muñeco de nieve: `cargo run --locked -- --threat piano` o `cargo run --locked -- --threat snowman`. No requiere numpad. `--smoke-threats` comprueba ahora los diez resultados de las cinco amenazas. Ver [fase 4B: mecánicas, modelos, pruebas y capturas](docs/minigames/southpark-phase4b.md).
+
 Los siguientes recursos son **planetas del sistema solar**. Sus archivos Blender son las fuentes editables; las exportaciones de juego y sus límites están documentados por franquicia.
 
 | Planeta | Fuente editable | Revisión técnica |

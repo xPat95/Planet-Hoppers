@@ -2,7 +2,7 @@
 //! score, lives and solar-system state. All coordinates are metres, Y up.
 use super::{
     kenny::{Kenny, KENNY_ID},
-    navigation::{NPC_HEIGHT, NPC_RADIUS},
+    navigation::{event_route, route_length, route_point, RoadNetwork, NPC_HEIGHT, NPC_RADIUS},
 };
 use crate::minigames::common::{
     collision::{Aabb, CollisionWorld, Obstacle},
@@ -20,13 +20,25 @@ pub enum ThreatKind {
     Bus,
     Ufo,
     Sewer,
+    Piano,
+    Snowman,
 }
 impl ThreatKind {
+    /// Stable catalog for a future shuffled, non-repeating session.
+    pub const ALL: [Self; 5] = [
+        Self::Bus,
+        Self::Ufo,
+        Self::Sewer,
+        Self::Piano,
+        Self::Snowman,
+    ];
     pub fn parse(s: &str) -> Option<Self> {
         match s {
             "bus" => Some(Self::Bus),
             "ufo" => Some(Self::Ufo),
             "sewer" => Some(Self::Sewer),
+            "piano" => Some(Self::Piano),
+            "snowman" => Some(Self::Snowman),
             _ => None,
         }
     }
@@ -35,6 +47,8 @@ impl ThreatKind {
             Self::Bus => "Autobús: busca el panel rojo y activa el freno",
             Self::Ufo => "OVNI: desactiva sus tres luces desde el suelo",
             Self::Sewer => "Alcantarilla: recoge la tapa y cubre el agujero",
+            Self::Piano => "Piano: busca el seguro amarillo antes de que caiga",
+            Self::Snowman => "Muñeco de nieve: enciende los tres calefactores",
         }
     }
     pub fn stage(self) -> Vector3 {
@@ -43,6 +57,8 @@ impl ThreatKind {
                 Self::Bus => -24.0,
                 Self::Ufo => -28.0,
                 Self::Sewer => -26.0,
+                Self::Piano => -28.0,
+                Self::Snowman => -26.0,
             },
             0.0,
             LANE_Z,
@@ -74,6 +90,14 @@ pub struct ThreatConfig {
     pub ufo_max_lift: f32,
     pub interaction_distance: f32,
     pub ufo_light_range: f32,
+    pub piano_seconds: f32,
+    pub piano_drop_seconds: f32,
+    pub piano_height: f32,
+    pub snowman_speed: f32,
+    pub kenny_flee_speed: f32,
+    pub snowman_gap: f32,
+    pub heater_slowdown: f32,
+    pub melt_seconds: f32,
 }
 impl Default for ThreatConfig {
     fn default() -> Self {
@@ -92,6 +116,14 @@ impl ThreatConfig {
             c.ufo_max_lift,
             c.interaction_distance,
             c.ufo_light_range,
+            c.piano_seconds,
+            c.piano_drop_seconds,
+            c.piano_height,
+            c.snowman_speed,
+            c.kenny_flee_speed,
+            c.snowman_gap,
+            c.heater_slowdown,
+            c.melt_seconds,
         ]
         .iter()
         .all(|n| n.is_finite() && *n > 0.0)
@@ -100,6 +132,14 @@ impl ThreatConfig {
             || c.sewer_seconds < 10.0
             || c.ufo_max_lift > 4.8
             || c.ufo_light_range < 8.0
+            || c.piano_seconds < 10.0
+            || c.piano_drop_seconds < 0.25
+            || c.piano_drop_seconds > 2.0
+            || !(4.0..=7.0).contains(&c.piano_height)
+            || !(8.0..=16.0).contains(&c.snowman_gap)
+            || c.kenny_flee_speed > 2.0
+            || c.snowman_speed > 3.0
+            || c.snowman_speed - 2.0 * c.heater_slowdown <= c.kenny_flee_speed
         {
             return Err(
                 "Invalid threat configuration: insufficient time/range or invalid lift".into(),
@@ -122,6 +162,17 @@ pub struct ThreatDirector {
     pub covered: bool,
     saved_position: Option<Vector3>,
     pub progress: f32,
+    pub heaters: [bool; 3],
+    pub piano_locked: bool,
+    /// Validated street polyline, shared by the fleeing NPC and pursuer.
+    chase_route: Vec<Vector3>,
+    chase_world: Option<CollisionWorld>,
+    kenny_distance: f32,
+    snow_distance: f32,
+    snow_position: Vector3,
+    pub snow_yaw: f32,
+    /// Keeps the result available while restoring free exploration.
+    pub released: bool,
 }
 impl Default for ThreatDirector {
     fn default() -> Self {
@@ -143,6 +194,15 @@ impl ThreatDirector {
             covered: false,
             saved_position: None,
             progress: 0.0,
+            heaters: [false; 3],
+            piano_locked: false,
+            chase_route: Vec::new(),
+            chase_world: None,
+            kenny_distance: 0.0,
+            snow_distance: 0.0,
+            snow_position: ThreatKind::Snowman.stage(),
+            snow_yaw: 0.0,
+            released: false,
         }
     }
     pub fn running(&self) -> bool {
@@ -152,15 +212,21 @@ impl ThreatDirector {
         )
     }
     pub fn owns_kenny(&self) -> bool {
-        self.running() || self.state == ThreatState::Failed
+        !self.released && (self.running() || self.state == ThreatState::Failed)
     }
     pub fn visible_kenny(&self) -> bool {
-        self.state != ThreatState::Failed || self.state_time < 1.4
+        self.released || self.state != ThreatState::Failed || self.state_time < 1.4
     }
     pub fn duration(&self) -> f32 {
         match self.kind {
             Some(ThreatKind::Bus) => self.config.bus_seconds,
             Some(ThreatKind::Ufo) => self.config.ufo_seconds,
+            Some(ThreatKind::Piano) => self.config.piano_seconds,
+            Some(ThreatKind::Snowman) => {
+                48.0 / self.config.kenny_flee_speed
+                    + self.config.snowman_gap / self.config.snowman_speed
+                    + 5.0
+            }
             _ => self.config.sewer_seconds,
         }
     }
@@ -173,6 +239,47 @@ impl ThreatDirector {
     }
     pub fn panel_position(&self) -> Vector3 {
         Vector3::new(-33.0, 0.0, LANE_Z + 2.0)
+    }
+    pub fn piano_impact(&self) -> Vector3 {
+        Vector3::new(-12.0, 0.0, LANE_Z)
+    }
+    pub fn lock_position(&self) -> Vector3 {
+        Vector3::new(-32.0, 0.0, LANE_Z + 2.0)
+    }
+    pub fn heater_position(&self, i: usize) -> Vector3 {
+        Vector3::new(-34.0 + 12.0 * i as f32, 0.0, LANE_Z + 2.0)
+    }
+    pub fn piano_position(&self) -> Vector3 {
+        let fall = if self.state == ThreatState::Resolving {
+            (self.state_time / self.config.piano_drop_seconds)
+                .clamp(0.0, 1.0)
+                .powi(2)
+        } else if self.state == ThreatState::Failed {
+            1.0
+        } else {
+            0.0
+        };
+        self.piano_impact() + Vector3::up() * (self.config.piano_height * (1.0 - fall))
+    }
+    pub fn piano_sway(&self) -> f32 {
+        if self.state == ThreatState::Active {
+            (self.elapsed * 2.8).sin() * (0.025 + 0.045 * self.progress)
+        } else {
+            0.0
+        }
+    }
+    pub fn snow_position(&self) -> Vector3 {
+        self.snow_position
+    }
+    pub fn snow_scale(&self) -> Vector3 {
+        let t = if self.state == ThreatState::Resolving {
+            (self.state_time / self.config.melt_seconds).clamp(0.0, 1.0)
+        } else if self.state == ThreatState::Succeeded {
+            1.0
+        } else {
+            0.0
+        };
+        Vector3::new(1.0 + 0.35 * t, (1.0 - t).max(0.015), 1.0 + 0.35 * t)
     }
     pub fn cover_position(&self) -> Vector3 {
         Vector3::new(-32.0, 0.0, LANE_Z + 2.0)
@@ -215,14 +322,26 @@ impl ThreatDirector {
         }
     }
     pub fn sprite_roll(&self) -> f32 {
-        if self.state == ThreatState::Failed && self.kind == Some(ThreatKind::Bus) {
+        if !self.released
+            && self.state == ThreatState::Failed
+            && matches!(
+                self.kind,
+                Some(ThreatKind::Bus | ThreatKind::Piano | ThreatKind::Snowman)
+            )
+        {
             (self.state_time / 0.7).min(1.0) * 80.0_f32.to_radians()
         } else {
             0.0
         }
     }
     pub fn sprite_height_scale(&self) -> f32 {
-        if self.state == ThreatState::Failed && self.kind == Some(ThreatKind::Bus) {
+        if !self.released
+            && self.state == ThreatState::Failed
+            && matches!(
+                self.kind,
+                Some(ThreatKind::Bus | ThreatKind::Piano | ThreatKind::Snowman)
+            )
+        {
             1.0 - (self.state_time / 0.7).min(1.0) * 0.7
         } else {
             1.0
@@ -237,8 +356,10 @@ impl ThreatDirector {
             ThreatKind::Bus => origin - Vector3::right() * 8.0,
             ThreatKind::Sewer => self.hole_position(),
             ThreatKind::Ufo => origin,
+            ThreatKind::Piano => self.piano_impact(),
+            ThreatKind::Snowman => origin + Vector3::right() * 48.0,
         };
-        for n in 0..=100 {
+        for n in 0..=if kind == ThreatKind::Snowman { 0 } else { 100 } {
             let p = origin + (end - origin) * (n as f32 / 100.0);
             let body = world.body(p, NPC_RADIUS, NPC_HEIGHT);
             if world
@@ -248,6 +369,18 @@ impl ThreatDirector {
                 .any(|o| body.overlaps(o.bounds))
             {
                 return Err("Kenny event route intersects an obstacle".into());
+            }
+        }
+        if kind == ThreatKind::Piano {
+            let min = self.piano_impact() + Vector3::new(-2.3, 0.0, -1.5);
+            let bounds = Aabb::new(min, self.piano_impact() + Vector3::new(2.3, 9.5, 1.5));
+            if world
+                .obstacles
+                .iter()
+                .filter(|o| o.id != KENNY_ID && o.id != "fps-player" && !o.id.starts_with(PREFIX))
+                .any(|o| bounds.overlaps(o.bounds))
+            {
+                return Err("Piano drop corridor is obstructed".into());
             }
         }
         if kind == ThreatKind::Bus {
@@ -277,6 +410,25 @@ impl ThreatDirector {
         {
             return Err("Interaction approach is blocked".into());
         }
+        if matches!(kind, ThreatKind::Piano | ThreatKind::Snowman) {
+            for prop in self.new_prop_obstacles(kind) {
+                let approach = world.body(
+                    prop.bounds.center() + Vector3::new(-1.8, 0.0, -0.8),
+                    0.35,
+                    1.8,
+                );
+                if world
+                    .obstacles
+                    .iter()
+                    .filter(|o| {
+                        o.id != KENNY_ID && o.id != "fps-player" && !o.id.starts_with(PREFIX)
+                    })
+                    .any(|o| prop.bounds.overlaps(o.bounds) || approach.overlaps(o.bounds))
+                {
+                    return Err(format!("Blocked prop or approach: {}", prop.id));
+                }
+            }
+        }
         Ok(())
     }
     pub fn start(
@@ -284,11 +436,33 @@ impl ThreatDirector {
         kind: ThreatKind,
         kenny: &mut Kenny,
         world: &CollisionWorld,
+        roads: &RoadNetwork,
     ) -> Result<(), String> {
         if self.running() {
             return Err("Ya hay una amenaza en curso. F8 reinicia; F9 vuelve a explorar.".into());
         }
         self.validate_zone(kind, world)?;
+        let mut travel_world = world.clone();
+        travel_world
+            .obstacles
+            .retain(|o| o.id != KENNY_ID && o.id != "fps-player" && !o.id.starts_with(PREFIX));
+        travel_world.obstacles.extend(self.new_prop_obstacles(kind));
+        let mut chase_route = Vec::new();
+        let mut initial_distance = 0.0;
+        if kind == ThreatKind::Snowman {
+            let a = kind.stage() - Vector3::right() * self.config.snowman_gap;
+            chase_route = event_route(roads, &travel_world, a, kind.stage(), 1.05, 3.3)?;
+            initial_distance = route_length(&chase_route);
+            let next = event_route(
+                roads,
+                &travel_world,
+                kind.stage(),
+                kind.stage() + Vector3::right() * 48.0,
+                1.05,
+                3.3,
+            )?;
+            chase_route.extend(next.into_iter().skip(1));
+        }
         let original = kenny.position();
         if !kenny.reposition_safe(kind.stage(), world) {
             return Err("Event stage is occupied; step off the marked lane".into());
@@ -305,16 +479,30 @@ impl ThreatDirector {
         self.carrying_lid = false;
         self.covered = false;
         self.progress = 0.0;
+        self.heaters = [false; 3];
+        self.released = false;
+        self.piano_locked = false;
+        self.kenny_distance = initial_distance;
+        self.snow_distance = 0.0;
+        self.snow_position = chase_route.first().copied().unwrap_or(kind.stage());
+        self.snow_yaw = -std::f32::consts::FRAC_PI_2;
+        self.chase_route = chase_route;
+        self.chase_world = Some(travel_world);
         kenny.pause();
         kenny.take_threat_contact();
         kenny.request_danger_animation(true);
         Ok(())
     }
-    pub fn restart(&mut self, kenny: &mut Kenny, world: &CollisionWorld) -> Result<(), String> {
+    pub fn restart(
+        &mut self,
+        kenny: &mut Kenny,
+        world: &CollisionWorld,
+        roads: &RoadNetwork,
+    ) -> Result<(), String> {
         let kind = self.kind.ok_or("No hay amenaza seleccionada")?;
         let previous = self.state;
         self.state = ThreatState::Inactive;
-        let result = self.start(kind, kenny, world);
+        let result = self.start(kind, kenny, world, roads);
         if result.is_err() {
             self.state = previous;
         }
@@ -355,6 +543,37 @@ impl ThreatDirector {
         kenny.request_danger_animation(false);
         kenny.resume();
     }
+    /// Remove derived props after the result has been visible. Failed Kenny is
+    /// restored safely; the result remains available to a future session flow.
+    pub fn release_completed(&mut self, kenny: &mut Kenny, world: &CollisionWorld) {
+        if self.released
+            || self.result.is_none()
+            || self.state_time < 6.0
+            || !matches!(self.kind, Some(ThreatKind::Piano | ThreatKind::Snowman))
+        {
+            return;
+        }
+        if self.state == ThreatState::Failed {
+            let anchor = self.saved_position.unwrap_or(ThreatKind::Snowman.stage());
+            if ![
+                Vector3::zero(),
+                Vector3::new(0.0, 0.0, 1.7),
+                Vector3::new(0.0, 0.0, -1.7),
+                Vector3::right() * 4.0,
+                -Vector3::right() * 4.0,
+            ]
+            .iter()
+            .any(|offset| kenny.reposition_safe(anchor + *offset, world))
+            {
+                return;
+            }
+        }
+        kenny.request_danger_animation(false);
+        kenny.resume();
+        self.released = true;
+        self.chase_world = None;
+        self.chase_route.clear();
+    }
     fn fail(&mut self, kenny: &mut Kenny) {
         self.state = ThreatState::Failed;
         self.state_time = 0.0;
@@ -362,6 +581,8 @@ impl ThreatDirector {
         kenny.notify_threat_contact(match self.kind {
             Some(ThreatKind::Bus) => "bus",
             Some(ThreatKind::Ufo) => "ufo",
+            Some(ThreatKind::Piano) => "piano",
+            Some(ThreatKind::Snowman) => "snowman",
             _ => "sewer",
         });
         kenny.pause();
@@ -373,6 +594,9 @@ impl ThreatDirector {
             0.0
         };
         self.state_time += dt;
+        if self.released {
+            return;
+        }
         let Some(kind) = self.kind else {
             return;
         };
@@ -393,6 +617,29 @@ impl ThreatDirector {
                 ThreatKind::Sewer => {
                     kind.stage() + (self.hole_position() - kind.stage()) * self.progress
                 }
+                ThreatKind::Piano => {
+                    kind.stage() + (self.piano_impact() - kind.stage()) * self.progress
+                }
+                ThreatKind::Snowman => {
+                    self.kenny_distance = (self.kenny_distance + dt * self.config.kenny_flee_speed)
+                        .min(route_length(&self.chase_route));
+                    let speed = self.config.snowman_speed
+                        - self.config.heater_slowdown
+                            * self.heaters.iter().filter(|on| **on).count() as f32;
+                    self.snow_distance = (self.snow_distance + dt * speed).min(self.kenny_distance);
+                    let goal = route_point(&self.chase_route, self.snow_distance);
+                    let delta = goal - self.snow_position;
+                    if delta.length() > 0.0001 {
+                        self.snow_yaw = (-delta.x).atan2(-delta.z);
+                    }
+                    self.snow_position = self.chase_world.as_ref().expect("Event world").move_body(
+                        self.snow_position,
+                        delta,
+                        1.05,
+                        3.3,
+                    );
+                    route_point(&self.chase_route, self.kenny_distance)
+                }
             };
             kenny.event_pose(p, dt);
             let contact = kind == ThreatKind::Bus
@@ -400,11 +647,31 @@ impl ThreatDirector {
                     p + Vector3::new(-NPC_RADIUS, 0.0, -NPC_RADIUS),
                     p + Vector3::new(NPC_RADIUS, NPC_HEIGHT, NPC_RADIUS),
                 ));
-            if self.progress >= 1.0 || contact {
+            if kind == ThreatKind::Piano
+                && self.progress >= 1.0
+                && (p - self.piano_impact()).length() < 0.05
+            {
+                self.state = ThreatState::Resolving;
+                self.state_time = 0.0;
+            } else if kind == ThreatKind::Snowman {
+                if (p - self.snow_position).length() <= 1.15 {
+                    self.fail(kenny);
+                }
+            } else if kind != ThreatKind::Piano && (self.progress >= 1.0 || contact) {
                 self.fail(kenny);
             }
         } else if self.state == ThreatState::Resolving {
-            if kind == ThreatKind::Ufo {
+            if kind == ThreatKind::Piano {
+                kenny.event_pose(self.piano_impact(), dt);
+                if self.state_time >= self.config.piano_drop_seconds {
+                    self.fail(kenny);
+                }
+            } else if kind == ThreatKind::Snowman {
+                kenny.event_pose(kenny.position(), dt);
+                if self.state_time >= self.config.melt_seconds {
+                    self.success(kenny);
+                }
+            } else if kind == ThreatKind::Ufo {
                 let mut p = kenny.position();
                 p.y = (p.y - 2.0 * dt).max(0.0);
                 kenny.event_pose(p, dt);
@@ -425,7 +692,7 @@ impl ThreatDirector {
                 ThreatKind::Ufo => {
                     self.config.ufo_max_lift + 2.0 * (self.state_time / 1.2).min(1.0)
                 }
-                ThreatKind::Bus => {
+                ThreatKind::Bus | ThreatKind::Piano | ThreatKind::Snowman => {
                     if self.state_time >= 1.4 {
                         -3.0
                     } else {
@@ -487,6 +754,24 @@ impl ThreatDirector {
                     );
                 }
             }
+            Some(ThreatKind::Piano) => add(
+                "piano-lock",
+                "Bloquear piano",
+                self.lock_position() + Vector3::up() * 1.35,
+                Vector3::new(0.4, 0.4, 0.28),
+            ),
+            Some(ThreatKind::Snowman) => {
+                for i in 0..3 {
+                    if !self.heaters[i] {
+                        add(
+                            &format!("heater-{i}"),
+                            "Encender calefactor",
+                            self.heater_position(i) + Vector3::up() * 0.85,
+                            Vector3::new(0.42, 0.6, 0.3),
+                        );
+                    }
+                }
+            }
             None => {}
         }
         result
@@ -540,6 +825,29 @@ impl ThreatDirector {
             return false;
         }
         match (self.kind, id) {
+            (Some(ThreatKind::Piano), "threat:piano-lock") if !self.piano_locked => {
+                self.piano_locked = true;
+                self.success(kenny);
+                true
+            }
+            (Some(ThreatKind::Snowman), _) => {
+                let Some(i) = id
+                    .strip_prefix("threat:heater-")
+                    .and_then(|s| s.parse::<usize>().ok())
+                    .filter(|i| *i < 3)
+                else {
+                    return false;
+                };
+                if self.heaters[i] {
+                    return false;
+                }
+                self.heaters[i] = true;
+                if self.heaters.iter().all(|on| *on) {
+                    self.state = ThreatState::Resolving;
+                    self.state_time = 0.0;
+                }
+                true
+            }
             (Some(ThreatKind::Bus), "threat:brake") => {
                 self.success(kenny);
                 true
@@ -575,6 +883,32 @@ impl ThreatDirector {
         }
     }
     pub fn obstacles(&self) -> Vec<Obstacle> {
+        if self.released || self.state == ThreatState::Inactive {
+            return vec![];
+        }
+        if let Some(kind @ (ThreatKind::Piano | ThreatKind::Snowman)) = self.kind {
+            let mut props = self.new_prop_obstacles(kind);
+            if kind == ThreatKind::Snowman && self.running() {
+                props.push(Obstacle {
+                    id: "threat:snowman-body".into(),
+                    bounds: Aabb::new(
+                        self.snow_position + Vector3::new(-1.05, 0.0, -1.05),
+                        self.snow_position + Vector3::new(1.05, 3.3 * self.snow_scale().y, 1.05),
+                    ),
+                });
+            }
+            if kind == ThreatKind::Piano {
+                let p = self.piano_position();
+                props.push(Obstacle {
+                    id: "threat:piano-body".into(),
+                    bounds: Aabb::new(
+                        p + Vector3::new(-2.3, 0.0, -1.5),
+                        p + Vector3::new(2.3, 2.3, 1.5),
+                    ),
+                });
+            }
+            return props;
+        }
         if self.kind == Some(ThreatKind::Bus) && self.state != ThreatState::Inactive {
             vec![Obstacle {
                 id: "threat:bus-body".into(),
@@ -582,6 +916,39 @@ impl ThreatDirector {
             }]
         } else {
             vec![]
+        }
+    }
+    fn new_prop_obstacles(&self, kind: ThreatKind) -> Vec<Obstacle> {
+        let prop = |id: String, p: Vector3, half: Vector3, height: f32| Obstacle {
+            id,
+            bounds: Aabb::new(p - half, p + Vector3::new(half.x, height, half.z)),
+        };
+        match kind {
+            ThreatKind::Piano => vec![
+                prop(
+                    "threat:piano-lock".into(),
+                    self.lock_position(),
+                    Vector3::new(0.4, 0.0, 0.28),
+                    1.8,
+                ),
+                prop(
+                    "threat:crane".into(),
+                    self.piano_impact() + Vector3::new(0.0, 0.0, 2.2),
+                    Vector3::new(0.45, 0.0, 0.45),
+                    9.5,
+                ),
+            ],
+            ThreatKind::Snowman => (0..3)
+                .map(|i| {
+                    prop(
+                        format!("threat:heater-{i}"),
+                        self.heater_position(i),
+                        Vector3::new(0.48, 0.0, 0.38),
+                        1.45,
+                    )
+                })
+                .collect(),
+            _ => vec![],
         }
     }
 }

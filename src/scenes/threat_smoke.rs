@@ -11,6 +11,7 @@ pub struct ThreatSmoke {
     started: bool,
     cooldown: f32,
     pub captured: bool,
+    detail_captured: bool,
     presses: usize,
     pub results: Vec<Value>,
 }
@@ -21,15 +22,16 @@ impl ThreatSmoke {
             started: false,
             cooldown: 0.0,
             captured: false,
+            detail_captured: false,
             presses: 0,
             results: Vec::new(),
         }
     }
     pub fn done(&self) -> bool {
-        self.case >= 6
+        self.case >= 10
     }
     fn kind(&self) -> ThreatKind {
-        [ThreatKind::Bus, ThreatKind::Ufo, ThreatKind::Sewer][self.case / 2]
+        ThreatKind::ALL[self.case / 2]
     }
     fn success(&self) -> bool {
         self.case.is_multiple_of(2)
@@ -53,6 +55,7 @@ impl ThreatSmoke {
             self.started = true;
             self.cooldown = 0.0;
             self.captured = false;
+            self.detail_captured = false;
             self.presses = 0;
         }
         self.cooldown -= 0.1;
@@ -60,6 +63,12 @@ impl ThreatSmoke {
             return Ok(());
         }
         let target = match self.kind() {
+            ThreatKind::Piano if scene.threats.elapsed >= 8.0 => {
+                scene.threats.targets().into_iter().next()
+            }
+            ThreatKind::Snowman if scene.threats.elapsed >= 3.0 => {
+                scene.threats.targets().into_iter().next()
+            }
             ThreatKind::Bus if scene.threats.elapsed >= 8.0 => {
                 scene.threats.targets().into_iter().next()
             }
@@ -76,6 +85,9 @@ impl ThreatSmoke {
         };
         if let Some(target) = target {
             let feet = match self.kind() {
+                ThreatKind::Piano | ThreatKind::Snowman => {
+                    target.bounds.center() + Vector3::new(-2.5, -target.bounds.center().y, -1.0)
+                }
                 ThreatKind::Bus => scene.threats.panel_position() + Vector3::new(-2.5, 0.0, -0.8),
                 ThreatKind::Ufo => ThreatKind::Ufo.stage() - Vector3::right() * 5.0,
                 ThreatKind::Sewer => {
@@ -109,7 +121,36 @@ impl ThreatSmoke {
         }
         Ok(())
     }
-    pub fn capture(&self, scene: &SouthParkScene) -> Option<&'static str> {
+    pub fn capture(&mut self, scene: &SouthParkScene) -> Option<&'static str> {
+        if !self.detail_captured {
+            let detail = match (self.kind(), self.success(), scene.threats.state) {
+                (ThreatKind::Piano, false, ThreatState::Resolving)
+                    if scene.threats.state_time >= 0.3 =>
+                {
+                    Some("piano-fall.png")
+                }
+                (ThreatKind::Piano, true, ThreatState::Succeeded)
+                    if scene.threats.state_time >= 0.3 =>
+                {
+                    Some("piano-secured.png")
+                }
+                (ThreatKind::Snowman, true, ThreatState::Resolving)
+                    if scene.threats.state_time >= 0.8 =>
+                {
+                    Some("snowman-melt.png")
+                }
+                (ThreatKind::Snowman, false, ThreatState::Failed)
+                    if scene.threats.state_time >= 0.5 =>
+                {
+                    Some("snowman-contact.png")
+                }
+                _ => None,
+            };
+            if detail.is_some() {
+                self.detail_captured = true;
+                return detail;
+            }
+        }
         if !self.success() || self.captured || scene.threats.state != ThreatState::Active {
             return None;
         }
@@ -117,11 +158,21 @@ impl ThreatSmoke {
             ThreatKind::Bus if scene.threats.elapsed >= 6.0 => Some("bus.png"),
             ThreatKind::Ufo if scene.threats.elapsed >= 2.0 => Some("ufo.png"),
             ThreatKind::Sewer if scene.threats.carrying_lid => Some("sewer.png"),
+            ThreatKind::Piano if scene.threats.elapsed >= 6.0 => Some("piano.png"),
+            ThreatKind::Snowman if scene.threats.elapsed >= 2.0 => Some("snowman.png"),
             _ => None,
         }
     }
     pub fn camera(&self, scene: &SouthParkScene) -> Camera3D {
         let (eye, target) = match self.kind() {
+            ThreatKind::Piano => (
+                scene.threats.piano_impact() + Vector3::new(-28.0, 4.0, -2.5),
+                scene.threats.piano_impact() + Vector3::new(-8.0, 3.5, 0.0),
+            ),
+            ThreatKind::Snowman => (
+                scene.threats.snow_position() + Vector3::new(18.0, 3.3, -2.5),
+                scene.threats.snow_position() + Vector3::new(5.0, 1.4, 0.0),
+            ),
             ThreatKind::Bus => {
                 let middle = (scene.threats.bus_position() + scene.kenny.position()) * 0.5;
                 (
@@ -167,6 +218,8 @@ impl ThreatSmoke {
                         ThreatKind::Bus => 1,
                         ThreatKind::Ufo => 3,
                         ThreatKind::Sewer => 2,
+                        ThreatKind::Piano => 1,
+                        ThreatKind::Snowman => 3,
                     })
         {
             return Err("An event succeeded without its expected raycast actions/capture".into());
@@ -183,6 +236,9 @@ impl ThreatSmoke {
             || scene.kenny.position().y.abs() > 0.001
             || scene.threats.carrying_lid
             || scene.threats.lights != [true; 3]
+            || scene.threats.heaters != [false; 3]
+            || scene.threats.piano_locked
+            || scene.threats.released
         {
             return Err("Incomplete event reset".into());
         }

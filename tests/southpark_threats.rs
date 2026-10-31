@@ -278,3 +278,230 @@ fn lid_and_hole_only_accept_the_circular_surface_not_box_corners() {
             .is_none());
     }
 }
+
+#[test]
+fn five_kind_catalog_is_unique_and_parseable() {
+    for (name, kind) in ["bus", "ufo", "sewer", "piano", "snowman"]
+        .into_iter()
+        .zip(ThreatKind::ALL)
+    {
+        assert_eq!(ThreatKind::parse(name), Some(kind));
+    }
+}
+
+#[test]
+fn piano_only_falls_after_kenny_enters_impact_zone_then_hits_ground() {
+    let mut s = scene();
+    active(&mut s, ThreatKind::Piano);
+    while s.threats.state == ThreatState::Active {
+        assert!((s.threats.piano_position().y - s.threats.config.piano_height).abs() < 0.001);
+        s.update_kenny(1.0 / 60.0);
+    }
+    assert_eq!(s.threats.state, ThreatState::Resolving);
+    assert!((s.kenny.position() - s.threats.piano_impact()).length() < 0.01);
+    let mut last = s.threats.piano_position().y;
+    while s.threats.state == ThreatState::Resolving {
+        s.update_kenny(1.0 / 60.0);
+        let y = s.threats.piano_position().y;
+        assert!(y >= 0.0 && y <= last);
+        last = y;
+    }
+    assert_eq!(s.threats.result, Some(ThreatResult::Died));
+    assert_eq!(last, 0.0);
+    tick(&mut s, 0.8);
+    assert!(s.threats.sprite_height_scale() < 0.4);
+}
+
+#[test]
+fn piano_safety_is_single_use_freezes_sway_and_prevents_later_fall() {
+    let mut s = scene();
+    active(&mut s, ThreatKind::Piano);
+    tick(&mut s, 3.0);
+    assert!(s.threats.piano_sway().abs() > 0.001);
+    assert!(act(&mut s, "threat:piano-lock"));
+    assert!(!act(&mut s, "threat:piano-lock"));
+    let p = s.threats.piano_position();
+    tick(&mut s, 3.0);
+    assert_eq!(s.threats.piano_position(), p);
+    assert_eq!(s.threats.piano_sway(), 0.0);
+    assert_eq!(s.threats.result, Some(ThreatResult::Survived));
+}
+
+#[test]
+fn heaters_are_independent_single_use_and_third_starts_melting() {
+    let mut s = scene();
+    active(&mut s, ThreatKind::Snowman);
+    assert!(!act(&mut s, "threat:heater-3"));
+    assert!(!act(&mut s, "threat:heater-200"));
+    for i in 0..3 {
+        assert!(act(&mut s, &format!("threat:heater-{i}")));
+        assert!(!act(&mut s, &format!("threat:heater-{i}")));
+        assert_eq!(s.threats.heaters.iter().filter(|b| **b).count(), i + 1);
+        if i < 2 {
+            assert_eq!(s.threats.state, ThreatState::Active);
+        }
+    }
+    assert_eq!(s.threats.state, ThreatState::Resolving);
+    let p = s.threats.snow_position();
+    tick(&mut s, 0.9);
+    assert_eq!(s.threats.snow_position(), p);
+    assert!(s.threats.snow_scale().y < 0.6 && s.threats.snow_scale().y > 0.0);
+    tick(&mut s, 1.3);
+    assert_eq!(s.threats.result, Some(ThreatResult::Survived));
+    assert!(!s.kenny.is_paused());
+}
+
+#[test]
+fn pursuit_is_continuous_clear_of_city_and_fails_by_contact() {
+    for heaters in 0..3 {
+        let mut s = scene();
+        active(&mut s, ThreatKind::Snowman);
+        for i in 0..heaters {
+            assert!(act(&mut s, &format!("threat:heater-{i}")));
+        }
+        let mut static_world = s.world.clone();
+        static_world
+            .obstacles
+            .retain(|o| o.id != "southpark-kenny" && !o.id.starts_with(PREFIX));
+        let mut previous = s.threats.snow_position();
+        for _ in 0..600 {
+            s.update_kenny(0.1);
+            let p = s.threats.snow_position();
+            assert!((p - previous).length() <= s.threats.config.snowman_speed * 0.1 + 0.002);
+            assert!(static_world.can_occupy(p, 1.05, 3.3));
+            assert!(static_world.can_occupy(s.kenny.position(), 0.28, 1.35));
+            assert_eq!(p.y, 0.0);
+            previous = p;
+            if s.threats.result.is_some() {
+                break;
+            }
+        }
+        assert_eq!(s.threats.result, Some(ThreatResult::Died));
+        assert!((s.kenny.position() - s.threats.snow_position()).length() <= 1.15);
+        let p = s.threats.snow_position();
+        tick(&mut s, 2.0);
+        assert_eq!(s.threats.snow_position(), p);
+    }
+}
+
+#[test]
+fn new_event_paths_match_at_different_frame_rates() {
+    for kind in [ThreatKind::Piano, ThreatKind::Snowman] {
+        let mut poses = vec![];
+        for fps in [30, 60, 144] {
+            let mut s = scene();
+            active(&mut s, kind);
+            for _ in 0..fps * 5 {
+                s.update_kenny(1.0 / fps as f32);
+            }
+            poses.push((s.kenny.position(), s.threats.snow_position()));
+        }
+        for pose in &poses[1..] {
+            assert!((pose.0 - poses[0].0).length() < 0.01);
+            assert!((pose.1 - poses[0].1).length() < 0.01);
+        }
+    }
+}
+
+#[test]
+fn new_event_result_cleanup_restores_kenny_and_removes_all_props() {
+    for kind in [ThreatKind::Piano, ThreatKind::Snowman] {
+        for win in [false, true] {
+            let mut s = scene();
+            active(&mut s, kind);
+            if win {
+                for target in s.threats.targets() {
+                    assert!(act(&mut s, &target.id));
+                }
+            }
+            while s.threats.result.is_none() {
+                s.update_kenny(0.1);
+            }
+            tick(&mut s, 6.2);
+            assert!(s.threats.released);
+            assert!(s.threats.visible_kenny());
+            assert!(!s.kenny.is_paused());
+            assert!(s.world.can_occupy(s.player.feet, 0.35, 1.8));
+            assert!(!s.world.obstacles.iter().any(|o| o.id.starts_with(PREFIX)));
+            assert!(!s.targets.iter().any(|o| o.id.starts_with(PREFIX)));
+            assert_eq!(s.kenny.position().y, 0.0);
+            assert!(s.threats.result.is_some());
+            s.restart_threat().unwrap();
+            assert_eq!(s.threats.state, ThreatState::Preparing);
+            assert!(!s.threats.released && !s.threats.piano_locked);
+            assert_eq!(s.threats.heaters, [false; 3]);
+            s.clear_threat().unwrap();
+            assert!(!s.kenny.is_paused());
+        }
+    }
+}
+
+#[test]
+fn new_targets_use_shared_range_and_occlusion() {
+    for kind in [ThreatKind::Piano, ThreatKind::Snowman] {
+        let mut s = scene();
+        active(&mut s, kind);
+        for target in s.threats.targets() {
+            let p = target.bounds.center();
+            let origin = p + Vector3::new(-2.5, 0.5, -1.0);
+            let select = |s: &SouthParkScene, range: f32| {
+                select_target_with(
+                    &s.targets,
+                    &s.world,
+                    origin,
+                    (p - origin).normalized(),
+                    range,
+                    |i, o, d, r, b| {
+                        if s.targets[i].id == target.id {
+                            s.threats.refine(&target.id, o, d, r, b)
+                        } else {
+                            None
+                        }
+                    },
+                )
+            };
+            let index = select(&s, 4.5).expect("Target should be visible from street");
+            assert_eq!(s.targets[index].id, target.id);
+            assert!(select(&s, 0.5).is_none());
+            let c = (origin + p) * 0.5;
+            s.world.obstacles.push(Obstacle {
+                id: "test-wall".into(),
+                bounds: Aabb::new(c - Vector3::one() * 0.2, c + Vector3::one() * 0.2),
+            });
+            assert!(select(&s, 4.5).is_none());
+            s.world.obstacles.pop();
+        }
+    }
+}
+
+#[test]
+fn wide_pursuer_uses_graph_detour_instead_of_crossing_a_wall() {
+    use planet_hoppers::minigames::{
+        common::collision::CollisionWorld,
+        southpark::navigation::{event_route, RoadNetwork},
+    };
+    let a = Vector3::new(-5.0, 0.0, 0.0);
+    let b = Vector3::new(5.0, 0.0, 0.0);
+    let c = Vector3::new(-5.0, 0.0, 5.0);
+    let d = Vector3::new(5.0, 0.0, 5.0);
+    let world = CollisionWorld::new(
+        Aabb::new(
+            Vector3::new(-20.0, 0.0, -20.0),
+            Vector3::new(20.0, 0.0, 20.0),
+        ),
+        0.0,
+        vec![Obstacle {
+            id: "wall".into(),
+            bounds: Aabb::new(Vector3::new(-1.0, 0.0, -3.0), Vector3::new(1.0, 5.0, 3.0)),
+        }],
+    );
+    let graph = RoadNetwork {
+        nodes: vec![a, c, d, b],
+        neighbors: vec![vec![1], vec![0, 2], vec![1, 3], vec![2]],
+    };
+    let path = event_route(&graph, &world, a, b, 1.05, 3.3).unwrap();
+    assert!(path.iter().any(|p| p.z > 3.0));
+    for p in path.windows(2) {
+        assert!((world.move_body(p[0], p[1] - p[0], 1.05, 3.3) - p[1]).length() < 0.002);
+    }
+}

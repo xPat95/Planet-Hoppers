@@ -45,8 +45,12 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
             "--no-test-objects" => no_probes = true,
             "--threat" => {
                 initial_threat = Some(
-                    ThreatKind::parse(&args.next().ok_or("--threat needs bus, ufo or sewer")?)
-                        .ok_or("Unknown threat: use bus, ufo or sewer")?,
+                    ThreatKind::parse(
+                        &args
+                            .next()
+                            .ok_or("--threat needs bus, ufo, sewer, piano or snowman")?,
+                    )
+                    .ok_or("Unknown threat: use bus, ufo, sewer, piano or snowman")?,
                 );
                 no_probes = true;
             }
@@ -54,7 +58,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 config_path = PathBuf::from(args.next().ok_or("--config requires a JSON path")?)
             }
             "--help" | "-h" => {
-                println!("cargo run --bin southpark -- [--config PATH] [--no-test-objects] [--threat bus|ufo|sewer] [--smoke] [--smoke-kenny] [--smoke-threats]\nWASD: caminar | Shift: correr | mouse: mirar | E: interactuar\nEsc: cursor / cerrar dialogo | Enter: aceptar / continuar\nF5: autobús | F6: OVNI | F7: alcantarilla | F8: reiniciar | F9: explorar\nF1: ayuda | F2: colisionadores | F3: indicador Kenny | F12: captura | Ctrl+Q: salir");
+                println!("cargo run --bin southpark -- [--config PATH] [--no-test-objects] [--threat bus|ufo|sewer|piano|snowman] [--smoke] [--smoke-kenny] [--smoke-threats]\nWASD: caminar | Shift: correr | mouse: mirar | E: interactuar\nEsc: cursor / cerrar dialogo | Enter: aceptar / continuar\nF5: autobús | F6: OVNI | F7: alcantarilla | F10: piano | F11: nieve | F8: reiniciar | F9: explorar\nF1: ayuda | F2: colisionadores | F3: indicador Kenny | F12: captura | Ctrl+Q: salir");
                 return Ok(());
             }
             _ => return Err(format!("Unknown option: {arg}").into()),
@@ -74,7 +78,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         .size(1280, 800)
         .resizable()
         .msaa_4x()
-        .title("Planet-Hoppers | South Park | SAVE KENNY! - Fase 4A")
+        .title("Planet-Hoppers | South Park | SAVE KENNY! - Fase 4B")
         .build();
     rl.set_exit_key(None);
     if smoke {
@@ -124,7 +128,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         return Err("GLB and collision manifest use different bounds/coordinates".into());
     }
     let captures = root.join(if threat_smoke {
-        "docs/references/southpark/phase4a"
+        "docs/references/southpark/phase4b"
     } else if kenny_smoke {
         "target/southpark-kenny-smoke"
     } else {
@@ -196,6 +200,10 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 Some(ThreatKind::Ufo)
             } else if rl.is_key_pressed(KeyboardKey::KEY_F7) {
                 Some(ThreatKind::Sewer)
+            } else if rl.is_key_pressed(KeyboardKey::KEY_F10) {
+                Some(ThreatKind::Piano)
+            } else if rl.is_key_pressed(KeyboardKey::KEY_F11) {
+                Some(ThreatKind::Snowman)
             } else {
                 None
             };
@@ -423,7 +431,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 }
             }
             d.draw_text(
-                "SOUTH PARK - SAVE KENNY! / fase 4A",
+                "SOUTH PARK - SAVE KENNY! / fase 4B",
                 16,
                 14,
                 20,
@@ -516,7 +524,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
             draw_status(&mut d, &scene.threats, width);
             if help && scene.confirmation.is_none() {
                 d.draw_text(
-                    "F5 autobús | F6 OVNI | F7 alcantarilla | F8 reiniciar | F9 explorar",
+                    "F5 bus | F6 OVNI | F7 tapa | F10 piano | F11 nieve | F8 reiniciar | F9 explorar",
                     16,
                     50,
                     18,
@@ -563,7 +571,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
             if threat_test.done() {
                 break;
             }
-            if frame > 1600 {
+            if frame > 3000 {
                 return Err("Threat graphical test timed out".into());
             }
         }
@@ -574,7 +582,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     rl.enable_cursor();
     if threat_smoke {
         if !threat_test.done() {
-            return Err("Threat test interrupted before all six cases".into());
+            return Err("Threat test interrupted before all ten cases".into());
         }
         let report = json!({"status":"PASS","cases":threat_test.results,"frames":frame,"model_loading_and_dimensions":"PASS","manual_hardware_input_tested":false,"note":"Real OpenGL and shared raycasting/E input; automated player placement, aiming and cinematic capture cameras."});
         std::fs::write(

@@ -213,6 +213,22 @@ impl SouthParkScene {
             self.threats.update(dt, &mut self.kenny);
         }
         self.world.obstacles.pop();
+        if self.threats.result.is_some()
+            && self.threats.state_time >= 6.0
+            && !self.threats.released
+            && matches!(
+                self.threats.kind,
+                Some(ThreatKind::Piano | ThreatKind::Snowman)
+            )
+        {
+            let mut clean = self.world.clone();
+            clean.obstacles.retain(|o| !o.id.starts_with(PREFIX));
+            clean.obstacles.push(Obstacle {
+                id: "fps-player".into(),
+                bounds: player_body,
+            });
+            self.threats.release_completed(&mut self.kenny, &clean);
+        }
         self.world.obstacles[self.kenny_obstacle].bounds = self.kenny.body(&self.world);
         self.sync_threats();
     }
@@ -270,7 +286,8 @@ impl SouthParkScene {
                 self.player.config.body_height,
             ),
         });
-        self.threats.start(kind, &mut self.kenny, &clean)?;
+        self.threats
+            .start(kind, &mut self.kenny, &clean, &self.roads)?;
         self.world.obstacles[self.kenny_obstacle].bounds = self.kenny.body(&self.world);
         self.sync_threats();
         Ok(())
@@ -286,7 +303,7 @@ impl SouthParkScene {
                 self.player.config.body_height,
             ),
         });
-        self.threats.restart(&mut self.kenny, &clean)?;
+        self.threats.restart(&mut self.kenny, &clean, &self.roads)?;
         self.world.obstacles[self.kenny_obstacle].bounds = self.kenny.body(&self.world);
         self.sync_threats();
         Ok(())
