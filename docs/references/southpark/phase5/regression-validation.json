@@ -1,0 +1,190 @@
+{
+  "status": "PASS",
+  "automated_tests_passed": 71,
+  "rust_checks": [
+    "cargo check --locked",
+    "cargo build --locked",
+    "cargo test --locked",
+    "cargo fmt --all -- --check",
+    "cargo clippy --all-targets --locked -- -D warnings"
+  ],
+  "fps": {
+    "frames": 90,
+    "manual_hardware_input_tested": false,
+    "model": {
+      "bounds_max": [
+        370,
+        23.196308135986328,
+        160
+      ],
+      "bounds_min": [
+        -350,
+        -1,
+        -175
+      ],
+      "draw_batches": 28,
+      "material_colors_match": true,
+      "original_primitives": 2734,
+      "source_materials": 27,
+      "triangles": 76212
+    },
+    "notes": "Real OpenGL render and raylib automation events. Physical keyboard/mouse and long play sessions require manual verification.",
+    "raylib_automation": {
+      "E_confirmations": 1,
+      "Escape_recapture": true,
+      "Escape_release": true,
+      "W_Shift": true,
+      "mouse_look": true,
+      "run_blocked_at_m": 2.4999046325683594
+    },
+    "render_mean_ms": 11.92920235294118,
+    "scene_solids": 395,
+    "status": "PASS"
+  },
+  "footsteps_plays": 1,
+  "kenny": {
+    "accepted_preparation_by_mouse": true,
+    "cancel_resumed_walk": true,
+    "closed_and_recaptured": true,
+    "dialogue_cursor_free": true,
+    "dialogue_opened_with_E": true,
+    "fps_frozen_during_dialogue": true,
+    "frames": 210,
+    "manual_hardware_input_tested": false,
+    "road_edges": 645,
+    "road_nodes": 638,
+    "status": "PASS",
+    "stopped_and_settled": true,
+    "texture": {
+      "height": 367,
+      "opaque_pixels": 566,
+      "transparent_pixels": 17087,
+      "width": 271
+    }
+  },
+  "individual_threats": {
+    "cases": [
+      {
+        "E_presses": 1,
+        "kind": "Bus",
+        "restart": "PASS",
+        "result": "Survived",
+        "return_to_exploration": "PASS"
+      },
+      {
+        "E_presses": 0,
+        "kind": "Bus",
+        "restart": "PASS",
+        "result": "Died",
+        "return_to_exploration": "PASS"
+      },
+      {
+        "E_presses": 3,
+        "kind": "Ufo",
+        "restart": "PASS",
+        "result": "Survived",
+        "return_to_exploration": "PASS"
+      },
+      {
+        "E_presses": 0,
+        "kind": "Ufo",
+        "restart": "PASS",
+        "result": "Died",
+        "return_to_exploration": "PASS"
+      },
+      {
+        "E_presses": 2,
+        "kind": "Sewer",
+        "restart": "PASS",
+        "result": "Survived",
+        "return_to_exploration": "PASS"
+      },
+      {
+        "E_presses": 0,
+        "kind": "Sewer",
+        "restart": "PASS",
+        "result": "Died",
+        "return_to_exploration": "PASS"
+      },
+      {
+        "E_presses": 1,
+        "kind": "Piano",
+        "restart": "PASS",
+        "result": "Survived",
+        "return_to_exploration": "PASS"
+      },
+      {
+        "E_presses": 0,
+        "kind": "Piano",
+        "restart": "PASS",
+        "result": "Died",
+        "return_to_exploration": "PASS"
+      },
+      {
+        "E_presses": 3,
+        "kind": "Snowman",
+        "restart": "PASS",
+        "result": "Survived",
+        "return_to_exploration": "PASS"
+      },
+      {
+        "E_presses": 0,
+        "kind": "Snowman",
+        "restart": "PASS",
+        "result": "Died",
+        "return_to_exploration": "PASS"
+      }
+    ],
+    "frames": 1697,
+    "manual_hardware_input_tested": false,
+    "model_loading_and_dimensions": "PASS",
+    "note": "Real OpenGL and shared raycasting/E input; automated player placement, aiming and cinematic capture cameras.",
+    "status": "PASS"
+  },
+  "voice_analysis": {
+    "source": "assets\\audio\\sfx\\South Park\\they_killed_kenny.mp3",
+    "frames": 147456,
+    "sample_rate": 44100,
+    "channels": 2,
+    "duration_seconds": 3.3436734693877552,
+    "window_seconds": 0.02,
+    "low_energy_intervals_seconds": [
+      [
+        0.82,
+        1.04
+      ],
+      [
+        1.54,
+        1.62
+      ],
+      [
+        2.08,
+        2.18
+      ],
+      [
+        2.48,
+        2.54
+      ],
+      [
+        3.12,
+        3.36
+      ]
+    ],
+    "configured_kyle_switch_seconds": 2.18,
+    "manual_listening_verified": false,
+    "note": "Initial switch inferred near the late pause; verify by listening."
+  },
+  "original_assets": {
+    "changed_files": [],
+    "protected_files": 87,
+    "algorithm": "SHA256"
+  },
+  "preexisting_user_changes_preserved": [
+    "Removed audio/music/.gitkeep",
+    "Removed audio/sfx/.gitkeep",
+    "Removed textures/minigames/.gitkeep",
+    "Untracked original MP3 files and Stan/Kyle PNGs"
+  ],
+  "manual_listening_verified": false,
+  "physical_input_verified": false
+}

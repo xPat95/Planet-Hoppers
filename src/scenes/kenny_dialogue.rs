@@ -102,7 +102,7 @@ pub fn draw(d: &mut RaylibDrawHandle, state: KennyDialogue, width: i32, height: 
         let text = if state == KennyDialogue::Preparing {
             "Volver a explorar"
         } else if i == 0 {
-            "Aceptar desafío"
+            "Comenzar desafío"
         } else {
             "Cancelar"
         };

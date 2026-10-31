@@ -1,0 +1,7 @@
+{
+  "death_animation_seconds": 1.5,
+  "voice_fallback_seconds": 3.35,
+  "kyle_switch_seconds": 2.18,
+  "success_hold_seconds": 1.3,
+  "text_characters_per_second": 45.0
+}

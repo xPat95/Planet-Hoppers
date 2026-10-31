@@ -9,6 +9,7 @@ use serde::Deserialize;
 use std::path::Path;
 pub mod kenny;
 pub mod navigation;
+pub mod session;
 pub mod threats;
 use kenny::{Kenny, KENNY_ID};
 use navigation::RoadNetwork;

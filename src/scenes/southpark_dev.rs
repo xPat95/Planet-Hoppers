@@ -1,6 +1,11 @@
-//! Standalone development host. No solar-system, progress or minigame rules.
+//! Standalone host; match rules, UI and audio live in their own modules.
 use super::kenny_dialogue::{self, DialogueAction};
+use super::session_ui::{self, SessionAction, SessionUi};
 use crate::minigames::southpark::threats::{ThreatKind, PREFIX};
+use crate::{
+    audio::{AudioConfig, AudioController},
+    minigames::southpark::session::{SaveKennySession, SessionConfig},
+};
 use crate::{
     graphics::billboard::SpriteBillboard,
     graphics::resources::{save_frame, StaticModel},
@@ -28,10 +33,22 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     let mut no_probes = false;
     let mut initial_threat = None;
     let mut threat_smoke = false;
+    let mut session_smoke = false;
+    let mut dev_threats = false;
+    let mut muted = false;
     let mut args = std::env::args().skip(1);
     while let Some(arg) = args.next() {
         match arg.as_str() {
             "--smoke" => smoke = true,
+            "--smoke-session" => {
+                session_smoke = true;
+                no_probes = true;
+            }
+            "--dev-threats" => {
+                dev_threats = true;
+                no_probes = true;
+            }
+            "--mute" => muted = true,
             "--smoke-threats" => {
                 smoke = true;
                 threat_smoke = true;
@@ -53,11 +70,13 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                     .ok_or("Unknown threat: use bus, ufo, sewer, piano or snowman")?,
                 );
                 no_probes = true;
+                dev_threats = true;
             }
             "--config" => {
                 config_path = PathBuf::from(args.next().ok_or("--config requires a JSON path")?)
             }
             "--help" | "-h" => {
+                println!("Partida normal: hablá con Kenny y elegí Comenzar desafío. P: pausa / abandonar.\n--dev-threats: habilitar F5/F6/F7/F10/F11 para pruebas individuales.\n--smoke-session: partida automatizada con audio y capturas de fase 5.\n--mute: cargar y verificar audio con volúmenes en cero.");
                 println!("cargo run --bin southpark -- [--config PATH] [--no-test-objects] [--threat bus|ufo|sewer|piano|snowman] [--smoke] [--smoke-kenny] [--smoke-threats]\nWASD: caminar | Shift: correr | mouse: mirar | E: interactuar\nEsc: cursor / cerrar dialogo | Enter: aceptar / continuar\nF5: autobús | F6: OVNI | F7: alcantarilla | F10: piano | F11: nieve | F8: reiniciar | F9: explorar\nF1: ayuda | F2: colisionadores | F3: indicador Kenny | F12: captura | Ctrl+Q: salir");
                 return Ok(());
             }
@@ -65,7 +84,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
     let mut config = DevConfig::load(&config_path)?;
-    if no_probes {
+    if no_probes || !smoke {
         config.test_objects = false;
     }
     if smoke && !kenny_smoke && !threat_smoke && !config.test_objects {
@@ -78,13 +97,49 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         .size(1280, 800)
         .resizable()
         .msaa_4x()
-        .title("Planet-Hoppers | South Park | SAVE KENNY! - Fase 4B")
+        .title("Planet-Hoppers | South Park | SAVE KENNY!")
         .build();
     rl.set_exit_key(None);
-    if smoke {
+    rl.set_window_min_size(640, 480);
+    if smoke || session_smoke {
         rl.set_window_state(WindowState::default().set_window_hidden(true));
     }
-    rl.set_target_fps(if smoke { 0 } else { 120 });
+    // The session smoke uses the real audio clock, so do not exhaust its frame
+    // budget faster than the combined voice file can physically play.
+    rl.set_target_fps(if session_smoke {
+        240
+    } else if smoke {
+        0
+    } else {
+        120
+    });
+    let device = RaylibAudio::init_audio_device().ok();
+    let mut audio_config = AudioConfig::load(&root.join("config/southpark-audio.json"))
+        .unwrap_or_else(|e| {
+            eprintln!("AUDIO_CONFIG_WARNING {e}");
+            AudioConfig::default()
+        });
+    if muted {
+        audio_config.music_volume = 0.0;
+        audio_config.sfx_volume = 0.0;
+        audio_config.voice_volume = 0.0;
+        audio_config.footsteps_volume = 0.0;
+    }
+    let mut audio = AudioController::load(device.as_ref(), &root, audio_config);
+    let mut session = SaveKennySession::new(SessionConfig::load(
+        &root.join("config/southpark-session.json"),
+    )?);
+    if let Some(length) = audio.voice_duration() {
+        session.config.voice_fallback_seconds = length;
+        session.config.kyle_switch_seconds = session
+            .config
+            .kyle_switch_seconds
+            .min((length - 0.15).max(0.0));
+    }
+    let session_ui = SessionUi::load(&mut rl, &thread, &root);
+    let mut seed = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)?
+        .as_nanos() as u64;
     unsafe {
         ffi::rlSetClipPlanes(0.05, 1500.0);
     }
@@ -127,14 +182,16 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     {
         return Err("GLB and collision manifest use different bounds/coordinates".into());
     }
-    let captures = root.join(if threat_smoke {
-        "docs/references/southpark/phase4b"
+    let captures = root.join(if session_smoke {
+        "docs/references/southpark/phase5"
+    } else if threat_smoke {
+        "target/southpark-threats-smoke"
     } else if kenny_smoke {
         "target/southpark-kenny-smoke"
     } else {
         "target/southpark-smoke"
     });
-    if smoke {
+    if smoke || session_smoke {
         std::fs::create_dir_all(&captures)?;
     }
     let mut cursor = CursorCapture::default();
@@ -150,6 +207,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     let mut run_distance = 0.0;
     let mut render_times = Vec::new();
     let mut threat_test = super::threat_smoke::ThreatSmoke::new();
+    let mut session_test = super::session_smoke::SessionSmoke::new();
     let mut dialogue_opened = false;
     let mut dialogue_paused = false;
     let mut cancelled_and_resumed = false;
@@ -162,6 +220,10 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     let mut modal_cursor_free = false;
     let kenny_start = scene.kenny.position();
     while !rl.window_should_close() {
+        audio.update();
+        if session_smoke {
+            session_test.before_frame(&rl, &mut scene, &session)?;
+        }
         if smoke {
             if threat_smoke {
                 threat_test.before_frame(&mut scene)?;
@@ -179,7 +241,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         let frame_start = Instant::now();
-        let dt = if threat_smoke {
+        let dt = if threat_smoke || session_smoke {
             0.1
         } else if smoke {
             1.0 / 60.0
@@ -193,7 +255,33 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
             break;
         }
         let mut input = PlayerInput::read(&rl);
-        if !smoke && scene.dialogue == KennyDialogue::Closed {
+        let session_was_modal = session.blocks_controls();
+        let had_dialogue = scene.dialogue != KennyDialogue::Closed;
+        if !smoke {
+            let action = session_ui::input(&rl, &session);
+            let result = match action {
+                SessionAction::Continue => session.continue_match(&mut scene),
+                SessionAction::Explore => {
+                    audio.stop_effects();
+                    audio.silence_voice();
+                    session.explore(&mut scene)
+                }
+                SessionAction::Replay => {
+                    audio.stop_effects();
+                    seed = seed.wrapping_add(0x9e3779b97f4a7c15);
+                    session.start(&mut scene, seed)
+                }
+                SessionAction::Pause => {
+                    session.pause();
+                    Ok(())
+                }
+                SessionAction::None => Ok(()),
+            };
+            if let Err(error) = result {
+                session.error = Some(error);
+            }
+        }
+        if !smoke && dev_threats && !session.in_match() && scene.dialogue == KennyDialogue::Closed {
             let requested = if rl.is_key_pressed(KeyboardKey::KEY_F5) {
                 Some(ThreatKind::Bus)
             } else if rl.is_key_pressed(KeyboardKey::KEY_F6) {
@@ -220,10 +308,22 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 scene.confirmation = Some((message, 4.0));
             }
         }
-        let modal_at_start = scene.dialogue != KennyDialogue::Closed;
-        if modal_at_start {
+        let modal_at_start = had_dialogue
+            || session_was_modal
+            || scene.dialogue != KennyDialogue::Closed
+            || session.blocks_controls();
+        if scene.dialogue != KennyDialogue::Closed {
             match kenny_dialogue::input(&rl, scene.dialogue) {
-                DialogueAction::Accept => scene.accept_challenge(),
+                DialogueAction::Accept => {
+                    if smoke {
+                        scene.accept_challenge();
+                    } else {
+                        seed = seed.wrapping_add(0x9e3779b97f4a7c15);
+                        if let Err(error) = session.start(&mut scene, seed) {
+                            scene.confirmation = Some((error, 4.0));
+                        }
+                    }
+                }
                 DialogueAction::Close => {
                     scene.close_dialogue();
                     cursor.captured = true;
@@ -233,12 +333,23 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
             }
             input.toggle_cursor = false;
         }
+        if session_was_modal
+            && !session.blocks_controls()
+            && scene.dialogue == KennyDialogue::Closed
+        {
+            cursor.captured = true;
+            cursor.apply(&mut rl);
+        }
+        if modal_at_start {
+            input.toggle_cursor = false;
+        }
         if smoke && (3..=50).contains(&frame) {
             running_read |= input.forward > 0.0 && input.sprint;
         }
         let old_yaw = scene.player.yaw;
-        let focused = smoke || rl.is_window_focused();
+        let focused = smoke || session_smoke || rl.is_window_focused();
         let active = !modal_at_start && cursor.update(&mut rl, &mut input, focused);
+        let previous_feet = scene.player.feet;
         if active {
             scene.player.update(input, dt, &scene.world);
         }
@@ -251,7 +362,25 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         if smoke && frame == 58 {
             recaptured = cursor.captured && rl.is_cursor_hidden();
         }
-        scene.update_kenny(dt);
+        let walk_speed = if active {
+            (scene.player.feet - previous_feet).length() / dt.max(0.0001)
+        } else {
+            0.0
+        };
+        if smoke {
+            scene.update_kenny(dt);
+        } else if let Err(error) = session.update(dt, &mut scene, audio.voice_clock()) {
+            session.error = Some(error);
+        }
+        audio.set_music(session.music());
+        for cue in session.take_cues() {
+            audio.cue(cue);
+        }
+        audio.footsteps(if session.blocks_controls() {
+            0.0
+        } else {
+            walk_speed
+        });
         let threat_capture = if threat_smoke {
             threat_test.capture(&scene)
         } else {
@@ -286,7 +415,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         pose.height *= scene.threats.sprite_height_scale();
         let kenny_index = scene.kenny_target();
         scene.targets[kenny_index].bounds = pose.bounds();
-        let selected = if active {
+        let selected = if active && session.permits_interaction() && !session.blocks_controls() {
             select_target_with(
                 &scene.targets,
                 &scene.world,
@@ -295,7 +424,10 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 scene.interaction_distance.max(scene.threats.range()),
                 |index, origin, direction, range, broad| {
                     if index == kenny_index {
-                        if scene.threats.owns_kenny() || !scene.threats.visible_kenny() {
+                        if session.in_match()
+                            || scene.threats.owns_kenny()
+                            || !scene.threats.visible_kenny()
+                        {
                             None
                         } else {
                             sprite.hit(
@@ -326,11 +458,13 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 scene.interact(index);
             }
         }
-        if scene.dialogue != KennyDialogue::Closed && cursor.captured {
+        if (scene.dialogue != KennyDialogue::Closed || session.blocks_controls()) && cursor.captured
+        {
             cursor.captured = false;
             cursor.apply(&mut rl);
         }
-        let active = active && scene.dialogue == KennyDialogue::Closed;
+        let active =
+            active && scene.dialogue == KennyDialogue::Closed && !session.blocks_controls();
         if kenny_smoke {
             if frame == 40 {
                 dialogue_opened = scene.dialogue == KennyDialogue::Invitation;
@@ -430,14 +564,8 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                     sprite.draw(&mut view, &pose);
                 }
             }
-            d.draw_text(
-                "SOUTH PARK - SAVE KENNY! / fase 4B",
-                16,
-                14,
-                20,
-                Color::DARKGRAY,
-            );
-            if !smoke {
+            d.draw_text("SOUTH PARK - SAVE KENNY!", 16, 14, 20, Color::DARKGRAY);
+            if !smoke && dev_threats {
                 d.draw_fps(width - 100, 14);
             }
             if active
@@ -471,7 +599,10 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                     );
                     d.draw_text(&text, x, height / 2 + 30, 22, Color::YELLOW);
                 }
-            } else if !active && scene.dialogue == KennyDialogue::Closed {
+            } else if !active
+                && scene.dialogue == KennyDialogue::Closed
+                && !session.blocks_controls()
+            {
                 d.draw_rectangle(0, height / 2 - 30, width, 60, Color::new(20, 30, 40, 210));
                 d.draw_text(
                     "Cursor libre - pulsa ESC para retomar",
@@ -482,11 +613,11 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 );
             }
             if let Some((text, _)) = &scene.confirmation {
-                if !(smoke && frame == 75) {
+                if !(smoke && frame == 75) && !session.in_match() {
                     d.draw_text(text, 16, 46, 20, Color::DARKGREEN);
                 }
             }
-            if help {
+            if help && !session.blocks_controls() {
                 d.draw_rectangle(0, height - 55, width, 55, Color::new(20, 30, 40, 210));
                 d.draw_text(
                     "WASD caminar | Shift correr | Mouse mirar | E interactuar | ESC cursor",
@@ -504,6 +635,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 );
             }
             if scene.kenny_hint
+                && !session.in_match()
                 && scene.dialogue == KennyDialogue::Closed
                 && !(kenny_smoke && frame == 195)
             {
@@ -521,8 +653,12 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
             if scene.dialogue != KennyDialogue::Closed {
                 kenny_dialogue::draw(&mut d, scene.dialogue, width, height);
             }
-            draw_status(&mut d, &scene.threats, width);
-            if help && scene.confirmation.is_none() {
+            if !session.in_match() {
+                draw_status(&mut d, &scene.threats, width);
+            }
+            session_ui.draw(&mut d, &session, &scene.threats, width, height);
+            if help && scene.confirmation.is_none() && (dev_threats || smoke) && !session.in_match()
+            {
                 d.draw_text(
                     "F5 bus | F6 OVNI | F7 tapa | F10 piano | F11 nieve | F8 reiniciar | F9 explorar",
                     16,
@@ -558,6 +694,11 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 save_frame(&captures.join(name), width, height)?;
                 threat_test.captured = true;
             }
+            if session_smoke {
+                if let Some(name) = session_test.capture(&session) {
+                    save_frame(&captures.join(name), width, height)?;
+                }
+            }
         }
         render_times.push(frame_start.elapsed().as_secs_f64() * 1000.0);
         if smoke && !kenny_smoke && !threat_smoke && frame == 60 {
@@ -566,6 +707,19 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
             scene.player.pitch = 0.0;
         }
         frame += 1;
+        if session_smoke {
+            session_test.after_frame(&scene, &session, &audio)?;
+            if session_test.done() {
+                break;
+            }
+            if frame > 12000 {
+                return Err(format!(
+                    "Session smoke timed out: {:?}, lives={}, saves={}",
+                    session.state, session.lives, session.saves
+                )
+                .into());
+            }
+        }
         if threat_smoke {
             threat_test.after_frame(&mut scene)?;
             if threat_test.done() {
@@ -580,7 +734,15 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
     rl.enable_cursor();
-    if threat_smoke {
+    if session_smoke {
+        session_test.finish(
+            &scene,
+            &session,
+            &audio,
+            session_ui.loaded_portraits,
+            &captures,
+        )?;
+    } else if threat_smoke {
         if !threat_test.done() {
             return Err("Threat test interrupted before all ten cases".into());
         }
@@ -629,6 +791,10 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         )?;
         println!("SMOKE_PASS {report}");
     }
+    println!(
+        "AUDIO_RUNTIME_AUDIT {}",
+        serde_json::to_string(&audio.audit)?
+    );
     Ok(())
 }
 
