@@ -157,6 +157,14 @@ No requiere Blender ni teclado numérico para jugar. WASD mueve al jugador, mous
 Al entrar se reproduce una presentación 3D sincronizada con el audio completo de `intro.mp3` (**27,376 segundos**); **Espacio o Enter** la saltan. Kenny aparece visible cerca del jugador inicial. Acercarse, apuntarle y pulsar **E** abre **SAVE KENNY!**. **Comenzar desafío** inicia tres vidas y cinco amenazas automáticas en distintas zonas. La búsqueda tiene un plazo calculado por las calles: acercarse adelanta la preparación, pero el peligro comienza también al agotarse el plazo aunque el jugador siga lejos. **M** abre el mapa y pausa el mundo, incluido ese plazo; rueda acerca, arrastrar desplaza, R recentra y M/Escape cierra. P permite pausar o abandonar la partida. **Retroceso** sale de South Park durante exploración libre. Ver [intro, balance, controles y preparación de integración de fase 6B](docs/minigames/southpark-phase6b.md), [zonas y mapas de fase 6A](docs/minigames/southpark-phase6a.md) y [HUD, audio y diálogos de fase 5](docs/minigames/southpark-phase5.md).
 
 
+### Sistema solar
+
+```powershell
+cargo run --locked --bin solarsystem
+```
+
+Fases 1 a 6: Sol central y los seis planetas de Blender en sus órbitas, con traslación y rotación propia (deltaTime), luz del Sol, fondo de estrellas y una nave para recorrerlos (W/S, mouse, Shift turbo, C vista general). Cerca de un planeta aparece **Explorar planeta**: South Park abre su minijuego y al salir se vuelve al sistema solar; los demás minijuegos siguen en construcción. Ver [sistema solar](docs/solar-system.md).
+
 ## Planetas disponibles para integración
 
 Modo de desarrollo de South Park: `cargo run --locked -- --dev-threats` habilita **F5** autobús, **F6** OVNI, **F7** alcantarilla, **F8** reiniciar y **F9** volver al paseo. También: `cargo run --locked -- --threat bus` (o `ufo`, `sewer`). Estas pruebas no descuentan vidas ni suman salvadas. Ver [fase 4A: controles, recursos y validación](docs/minigames/southpark-phase4a.md).

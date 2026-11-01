@@ -63,7 +63,7 @@ pub struct StaticModel {
     pub audit: ModelAudit,
 }
 
-fn glb_document(path: &Path) -> Result<Value, Box<dyn std::error::Error>> {
+pub(crate) fn glb_document(path: &Path) -> Result<Value, Box<dyn std::error::Error>> {
     let bytes = std::fs::read(path)?;
     if bytes.len() < 20
         || &bytes[..4] != b"glTF"

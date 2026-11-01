@@ -44,3 +44,7 @@ Las superficies se agrupan por cara, componente y material. Son mallas de bloque
 Seleccionar la jerarquía de `Minecraft_Planet_ROOT` para exportar y excluir `Presentation`. El agua es opaca en esta versión para simplificar la visualización desde cualquier ángulo. Las seis caras tienen geometría; la vista previa no sustituye el modelo.
 
 Esta entrega es un blockout para refinamiento manual. Antes de integrarlo definitivamente se deben revisar escala, presupuesto de polígonos, caras internas entre bloques, unificación de materiales, colisiones y posibles niveles de detalle. No incluye lógica de juego ni dependencias. El formato de exportación se decidirá al elegir el motor gráfico.
+
+## Exportación para el juego
+
+[minecraft_planet.glb](exports/minecraft_planet.glb): GLB para el [sistema solar](../../../../docs/solar-system.md), generado con [export_solar_models.py](../../../../tools/blender/solarsystem/export_solar_models.py) sin modificar el `.blend` (se excluyen `Presentation`, cámaras y luces). ~79 000 triángulos. Los tintes de pasto, hojas y agua se hornean en copias de las imágenes al exportar (glTF no guarda el nodo Multiplicar). Volver a exportar después de cambiar el modelo.

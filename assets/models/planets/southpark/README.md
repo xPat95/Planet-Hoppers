@@ -63,3 +63,7 @@ El [informe de v3](../../../../docs/references/southpark/iteration03_report.md) 
 Esto no garantiza un presupuesto de rendimiento para un motor todavía no elegido. Antes de integrar: evaluar agrupación por material, instancias, colisiones, niveles de detalle, escala y comportamiento de normales. No se ha exportado el modelo.
 
 Ver [las vistas actuales y las históricas](../../../../docs/references/southpark/README.md), el [generador de v1](../../../../tools/blender/southpark/build_southpark_planet.py), el [refinamiento de v2](../../../../tools/blender/southpark/refine_southpark_planet_v02.py) y el [refinamiento de v3](../../../../tools/blender/southpark/refine_southpark_planet_v03.py). No es necesario ejecutar scripts para abrir el `.blend`.
+
+## Exportación para el juego
+
+[southpark_planet.glb](exports/southpark_planet.glb): GLB para el [sistema solar](../../../../docs/solar-system.md), generado con [export_solar_models.py](../../../../tools/blender/solarsystem/export_solar_models.py) sin modificar el `.blend` (se excluyen `Presentation`, cámaras y luces). ~98 000 triángulos. El sistema solar dibuja sin descartar caras traseras y corrige en el shader las normales invertidas de carreteras y cartel. Volver a exportar después de cambiar el modelo.

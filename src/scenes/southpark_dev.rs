@@ -36,6 +36,13 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
 pub fn run_visit(
     visits: &mut SouthParkVisits,
 ) -> Result<SouthParkExit, Box<dyn std::error::Error>> {
+    run_visit_with_args(visits, std::env::args().skip(1))
+}
+/// Host entry (solar system): the host's own command-line options are not South Park's.
+pub fn run_visit_with_args(
+    visits: &mut SouthParkVisits,
+    mut args: impl Iterator<Item = String>,
+) -> Result<SouthParkExit, Box<dyn std::error::Error>> {
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let mut config_path = root.join("config/southpark-dev.json");
     let mut smoke = false;
@@ -48,7 +55,6 @@ pub fn run_visit(
     let mut entry_smoke = false;
     let mut dev_threats = false;
     let mut muted = false;
-    let mut args = std::env::args().skip(1);
     while let Some(arg) = args.next() {
         match arg.as_str() {
             "--smoke-entry" => entry_smoke = true,

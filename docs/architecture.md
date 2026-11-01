@@ -2,7 +2,7 @@
 
 ## Alcance inicial
 
-La organización inicial se definió sin elegir motor. Desde la fase 2 de South Park existe una aplicación mínima Rust/raylib-rs: `src/bin/southpark.rs` inicia el anfitrión de desarrollo de `src/scenes/southpark_dev.rs`. El resto del juego y el sistema solar continúan pendientes.
+La organización inicial se definió sin elegir motor. Desde la fase 2 de South Park existe una aplicación mínima Rust/raylib-rs: `src/bin/southpark.rs` inicia el anfitrión de desarrollo de `src/scenes/southpark_dev.rs`. Desde las fases 1 a 6 del sistema solar, `src/bin/solarsystem.rs` abre `src/scenes/solar_system.rs`. La escena une `src/solarSystem/` (órbitas, rotación, formas de choque y proximidad), `src/ships/` (vuelo y choques de la nave) y `src/graphics/space.rs` (modelos, luz del Sol y cielo). También coordina las visitas: cierra su ventana, abre el minijuego (South Park mediante `southpark_dev::run_visit_with_args`) y al volver retoma el mismo estado. Ver [sistema solar](solar-system.md). La estación, el progreso y el final continúan pendientes.
 
 El controlador, la colisión continua contra AABB, el raycasting y la lectura del manifiesto están en `src/minigames/common/`; la escena y sus tres objetos de prueba están en `src/minigames/southpark/`. `src/graphics/` carga y agrupa las mallas en memoria y aplica iluminación. La configuración de desarrollo está en `config/southpark-dev.json`. Estos módulos no importan naves, progreso, personajes ni sistema solar. Ver [detalle de fase 2](minigames/southpark-phase2.md). Las responsabilidades siguientes siguen guiando las futuras implementaciones.
 

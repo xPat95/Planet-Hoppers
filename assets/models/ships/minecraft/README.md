@@ -47,3 +47,7 @@ Las once imágenes están **empaquetadas en el .blend**, con rutas externas rela
 La Dragon Head usa una silueta cúbica de cráneo, hocico, mandíbula y cuernos, con obsidiana provisional y ojos morados. No reproduce el atlas original de la entidad. Los dos cofres interiores tienen UV simplificadas y el soporte de pociones conserva base y columna; no se incluyen botellas, inventarios, Elytra, marcos de objetos, shulkers ni animaciones. Estas limitaciones afectan a los accesorios, no a la distribución de bloques de la estructura del barco.
 
 Los [scripts](../../../../tools/blender/minecraft/end_ship/README.md) y los [datos de procedencia](../../../../docs/references/minecraft/end_ship/source_provenance.json) documentan la generación. No se modificaron los archivos de otros planetas o naves.
+
+## Exportación para el juego
+
+[end_ship.glb](exports/end_ship.glb): GLB para el [sistema solar](../../../../docs/solar-system.md), generado con [export_solar_models.py](../../../../tools/blender/solarsystem/export_solar_models.py) sin modificar el `.blend` (se excluyen `Presentation`, cámaras y luces). ~17 000 triángulos. Volver a exportar después de cambiar el modelo.

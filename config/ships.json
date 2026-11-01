@@ -1,0 +1,60 @@
+{
+  "active_ship": "smilingfriends",
+  "ships": [
+    {
+      "id": "smilingfriends",
+      "name": "Nave de Smiling Friends",
+      "model": "assets/models/ships/smilingfriends/exports/smilingfriends_ship.glb",
+      "length": 4.0
+    },
+    {
+      "id": "minecraft",
+      "name": "Barco del End",
+      "model": "assets/models/ships/minecraft/exports/end_ship.glb",
+      "length": 5.0
+    },
+    {
+      "id": "southpark",
+      "name": "Nave de Butters",
+      "model": "assets/models/ships/southpark/butters/exports/southpark_butters_ship.glb",
+      "length": 4.0,
+      "model_rotation_degrees": [
+        0.0,
+        180.0,
+        0.0
+      ]
+    },
+    {
+      "id": "regularshow",
+      "name": "Carrito de golf",
+      "model": "assets/models/ships/regularshow/golfcart/exports/regularshow_golfcart_ship_near.glb",
+      "length": 4.0,
+      "model_rotation_degrees": [
+        0.0,
+        180.0,
+        0.0
+      ]
+    },
+    {
+      "id": "starwars",
+      "name": "N-1 de Naboo",
+      "model": "assets/models/ships/starwars/naboo/exports/naboo_n1_royal_ship_near.glb",
+      "length": 5.0
+    },
+    {
+      "id": "starwars_mandalorian",
+      "name": "N-1 del Mandaloriano",
+      "model": "assets/models/ships/starwars/mandalorian/exports/mandalorian_n1_ship_near.glb",
+      "length": 5.0
+    }
+  ],
+  "flight": {
+    "cruise_speed": 40.0,
+    "boost_speed": 130.0,
+    "acceleration": 45.0,
+    "turn_speed_degrees": 70.0,
+    "mouse_sensitivity": 0.0025,
+    "radius": 1.6,
+    "carry_range": 3.0
+  }
+}

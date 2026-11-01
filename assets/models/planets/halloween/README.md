@@ -30,3 +30,7 @@ Presupuesto de cerca: ~175 000 (los planetas de Regular Show y Star Wars tienen 
 ## Edición
 
 **No editar el `.blend` a mano:** se regenera completo con [build_halloween_planet.py](../../../../tools/blender/halloween/build_halloween_planet.py). Ver [instrucciones del script](../../../../tools/blender/halloween/README.md).
+
+## Exportación para el juego
+
+[halloween_planet.glb](exports/halloween_planet.glb): GLB para el [sistema solar](../../../../docs/solar-system.md), generado con [export_solar_models.py](../../../../tools/blender/solarsystem/export_solar_models.py) sin modificar el `.blend` (se excluyen `Presentation`, cámaras y luces). ~194 000 triángulos, más [la versión lejana](exports/halloween_planet_far.glb) (solo el cráneo de `LOD_Far`, ~22 000), que el sistema solar usa a más de 9 radios. Volver a exportar después de cambiar el modelo.

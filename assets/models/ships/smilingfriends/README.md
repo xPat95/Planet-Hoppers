@@ -22,3 +22,7 @@ Todo depende de `SmilingFriends_Ship_ROOT`, en el origen. Radio del platillo: 2 
 ## Edición
 
 **No editar el `.blend` a mano:** se regenera con [build_smilingfriends_ship.py](../../../../tools/blender/smilingfriends/build_smilingfriends_ship.py). Ver [instrucciones de los scripts](../../../../tools/blender/smilingfriends/README.md).
+
+## Exportación para el juego
+
+[smilingfriends_ship.glb](exports/smilingfriends_ship.glb): GLB para el [sistema solar](../../../../docs/solar-system.md), generado con [export_solar_models.py](../../../../tools/blender/solarsystem/export_solar_models.py) sin modificar el `.blend` (se excluyen `Presentation`, cámaras y luces). ~5 300 triángulos, sin el contorno `Outline`. Volver a exportar después de cambiar el modelo.
