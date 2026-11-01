@@ -7,12 +7,27 @@ fn config() -> SolarSystemConfig {
 }
 
 #[test]
-fn el_orden_orbital_es_el_definitivo_sin_cambiar_las_orbitas() {
+fn el_orden_orbital_es_el_definitivo_con_la_escala_comun() {
     let config = config();
     let actual: Vec<_> = config.planets.iter().map(|p| p.id.as_str()).collect();
     assert_eq!(actual, ["halloween", "starwars", "smilingfriends", "minecraft", "regularshow", "southpark"]);
     let radii: Vec<_> = config.planets.iter().map(|p| p.orbit_radius).collect();
-    assert_eq!(radii, [150.0, 230.0, 320.0, 410.0, 500.0, 590.0]);
+    assert_eq!(radii, [1800.0, 2760.0, 3840.0, 4920.0, 6000.0, 7080.0]);
+}
+
+#[test]
+fn la_escala_conserva_proporciones_y_un_punto_de_partida_seguro() {
+    let config = config();
+    let system = SolarSystem::new(&config);
+    assert_eq!(config.sun.radius, 540.0);
+    let radii: Vec<_> = config.planets.iter().map(|p| p.radius).collect();
+    assert_eq!(radii, [216.0, 264.0, 264.0, 192.0, 240.0, 216.0]);
+    let start = system.departure_position();
+    assert!(start.length() > config.sun.radius * 1.5);
+    for p in &system.planets {
+        assert!(p.shape_distance(start, 5.0) > 1.0);
+    }
+    assert_eq!(system.planet_in_reach(start), None);
 }
 
 #[test]
@@ -70,8 +85,9 @@ fn el_movimiento_no_depende_de_los_fps() {
         fast.update(1.0 / 144.0);
     }
     for (a, b) in slow.planets.iter().zip(&fast.planets) {
-        // Solo cambia el redondeo de f32 al sumar más pasos: centésimas de unidad en órbitas de decenas
-        assert!((a.position() - b.position()).length() < 1e-2, "{}", a.config.id);
+        // Se conserva la tolerancia en unidades de diseño: f32 redondea en un mundo mayor.
+        let tolerance = 1e-2 * planet_hoppers::solar_system::scale::WORLD_SCALE;
+        assert!((a.position() - b.position()).length() < tolerance, "{}", a.config.id);
         // Diferencia de ángulos dando la vuelta (0 y 2π son el mismo giro)
         let diff = (a.spin_angle - b.spin_angle).rem_euclid(TAU);
         assert!(diff.min(TAU - diff) < 1e-3, "{}", a.config.id);

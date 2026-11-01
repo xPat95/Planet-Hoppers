@@ -30,21 +30,38 @@ En las dos: O muestra u oculta las órbitas, F12 guarda una captura en `target/s
 ## Fase 1: estructura
 
 - **Centro:** el Sol está fijo en el origen; las órbitas son círculos en el plano XZ.
-- **Datos:** [`config/solar-system.json`](../config/solar-system.json) define el Sol y, por planeta, la órbita, el tamaño, las velocidades, la inclinación del eje, el ángulo inicial, el modelo y el minijuego.
+- **Datos:** [`config/solar-system.json`](../config/solar-system.json) conserva las unidades de diseño originales: Sol, órbita, tamaño, velocidades, inclinación, ángulo inicial, modelo y minijuego. `SolarSystemConfig::load` devuelve los valores efectivos de juego, aplicando una sola vez la escala común de [`src/solarSystem/scale.rs`](../src/solarSystem/scale.rs).
 - **Validación:** al cargar se revisa que estén los seis identificadores y que cada planeta quepa entero entre su vecino de adentro y el de afuera.
 
 | Planeta | Órbita | Radio | Traslación (°/s) | Rotación (°/s) | Eje | Minijuego |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
-| Calaca (Halloween) | 150 | 18 | 2,2 | −7 (al revés) | 10° | en construcción |
-| Estrella de la Muerte (Star Wars) | 230 | 22 | 1,5 | 5 | 5° | en construcción |
-| Smiling Friends | 320 | 22 | 1,1 | 6 | 12° | en construcción |
-| Minecraft | 410 | 16 | 0,85 | 10 | 8° | en construcción |
-| Un Show Más | 500 | 20 | 0,7 | 9 | 18° | en construcción |
-| South Park | 590 | 18 | 0,55 | 8 | 15° | `southpark` |
+| Calaca (Halloween) | 1800 | 216 | 0,6351 | −7 (al revés) | 10° | en construcción |
+| Estrella de la Muerte (Star Wars) | 2760 | 264 | 0,4330 | 5 | 5° | en construcción |
+| Smiling Friends | 3840 | 264 | 0,3175 | 6 | 12° | en construcción |
+| Minecraft | 4920 | 192 | 0,2454 | 10 | 8° | en construcción |
+| Un Show Más | 6000 | 240 | 0,2021 | 9 | 18° | en construcción |
+| South Park | 7080 | 216 | 0,1588 | 8 | 15° | `southpark` |
 
-La tabla sigue el orden desde el Sol hacia el exterior. Se conservan los radios y las velocidades de las seis órbitas; cada planeta mantiene su identificador, modelos, radio, giro propio, eje, ángulo inicial y minijuego.
+La tabla muestra valores efectivos, desde el Sol hacia el exterior. Cada planeta mantiene su identificador, modelos, proporciones, giro propio, eje, ángulo inicial y minijuego.
 
-El Sol mide 45 de radio. Las naves miden de 4 a 5 unidades de largo, así que cada planeta es unas diez veces la nave. Los de afuera giran más despacio alrededor del Sol, y ningún planeta pasa de ~6 unidades por segundo en su órbita: la nave va a 40 (130 con turbo).
+### Proporciones y tiempos de viaje
+
+`WORLD_SCALE = 12` es el único factor de escala. Multiplica radios planetarios, Sol y órbitas; las mallas se ajustan con las transformaciones existentes del motor. No se editan Blender, texturas ni shaders. Los cargadores de configuraciones del espacio aplican la escala; los minijuegos no la utilizan.
+
+| Magnitud | Antes | Ahora |
+| --- | --- | --- |
+| Radios planetarios | 16–22 | 192–264 |
+| Diámetros planetarios / largo de nave | 6,4–11 veces | 76,8–132 veces |
+| Radio del Sol | 45 | 540 |
+| Radios orbitales | 150–590 | 1800–7080 |
+| Separación entre centros de órbitas vecinas | 80–90 | 960–1080 |
+| Largo de naves / radio de colisión | 4–5 / 1,6 | 4–5 / 1,6 |
+| Velocidad normal / turbo | 40 / 130 | 138,56 / 450,33 |
+| Aceleración normal | 45 | 155,88 |
+
+`travel_scale() = sqrt(WORLD_SCALE)` deriva el balance del mismo factor: velocidades lineales y aceleración se multiplican por √12; velocidades angulares orbitales se dividen por √12. Así se mantienen los tiempos de aceleración y la ventaja de velocidad de las naves sobre los planetas, pero los viajes y períodos orbitales duran unas 3,46 veces más. La rotación propia no cambia. Como referencia geométrica, recorrer 7080 unidades toma unos 16 s con turbo o 51 s en normal, sin contar aceleración, rodeos ni aproximación.
+
+La detección y el arrastre conservan sus unidades relativas: explorar hasta 0,9 radios desde la superficie del elipsoide de colisión (aproximadamente 173–238 unidades para una esfera), arrastre a 3 radios del centro y LOD a 9 radios. Las formas de choque se recalculan al cargar los modelos escalados; la nave conserva su radio. El Sol sigue teniendo 2,05–2,81 veces el radio de un planeta. El inicio queda en medio del espacio libre entre el Sol y Calaca (a 1062 unidades del centro solar), y el estacionamiento y el regreso mantienen sus márgenes relativos.
 
 ## Fase 2: traslación y rotación
 
@@ -77,9 +94,9 @@ El Sol mide 45 de radio. Las naves miden de 4 a 5 unidades de largo, así que ca
 ## Fase 5: navegación con naves
 
 - **Vuelo** (`src/ships/`): la nave va hacia donde apunta su nariz. Acelera hasta la velocidad pedida, frena sola poco a poco y se ladea al girar. Todo usa deltaTime.
-- **Cámara:** detrás y arriba de la nave, siguiéndola con suavidad; tiembla un poco al chocar.
+- **Cámara:** detrás y arriba de la nave, a 3 largos de distancia y 0,9 de altura, con FOV de 60°. Acompaña su desplazamiento para evitar que el turbo la deje atrás; suaviza los giros y se mantiene fuera de las colisiones de los cuerpos. La vista general conserva FOV de 50°, arranca a 2,7 veces la extensión del sistema (incluye los radios planetarios), y compensa ventanas verticales. El plano cercano sigue en 0,5; el lejano parte de 65 664 y crece si la nave se aleja, en función de la posición de cámara y el tamaño del sistema.
 - **Choques:** contra el Sol (esfera) y contra cada planeta. La forma de cada planeta es un elipsoide que sigue la caja de su modelo, con su giro e inclinación, así que el disco de Smiling Friends es plano y no una esfera. Al chocar, la nave se queda en el borde y pierde casi toda la velocidad.
-- **Alcanzar planetas en movimiento:** cerca de un planeta (a menos de 3 radios) la nave lo acompaña en su órbita, así que quedarse quieta junto a él es fácil. El objetivo tiene marcador y flecha, y el piloto automático apunta adonde va a estar cuando la nave llegue.
+- **Alcanzar planetas en movimiento:** cerca de un planeta (a menos de 3 radios) la nave lo acompaña en su órbita. El piloto automático predice la posición sobre la órbita circular y rodea el Sol cuando bloquea la ruta. Los controles se conservan: el jugador acelera y elige normal o turbo.
 - **Naves:** [`config/ships.json`](../config/ships.json) lista las seis que tienen modelo (Smiling Friends, el barco del End de Minecraft, Butters, el carrito de golf y los dos N-1). La activa es la de Smiling Friends. La de Halloween todavía no existe.
 
 ## Fase 6: interacción con planetas
@@ -95,6 +112,7 @@ El Sol mide 45 de radio. Las naves miden de 4 a 5 unidades de largo, así que ca
 | Archivo | Contenido |
 | --- | --- |
 | `src/solarSystem/mod.rs` | Órbitas, rotación, velocidad de cada planeta, forma de choque y proximidad. En Rust: `planet_hoppers::solar_system`. |
+| `src/solarSystem/scale.rs` | Escala común del espacio y factor de viaje derivado. |
 | `src/ships/mod.rs` | Configuración de naves y vuelo: velocidad, giro, piloto automático, arrastre orbital y choques. |
 | `src/graphics/space.rs` | Carga y ajuste de los GLB, shaders del espacio y del Sol, cielo y halo. |
 | `src/scenes/solar_system.rs` | La escena: vistas, cámara, interfaz, visitas a minijuegos y pruebas automáticas. |
@@ -109,7 +127,9 @@ cargo run --locked --bin solarsystem -- --smoke         # recorrido con capturas
 cargo run --locked --bin solarsystem -- --smoke-visit   # ida y vuelta a South Park
 ```
 
-`--smoke` captura la vista general, cada planeta desde su lado iluminado, la nave, el botón Explorar y cada nave de costado (para revisar hacia dónde apunta). `--smoke-visit` estaciona la nave junto a South Park, explora, deja que South Park corra su prueba de entrada (la intro dura ~27 s) y captura la vuelta.
+`--smoke` captura la vista general, cada planeta desde su lado iluminado, la nave, el botón Explorar, la aproximación a South Park (`target/solarsystem/scale-approach.png`) y cada nave de costado. Las pruebas de vuelo usan la misma predicción que la escena y verifican 144 rutas: los seis destinos desde el inicio y desde los otros cinco planetas, en normal y turbo, a 60 FPS y con dt de 0,1 s. Cada ruta debe entrar al alcance de exploración en menos de 180 s simulados. También se comprueban partida segura, proporciones, colisiones y proximidad. `--smoke-visit` estaciona la nave junto a South Park, explora, deja que South Park corra su prueba de entrada (la intro dura ~27 s) y captura la vuelta.
+
+La compilación, las 106 pruebas y el recorrido gráfico se validaron con esta escala. El recorrido gráfico termina correctamente; persiste el aviso conocido de raylib sobre índices de 32 bits de Star Wars, que el cargador existente reconstruye. La prueba de visita escribe evidencias del minijuego en `docs/references/southpark/phase6b`; en entornos que deniegan esas escrituras no se puede completar ese recorrido sin cambiar sus permisos. No se modificó el minijuego para este ajuste.
 
 No se midieron los FPS en una ventana visible: Star Wars y Un Show Más tienen ~500 000 triángulos de cerca cada uno. Si va lento, el siguiente paso es dar versiones lejanas a South Park, Smiling Friends y Minecraft.
 

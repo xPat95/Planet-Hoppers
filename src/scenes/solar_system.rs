@@ -15,11 +15,10 @@ const HELP_SHIP: &str = "W/S: acelerar / frenar | Mouse o A/D: girar | Shift: tu
 const HELP_OVERVIEW: &str = "Arrastrar: girar cámara | Rueda: acercar | Tab: seguir planeta | Espacio: pausa | Arriba/Abajo: velocidad del tiempo\n\
                              C: volver a la nave | O: órbitas | F12: captura | Ctrl+Q: salir";
 
-/// Planos de recorte: el sistema mide más de mil unidades de punta a punta (raylib usa 1000 por defecto).
+/// El plano cercano conserva el detalle de las naves; el lejano se calcula con el sistema.
 const NEAR_PLANE: f64 = 0.5;
-const FAR_PLANE: f64 = 12_000.0;
 /// Distancia de la vista general y alejamiento máximo, en múltiplos de la órbita más lejana.
-const OVERVIEW: f32 = 1.9;
+const OVERVIEW: f32 = 2.7;
 const MAX_ZOOM_OUT: f32 = 3.5;
 const ORBIT_SEGMENTS: usize = 256;
 /// Más lejos que esto (en radios del planeta) se usa la versión liviana del modelo.
@@ -42,12 +41,12 @@ struct OrbitCamera {
 }
 
 impl OrbitCamera {
-    fn camera(&self, target: Vector3) -> Camera3D {
+    fn camera(&self, target: Vector3, aspect: f32) -> Camera3D {
         let offset = Vector3::new(
             self.pitch.cos() * self.yaw.cos(),
             self.pitch.sin(),
             self.pitch.cos() * self.yaw.sin(),
-        ) * self.distance;
+        ) * (self.distance / aspect.clamp(0.1, 1.0));
         Camera3D::perspective(target + offset, target, Vector3::up(), 50.0)
     }
 }
@@ -89,7 +88,7 @@ fn color(hex: &str) -> Color {
 }
 
 fn outer_orbit(system: &SolarSystem) -> f32 {
-    system.planets.iter().map(|p| p.config.orbit_radius).fold(0.0, f32::max)
+    system.planets.iter().map(|p| p.config.orbit_radius + p.config.radius).fold(0.0, f32::max)
 }
 
 /// Deja la nave junto al planeta, del lado del Sol (el lado iluminado), un poco por encima de la órbita.
@@ -143,7 +142,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     let outer = outer_orbit(&system);
     // La nave empieza entre el Sol y el primer planeta, mirándolo
     let first = system.planets[0].position();
-    let mut ship = Ship::new(first * 0.62 + Vector3::new(0.0, 14.0, 0.0), 0.0);
+    let mut ship = Ship::new(system.departure_position(), 0.0);
     ship.look_at(first);
     let mut session = Session {
         ship_index: ships.ships.iter().position(|s| s.id == ships.active_ship).unwrap_or(0),
@@ -242,7 +241,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         rl.set_window_state(WindowState::default().set_window_hidden(true));
     }
     rl.set_target_fps(60);
-    unsafe { ffi::rlSetClipPlanes(NEAR_PLANE, FAR_PLANE) };
+    let far_plane = outer_orbit(&s.system) * (2.0 * MAX_ZOOM_OUT + 2.0);
     {
         let mut d = rl.begin_drawing(&thread);
         d.clear_background(BACKGROUND);
@@ -272,6 +271,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         rl.disable_cursor();
     }
     let mut chase = s.ship.position - s.ship.forward() * 20.0;
+    let mut previous_ship_position = s.ship.position;
     let mut snap = true;
     let mut fade = if smoke { 0.0 } else { 1.0_f32 }; // 1 = negro; baja al entrar
     let mut leaving: Option<usize> = None;
@@ -349,6 +349,12 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                     snap = true;
                 }
                 f if f == 55 + n * 15 => capture = Some("explore.png".into()),
+                f if f == 58 + n * 15 => {
+                    // Aproximación: nave y horizonte juntos para revisar su escala relativa.
+                    park_ship(&mut s.ship, &s.system.planets[southpark], 1.12, true);
+                    snap = true;
+                    capture = Some("scale-approach.png".into());
+                }
                 f if (60 + n * 15..60 + n * 15 + ships * 10).contains(&f) => {
                     // Cada nave de costado, para revisar hacia dónde apunta la nariz (con la cámara en +Z, a la izquierda)
                     let k = ((f - 60 - n * 15) / 10) as usize;
@@ -459,10 +465,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 };
                 // Piloto automático: apunta adonde va a estar el objetivo cuando la nave llegue
                 let aim_at = s.target.filter(|_| key(KeyboardKey::KEY_SPACE)).map(|i| {
-                    let p = &s.system.planets[i];
-                    let distance = (p.position() - s.ship.position).length();
-                    let eta = distance / s.ship.speed.abs().max(s.ships.flight.cruise_speed);
-                    p.position() + p.velocity() * eta
+                    s.ship.autopilot_aim(i, &s.ships.flight, &s.system)
                 });
                 let input = FlightInput {
                     throttle: axis(
@@ -528,10 +531,14 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
 
         // --- Cámara --------------------------------------------------------------------------------------------
         let ship_len = s.ships.ships[s.ship_index].length;
+        // Trasladar la cámara con la nave evita que el turbo la deje muy atrás.
+        chase += s.ship.position - previous_ship_position;
+        previous_ship_position = s.ship.position;
         let camera = match s.view {
             View::Overview => {
                 let target = s.focus.map_or(s.system.center(), |i| s.system.planets[i].position());
-                s.orbit.camera(target)
+                let aspect = rl.get_screen_width() as f32 / rl.get_screen_height().max(1) as f32;
+                s.orbit.camera(target, aspect)
             }
             View::Ship => {
                 // Cámara de persecución: detrás y un poco arriba, siguiendo con suavidad
@@ -541,6 +548,17 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                     chase = wanted;
                 } else {
                     chase += (wanted - chase) * (1.0 - (-7.0 * dt).exp());
+                }
+                // Al girar junto a una superficie, la cámara también queda afuera.
+                let margin = NEAR_PLANE as f32 * 2.0;
+                let sun_clearance = s.system.sun.radius + margin;
+                if chase.length() < sun_clearance {
+                    chase = chase.normalized() * sun_clearance;
+                }
+                for planet in &s.system.planets {
+                    if let Some(out) = planet.push_out(chase, margin) {
+                        chase = out;
+                    }
                 }
                 let jitter = if shake > 0.0 {
                     let t = rl.get_time() as f32 * 60.0;
@@ -553,6 +571,9 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         };
         snap = false;
         let camera = side_camera.unwrap_or(camera);
+        // También cubre el sistema cuando la nave se aleja más allá de la última órbita.
+        let far = far_plane.max(camera.position.length() + outer * 2.0);
+        unsafe { ffi::rlSetClipPlanes(NEAR_PLANE, far as f64) };
 
         // --- Proyecciones para el dibujo 2D (antes de empezar a dibujar) -------------------------------------
         let time = rl.get_time() as f32;

@@ -7,6 +7,8 @@ use raylib::prelude::{Matrix, Vector3};
 use serde::Deserialize;
 use std::{collections::HashSet, f32::consts::TAU, path::Path};
 
+pub mod scale;
+
 /// Franquicias del juego, en el mismo orden que las carpetas de `assets/models/planets/`.
 pub const PLANET_IDS: [&str; 6] = [
     "minecraft",
@@ -70,8 +72,15 @@ fn default_interaction() -> f32 {
 }
 
 impl SolarSystemConfig {
+    /// Carga unidades de diseño y devuelve dimensiones y velocidades de juego.
     pub fn load(path: &Path) -> Result<Self, Box<dyn std::error::Error>> {
-        let config: Self = serde_json::from_str(&std::fs::read_to_string(path)?)?;
+        let mut config: Self = serde_json::from_str(&std::fs::read_to_string(path)?)?;
+        config.sun.radius *= scale::WORLD_SCALE;
+        for planet in &mut config.planets {
+            planet.radius *= scale::WORLD_SCALE;
+            planet.orbit_radius *= scale::WORLD_SCALE;
+            planet.orbit_speed_degrees /= scale::travel_scale();
+        }
         config.validate()?;
         Ok(config)
     }
@@ -200,6 +209,13 @@ impl SolarSystem {
     /// Centro del sistema: el Sol está fijo en el origen.
     pub fn center(&self) -> Vector3 {
         Vector3::zero()
+    }
+
+    /// Punto de partida en medio del espacio libre entre el Sol y la primera órbita.
+    pub fn departure_position(&self) -> Vector3 {
+        let first = &self.planets[0];
+        let distance = (self.sun.radius + first.config.orbit_radius - first.config.radius) * 0.5;
+        first.position().normalized() * distance
     }
 
     /// Avanza la traslación y la rotación `dt` segundos. Todo se multiplica por dt, así que un paso de un segundo

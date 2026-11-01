@@ -28,9 +28,28 @@ fn las_naves_del_config_existen() {
 }
 
 #[test]
+fn la_escala_de_vuelo_conserva_naves_y_tiempos_de_aceleracion() {
+    let (_, ships) = setup();
+    let base: ShipsConfig = serde_json::from_str(&std::fs::read_to_string(root().join("config/ships.json")).unwrap()).unwrap();
+    let factor = planet_hoppers::solar_system::scale::travel_scale();
+    assert_eq!(ships.flight.cruise_speed, base.flight.cruise_speed * factor);
+    assert_eq!(ships.flight.boost_speed, base.flight.boost_speed * factor);
+    assert_eq!(ships.flight.acceleration, base.flight.acceleration * factor);
+    assert_eq!(ships.flight.radius, base.flight.radius);
+    for (actual, original) in ships.ships.iter().zip(&base.ships) {
+        assert_eq!(actual.id, original.id);
+        assert_eq!(actual.length, original.length);
+        assert_eq!(actual.model, original.model);
+    }
+    let before = base.flight.boost_speed / (base.flight.acceleration * 2.0);
+    let after = ships.flight.boost_speed / (ships.flight.acceleration * 2.0);
+    assert!((before - after).abs() < 1e-5);
+}
+
+#[test]
 fn avanza_hacia_donde_apunta() {
     let (system, ships) = setup();
-    let mut ship = Ship::new(Vector3::new(0.0, 200.0, 0.0), 0.3);
+    let mut ship = Ship::new(Vector3::new(0.0, system.sun.radius * 4.0, 0.0), 0.3);
     let start = ship.position;
     let input = FlightInput { throttle: 1.0, ..Default::default() };
     for _ in 0..120 {
@@ -46,7 +65,7 @@ fn avanza_hacia_donde_apunta() {
 fn el_vuelo_no_depende_de_los_fps() {
     let (system, ships) = setup();
     let input = FlightInput { throttle: 1.0, turn: (1.0, 0.0), ..Default::default() };
-    let mut a = Ship::new(Vector3::new(0.0, 200.0, 0.0), 0.0);
+    let mut a = Ship::new(Vector3::new(0.0, system.sun.radius * 4.0, 0.0), 0.0);
     let mut b = a.clone();
     for _ in 0..30 {
         a.update(1.0 / 30.0, &input, &ships.flight, &system);
@@ -55,14 +74,15 @@ fn el_vuelo_no_depende_de_los_fps() {
         b.update(1.0 / 144.0, &input, &ships.flight, &system);
     }
     assert!((a.yaw - b.yaw).abs() < 1e-3);
-    assert!((a.speed - b.speed).abs() < 0.5);
-    assert!((a.position - b.position).length() < 1.0, "{:?} {:?}", a.position, b.position);
+    let travel = planet_hoppers::solar_system::scale::travel_scale();
+    assert!((a.speed - b.speed).abs() < 0.5 * travel);
+    assert!((a.position - b.position).length() < travel, "{:?} {:?}", a.position, b.position);
 }
 
 #[test]
 fn no_atraviesa_el_sol_ni_los_planetas() {
     let (system, ships) = setup();
-    let mut ship = Ship::new(Vector3::new(0.0, 0.0, 120.0), 0.0); // Mira hacia -Z: directo al Sol
+    let mut ship = Ship::new(Vector3::new(0.0, 0.0, system.sun.radius + 100.0), 0.0); // Directo al Sol
     let input = FlightInput { throttle: 1.0, boost: true, ..Default::default() };
     for _ in 0..600 {
         ship.update(1.0 / 60.0, &input, &ships.flight, &system);
@@ -100,24 +120,38 @@ fn puede_alcanzar_cualquier_planeta() {
     // La nave es mucho más rápida que cualquier planeta en su órbita
     let fastest = system.planets.iter().map(|p| p.velocity().length()).fold(0.0, f32::max);
     assert!(ships.flight.cruise_speed > fastest * 4.0, "{fastest}");
-    // Con piloto automático llega al alcance de "Explorar" del planeta más lejano
-    let (mut system, i) = (system, 5);
-    let mut ship = Ship::new(Vector3::new(0.0, 30.0, 80.0), 0.0);
-    let mut reached = false;
-    for _ in 0..60 * 60 {
-        let p = &system.planets[i];
-        let eta = (p.position() - ship.position).length() / ships.flight.boost_speed;
-        let aim = p.position() + p.velocity() * eta;
-        let near = system.planet_in_reach(ship.position) == Some(i);
-        let input = FlightInput { throttle: if near { 0.0 } else { 1.0 }, boost: true, aim_at: Some(aim), ..Default::default() };
-        system.update(1.0 / 60.0);
-        ship.update(1.0 / 60.0, &input, &ships.flight, &system);
-        if system.planet_in_reach(ship.position) == Some(i) {
-            reached = true;
-            break;
+    // La misma predicción que usa la escena: todos los destinos, en normal y turbo,
+    // también con el dt máximo del juego (0,1 s).
+    for boost in [false, true] {
+        for dt in [1.0 / 60.0, 0.1] {
+            for i in 0..system.planets.len() {
+                // Salida inicial y viajes desde cada uno de los otros planetas.
+                for origin in 0..=system.planets.len() {
+                    if origin == i { continue; }
+                    let mut system = system.clone();
+                    let start = if origin == system.planets.len() {
+                        system.departure_position()
+                    } else {
+                        beside(&system, origin, 2.2)
+                    };
+                    let mut ship = Ship::new(start, 0.0);
+                    ship.look_at(system.planets[0].position());
+                    let mut reached = false;
+                    for _ in 0..(180.0 / dt) as usize {
+                        let aim = ship.autopilot_aim(i, &ships.flight, &system);
+                        let input = FlightInput { throttle: 1.0, boost, aim_at: Some(aim), ..Default::default() };
+                        system.update(dt);
+                        ship.update(dt, &input, &ships.flight, &system);
+                        if system.planet_in_reach(ship.position) == Some(i) {
+                            reached = true;
+                            break;
+                        }
+                    }
+                    assert!(reached, "{} origin={origin} boost={boost} dt={dt}", system.planets[i].config.id);
+                }
+            }
         }
     }
-    assert!(reached);
 }
 
 #[test]

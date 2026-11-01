@@ -4,7 +4,7 @@
 //! Sol y la forma de cada planeta; y cerca de un planeta lo acompaña en su órbita (lo "arrastra"), así que es
 //! posible alcanzar planetas en movimiento y quedarse junto a ellos. Todo usa deltaTime.
 //! La selección y el desbloqueo de naves (etapa 8) todavía no existen: `config/ships.json` elige la nave activa.
-use crate::solar_system::SolarSystem;
+use crate::solar_system::{scale::travel_scale, SolarSystem};
 use raylib::prelude::Vector3;
 use serde::Deserialize;
 use std::path::Path;
@@ -46,8 +46,13 @@ pub struct ShipsConfig {
 }
 
 impl ShipsConfig {
+    /// Carga unidades de diseño y devuelve velocidades de juego; no escala las naves.
     pub fn load(path: &Path) -> Result<Self, Box<dyn std::error::Error>> {
-        let config: Self = serde_json::from_str(&std::fs::read_to_string(path)?)?;
+        let mut config: Self = serde_json::from_str(&std::fs::read_to_string(path)?)?;
+        let travel = travel_scale();
+        config.flight.cruise_speed *= travel;
+        config.flight.boost_speed *= travel;
+        config.flight.acceleration *= travel;
         if config.active().is_none() {
             return Err(format!("active_ship '{}' no está en la lista de naves", config.active_ship).into());
         }
@@ -114,6 +119,28 @@ impl Ship {
         let d = (target - self.position).normalized();
         self.yaw = (-d.x).atan2(-d.z);
         self.pitch = d.y.clamp(-1.0, 1.0).asin().clamp(-PITCH_LIMIT, PITCH_LIMIT);
+    }
+
+    /// Predicción sobre la órbita circular, compartida por el juego y las pruebas.
+    pub fn autopilot_aim(&self, index: usize, flight: &FlightConfig, system: &SolarSystem) -> Vector3 {
+        let p = &system.planets[index];
+        let eta = (p.position() - self.position).length() / self.speed.abs().max(flight.cruise_speed);
+        let angle = p.orbit_angle + p.config.orbit_speed_degrees.to_radians() * eta;
+        let target = Vector3::new(angle.cos(), 0.0, -angle.sin()) * p.config.orbit_radius;
+        // Un destino al otro lado del Sol necesita un rodeo. La ruta directa
+        // dejaría al piloto empujando contra su colisión, especialmente en normal.
+        let route = target - self.position;
+        let t = (-self.position).dot(route) / route.dot(route).max(1.0);
+        let closest = self.position + route * t.clamp(0.0, 1.0);
+        let clearance = system.sun.radius * 1.35 + flight.radius;
+        if (0.0..1.0).contains(&t) && closest.length() < clearance {
+            let direction = route.normalized();
+            let up = Vector3::up() - direction * direction.y;
+            let lift = if up.dot(up) > 0.01 { up.normalized() } else { Vector3::right() };
+            closest + lift * clearance * 1.5
+        } else {
+            target
+        }
     }
 
     pub fn update(&mut self, dt: f32, input: &FlightInput, flight: &FlightConfig, system: &SolarSystem) {
