@@ -1,0 +1,73 @@
+{
+  "audio": {
+    "loaded": {
+      "assets/audio/music/South Park/exploration.mp3": 860.3950805664062,
+      "assets/audio/music/South Park/intro.mp3": 27.376325607299805,
+      "assets/audio/music/South Park/save_kenny.mp3": 215.71917724609375,
+      "assets/audio/sfx/South Park/danger.mp3": 5.381229400634766,
+      "assets/audio/sfx/South Park/footsteps.mp3": 7.584000110626221,
+      "assets/audio/sfx/South Park/game_over.mp3": 3.082458257675171,
+      "assets/audio/sfx/South Park/success.mp3": 3.4079999923706055,
+      "assets/audio/sfx/South Park/they_killed_kenny.mp3": 3.3436734676361084,
+      "assets/audio/sfx/South Park/victory.mp3": 3.503999948501587
+    },
+    "music_transitions": [
+      "intro",
+      "exploration",
+      "intro",
+      "exploration",
+      "intro",
+      "exploration",
+      "silent",
+      "exploration"
+    ],
+    "plays": {},
+    "warnings": []
+  },
+  "cases": [
+    {
+      "audio_finished": true,
+      "audio_position": 27.376325607299805,
+      "case": 0,
+      "cursor_captured": true,
+      "duration": 27.376325607299805,
+      "elapsed": 27.376325607299805,
+      "full_intro": true,
+      "kenny_distance": 7.199985504150391
+    },
+    {
+      "audio_finished": false,
+      "audio_position": 0.6000000238418579,
+      "case": 1,
+      "cursor_captured": true,
+      "duration": 27.376325607299805,
+      "elapsed": 0.6000000238418579,
+      "full_intro": true,
+      "kenny_distance": 7.199985504150391
+    },
+    {
+      "audio_finished": false,
+      "audio_position": 0.6000000238418579,
+      "case": 2,
+      "cursor_captured": true,
+      "duration": 27.376325607299805,
+      "elapsed": 0.6000000238418579,
+      "full_intro": true,
+      "kenny_distance": 7.199985504150391
+    },
+    {
+      "audio_finished": false,
+      "audio_position": null,
+      "case": 3,
+      "cursor_captured": true,
+      "duration": 0.699999988079071,
+      "elapsed": 0.70435631275177,
+      "full_intro": false,
+      "kenny_distance": 7.199985504150391
+    }
+  ],
+  "clock": "stream playback clock; first intro waits for natural audio completion",
+  "manual_listening_verified": false,
+  "physical_input_verified": false,
+  "status": "PASS"
+}

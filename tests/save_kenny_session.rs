@@ -380,7 +380,7 @@ fn missing_audio_files_degrade_to_subtitles_without_panicking() {
         PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("target/nonexistent-phase5-audio-assets");
     let mut audio = AudioController::load(Some(&device), &root, AudioConfig::default());
     assert!(audio.audit.loaded.is_empty());
-    assert_eq!(audio.audit.warnings.len(), 8);
+    assert_eq!(audio.audit.warnings.len(), 9);
     audio.set_music(MusicMode::Challenge);
     audio.cue(SessionCue::DeathVoice);
     audio.update();

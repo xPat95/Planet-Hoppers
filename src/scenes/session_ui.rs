@@ -164,18 +164,21 @@ impl SessionUi {
         d.draw_text(threat_name(s.current()), 28, 109, 20, Color::YELLOW);
         let detail = if s.state == Searching {
             format!(
-                "Localizalo en el minimapa. {:.0} m | Sin tiempo mortal",
-                s.objective_distance
+                "{}: {:.0} m | Peligro en {:.0} s",
+                if s.objective_distance <= s.config.zone_detection_distance {
+                    "Zona detectada"
+                } else {
+                    "Localizalo"
+                },
+                s.objective_distance,
+                s.search_remaining()
             )
         } else if s.state == Interlude {
             "Explorá el pueblo. La próxima alerta llegará automáticamente.".into()
         } else if s.state == Success && s.dynamic() {
             "¡Kenny está a salvo! La partida continúa automáticamente.".into()
         } else if s.state == Preparing {
-            format!(
-                "Preparación: {:.1} s. Ubicá el mecanismo.",
-                event.remaining()
-            )
+            format!("En {:.1} s: {}", event.remaining(), s.current().label())
         } else if s.state == Active {
             match s.current() {
                 ThreatKind::Ufo => format!(
@@ -207,11 +210,22 @@ impl SessionUi {
         } else {
             String::new()
         };
-        d.draw_text(&detail, 28, 138, 16, Color::LIGHTGRAY);
+        let detail_size = if d.measure_text(&detail, 16) > w - 56 {
+            12
+        } else {
+            16
+        };
+        d.draw_text(&detail, 28, 138, detail_size, Color::LIGHTGRAY);
         if s.state == Searching {
             d.draw_text("¡KENNY ESTÁ EN PELIGRO!", 28, 178, 24, Color::RED);
             if let Some(site) = &s.site {
-                d.draw_text(&site.road, 28, 208, 18, Color::DARKBLUE);
+                d.draw_text(
+                    &format!("{} | Llega antes de que sea demasiado tarde", site.road),
+                    28,
+                    208,
+                    18,
+                    Color::DARKBLUE,
+                );
             }
         }
         if s.state == DeathDialogue {

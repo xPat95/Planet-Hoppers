@@ -98,7 +98,10 @@ fn bus_motion_is_continuous_and_matches_active_time_at_different_fps() {
         for _ in 0..fps * 8 {
             s.update_kenny(1.0 / fps as f32);
             let p = s.threats.bus_position();
-            assert!((p - previous).length() < 4.0 / fps as f32 + 0.001);
+            assert!(
+                (p - previous).length()
+                    < (52.85 / s.threats.config.bus_seconds) / fps as f32 + 0.001
+            );
             previous = p;
         }
         positions.push(previous);
@@ -127,7 +130,8 @@ fn three_ufo_lights_are_independent_and_cannot_be_counted_twice() {
 fn ufo_abduction_fails_at_height_limit_and_can_restart() {
     let mut s = scene();
     active(&mut s, ThreatKind::Ufo);
-    tick(&mut s, 20.0);
+    let timeout = s.threats.config.ufo_seconds + 2.0;
+    tick(&mut s, timeout);
     assert_eq!(s.threats.result, Some(ThreatResult::Died));
     assert!(s.kenny.position().y >= s.threats.config.ufo_max_lift);
     assert!(!s.threats.visible_kenny());
@@ -185,7 +189,8 @@ fn uncovered_hole_causes_vertical_fall_and_reset_clears_carrying() {
     let mut s = scene();
     active(&mut s, ThreatKind::Sewer);
     assert!(act(&mut s, "threat:pickup"));
-    tick(&mut s, 20.0);
+    let timeout = s.threats.config.sewer_seconds + 2.0;
+    tick(&mut s, timeout);
     assert_eq!(s.threats.state, ThreatState::Failed);
     assert!(s.kenny.position().y < -2.0);
     assert!(!s.threats.visible_kenny());

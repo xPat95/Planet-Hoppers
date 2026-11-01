@@ -153,25 +153,26 @@ fn every_translated_layout_preserves_success_and_failure() {
     }
 }
 #[test]
-fn distant_search_never_moves_hazards_or_costs_a_life() {
+fn distant_search_is_finite_and_does_not_teleport_player() {
     let mut w = scene();
     let original = w.player.feet;
     let mut s = SaveKennySession::default();
     s.enable_world(catalog(), 44);
     s.start(&mut w, 12).unwrap();
     search(&mut s, &mut w);
-    let npc = w.kenny.position();
-    assert!((s.objective_distance - (npc - w.player.feet).length()).abs() < 0.001);
-    let bus = w.threats.bus_position();
-    tick(&mut s, &mut w, 2000);
-    assert_eq!(s.state, SessionState::Searching);
+    assert!((10.0..=70.0).contains(&s.search_budget));
+    let mut began = false;
+    for _ in 0..1600 {
+        s.update(0.1, &mut w, VoiceClock::default()).unwrap();
+        began |= s.state == SessionState::Active;
+        if s.state == SessionState::DeathDialogue {
+            break;
+        }
+    }
+    assert!(began);
+    assert_eq!(s.state, SessionState::DeathDialogue);
     assert_eq!(w.player.feet, original);
-    assert_eq!(w.kenny.position(), npc);
-    assert_eq!(w.threats.bus_position(), bus);
-    assert_eq!((w.threats.elapsed, w.threats.state_time), (0.0, 0.0));
     assert_eq!((s.lives, s.saves), (3, 0));
-    arrive(&mut s, &mut w);
-    assert!(s.state == SessionState::Active);
 }
 #[test]
 fn complete_match_advances_automatically_without_continue_calls() {
@@ -320,7 +321,7 @@ fn map_zoom_pan_and_recenter_are_bounded() {
     assert_eq!(v.centre, centre);
 }
 #[test]
-fn dynamic_return_to_exploration_cleans_and_chooses_a_new_spawn() {
+fn dynamic_return_to_exploration_cleans_and_places_kenny_nearby() {
     let mut s = SaveKennySession::default();
     let mut w = scene();
     s.enable_world(catalog(), 31);
@@ -330,4 +331,5 @@ fn dynamic_return_to_exploration_cleans_and_chooses_a_new_spawn() {
     assert_eq!(s.state, SessionState::Relocating);
     tick(&mut s, &mut w, 8);
     assert!(s.assert_exploration_clean(&w));
+    assert!((4.0..=24.0).contains(&(w.kenny.position() - w.player.feet).length()));
 }

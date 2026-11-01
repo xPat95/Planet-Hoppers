@@ -363,7 +363,7 @@ impl SessionSmoke {
             || audio.audit.plays.get("victory") != Some(&1)
             || audio.audit.plays.get("game_over") != Some(&1)
             || audio.audit.plays.get("success") != Some(&5)
-            || audio.audit.loaded.len() != 8
+            || audio.audit.loaded.len() != 9
             || portraits != 2
             || !s.assert_exploration_clean(scene)
             || self.captures.len() != if s.dynamic() { 10 } else { 8 }

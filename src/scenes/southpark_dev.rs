@@ -27,7 +27,15 @@ use raylib::{ffi, prelude::*};
 use serde_json::json;
 use std::{path::PathBuf, time::Instant};
 
+use super::southpark_entry::{EntryConfig, SouthParkEntry, SouthParkExit, SouthParkVisits};
+
 pub fn run() -> Result<(), Box<dyn std::error::Error>> {
+    run_visit(&mut SouthParkVisits::default()).map(|_| ())
+}
+/// Standalone lifetime adapter. A future host retains `visits` across entries.
+pub fn run_visit(
+    visits: &mut SouthParkVisits,
+) -> Result<SouthParkExit, Box<dyn std::error::Error>> {
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let mut config_path = root.join("config/southpark-dev.json");
     let mut smoke = false;
@@ -37,11 +45,13 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     let mut threat_smoke = false;
     let mut session_smoke = false;
     let mut world_smoke = false;
+    let mut entry_smoke = false;
     let mut dev_threats = false;
     let mut muted = false;
     let mut args = std::env::args().skip(1);
     while let Some(arg) = args.next() {
         match arg.as_str() {
+            "--smoke-entry" => entry_smoke = true,
             "--smoke-world" => {
                 world_smoke = true;
                 session_smoke = true;
@@ -84,10 +94,10 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 config_path = PathBuf::from(args.next().ok_or("--config requires a JSON path")?)
             }
             "--help" | "-h" => {
-                println!("M: mapa ampliado (pausa el mundo). Arrastrar: mover; rueda: zoom; R: jugador; M/Esc: cerrar.\n--smoke-world: prueba gráfica del mundo dinámico y los mapas.\ncargo run --bin southpark-locations: auditoría de zonas sin ventana.");
+                println!("Intro: Espacio/Enter saltar. Backspace: salir de South Park durante exploracion. --smoke-entry: validar intro y visitas.\nM: mapa ampliado (pausa el mundo). Arrastrar: mover; rueda: zoom; R: jugador; M/Esc: cerrar.\n--smoke-world: prueba gráfica del mundo dinámico y los mapas.\ncargo run --bin southpark-locations: auditoría de zonas sin ventana.");
                 println!("Partida normal: hablá con Kenny y elegí Comenzar desafío. P: pausa / abandonar.\n--dev-threats: habilitar F5/F6/F7/F10/F11 para pruebas individuales.\n--smoke-session: partida automatizada con audio y capturas de fase 5.\n--mute: cargar y verificar audio con volúmenes en cero.");
                 println!("cargo run --bin southpark -- [--config PATH] [--no-test-objects] [--threat bus|ufo|sewer|piano|snowman] [--smoke] [--smoke-kenny] [--smoke-threats]\nWASD: caminar | Shift: correr | mouse: mirar | E: interactuar\nEsc: cursor / cerrar dialogo | Enter: aceptar / continuar\nF5: autobús | F6: OVNI | F7: alcantarilla | F10: piano | F11: nieve | F8: reiniciar | F9: explorar\nF1: ayuda | F2: colisionadores | F3: indicador Kenny | F12: captura | Ctrl+Q: salir");
-                return Ok(());
+                return Ok(SouthParkExit::ReturnToHost);
             }
             _ => return Err(format!("Unknown option: {arg}").into()),
         }
@@ -123,12 +133,12 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         .build();
     rl.set_exit_key(None);
     rl.set_window_min_size(640, 480);
-    if smoke || session_smoke {
+    if smoke || session_smoke || entry_smoke {
         rl.set_window_state(WindowState::default().set_window_hidden(true));
     }
     // The session smoke uses the real audio clock, so do not exhaust its frame
     // budget faster than the combined voice file can physically play.
-    rl.set_target_fps(if session_smoke {
+    rl.set_target_fps(if session_smoke || entry_smoke {
         240
     } else if smoke {
         0
@@ -164,7 +174,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         .as_nanos() as u64;
     if let Some(locations) = locations {
         session.enable_world(locations, seed);
-        session.randomize_exploration(&mut scene)?;
+        session.place_kenny_near_player(&mut scene)?;
     }
     let mut world_map = WorldMap::load(&mut rl, &thread, &root, &scene)?;
     unsafe {
@@ -209,8 +219,16 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     {
         return Err("GLB and collision manifest use different bounds/coordinates".into());
     }
-    let captures = root.join(if world_smoke {
-        "docs/references/southpark/phase6a"
+    let entry_config = EntryConfig::load(&root.join("config/southpark-entry.json"))?;
+    let mut entry =
+        SouthParkEntry::new(visits, entry_config.clone(), audio.intro_duration(), &scene)?;
+    entry.active = !smoke && !session_smoke && !dev_threats;
+    let mut entry_case = 0;
+    let mut entry_checks = Vec::new();
+    let mut entry_captures = std::collections::BTreeSet::new();
+    let mut exit = SouthParkExit::WindowClosed;
+    let captures = root.join(if entry_smoke || world_smoke {
+        "docs/references/southpark/phase6b"
     } else if session_smoke {
         "target/southpark-session-smoke"
     } else if threat_smoke {
@@ -220,7 +238,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     } else {
         "target/southpark-smoke"
     });
-    if smoke || session_smoke {
+    if smoke || session_smoke || entry_smoke {
         std::fs::create_dir_all(&captures)?;
     }
     let mut cursor = CursorCapture::default();
@@ -248,6 +266,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     let mut modal_fps_frozen = false;
     let mut modal_cursor_free = false;
     let kenny_start = scene.kenny.position();
+    let initial_look = (scene.player.yaw, scene.player.pitch);
     while !rl.window_should_close() {
         audio.update();
         if session_smoke {
@@ -283,11 +302,74 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         {
             break;
         }
+        let intro_was_active = entry.active;
+        if entry_smoke && entry.active {
+            if scene.player.feet != initial_feet
+                || (scene.player.yaw, scene.player.pitch) != initial_look
+                || scene.kenny.position() != kenny_start
+                || session.state != SessionState::Exploring
+            {
+                return Err("World/FPS changed during cinematic".into());
+            }
+            for key in [KeyboardKey::KEY_W, KeyboardKey::KEY_M, KeyboardKey::KEY_E] {
+                unsafe {
+                    ffi::PlayAutomationEvent(ffi::AutomationEvent {
+                        frame: 0,
+                        type_: 2,
+                        params: [key as i32, 0, 0, 0],
+                    });
+                }
+            }
+        }
+        if entry_smoke
+            && entry.active
+            && entry.elapsed >= 0.6
+            && (entry_case == 1 || entry_case == 2)
+        {
+            unsafe {
+                ffi::PlayAutomationEvent(ffi::AutomationEvent {
+                    frame: 0,
+                    type_: 2,
+                    params: [
+                        if entry_case == 1 {
+                            KeyboardKey::KEY_SPACE as i32
+                        } else {
+                            KeyboardKey::KEY_ENTER as i32
+                        },
+                        0,
+                        0,
+                        0,
+                    ],
+                });
+            }
+        }
+        let intro_clock = audio.intro_clock();
+        if entry.active {
+            entry.update_audio(
+                dt,
+                rl.is_key_pressed(KeyboardKey::KEY_SPACE)
+                    || rl.is_key_pressed(KeyboardKey::KEY_ENTER),
+                visits,
+                intro_clock,
+            );
+            if !entry.active {
+                cursor.captured = true;
+                cursor.apply(&mut rl);
+            }
+        }
+        if !intro_was_active
+            && session.state == SessionState::Exploring
+            && scene.dialogue == KennyDialogue::Closed
+            && rl.is_key_pressed(KeyboardKey::KEY_BACKSPACE)
+        {
+            exit = SouthParkExit::ReturnToHost;
+            break;
+        }
         let mut input = PlayerInput::read(&rl);
         let session_was_modal = session.blocks_controls();
         let had_dialogue = scene.dialogue != KennyDialogue::Closed;
         let map_was_open = session.state == SessionState::MapOpen;
-        if !smoke && !had_dialogue {
+        if !smoke && !intro_was_active && !had_dialogue {
             if map_was_open {
                 world_map.input(&rl, scene.player.feet);
                 if rl.is_key_pressed(KeyboardKey::KEY_M)
@@ -300,7 +382,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         let map_consumed = map_was_open || session.state == SessionState::MapOpen;
-        if !smoke && !map_consumed {
+        if !smoke && !intro_was_active && !map_consumed {
             let action = session_ui::input(&rl, &session);
             let result = match action {
                 SessionAction::Continue => session.continue_match(&mut scene),
@@ -324,7 +406,13 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 session.error = Some(error);
             }
         }
-        if !smoke && dev_threats && !session.in_match() && scene.dialogue == KennyDialogue::Closed {
+        if !smoke
+            && !intro_was_active
+            && !map_consumed
+            && dev_threats
+            && !session.in_match()
+            && scene.dialogue == KennyDialogue::Closed
+        {
             let requested = if rl.is_key_pressed(KeyboardKey::KEY_F5) {
                 Some(ThreatKind::Bus)
             } else if rl.is_key_pressed(KeyboardKey::KEY_F6) {
@@ -351,7 +439,8 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 scene.confirmation = Some((message, 4.0));
             }
         }
-        let modal_at_start = had_dialogue
+        let modal_at_start = intro_was_active
+            || had_dialogue
             || session_was_modal
             || scene.dialogue != KennyDialogue::Closed
             || session.blocks_controls();
@@ -410,7 +499,9 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         } else {
             0.0
         };
-        if smoke {
+        if intro_was_active {
+            // Freeze world simulation until the FPS handoff, including Kenny.
+        } else if smoke {
             scene.update_kenny(dt);
         } else if let Err(error) = session.update(dt, &mut scene, audio.voice_clock()) {
             session.error = Some(error);
@@ -424,7 +515,15 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
             cursor.captured = true;
             cursor.apply(&mut rl);
         }
-        audio.set_music(session.music());
+        audio.set_music(if entry.active {
+            if entry.full_intro {
+                crate::audio::MusicMode::Intro
+            } else {
+                crate::audio::MusicMode::Silent
+            }
+        } else {
+            session.music()
+        });
         for cue in session.take_cues() {
             audio.cue(cue);
         }
@@ -438,7 +537,9 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         } else {
             None
         };
-        let camera = if threat_capture.is_some() {
+        let camera = if entry.active {
+            entry.camera()
+        } else if threat_capture.is_some() {
             threat_test.camera(&scene)
         } else if smoke && !kenny_smoke && !threat_smoke && frame == 75 {
             Camera3D::perspective(
@@ -515,8 +616,10 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
             cursor.captured = false;
             cursor.apply(&mut rl);
         }
-        let active =
-            active && scene.dialogue == KennyDialogue::Closed && !session.blocks_controls();
+        let active = active
+            && !intro_was_active
+            && scene.dialogue == KennyDialogue::Closed
+            && !session.blocks_controls();
         if kenny_smoke {
             if frame == 40 {
                 dialogue_opened = scene.dialogue == KennyDialogue::Invitation;
@@ -617,6 +720,20 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 }
             }
             d.draw_text("SOUTH PARK - SAVE KENNY!", 16, 14, 20, Color::DARKGRAY);
+            if !entry.active
+                && !smoke
+                && !dev_threats
+                && session.state == SessionState::Exploring
+                && scene.dialogue == KennyDialogue::Closed
+            {
+                d.draw_text(
+                    "E: hablar | M: mapa | Retroceso: salir de South Park",
+                    16,
+                    46,
+                    16,
+                    Color::DARKBLUE,
+                );
+            }
             if !smoke && dev_threats {
                 d.draw_fps(width - 100, 14);
             }
@@ -725,7 +842,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 draw_status(&mut d, &scene.threats, width);
             }
             session_ui.draw(&mut d, &session, &scene.threats, width, height);
-            if scene.dialogue == KennyDialogue::Closed {
+            if !entry.active && scene.dialogue == KennyDialogue::Closed {
                 world_map.draw(&mut d, &scene, &session, width, height);
             }
             if help && scene.confirmation.is_none() && (dev_threats || smoke) && !session.in_match()
@@ -737,6 +854,18 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                     18,
                     Color::DARKGRAY,
                 );
+            }
+            entry.draw(&mut d, width, height);
+            if entry_smoke && entry_case == 0 && entry.active {
+                for (at, name) in [
+                    (3.0, "intro-30.png"),
+                    (12.0, "intro-120.png"),
+                    (22.0, "intro-220.png"),
+                ] {
+                    if entry.elapsed >= at && entry_captures.insert(name) {
+                        save_frame(&captures.join(name), width, height)?;
+                    }
+                }
             }
             if manual_capture {
                 let path = root.join("target/southpark.png");
@@ -778,6 +907,41 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
             scene.player.pitch = 0.0;
         }
         frame += 1;
+        if entry_smoke && intro_was_active && !entry.active {
+            if !visits.intro_seen || !cursor.captured || !rl.is_cursor_hidden() {
+                return Err("Entry did not restore visit/cursor".into());
+            }
+            if entry_case == 0 && !intro_clock.finished {
+                return Err("Intro ended before its stream finished".into());
+            }
+            entry_checks.push(json!({"case":entry_case,"elapsed":entry.elapsed,
+                "full_intro":entry.full_intro,"cursor_captured":cursor.captured,
+                "audio_finished":intro_clock.finished,"audio_position":intro_clock.position,"duration":entry.duration,
+                "kenny_distance":(scene.kenny.position()-scene.player.feet).length()}));
+            if entry_case == 3 {
+                let report = json!({"status":"PASS","cases":entry_checks,"audio":audio.audit,
+                    "manual_listening_verified":false,"physical_input_verified":false,"clock":"stream playback clock; first intro waits for natural audio completion"});
+                std::fs::write(
+                    captures.join("intro-validation.json"),
+                    serde_json::to_string_pretty(&report)?,
+                )?;
+                println!("ENTRY_SMOKE_PASS {report}");
+                break;
+            }
+            entry_case += 1;
+            visits.intro_seen = entry_case == 3;
+            for key in [KeyboardKey::KEY_SPACE, KeyboardKey::KEY_ENTER] {
+                unsafe {
+                    ffi::PlayAutomationEvent(ffi::AutomationEvent {
+                        frame: 0,
+                        type_: 1,
+                        params: [key as i32, 0, 0, 0],
+                    });
+                }
+            }
+            entry =
+                SouthParkEntry::new(visits, entry_config.clone(), audio.intro_duration(), &scene)?;
+        }
         if session_smoke {
             session_test.after_frame(&scene, &session, &audio)?;
             if session_test.done() {
@@ -804,6 +968,9 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
             break;
         }
     }
+    audio.set_music(crate::audio::MusicMode::Silent);
+    audio.stop_effects();
+    audio.silence_voice();
     rl.enable_cursor();
     if session_smoke {
         if world_smoke && !(world_map.zoomed && world_map.dragged) {
@@ -869,7 +1036,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         "AUDIO_RUNTIME_AUDIT {}",
         serde_json::to_string(&audio.audit)?
     );
-    Ok(())
+    Ok(exit)
 }
 
 fn inject_kenny_input(rl: &RaylibHandle, frame: u32) {

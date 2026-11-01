@@ -17,6 +17,7 @@ pub enum MusicMode {
     Exploration,
     Challenge,
     Silent,
+    Intro,
 }
 #[derive(Clone, Copy, Debug, Default)]
 pub struct VoiceClock {
@@ -63,14 +64,16 @@ pub struct AudioAudit {
     pub music_transitions: Vec<String>,
 }
 pub struct AudioController<'a> {
+    intro: Option<Music<'a>>,
     exploration: Option<Music<'a>>,
     challenge: Option<Music<'a>>,
     voice: Option<Music<'a>>,
     sounds: BTreeMap<&'static str, Sound<'a>>,
     config: AudioConfig,
     mode: MusicMode,
-    music_started: [bool; 2],
+    music_started: [bool; 3],
     voice_started: Option<Instant>,
+    intro_started: Option<Instant>,
     pub audit: AudioAudit,
 }
 impl<'a> AudioController<'a> {
@@ -96,6 +99,7 @@ impl<'a> AudioController<'a> {
             });
             loaded
         };
+        let intro = music("assets/audio/music/South Park/intro.mp3", false);
         let exploration = music("assets/audio/music/South Park/exploration.mp3", true);
         let challenge = music("assets/audio/music/South Park/save_kenny.mp3", true);
         let voice = music("assets/audio/sfx/South Park/they_killed_kenny.mp3", false);
@@ -132,14 +136,16 @@ impl<'a> AudioController<'a> {
             serde_json::to_string(&audit).unwrap_or_default()
         );
         Self {
+            intro,
             exploration,
             challenge,
             voice,
             sounds,
             config,
             mode: MusicMode::Silent,
-            music_started: [false; 2],
+            music_started: [false; 3],
             voice_started: None,
+            intro_started: None,
             audit,
         }
     }
@@ -153,19 +159,26 @@ impl<'a> AudioController<'a> {
         if let Some(m) = match self.mode {
             MusicMode::Exploration => self.exploration.as_ref(),
             MusicMode::Challenge => self.challenge.as_ref(),
+            MusicMode::Intro => self.intro.as_ref(),
             _ => None,
         } {
-            m.pause_stream();
+            if self.mode == MusicMode::Intro {
+                m.stop_stream();
+            } else {
+                m.pause_stream();
+            }
         }
         self.mode = mode;
+        self.intro_started = (mode == MusicMode::Intro).then(Instant::now);
         let (music, index, name) = match mode {
             MusicMode::Exploration => (self.exploration.as_ref(), 0, "exploration"),
             MusicMode::Challenge => (self.challenge.as_ref(), 1, "save_kenny"),
             MusicMode::Silent => (None, 0, "silent"),
+            MusicMode::Intro => (self.intro.as_ref(), 2, "intro"),
         };
         if let Some(m) = music {
             m.set_volume(self.config.music_volume);
-            if self.music_started[index] {
+            if self.music_started[index] && mode != MusicMode::Intro {
                 m.resume_stream();
             } else {
                 m.play_stream();
@@ -203,7 +216,7 @@ impl<'a> AudioController<'a> {
         self.count(name);
     }
     pub fn update(&self) {
-        for m in [&self.exploration, &self.challenge, &self.voice]
+        for m in [&self.intro, &self.exploration, &self.challenge, &self.voice]
             .into_iter()
             .flatten()
         {
@@ -211,6 +224,31 @@ impl<'a> AudioController<'a> {
                 m.update_stream();
             }
         }
+    }
+    pub fn intro_clock(&self) -> VoiceClock {
+        let (Some(started), Some(m)) = (self.intro_started, self.intro.as_ref()) else {
+            return VoiceClock::default();
+        };
+        let length = m.get_time_length();
+        // Device/stream loss must still fall back to the timed cinematic.
+        if started.elapsed().as_secs_f32() > length + 2.0 {
+            return VoiceClock::default();
+        }
+        let finished = !m.is_stream_playing() && started.elapsed().as_secs_f32() > 0.1;
+        VoiceClock {
+            position: Some(if finished {
+                length
+            } else {
+                m.get_time_played()
+            }),
+            finished,
+        }
+    }
+    pub fn intro_duration(&self) -> Option<f32> {
+        self.intro
+            .as_ref()
+            .map(Music::get_time_length)
+            .filter(|v| v.is_finite() && *v > 0.0)
     }
     pub fn voice_duration(&self) -> Option<f32> {
         self.voice

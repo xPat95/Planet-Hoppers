@@ -1,0 +1,227 @@
+[
+  {
+    "death_sequence_seconds": 49.049537658691406,
+    "kind": "Bus",
+    "lives": 2,
+    "route_metres": 221.59994506835938,
+    "search_seconds": 32.084991455078125,
+    "site": 0,
+    "voice_cues": 1
+  },
+  {
+    "death_sequence_seconds": 87.0007095336914,
+    "kind": "Bus",
+    "lives": 2,
+    "route_metres": 525.6741333007812,
+    "search_seconds": 70.0,
+    "site": 1,
+    "voice_cues": 1
+  },
+  {
+    "death_sequence_seconds": 47.549560546875,
+    "kind": "Bus",
+    "lives": 2,
+    "route_metres": 210.06944274902344,
+    "search_seconds": 30.571613311767578,
+    "site": 2,
+    "voice_cues": 1
+  },
+  {
+    "death_sequence_seconds": 67.89954376220703,
+    "kind": "Bus",
+    "lives": 2,
+    "route_metres": 365.04998779296875,
+    "search_seconds": 50.91280746459961,
+    "site": 3,
+    "voice_cues": 1
+  },
+  {
+    "death_sequence_seconds": 30.849815368652344,
+    "kind": "Bus",
+    "lives": 2,
+    "route_metres": 82.79998779296875,
+    "search_seconds": 13.867497444152832,
+    "site": 4,
+    "voice_cues": 1
+  },
+  {
+    "death_sequence_seconds": 37.399715423583984,
+    "kind": "Ufo",
+    "lives": 2,
+    "route_metres": 117.0,
+    "search_seconds": 18.35624885559082,
+    "site": 0,
+    "voice_cues": 1
+  },
+  {
+    "death_sequence_seconds": 46.59957504272461,
+    "kind": "Ufo",
+    "lives": 2,
+    "route_metres": 187.09999084472656,
+    "search_seconds": 27.556873321533203,
+    "site": 1,
+    "voice_cues": 1
+  },
+  {
+    "death_sequence_seconds": 49.59952926635742,
+    "kind": "Ufo",
+    "lives": 2,
+    "route_metres": 210.06944274902344,
+    "search_seconds": 30.571613311767578,
+    "site": 2,
+    "voice_cues": 1
+  },
+  {
+    "death_sequence_seconds": 69.94966888427734,
+    "kind": "Ufo",
+    "lives": 2,
+    "route_metres": 365.04998779296875,
+    "search_seconds": 50.91280746459961,
+    "site": 3,
+    "voice_cues": 1
+  },
+  {
+    "death_sequence_seconds": 32.899784088134766,
+    "kind": "Ufo",
+    "lives": 2,
+    "route_metres": 82.79998779296875,
+    "search_seconds": 13.867497444152832,
+    "site": 4,
+    "voice_cues": 1
+  },
+  {
+    "death_sequence_seconds": 37.399715423583984,
+    "kind": "Sewer",
+    "lives": 2,
+    "route_metres": 117.0,
+    "search_seconds": 18.35624885559082,
+    "site": 0,
+    "voice_cues": 1
+  },
+  {
+    "death_sequence_seconds": 46.59957504272461,
+    "kind": "Sewer",
+    "lives": 2,
+    "route_metres": 187.09999084472656,
+    "search_seconds": 27.556873321533203,
+    "site": 1,
+    "voice_cues": 1
+  },
+  {
+    "death_sequence_seconds": 49.59952926635742,
+    "kind": "Sewer",
+    "lives": 2,
+    "route_metres": 210.06944274902344,
+    "search_seconds": 30.571613311767578,
+    "site": 2,
+    "voice_cues": 1
+  },
+  {
+    "death_sequence_seconds": 69.94966888427734,
+    "kind": "Sewer",
+    "lives": 2,
+    "route_metres": 365.04998779296875,
+    "search_seconds": 50.91280746459961,
+    "site": 3,
+    "voice_cues": 1
+  },
+  {
+    "death_sequence_seconds": 32.899784088134766,
+    "kind": "Sewer",
+    "lives": 2,
+    "route_metres": 82.79998779296875,
+    "search_seconds": 13.867497444152832,
+    "site": 4,
+    "voice_cues": 1
+  },
+  {
+    "death_sequence_seconds": 37.049720764160156,
+    "kind": "Piano",
+    "lives": 2,
+    "route_metres": 117.0,
+    "search_seconds": 18.35624885559082,
+    "site": 0,
+    "voice_cues": 1
+  },
+  {
+    "death_sequence_seconds": 46.24958038330078,
+    "kind": "Piano",
+    "lives": 2,
+    "route_metres": 187.09999084472656,
+    "search_seconds": 27.556873321533203,
+    "site": 1,
+    "voice_cues": 1
+  },
+  {
+    "death_sequence_seconds": 49.249534606933594,
+    "kind": "Piano",
+    "lives": 2,
+    "route_metres": 210.06944274902344,
+    "search_seconds": 30.571613311767578,
+    "site": 2,
+    "voice_cues": 1
+  },
+  {
+    "death_sequence_seconds": 69.59964752197266,
+    "kind": "Piano",
+    "lives": 2,
+    "route_metres": 365.04998779296875,
+    "search_seconds": 50.91280746459961,
+    "site": 3,
+    "voice_cues": 1
+  },
+  {
+    "death_sequence_seconds": 32.54978942871094,
+    "kind": "Piano",
+    "lives": 2,
+    "route_metres": 82.79998779296875,
+    "search_seconds": 13.867497444152832,
+    "site": 4,
+    "voice_cues": 1
+  },
+  {
+    "death_sequence_seconds": 35.299747467041016,
+    "kind": "Snowman",
+    "lives": 2,
+    "route_metres": 117.0384521484375,
+    "search_seconds": 18.361295700073242,
+    "site": 0,
+    "voice_cues": 1
+  },
+  {
+    "death_sequence_seconds": 65.29938507080078,
+    "kind": "Snowman",
+    "lives": 2,
+    "route_metres": 345.67376708984375,
+    "search_seconds": 48.36967849731445,
+    "site": 1,
+    "voice_cues": 1
+  },
+  {
+    "death_sequence_seconds": 62.09933853149414,
+    "kind": "Snowman",
+    "lives": 2,
+    "route_metres": 321.30010986328125,
+    "search_seconds": 45.17063903808594,
+    "site": 2,
+    "voice_cues": 1
+  },
+  {
+    "death_sequence_seconds": 67.84954071044922,
+    "kind": "Snowman",
+    "lives": 2,
+    "route_metres": 365.04998779296875,
+    "search_seconds": 50.91280746459961,
+    "site": 3,
+    "voice_cues": 1
+  },
+  {
+    "death_sequence_seconds": 30.799816131591797,
+    "kind": "Snowman",
+    "lives": 2,
+    "route_metres": 82.79998779296875,
+    "search_seconds": 13.867497444152832,
+    "site": 4,
+    "voice_cues": 1
+  }
+]

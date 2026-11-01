@@ -3,6 +3,7 @@
 use super::{
     kenny::KENNY_ID,
     locations::{random_step, EventSite, WorldLocations},
+    navigation::{event_route, route_length},
     threats::{ThreatKind, ThreatResult, ThreatState, PREFIX},
     SouthParkScene,
 };
@@ -40,6 +41,11 @@ pub struct SessionConfig {
     pub world_interval_seconds: f32,
     pub arrival_distance: f32,
     pub relocation_seconds: f32,
+    pub zone_detection_distance: f32,
+    pub search_min_seconds: f32,
+    pub search_max_seconds: f32,
+    pub search_orientation_seconds: f32,
+    pub search_route_factor: f32,
 }
 impl Default for SessionConfig {
     fn default() -> Self {
@@ -59,9 +65,16 @@ impl SessionConfig {
             c.world_interval_seconds,
             c.arrival_distance,
             c.relocation_seconds,
+            c.zone_detection_distance,
+            c.search_min_seconds,
+            c.search_max_seconds,
+            c.search_orientation_seconds,
+            c.search_route_factor,
         ]
         .iter()
         .all(|v| v.is_finite() && *v > 0.0)
+            || c.search_max_seconds < c.search_min_seconds
+            || c.zone_detection_distance <= c.arrival_distance
             || c.death_animation_seconds < 1.4
             || c.kyle_switch_seconds >= c.voice_fallback_seconds
         {
@@ -86,6 +99,9 @@ pub struct SaveKennySession {
     pub locations: Option<WorldLocations>,
     pub site: Option<EventSite>,
     pub objective_distance: f32,
+    pub search_budget: f32,
+    pub search_route_metres: f32,
+    pub search_entry: Vector3,
     last_site: Option<String>,
     random: u64,
     returning: bool,
@@ -115,6 +131,9 @@ impl SaveKennySession {
             random: 1,
             returning: false,
             objective_distance: 0.0,
+            search_budget: 0.0,
+            search_route_metres: 0.0,
+            search_entry: Vector3::zero(),
         }
     }
     pub fn in_match(&self) -> bool {
@@ -145,6 +164,59 @@ impl SaveKennySession {
             }
         }
         Err("No safe exploration spawn available".into())
+    }
+    /// Entry/return only, behind the entry or relocation transition.
+    pub fn place_kenny_near_player(&mut self, scene: &mut SouthParkScene) -> Result<(), String> {
+        let mut clean = scene.world.clone();
+        clean
+            .obstacles
+            .retain(|o| o.id != KENNY_ID && !o.id.starts_with(PREFIX));
+        let mut candidates: Vec<_> = scene
+            .roads
+            .nodes
+            .iter()
+            .copied()
+            .filter(|p| {
+                let d = (*p - scene.player.feet).length();
+                (4.0..=14.0).contains(&d)
+                    && (*p - scene.player.feet).dot(scene.player.direction()) > 2.0
+                    && clean.can_occupy(*p, 0.28, 1.35)
+                    && clean
+                        .ray_distance_ignoring(
+                            scene.player.eye(),
+                            (*p + Vector3::up() - scene.player.eye()).normalized(),
+                            (*p + Vector3::up() - scene.player.eye()).length(),
+                            None,
+                        )
+                        .is_none()
+            })
+            .collect();
+        candidates.sort_by(|a, b| {
+            (*a - scene.player.feet)
+                .length()
+                .total_cmp(&(*b - scene.player.feet).length())
+        });
+        candidates.extend(scene.roads.nodes.iter().copied().filter(|p| {
+            (4.0..=24.0).contains(&(*p - scene.player.feet).length())
+                && clean.can_occupy(*p, 0.28, 1.35)
+        }));
+        for p in candidates {
+            if event_route(&scene.roads, &clean, scene.player.feet, p, 0.35, 1.8).is_ok()
+                && scene.relocate_kenny(p)
+            {
+                scene.kenny.resume();
+                return Ok(());
+            }
+        }
+        Err("No safe nearby street for Kenny".into())
+    }
+    pub fn search_remaining(&self) -> f32 {
+        let elapsed = if self.state == SessionState::MapOpen {
+            self.paused.map(|s| s.1).unwrap_or(self.elapsed)
+        } else {
+            self.elapsed
+        };
+        (self.search_budget - elapsed).max(0.0)
     }
     pub fn current(&self) -> ThreatKind {
         self.order[self.index.min(4)]
@@ -391,7 +463,7 @@ impl SaveKennySession {
             SessionState::Relocating => {
                 if self.elapsed >= self.config.relocation_seconds {
                     if self.returning {
-                        self.randomize_exploration(scene)?;
+                        self.place_kenny_near_player(scene)?;
                         self.returning = false;
                         self.enter(SessionState::Exploring);
                     } else {
@@ -404,16 +476,17 @@ impl SaveKennySession {
                 self.objective_distance = delta.length();
                 let eye = scene.player.eye();
                 let toward = scene.kenny.position() + Vector3::up() - eye;
-                if delta.length() <= self.config.arrival_distance
-                    && !scene
-                        .world
-                        .ray_distance_ignoring(
-                            eye,
-                            toward.normalized(),
-                            toward.length(),
-                            Some(KENNY_ID),
-                        )
-                        .is_some_and(|d| d < toward.length() - 0.1)
+                if self.elapsed >= self.search_budget
+                    || (delta.length() <= self.config.arrival_distance
+                        && !scene
+                            .world
+                            .ray_distance_ignoring(
+                                eye,
+                                toward.normalized(),
+                                toward.length(),
+                                Some(KENNY_ID),
+                            )
+                            .is_some_and(|d| d < toward.length() - 0.1))
                 {
                     self.enter(SessionState::Preparing);
                 }
@@ -505,6 +578,42 @@ impl SaveKennySession {
                 .is_ok()
             {
                 self.last_site = Some(site.id.clone());
+                let mut clean = scene.world.clone();
+                // Include staged props/vehicles: the approach must account for their road blocks.
+                clean
+                    .obstacles
+                    .retain(|o| o.id != KENNY_ID && o.id != "fps-player");
+                let entry = Vector3::new(site.entry[0], site.entry[1], site.entry[2]);
+                let route = [
+                    entry,
+                    entry + Vector3::new(0.0, 0.0, -3.0),
+                    entry + Vector3::new(0.0, 0.0, 3.0),
+                ]
+                .into_iter()
+                .filter_map(|p| {
+                    event_route(
+                        &scene.roads,
+                        &clean,
+                        scene.player.feet,
+                        p,
+                        scene.player.config.radius,
+                        scene.player.config.body_height,
+                    )
+                    .ok()
+                    .map(|r| (p, route_length(&r)))
+                })
+                .min_by(|a, b| a.1.total_cmp(&b.1));
+                let (access, length) =
+                    route.unwrap_or((entry, (entry - scene.player.feet).length() * 1.8));
+                self.search_entry = access;
+                self.search_route_metres = length;
+                self.search_budget = (self.search_route_metres / scene.player.config.run_speed
+                    * self.config.search_route_factor
+                    + self.config.search_orientation_seconds)
+                    .clamp(
+                        self.config.search_min_seconds,
+                        self.config.search_max_seconds,
+                    );
                 self.site = Some(site);
                 self.objective_distance = (scene.kenny.position() - scene.player.feet).length();
                 self.enter(SessionState::Searching);
