@@ -503,7 +503,15 @@ pub fn run_visit(
             // Freeze world simulation until the FPS handoff, including Kenny.
         } else if smoke {
             scene.update_kenny(dt);
-        } else if let Err(error) = session.update(dt, &mut scene, audio.voice_clock()) {
+        } else if let Err(error) = session.update(
+            if session_smoke {
+                dt
+            } else {
+                rl.get_frame_time()
+            },
+            &mut scene,
+            audio.voice_clock(),
+        ) {
             session.error = Some(error);
         }
         // Automatic relocation/search transitions also leave modal input.

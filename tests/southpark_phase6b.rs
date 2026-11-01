@@ -39,10 +39,17 @@ fn catalog() -> WorldLocations {
     .clone()
 }
 fn setup(kind: ThreatKind, site: usize) -> (SaveKennySession, SouthParkScene) {
+    setup_at(kind, site, false)
+}
+fn setup_at(kind: ThreatKind, site: usize, near: bool) -> (SaveKennySession, SouthParkScene) {
     let mut w = scene();
     let mut s = SaveKennySession::default();
     let mut c = catalog();
     let selected = c.sites[site].clone();
+    if near {
+        w.player.feet = Vector3::new(selected.entry[0], 0.0, selected.entry[2] - 3.0);
+        assert!(w.world.can_occupy(w.player.feet, 0.35, 1.8));
+    }
     c.sites = vec![selected];
     s.enable_world(c, 11);
     s.start(&mut w, 15).unwrap();
@@ -57,6 +64,130 @@ fn setup(kind: ThreatKind, site: usize) -> (SaveKennySession, SouthParkScene) {
 }
 fn step(s: &mut SaveKennySession, w: &mut SouthParkScene) {
     s.update(0.05, w, VoiceClock::default()).unwrap();
+}
+#[test]
+fn total_deadline_includes_interval_relocation_search_and_preparation() {
+    let mut report = vec![];
+    for kind in ThreatKind::ALL {
+        for site in 0..5 {
+            for dt in [1.0 / 30.0, 1.0 / 60.0, 1.0 / 144.0, 0.073] {
+                let mut w = scene();
+                let mut s = SaveKennySession::default();
+                let mut locations = catalog();
+                locations.sites = vec![locations.sites[site].clone()];
+                s.enable_world(locations, 44);
+                s.start(&mut w, 12).unwrap();
+                s.order[0] = kind;
+                let mut time = 0.0_f64;
+                let mut moved = false;
+                for _ in 0..4000 {
+                    let before = time;
+                    s.update(dt, &mut w, VoiceClock::default()).unwrap();
+                    time += f64::from(dt);
+                    if s.state == SessionState::Active {
+                        // The update that crosses the deadline already advances real danger.
+                        assert!(
+                            w.threats.elapsed > 0.0,
+                            "{kind:?}/{site}: active but frozen"
+                        );
+                        assert!(
+                            before < 15.000001,
+                            "{kind:?}/{site}: motion started at {before}"
+                        );
+                        assert!(time <= 15.0 + f64::from(dt) + 0.000001);
+                        if kind == ThreatKind::Piano {
+                            assert!(w.threats.piano_sway().abs() > 0.0);
+                        }
+                        report.push(json!({"kind":format!("{kind:?}"),"site":site,"dt":dt,
+                            "motion_update_start_seconds":before,"observed_active_seconds":time,
+                            "hazard_elapsed":w.threats.elapsed}));
+                        moved = true;
+                        break;
+                    }
+                }
+                assert!(moved, "{kind:?}/{site}: no motion");
+            }
+        }
+    }
+    std::fs::write(
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("target/kenny-deadline.json"),
+        serde_json::to_string_pretty(&report).unwrap(),
+    )
+    .unwrap();
+}
+#[test]
+fn deadline_is_not_extended_by_a_long_frame_or_by_retrying_after_death() {
+    let mut w = scene();
+    let mut s = SaveKennySession::default();
+    s.enable_world(catalog(), 44);
+    s.start(&mut w, 12).unwrap();
+    s.update(14.9, &mut w, VoiceClock::default()).unwrap();
+    s.update(0.1, &mut w, VoiceClock::default()).unwrap();
+    assert_eq!(s.state, SessionState::Active);
+    assert!(w.threats.elapsed > 0.0);
+    while s.state != SessionState::Restoring {
+        step(&mut s, &mut w);
+    }
+    assert_eq!(s.lives, 2);
+    let pending = s.current();
+    step(&mut s, &mut w); // Restoring enters the new pending event; controls are still blocked.
+    assert_eq!(s.activation_elapsed, 0.0);
+    let mut time = 0.0_f64;
+    while s.state != SessionState::Active && time < 15.1 {
+        step(&mut s, &mut w);
+        time += 0.05;
+    }
+    assert_eq!(s.state, SessionState::Active);
+    assert!(time <= 15.05);
+    assert_eq!(s.current(), pending);
+    assert_eq!((s.lives, s.saves), (2, 0));
+    assert!(w.threats.elapsed > 0.0);
+}
+#[test]
+fn deadline_counts_success_hold_and_survives_map_and_pause_without_resetting() {
+    let mut w = scene();
+    let mut s = SaveKennySession::default();
+    s.enable_world(catalog(), 44);
+    s.start(&mut w, 12).unwrap();
+    while s.state != SessionState::Searching {
+        step(&mut s, &mut w);
+    }
+    let clock = s.activation_elapsed;
+    assert!(s.open_map());
+    for _ in 0..400 {
+        step(&mut s, &mut w);
+    }
+    assert_eq!(s.activation_elapsed, clock);
+    s.continue_match(&mut w).unwrap();
+    s.pause();
+    for _ in 0..400 {
+        step(&mut s, &mut w);
+    }
+    assert_eq!(s.activation_elapsed, clock);
+    s.continue_match(&mut w).unwrap();
+    while s.state != SessionState::Active {
+        step(&mut s, &mut w);
+    }
+    for _ in 0..100 {
+        for t in w.threats.targets() {
+            w.threats.interact(&t.id, &mut w.kenny);
+        }
+        step(&mut s, &mut w);
+        if s.state == SessionState::Success {
+            break;
+        }
+    }
+    assert_eq!(s.state, SessionState::Success);
+    assert_eq!(s.activation_elapsed, 0.0);
+    let mut time = 0.0;
+    while s.state != SessionState::Active && time < 15.1 {
+        step(&mut s, &mut w);
+        time += 0.05;
+    }
+    assert_eq!(s.state, SessionState::Active);
+    assert!(time <= 15.05);
+    assert!(w.threats.elapsed > 0.0);
+    assert_eq!((s.lives, s.saves), (3, 1));
 }
 #[test]
 fn intro_visit_skip_and_camera_clearance() {
@@ -185,11 +316,11 @@ fn walk(w: &mut SouthParkScene, path: &[Vector3], index: &mut usize) {
     );
 }
 #[test]
-fn every_site_can_be_saved_by_running_and_shared_raycasting() {
+fn nearby_rescues_remain_possible_by_running_and_shared_raycasting() {
     let mut report = vec![];
     for kind in ThreatKind::ALL {
         for site in 0..5 {
-            let (mut s, mut w) = setup(kind, site);
+            let (mut s, mut w) = setup_at(kind, site, true);
             let entry = s.search_entry;
             let mut path = route(&w, w.player.feet, entry);
             let mut index = 0;

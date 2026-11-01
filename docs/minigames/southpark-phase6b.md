@@ -104,13 +104,20 @@ primero. Alejarse después no cancela ni reinicia la preparación. El peligro
 real empieza al terminar los **2 s** de advertencia; ningún evento espera
 indefinidamente la proximidad del jugador. Los controles continúan disponibles.
 
+**Ajuste posterior: máximo total de 15 s hasta el movimiento.** El intervalo,
+la transición, la búsqueda y la preparación comparten un único reloj. Tras una
+salvada también cuenta el aviso de éxito; al reintentar se abre un presupuesto
+nuevo. No se suman 15 s a las otras fases. M y P conservan su pausa del mundo.
+Ver [detalle y verificaciones del límite total](southpark-activation-deadline.md).
+
 Parámetros en `config/southpark-session.json`:
 
 | Parámetro | Valor | Uso |
 | --- | --- | --- |
 | `zone_detection_distance` | 90 m | Indica que ya se detectó la zona en el aviso |
 | `arrival_distance` | 32 m | Adelanta la preparación con visión directa |
-| `search_min_seconds` / `search_max_seconds` | 10 / 70 s | Límites de búsqueda |
+| `activation_max_seconds` | 15 s | Máximo total, incluyendo todas las esperas |
+| `search_min_seconds` / `search_max_seconds` | 2 / 15 s | Límites orientativos, sujetos al presupuesto restante |
 | `search_route_factor` | 1,05 | Margen sobre el tiempo estimado corriendo |
 | `search_orientation_seconds` | 3 s | Tiempo adicional para orientarse |
 | `world_interval_seconds` | 6 s | Intervalo entre eventos |
@@ -119,7 +126,8 @@ Parámetros en `config/southpark-session.json`:
 Se calcula una vez:
 
 ```text
-tiempo = clamp(longitud_ruta / velocidad_carrera × 1,05 + 3, 10, 70)
+estimación = clamp(longitud_ruta / velocidad_carrera × 1,05 + 3, 2, 15)
+búsqueda = min(estimación, max(0, 15 - tiempo_acumulado - preparación))
 ```
 
 Se reutiliza `event_route` sobre la red de calles. Se prueban el acceso original
@@ -130,11 +138,12 @@ el acceso; el controlador del jugador sigue colisionando con él al caminar.
 Si no se encuentra ruta, el respaldo documentado es distancia recta×1,8.
 La búsqueda no recalcula ni extiende su plazo al moverse el jugador.
 
-Los 25 casos desde el spawn inicial producen plazos de aproximadamente **13,9–70 s**;
-los rescates recorrieron aproximadamente **89–531 m**. El rango orientativo
-15–40 s sería insuficiente para algunos rodeos de esta ciudad. La red existente
-usa BFS, no un planificador ponderado óptimo: el cálculo es una estimación
-conservadora y no una ruta garantizada para cualquier posición futura.
+El cálculo por distancia nunca amplía el máximo total. Con los valores actuales,
+el primer evento dispone de unos 6,6 s de búsqueda después del intervalo y la
+transición; los 2 s de preparación están incluidos en los 15 s. Los recorridos
+históricos desde el spawn inicial alcanzaban 89–531 m: el nuevo límite exige
+estar bien ubicado y no garantiza salvar a Kenny desde cualquier extremo de
+la ciudad. No se cambiaron la velocidad del jugador ni las de las amenazas.
 
 Balance en `config/southpark-threats.json`:
 
@@ -200,14 +209,14 @@ perteneciendo a gameplay; esta fase no inventa sus reglas ni entrega recompensas
 
 - `cargo check --locked`, `cargo build --locked`, `cargo fmt --all -- --check`:
   correctos.
-- `cargo test --locked`: **87 pruebas correctas**, incluyendo las cinco nuevas
+- `cargo test --locked`: **90 pruebas correctas**, incluyendo las ocho nuevas
   de fase 6B y las regresiones FPS, Kenny, partida, amenazas y mapas.
 - `cargo clippy --all-targets --locked -- -D warnings`: correcto.
 - `python tools/southpark/generate_map.py --check`: correcto.
 - Inactividad: **25/25** (cinco amenazas × cinco zonas). Vence búsqueda,
   activa peligro, ejecuta fracaso/animación/diálogo, resta exactamente una vida,
   emite una sola señal de voz y mantiene cero salvadas.
-- Rescate: **25/25**, desde el spawn inicial. Movimiento con el controlador FPS
+- Rescate: **25/25**, desde accesos cercanos a las zonas. Movimiento con el controlador FPS
   a 8 m/s y colisiones, aproximaciones transitables, raycasting compartido con
   refinamiento y oclusión, reacción de 0,5 s entre acciones. Sin teletransporte
   durante los recorridos. Una salvada, tres vidas conservadas en cada caso.
@@ -228,12 +237,16 @@ aviso, HUD, mapas, diálogos y finales; `intro-validation.json`,
 `runtime-validation.json`, `idle-validation.json`, `rescue-validation.json`
 y `regression-validation.json`.
 
+Esos archivos conservan la evidencia histórica de la entrega 6B. Las pruebas del
+ajuste posterior a 15 s están en
+[activation-deadline](../references/southpark/activation-deadline/validation.json).
+
 Las pruebas gráficas se ejecutaron silenciadas. Se verificaron carga, streams,
 transiciones y retratos, pero **no se escuchó la mezcla ni la sincronización**.
 La comodidad de los controles físicos y la dificultad humana requieren prueba
 manual: la puntería automatizada no reproduce dudas o errores de una persona.
-Los recorridos de rescate abarcan las 25 combinaciones desde el spawn inicial;
-no prueban todas las posiciones posibles entre eventos ni todos los tamaños de
+Los recorridos de rescate actuales abarcan las 25 combinaciones desde accesos cercanos;
+no garantizan llegar desde el spawn inicial o todas las posiciones posibles entre eventos ni todos los tamaños de
 ventana. El mapa conserva sus huellas AABB simplificadas.
 
 ## Archivos

@@ -39,6 +39,7 @@ pub struct SessionConfig {
     pub success_hold_seconds: f32,
     pub text_characters_per_second: f32,
     pub world_interval_seconds: f32,
+    pub activation_max_seconds: f32,
     pub arrival_distance: f32,
     pub relocation_seconds: f32,
     pub zone_detection_distance: f32,
@@ -63,6 +64,7 @@ impl SessionConfig {
             c.success_hold_seconds,
             c.text_characters_per_second,
             c.world_interval_seconds,
+            c.activation_max_seconds,
             c.arrival_distance,
             c.relocation_seconds,
             c.zone_detection_distance,
@@ -73,6 +75,7 @@ impl SessionConfig {
         ]
         .iter()
         .all(|v| v.is_finite() && *v > 0.0)
+            || c.activation_max_seconds > 15.0
             || c.search_max_seconds < c.search_min_seconds
             || c.zone_detection_distance <= c.arrival_distance
             || c.death_animation_seconds < 1.4
@@ -100,6 +103,9 @@ pub struct SaveKennySession {
     pub site: Option<EventSite>,
     pub objective_distance: f32,
     pub search_budget: f32,
+    /// Shared pending-event clock: success hold, interval, relocation, search and preparation.
+    pub activation_elapsed: f64,
+    search_deadline: f64,
     pub search_route_metres: f32,
     pub search_entry: Vector3,
     last_site: Option<String>,
@@ -132,6 +138,8 @@ impl SaveKennySession {
             returning: false,
             objective_distance: 0.0,
             search_budget: 0.0,
+            activation_elapsed: 0.0,
+            search_deadline: 0.0,
             search_route_metres: 0.0,
             search_entry: Vector3::zero(),
         }
@@ -211,6 +219,9 @@ impl SaveKennySession {
         Err("No safe nearby street for Kenny".into())
     }
     pub fn search_remaining(&self) -> f32 {
+        if self.dynamic() {
+            return (self.search_deadline - self.activation_elapsed).max(0.0) as f32;
+        }
         let elapsed = if self.state == SessionState::MapOpen {
             self.paused.map(|s| s.1).unwrap_or(self.elapsed)
         } else {
@@ -299,6 +310,7 @@ impl SaveKennySession {
         self.paused = None;
         self.returning = false;
         self.site = None;
+        self.activation_elapsed = 0.0;
         if self.dynamic() {
             scene.kenny.resume();
             self.enter(SessionState::Interlude);
@@ -442,6 +454,7 @@ impl SaveKennySession {
         scene: &mut SouthParkScene,
         voice: VoiceClock,
     ) -> Result<(), String> {
+        let activation_dt = if dt.is_finite() { dt.max(0.0) } else { 0.0 };
         let dt = if dt.is_finite() {
             dt.clamp(0.0, 0.1)
         } else {
@@ -449,6 +462,46 @@ impl SaveKennySession {
         };
         if !matches!(self.state, SessionState::Paused | SessionState::MapOpen) {
             self.elapsed += dt;
+        }
+        // One deadline, never a fresh allowance for each phase. Paused/map/dialogue
+        // states do not spend game time; cinematic logic is completely separate.
+        if self.dynamic()
+            && !self.returning
+            && self.saves < 5
+            && matches!(
+                self.state,
+                SessionState::Interlude
+                    | SessionState::Relocating
+                    | SessionState::Searching
+                    | SessionState::Preparing
+                    | SessionState::Success
+            )
+        {
+            self.activation_elapsed += f64::from(activation_dt);
+            let limit = f64::from(self.config.activation_max_seconds.min(15.0));
+            if self.activation_elapsed >= limit - 0.000001 {
+                if self.state == SessionState::Success {
+                    self.index += 1;
+                    self.enter(SessionState::Relocating);
+                }
+                if matches!(
+                    self.state,
+                    SessionState::Interlude | SessionState::Relocating
+                ) {
+                    self.prepare_search(scene)?;
+                }
+                if matches!(
+                    self.state,
+                    SessionState::Searching | SessionState::Preparing
+                ) && scene.threats.state == ThreatState::Preparing
+                {
+                    // Advance on this very update: the director's usual preparation
+                    // transition alone would defer real motion until the next frame.
+                    scene.threats.state = ThreatState::Active;
+                    scene.threats.state_time = 0.0;
+                    self.enter(SessionState::Active);
+                }
+            }
         }
         match self.state {
             SessionState::Exploring => scene.update_kenny(dt),
@@ -476,7 +529,7 @@ impl SaveKennySession {
                 self.objective_distance = delta.length();
                 let eye = scene.player.eye();
                 let toward = scene.kenny.position() + Vector3::up() - eye;
-                if self.elapsed >= self.search_budget
+                if self.search_remaining() <= 0.0
                     || (delta.length() <= self.config.arrival_distance
                         && !scene
                             .world
@@ -497,6 +550,7 @@ impl SaveKennySession {
                     scene.kenny.pause();
                     if result == ThreatResult::Survived {
                         self.saves += 1;
+                        self.activation_elapsed = 0.0;
                         self.enter(SessionState::Success);
                         self.cues.push(SessionCue::Success);
                     } else {
@@ -545,6 +599,7 @@ impl SaveKennySession {
                     self.cues.push(SessionCue::GameOver);
                 } else {
                     if self.dynamic() {
+                        self.activation_elapsed = 0.0;
                         self.enter(SessionState::Relocating);
                     } else {
                         self.briefing(scene)?;
@@ -613,7 +668,14 @@ impl SaveKennySession {
                     .clamp(
                         self.config.search_min_seconds,
                         self.config.search_max_seconds,
+                    )
+                    .min(
+                        (f64::from(self.config.activation_max_seconds.min(15.0))
+                            - self.activation_elapsed
+                            - f64::from(scene.threats.config.preparation_seconds))
+                        .max(0.0) as f32,
                     );
+                self.search_deadline = self.activation_elapsed + f64::from(self.search_budget);
                 self.site = Some(site);
                 self.objective_distance = (scene.kenny.position() - scene.player.feet).length();
                 self.enter(SessionState::Searching);

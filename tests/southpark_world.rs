@@ -160,7 +160,7 @@ fn distant_search_is_finite_and_does_not_teleport_player() {
     s.enable_world(catalog(), 44);
     s.start(&mut w, 12).unwrap();
     search(&mut s, &mut w);
-    assert!((10.0..=70.0).contains(&s.search_budget));
+    assert!(s.search_budget > 0.0 && s.search_budget < 15.0);
     let mut began = false;
     for _ in 0..1600 {
         s.update(0.1, &mut w, VoiceClock::default()).unwrap();
