@@ -4,7 +4,7 @@
 use super::southpark_dev;
 use super::southpark_entry::{SouthParkExit, SouthParkVisits};
 use crate::graphics::resources::save_frame;
-use crate::graphics::space::{draw_sun_glow, Fit, Sky, SpaceModel, SpaceShader, SunShader};
+use crate::graphics::space::{draw_sun_glow, Fit, Sky, SpaceModel, SpaceShader, SunShader, SKY_BACKGROUND};
 use crate::ships::{FlightInput, Ship, ShipsConfig};
 use crate::solar_system::{hex_color, Planet, SolarSystem, SolarSystemConfig};
 use raylib::{ffi, prelude::*};
@@ -25,7 +25,6 @@ const ORBIT_SEGMENTS: usize = 256;
 const FAR_LOD: f32 = 9.0;
 /// Duración del fundido a negro al entrar o salir (segundos).
 const FADE: f32 = 0.6;
-const BACKGROUND: Color = Color::new(1, 1, 4, 255);
 
 #[derive(Clone, Copy, PartialEq)]
 enum View {
@@ -244,7 +243,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
     let far_plane = outer_orbit(&s.system) * (2.0 * MAX_ZOOM_OUT + 2.0);
     {
         let mut d = rl.begin_drawing(&thread);
-        d.clear_background(BACKGROUND);
+        d.clear_background(SKY_BACKGROUND);
         d.draw_text("Cargando el sistema solar...", 40, 40, 24, Color::RAYWHITE);
     }
 
@@ -377,7 +376,23 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                         capture = Some(format!("ship-{}.png", s.ships.ships[k].id));
                     }
                 }
-                f if f >= 60 + n * 15 + ships * 10 => return Ok(Exit::Quit),
+                f if (60 + n * 15 + ships * 10..105 + n * 15 + ships * 10).contains(&f) => {
+                    // Sol desde lejos, a media distancia y cerca, sin mover el sistema.
+                    let step = f - (60 + n * 15 + ships * 10);
+                    let k = (step / 15) as usize;
+                    let (name, radii) = [("far", 14.0), ("medium", 4.0), ("near", 1.8)][k];
+                    let center = s.system.center();
+                    side_camera = Some(Camera3D::perspective(
+                        center + Vector3::new(0.6, 0.25, 1.0).normalized() * s.system.sun.radius * radii,
+                        center,
+                        Vector3::up(),
+                        60.0,
+                    ));
+                    if step % 15 == 12 {
+                        capture = Some(format!("sun-{name}.png"));
+                    }
+                }
+                f if f >= 105 + n * 15 + ships * 10 => return Ok(Exit::Quit),
                 _ => {}
             }
         }
@@ -613,10 +628,10 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
 
         // --- Dibujo --------------------------------------------------------------------------------------------
         let mut d = rl.begin_drawing(&thread);
-        d.clear_background(BACKGROUND);
-        sky.draw(&mut d, &sky_frame, time);
+        d.clear_background(SKY_BACKGROUND);
+        sky.draw(&mut d, &sky_frame);
         if let Some((at, radius)) = sun_glow {
-            draw_sun_glow(&mut d, at, radius);
+            draw_sun_glow(&mut d, at, radius, Vector2::new(width as f32, height as f32));
         }
         {
             let mut d3 = d.begin_mode3D(camera);
