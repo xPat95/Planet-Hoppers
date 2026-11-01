@@ -5,7 +5,7 @@
 Desde la raíz del repositorio, con las herramientas de Rust/raylib de fase 2:
 
 ```powershell
-cargo run --locked
+cargo run --locked --bin southpark
 ```
 
 Kenny aparece a unos 3.6 m del jugador, ligeramente a su izquierda, junto a North Avenue. Mirar un poco hacia abajo, acercarse y apuntarle: aparece **[E] Hablar con Kenny**. Camina a 1.3 m/s; el jugador puede alcanzarlo caminando. F3 oculta su indicador de distancia; también se puede desactivar con `kenny_hint: false` en `config/southpark-dev.json`.
@@ -13,7 +13,7 @@ Kenny aparece a unos 3.6 m del jugador, ligeramente a su izquierda, junto a Nort
 Para verlo sin los tres objetos técnicos de fase 2:
 
 ```powershell
-cargo run --locked -- --no-test-objects
+cargo run --locked --bin southpark -- --no-test-objects
 ```
 
 E abre **SAVE KENNY! — ¿Podrás evitar que maten a Kenny?**. Los botones permiten aceptar o cancelar con mouse; Enter acepta y Escape cancela. Aceptar solo muestra una preparación, sin iniciar amenazas. Desde esa confirmación, Enter, E, Escape o el botón de regreso permiten continuar explorando. El diálogo pausa a Kenny, bloquea el movimiento y giro FPS y libera el cursor. Cerrarlo recaptura el cursor y continúa la ruta.
@@ -82,8 +82,8 @@ cargo build --locked
 cargo fmt --all -- --check
 cargo clippy --all-targets --locked -- -D warnings
 cargo test --locked
-cargo run --locked -- --smoke-kenny
-cargo run --locked -- --smoke
+cargo run --locked --bin southpark -- --smoke-kenny
+cargo run --locked --bin southpark -- --smoke
 ```
 
 Se aprobaron **34 pruebas**: 15 de Kenny y las 19 anteriores. Dos expectativas de conteo de la suite FPS se adaptaron porque Kenny permanece al retirar la utilería técnica. Se conservan las pruebas de carreras, paredes, suelo, límites, calles y oclusión.

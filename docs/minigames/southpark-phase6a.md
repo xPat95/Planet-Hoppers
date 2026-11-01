@@ -112,7 +112,7 @@ Prioridad: diálogos de Kenny/Stan/Kyle, victoria, derrota, pausa y transición 
 
 ## Desarrollo y verificación
 
-Se conserva `cargo run -- --dev-threats` y `--threat bus|ufo|sewer|piano|snowman`, con la plantilla original de desarrollo y F5/F6/F7/F10/F11, F8 y F9. No consumen vidas ni suman salvadas. La modalidad histórica de fase 5 y su botón de avance quedan restringidos al flujo de desarrollo/pruebas; el inicio normal habilita automáticamente las ubicaciones dinámicas.
+Se conserva `cargo run --bin southpark -- --dev-threats` y `--threat bus|ufo|sewer|piano|snowman`, con la plantilla original de desarrollo y F5/F6/F7/F10/F11, F8 y F9. No consumen vidas ni suman salvadas. La modalidad histórica de fase 5 y su botón de avance quedan restringidos al flujo de desarrollo/pruebas; el inicio normal habilita automáticamente las ubicaciones dinámicas.
 
 ```powershell
 cargo fmt --all -- --check
@@ -120,7 +120,7 @@ cargo check --locked
 cargo build --locked
 cargo test --locked
 cargo clippy --all-targets --locked -- -D warnings
-cargo run --locked -- --smoke-world
+cargo run --locked --bin southpark -- --smoke-world
 ```
 
 Pasaron **82 pruebas** (71 anteriores y 11 nuevas). Las nuevas cubren nueve apariciones seguras, selección sin repetición inmediata, éxito y fracaso de las 25 combinaciones, búsqueda prolongada sin peligro, victoria automática sin llamadas de avance, pausa/reanudación de las cinco amenazas —incluida la caída del piano—, prioridad de menús y proyección/zoom/desplazamiento limitados.

@@ -3,7 +3,8 @@
 //! Solo lógica, sin ventana. La nave avanza hacia donde apunta su nariz, con aceleración y turbo; choca contra el
 //! Sol y la forma de cada planeta; y cerca de un planeta lo acompaña en su órbita (lo "arrastra"), así que es
 //! posible alcanzar planetas en movimiento y quedarse junto a ellos. Todo usa deltaTime.
-//! La selección y el desbloqueo de naves (etapa 8) todavía no existen: `config/ships.json` elige la nave activa.
+//! El flujo normal recibe la propiedad de naves desde `gameplay::selection`; el acceso directo de desarrollo
+//! usa la nave activa de `config/ships.json` y conserva su catálogo completo.
 use crate::solar_system::{scale::travel_scale, SolarSystem};
 use raylib::prelude::Vector3;
 use serde::Deserialize;

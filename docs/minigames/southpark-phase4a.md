@@ -3,7 +3,7 @@
 ## Ejecutar y activar eventos
 
 ```powershell
-cargo run --locked
+cargo run --locked --bin southpark
 ```
 
 El paseo libre y el diálogo de fase 3 siguen disponibles. Las amenazas se prueban mediante teclas de desarrollo cuando el diálogo está cerrado:
@@ -24,9 +24,9 @@ El paseo libre y el diálogo de fase 3 siguen disponibles. Las amenazas se prueb
 En laptops puede requerirse Fn para las teclas F. También se puede iniciar directamente un evento, retirando la utilería técnica de fase 2:
 
 ```powershell
-cargo run --locked -- --threat bus
-cargo run --locked -- --threat ufo
-cargo run --locked -- --threat sewer
+cargo run --locked --bin southpark -- --threat bus
+cargo run --locked --bin southpark -- --threat ufo
+cargo run --locked --bin southpark -- --threat sewer
 ```
 
 Las advertencias y el estado aparecen arriba. Solo hay un evento en curso. Pulsar otra tecla de amenaza durante preparación, actividad o resolución muestra un aviso y conserva la actual. F8 reinicia; F9 limpia los objetivos/colisionadores temporales y coloca a Kenny en una posición segura próxima a la que tenía antes del evento. Si el jugador ocupa una aparición requerida, se rechaza el cambio con un mensaje: apartarse y repetir.
@@ -101,9 +101,9 @@ cargo build --locked
 cargo fmt --all -- --check
 cargo clippy --all-targets --locked -- -D warnings
 cargo test --locked
-cargo run --locked -- --smoke-threats
-cargo run --locked -- --smoke
-cargo run --locked -- --smoke-kenny
+cargo run --locked --bin southpark -- --smoke-threats
+cargo run --locked --bin southpark -- --smoke
+cargo run --locked --bin southpark -- --smoke-kenny
 ```
 
 Las pruebas incluyen 14 nuevas de amenazas y las 34 anteriores: **48 en total**. Cubren los corredores reales, un solo evento activo, bloqueo de interacciones prematuras, frenado, contacto, movimiento a distintos FPS, tres luces únicas, precisión de esferas y superficies circulares, ascenso/descenso, recogida/colocación, caída, resultados, reinicios, limpieza de objetivos y recuperación del paseo. Se prueba alcance/oclusión del panel y que el autobús no deje el volumen FPS encerrado.

@@ -6,7 +6,7 @@ El Sol en el centro, los seis planetas de Blender en sus órbitas y una nave par
 cargo run --locked --bin solarsystem
 ```
 
-Requisitos de Windows al final. La estación espacial, la selección y el desbloqueo de naves, los tokens y el final siguen pendientes (etapas 8 a 10).
+Requisitos de Windows al final. El flujo normal comienza en el [menú y hangar inicial](hangar.md) con `cargo run --locked`; el comando anterior conserva el acceso de desarrollo. La entrada física a la estación, el desbloqueo por progreso, los tokens y el final siguen pendientes (etapas 8 a 10).
 
 ## Controles
 
@@ -99,7 +99,7 @@ La detección y el arrastre conservan sus unidades relativas: explorar hasta 0,9
 - **Cámara:** detrás y arriba de la nave, a 3 largos de distancia y 0,9 de altura, con FOV de 60°. Acompaña su desplazamiento para evitar que el turbo la deje atrás; suaviza los giros y se mantiene fuera de las colisiones de los cuerpos. La vista general conserva FOV de 50°, arranca a 2,7 veces la extensión del sistema (incluye los radios planetarios), y compensa ventanas verticales. El plano cercano sigue en 0,5; el lejano parte de 65 664 y crece si la nave se aleja, en función de la posición de cámara y el tamaño del sistema.
 - **Choques:** contra el Sol (esfera) y contra cada planeta. La forma de cada planeta es un elipsoide que sigue la caja de su modelo, con su giro e inclinación, así que el disco de Smiling Friends es plano y no una esfera. Al chocar, la nave se queda en el borde y pierde casi toda la velocidad.
 - **Alcanzar planetas en movimiento:** cerca de un planeta (a menos de 3 radios) la nave lo acompaña en su órbita. El piloto automático predice la posición sobre la órbita circular y rodea el Sol cuando bloquea la ruta. Los controles se conservan: el jugador acelera y elige normal o turbo.
-- **Naves:** [`config/ships.json`](../config/ships.json) lista las seis que tienen modelo (Smiling Friends, el barco del End de Minecraft, Butters, el carrito de golf y los dos N-1). La activa es la de Smiling Friends. La de Halloween todavía no existe.
+- **Naves:** [`config/ships.json`](../config/ships.json) lista las seis que tienen modelo (Smiling Friends, el barco del End de Minecraft, Butters, el carrito de golf y los dos N-1). El acceso directo usa Smiling Friends como activa de desarrollo. La aventura recibe la elección del hangar mediante `run_with_game`; Calaca utiliza un placeholder geométrico de 4 unidades hasta integrar su modelo. N recorre únicamente las desbloqueadas en una aventura y mantiene el catálogo completo en desarrollo. Ver [selección y propiedad](hangar.md).
 
 ## Fase 6: interacción con planetas
 

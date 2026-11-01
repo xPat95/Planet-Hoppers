@@ -7,9 +7,9 @@ Las cinco amenazas comparten el `ThreatDirector` existente: preparación, activi
 Desde la raíz, con el entorno Rust/nativo ya usado en fase 4A:
 
 ```powershell
-cargo run --locked
-cargo run --locked -- --threat piano
-cargo run --locked -- --threat snowman
+cargo run --locked --bin southpark
+cargo run --locked --bin southpark -- --threat piano
+cargo run --locked --bin southpark -- --threat snowman
 ```
 
 Los comandos directos retiran los tres objetos técnicos de fase 2. No necesitan Blender ni numpad. En laptop, usar Fn si las teclas F controlan brillo/volumen.
@@ -68,9 +68,9 @@ cargo check --locked
 cargo build --locked
 cargo test --locked
 cargo clippy --all-targets --locked -- -D warnings
-cargo run --locked -- --smoke-threats
-cargo run --locked -- --smoke
-cargo run --locked -- --smoke-kenny
+cargo run --locked --bin southpark -- --smoke-threats
+cargo run --locked --bin southpark -- --smoke
+cargo run --locked --bin southpark -- --smoke-kenny
 ```
 
 Verificados: compilación, 57 pruebas (19 FPS, 15 Kenny, 23 amenazas), clippy sin advertencias y ejecución OpenGL 3.3 en Intel UHD. La prueba gráfica de amenazas ejecutó diez casos en 1697 frames, usando el raycasting compartido y eventos E de raylib; comprobó carga/dimensiones de modelos, éxito/fracaso, reinicio y retorno al paseo de los cinco tipos. La prueba FPS confirmó movimiento, carrera bloqueada, mouse, E y Escape; la de Kenny confirmó diálogo, pausa, cancelación y recuperación del cursor.

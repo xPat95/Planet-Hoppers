@@ -142,11 +142,19 @@ El [plan de desarrollo](docs/development-plan.md) describe las diez etapas y su 
 
 ## Tecnologías utilizadas
 
-La prueba independiente de South Park utiliza **Rust (edición 2021), raylib-rs 5.5.1 y serde/serde_json**. Renderiza el GLB real en 3D, con controlador FPS, colisiones, raycasting y Kenny como sprite con movimiento autónomo. La integración del juego completo y del sistema solar sigue pendiente.
+El juego utiliza **Rust (edición 2021), raylib-rs 5.5.1 y serde/serde_json**. El menú principal permite elegir una nave en el hangar e iniciar el sistema solar. South Park también conserva su ejecutable independiente, con su GLB real, controlador FPS, colisiones, raycasting y Kenny como sprite con movimiento autónomo.
 
 ## Instrucciones de ejecución
 
 Desde la raíz del repositorio, con Rust/Cargo y las herramientas nativas de raylib instaladas:
+
+```powershell
+cargo run --locked
+```
+
+El flujo normal es **Menú principal → Nueva partida → Hangar → Elegir nave → Sistema solar**. Las seis franquicias están disponibles al inicio; Calaca utiliza un placeholder hasta integrar su nave. La elegida es la única desbloqueada y permanece activa durante la sesión, también al regresar de South Park. No hay guardado ni opción Continuar. Ver [menú, selección y preparación del hangar definitivo](docs/hangar.md).
+
+Para ejecutar la prueba independiente de South Park:
 
 ```powershell
 cargo run --locked --bin southpark
@@ -167,9 +175,9 @@ Fases 1 a 6: Sol central y los seis planetas de Blender en sus órbitas, con tra
 
 ## Planetas disponibles para integración
 
-Modo de desarrollo de South Park: `cargo run --locked -- --dev-threats` habilita **F5** autobús, **F6** OVNI, **F7** alcantarilla, **F8** reiniciar y **F9** volver al paseo. También: `cargo run --locked -- --threat bus` (o `ufo`, `sewer`). Estas pruebas no descuentan vidas ni suman salvadas. Ver [fase 4A: controles, recursos y validación](docs/minigames/southpark-phase4a.md).
+Modo de desarrollo de South Park: `cargo run --locked --bin southpark -- --dev-threats` habilita **F5** autobús, **F6** OVNI, **F7** alcantarilla, **F8** reiniciar y **F9** volver al paseo. También: `cargo run --locked --bin southpark -- --threat bus` (o `ufo`, `sewer`). Estas pruebas no descuentan vidas ni suman salvadas. Ver [fase 4A: controles, recursos y validación](docs/minigames/southpark-phase4a.md).
 
-La fase 4B agrega **F10** piano y **F11** muñeco de nieve: `cargo run --locked -- --threat piano` o `cargo run --locked -- --threat snowman`. No requiere numpad. `--smoke-threats` comprueba ahora los diez resultados de las cinco amenazas. Ver [fase 4B: mecánicas, modelos, pruebas y capturas](docs/minigames/southpark-phase4b.md).
+La fase 4B agrega **F10** piano y **F11** muñeco de nieve: `cargo run --locked --bin southpark -- --threat piano` o `cargo run --locked --bin southpark -- --threat snowman`. No requiere numpad. `--smoke-threats` comprueba ahora los diez resultados de las cinco amenazas. Ver [fase 4B: mecánicas, modelos, pruebas y capturas](docs/minigames/southpark-phase4b.md).
 
 Los siguientes recursos son **planetas del sistema solar**. Sus archivos Blender son las fuentes editables; las exportaciones de juego y sus límites están documentados por franquicia.
 

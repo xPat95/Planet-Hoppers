@@ -1,4 +1,5 @@
 mod kenny_dialogue;
+pub mod front_end;
 pub mod minigame_host;
 mod return_smoke;
 mod session_smoke;

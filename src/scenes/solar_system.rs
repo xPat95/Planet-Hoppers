@@ -6,6 +6,7 @@ use crate::minigames::common::host::{MinigameCompletion, MinigameExit, MinigameR
 use crate::graphics::resources::save_frame;
 use crate::graphics::space::{draw_sun_glow, Fit, Sky, SpaceModel, SpaceShader, SunShader, SKY_BACKGROUND};
 use crate::ships::{FlightInput, Ship, ShipsConfig};
+use crate::gameplay::selection::{GameState, ShipCatalog};
 use crate::solar_system::{hex_color, Planet, SolarSystem, SolarSystemConfig};
 use raylib::{ffi, prelude::*};
 use std::path::{Path, PathBuf};
@@ -66,6 +67,8 @@ struct Session {
     minigames: MinigameVisits,
     last_completion: Option<MinigameCompletion>,
     return_smoke: bool,
+    launch_smoke: bool,
+    game: Option<GameState>,
     returning_from: Option<usize>,
     /// Prueba de ida y vuelta a un minijuego (--smoke-visit): cuántas visitas van.
     visit_smoke: Option<u32>,
@@ -110,17 +113,27 @@ fn park_ship(ship: &mut Ship, planet: &Planet, radii: f32, facing_planet: bool) 
 }
 
 pub fn run() -> Result<(), Box<dyn std::error::Error>> {
+    run_session(std::env::args().skip(1), None).map(|_| ())
+}
+
+pub fn run_with_game(game: GameState, args: impl Iterator<Item = String>) -> Result<GameState, Box<dyn std::error::Error>> {
+    run_session(args, Some(game))?.ok_or_else(|| "Se perdió el estado de la aventura".into())
+}
+
+fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> Result<Option<GameState>, Box<dyn std::error::Error>> {
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let mut config_path = root.join("config/solar-system.json");
     let mut ships_path = root.join("config/ships.json");
     let mut smoke = false;
     let mut visit_smoke = false;
     let mut return_smoke = false;
+    let mut launch_smoke = false;
     let mut overview = false;
-    let mut args = std::env::args().skip(1);
+    let mut args = args;
     while let Some(arg) = args.next() {
         match arg.as_str() {
             "--smoke" => smoke = true,
+            "--smoke-launch" => { smoke = true; launch_smoke = true; }
             "--smoke-returns" => { smoke = true; visit_smoke = true; return_smoke = true; }
             "--smoke-visit" => {
                 smoke = true;
@@ -135,13 +148,17 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 println!("--smoke: recorrido automático sin ventana visible; guarda capturas en target/solarsystem/");
                 println!("--smoke-visit: ida y vuelta a South Park (con su prueba de entrada) y captura al volver");
                 println!("--smoke-returns: victoria, derrota, pausa/reinicio/abandono y cuatro visitas a South Park");
-                return Ok(());
+                return Ok(game);
             }
             _ => return Err(format!("Opción desconocida: {arg}").into()),
         }
     }
     let config = SolarSystemConfig::load(&config_path)?;
-    let ships = ShipsConfig::load(&ships_path)?;
+    let mut ships = ShipsConfig::load(&ships_path)?;
+    if let Some(game) = &game {
+        let catalog = ShipCatalog::load(&root.join("config/ship-selection.json"), &ships)?;
+        catalog.configure_active(game, &mut ships)?;
+    }
     let system = SolarSystem::new(&config);
     let outer = outer_orbit(&system);
     // La nave empieza entre el Sol y el primer planeta, mirándolo
@@ -163,12 +180,14 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         minigames: MinigameVisits::default(),
         last_completion: None,
         return_smoke,
+        launch_smoke,
+        game,
         returning_from: None,
         visit_smoke: visit_smoke.then_some(0),
     };
     loop {
         match fly(&root, &mut session, smoke)? {
-            Exit::Quit => return Ok(()),
+            Exit::Quit => return Ok(session.game),
             Exit::Visit(i) => {
                 // La ventana del sistema solar ya se cerró: el minijuego abre la suya
                 let planet = &session.system.planets[i].config;
@@ -182,7 +201,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 let ship_index = session.ship_index;
                 let orbit_angles: Vec<_> = session.system.planets.iter().map(|p| p.orbit_angle).collect();
                 match minigame_host::run(&id, &mut session.minigames, args.into_iter())? {
-                    MinigameExit::WindowClosed if session.visit_smoke.is_none() => return Ok(()),
+                    MinigameExit::WindowClosed if session.visit_smoke.is_none() => return Ok(session.game),
                     MinigameExit::Returned(result) => {
                         let completion = MinigameCompletion { planet_id: planet.id.clone(), minigame_id: id, result };
                         println!("MINIGAME_RETURN {}", serde_json::to_string(&completion)?);
@@ -246,6 +265,7 @@ fn load_ship_model(
     session: &Session,
 ) -> Option<SpaceModel> {
     let s = &session.ships.ships[session.ship_index];
+    if s.model.is_empty() { return None; }
     SpaceModel::load(rl, thread, &root.join(&s.model), shader, s.model_rotation_degrees, Fit::Length(s.length))
         .map_err(|e| eprintln!("Aviso: nave {}: {e}", s.id))
         .ok()
@@ -300,6 +320,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
     let mut fade = if smoke { 0.0 } else { 1.0_f32 }; // 1 = negro; baja al entrar
     let mut leaving: Option<usize> = None;
     let mut interaction_armed = false;
+    let mut discard_mouse_frames = 2u8;
     let mut notice: Option<(String, f32)> = None;
     let mut frame = 0u32;
     let mut shake = 0.0_f32;
@@ -336,7 +357,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                     snap = true;
                 }
                 (_, 1) if visits > 0 && visits < total => {
-                    s.ship_index = visits as usize % s.ships.ships.len();
+                    if s.game.is_none() { s.ship_index = visits as usize % s.ships.ships.len(); }
                     ship_model = load_ship_model(&mut rl, &thread, root, &shader, s);
                     park_ship(&mut s.ship, &s.system.planets[southpark], 1.7, true);
                     snap = true;
@@ -358,6 +379,12 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 }
                 _ => {}
             }
+        } else if s.launch_smoke {
+            if let Some(game) = &s.game {
+                if s.ships.ships[s.ship_index].id != game.active_ship() { return Err("El modelo activo no coincide con la selección".into()); }
+            }
+            if frame == 30 { capture = Some(format!("launch-{}.png", s.ships.ships[s.ship_index].id)); }
+            if frame == 61 { println!("LAUNCH_SMOKE_PASS ship={}", s.ships.ships[s.ship_index].id); return Ok(Exit::Quit); }
         } else if smoke {
             let n = s.system.planets.len() as u32;
             let ships = s.ships.ships.len() as u32;
@@ -453,10 +480,16 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             s.show_orbits = !s.show_orbits;
         }
         if pressed(&rl, KeyboardKey::KEY_N) {
-            // Cambio de nave para probar (la estación y los desbloqueos llegan en la etapa 8)
-            s.ship_index = (s.ship_index + 1) % s.ships.ships.len();
-            ship_model = load_ship_model(&mut rl, &thread, root, &shader, s);
-            notice = Some((s.ships.ships[s.ship_index].name.clone(), 2.0));
+            // Development keeps the complete catalog; adventures respect ownership.
+            let next = (1..=s.ships.ships.len()).map(|step| (s.ship_index + step) % s.ships.ships.len())
+                .find(|i| s.game.as_ref().is_none_or(|game| game.is_unlocked(&s.ships.ships[*i].id))).unwrap_or(s.ship_index);
+            if next != s.ship_index {
+                if let Some(game) = &mut s.game { game.activate(&s.ships.ships[next].id)?; }
+                s.ship_index = next;
+                s.ships.active_ship = s.ships.ships[next].id.clone();
+                ship_model = load_ship_model(&mut rl, &thread, root, &shader, s);
+                notice = Some((s.ships.ships[next].name.clone(), 2.0));
+            }
         }
 
         // --- Actualización -------------------------------------------------------------------------------------
@@ -503,6 +536,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                         rl.enable_cursor();
                     } else {
                         rl.disable_cursor();
+                        discard_mouse_frames = 2;
                     }
                 }
                 if pressed(&rl, KeyboardKey::KEY_TAB) {
@@ -514,7 +548,10 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 }
                 let axis = |neg: bool, pos: bool| (pos as i32 - neg as i32) as f32;
                 let key = |k| down(&rl, k);
-                let mouse = if !smoke && rl.is_cursor_hidden() {
+                let mouse = if discard_mouse_frames > 0 {
+                    discard_mouse_frames -= 1;
+                    (0.0, 0.0)
+                } else if !smoke && rl.is_cursor_hidden() {
                     let m = rl.get_mouse_delta();
                     (m.x, m.y)
                 } else {
@@ -717,6 +754,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 * Matrix::translate(sp.position.x, sp.position.y, sp.position.z);
             match &ship_model {
                 Some(model) => model.draw(&mut d3, &mut shader, ship_world),
+                None if s.ships.ships[s.ship_index].model.is_empty() => crate::graphics::ship_placeholder::draw(&mut d3, sp.position, Vector3::new(sp.pitch.to_degrees(), sp.yaw.to_degrees(), sp.bank.to_degrees()), ship_len),
                 None => d3.draw_sphere(sp.position, ship_len * 0.3, Color::new(220, 220, 230, 255)),
             }
             if sp.speed > 1.0 {

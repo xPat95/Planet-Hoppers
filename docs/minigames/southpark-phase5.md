@@ -80,7 +80,7 @@ Volúmenes en `config/southpark-audio.json`, rango 0–1:
 {"music_volume":0.3,"sfx_volume":0.65,"voice_volume":1.0,"footsteps_volume":0.22}
 ```
 
-Reiniciar para aplicar cambios. `cargo run -- --mute` carga y verifica todo con los volúmenes en cero.
+Reiniciar para aplicar cambios. `cargo run --bin southpark -- --mute` carga y verifica todo con los volúmenes en cero.
 
 ### Stan y Kyle
 
@@ -114,9 +114,9 @@ El informe queda en `target/phase5-voice-analysis.json`.
 ## Desarrollo y pruebas
 
 ```powershell
-cargo run --locked -- --dev-threats
-cargo run --locked -- --threat piano
-cargo run --locked -- --threat snowman
+cargo run --locked --bin southpark -- --dev-threats
+cargo run --locked --bin southpark -- --threat piano
+cargo run --locked --bin southpark -- --threat snowman
 ```
 
 El modo explícito de desarrollo conserva F5 autobús, F6 OVNI, F7 alcantarilla, F10 piano, F11 muñeco, F8 reinicio y F9 limpieza. No consume vidas ni suma salvadas. Estas teclas se ignoran durante una partida normal, que puede completarse mediante los controles habituales y menús.
@@ -127,10 +127,10 @@ cargo check --locked
 cargo build --locked
 cargo test --locked
 cargo clippy --all-targets --locked -- -D warnings
-cargo run --locked -- --smoke
-cargo run --locked -- --smoke-kenny
-cargo run --locked -- --smoke-threats
-cargo run --locked -- --smoke-session
+cargo run --locked --bin southpark -- --smoke
+cargo run --locked --bin southpark -- --smoke-kenny
+cargo run --locked --bin southpark -- --smoke-threats
+cargo run --locked --bin southpark -- --smoke-session
 ```
 
 Los tres primeros modos gráficos escriben en `target/southpark-smoke/`, `target/southpark-kenny-smoke/` y `target/southpark-threats-smoke/`. Se preservan las capturas históricas 4A/4B. La prueba nueva genera las referencias de fase 5 y respeta el reloj de audio real, limitándose a 240 FPS para permitir que termine la voz.

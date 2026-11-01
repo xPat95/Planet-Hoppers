@@ -20,10 +20,10 @@ exploración libre. En el ejecutable independiente esto cierra la aplicación;
 no muestra un sistema solar ficticio. F12 guarda `target/southpark.png`.
 
 ```powershell
-cargo run -- --dev-threats
-cargo run -- --threat snowman
-cargo run -- --smoke-entry --mute
-cargo run -- --smoke-world --mute
+cargo run --bin southpark -- --dev-threats
+cargo run --bin southpark -- --threat snowman
+cargo run --bin southpark -- --smoke-entry --mute
+cargo run --bin southpark -- --smoke-world --mute
 cargo test --locked
 ```
 
