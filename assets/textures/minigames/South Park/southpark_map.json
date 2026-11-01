@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "world_min": [
+    -350,
+    -175
+  ],
+  "world_max": [
+    370,
+    160
+  ],
+  "image_size": [
+    1024,
+    512
+  ],
+  "source": "assets\\models\\minigames\\southpark\\southpark_town.scene.json",
+  "source_sha256": "c781072e481a198a2f179b10113726b125a35161193260298474f60107949a6f",
+  "image_sha256": "39cb71d460499ff6fd45eb244915f4ceb427bbd4e5f8bbc00cf8da0ef2554acc",
+  "roads": 15,
+  "footprints": 395,
+  "axes": "world X right, world Z down; north = -Z; authoring (x,y,z) -> (x,z,-y)"
+}

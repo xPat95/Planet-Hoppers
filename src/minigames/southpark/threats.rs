@@ -1,0 +1,1079 @@
+//! One development event at a time. Logic/results are independent of rendering,
+//! score, lives and solar-system state. All coordinates are metres, Y up.
+use super::{
+    kenny::{Kenny, KENNY_ID},
+    navigation::{event_route, route_length, route_point, RoadNetwork, NPC_HEIGHT, NPC_RADIUS},
+};
+use crate::minigames::common::{
+    collision::{Aabb, CollisionWorld, Obstacle},
+    interaction::InteractionTarget,
+};
+use raylib::prelude::Vector3;
+use serde::{Deserialize, Serialize};
+use std::path::Path;
+
+pub const PREFIX: &str = "threat:";
+pub const LANE_Z: f32 = -42.9;
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+pub enum ThreatKind {
+    Bus,
+    Ufo,
+    Sewer,
+    Piano,
+    Snowman,
+}
+impl ThreatKind {
+    /// Stable catalog for a future shuffled, non-repeating session.
+    pub const ALL: [Self; 5] = [
+        Self::Bus,
+        Self::Ufo,
+        Self::Sewer,
+        Self::Piano,
+        Self::Snowman,
+    ];
+    pub fn parse(s: &str) -> Option<Self> {
+        match s {
+            "bus" => Some(Self::Bus),
+            "ufo" => Some(Self::Ufo),
+            "sewer" => Some(Self::Sewer),
+            "piano" => Some(Self::Piano),
+            "snowman" => Some(Self::Snowman),
+            _ => None,
+        }
+    }
+    pub fn label(self) -> &'static str {
+        match self {
+            Self::Bus => "Autobús: busca el panel rojo y activa el freno",
+            Self::Ufo => "OVNI: desactiva sus tres luces desde el suelo",
+            Self::Sewer => "Alcantarilla: recoge la tapa y cubre el agujero",
+            Self::Piano => "Piano: busca el seguro amarillo antes de que caiga",
+            Self::Snowman => "Muñeco de nieve: enciende los tres calefactores",
+        }
+    }
+    pub fn stage(self) -> Vector3 {
+        Vector3::new(
+            match self {
+                Self::Bus => -24.0,
+                Self::Ufo => -28.0,
+                Self::Sewer => -26.0,
+                Self::Piano => -28.0,
+                Self::Snowman => -26.0,
+            },
+            0.0,
+            LANE_Z,
+        )
+    }
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+pub enum ThreatState {
+    Inactive,
+    Preparing,
+    Active,
+    Resolving,
+    Succeeded,
+    Failed,
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+pub enum ThreatResult {
+    Survived,
+    Died,
+}
+
+#[derive(Clone, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ThreatConfig {
+    pub preparation_seconds: f32,
+    pub bus_seconds: f32,
+    pub ufo_seconds: f32,
+    pub sewer_seconds: f32,
+    pub ufo_max_lift: f32,
+    pub interaction_distance: f32,
+    pub ufo_light_range: f32,
+    pub piano_seconds: f32,
+    pub piano_drop_seconds: f32,
+    pub piano_height: f32,
+    pub snowman_speed: f32,
+    pub kenny_flee_speed: f32,
+    pub snowman_gap: f32,
+    pub heater_slowdown: f32,
+    pub melt_seconds: f32,
+}
+impl Default for ThreatConfig {
+    fn default() -> Self {
+        serde_json::from_str(include_str!("../../../config/southpark-threats.json"))
+            .expect("Bundled threat configuration")
+    }
+}
+impl ThreatConfig {
+    pub fn load(path: &Path) -> Result<Self, Box<dyn std::error::Error>> {
+        let c: Self = serde_json::from_slice(&std::fs::read(path)?)?;
+        if ![
+            c.preparation_seconds,
+            c.bus_seconds,
+            c.ufo_seconds,
+            c.sewer_seconds,
+            c.ufo_max_lift,
+            c.interaction_distance,
+            c.ufo_light_range,
+            c.piano_seconds,
+            c.piano_drop_seconds,
+            c.piano_height,
+            c.snowman_speed,
+            c.kenny_flee_speed,
+            c.snowman_gap,
+            c.heater_slowdown,
+            c.melt_seconds,
+        ]
+        .iter()
+        .all(|n| n.is_finite() && *n > 0.0)
+            || c.bus_seconds < 6.0
+            || c.ufo_seconds < 8.0
+            || c.sewer_seconds < 10.0
+            || c.ufo_max_lift > 4.8
+            || c.ufo_light_range < 8.0
+            || c.piano_seconds < 10.0
+            || c.piano_drop_seconds < 0.25
+            || c.piano_drop_seconds > 2.0
+            || !(4.0..=7.0).contains(&c.piano_height)
+            || !(8.0..=16.0).contains(&c.snowman_gap)
+            || c.kenny_flee_speed > 2.0
+            || c.snowman_speed > 3.0
+            || c.snowman_speed - 2.0 * c.heater_slowdown <= c.kenny_flee_speed
+        {
+            return Err(
+                "Invalid threat configuration: insufficient time/range or invalid lift".into(),
+            );
+        }
+        Ok(c)
+    }
+}
+
+pub struct ThreatDirector {
+    /// Translation of the verified local layout; original dev layout is zero.
+    pub offset: Vector3,
+    pub config: ThreatConfig,
+    pub kind: Option<ThreatKind>,
+    pub state: ThreatState,
+    pub result: Option<ThreatResult>,
+    pub kenny_id: &'static str,
+    pub elapsed: f32,
+    pub state_time: f32,
+    pub lights: [bool; 3],
+    pub carrying_lid: bool,
+    pub covered: bool,
+    saved_position: Option<Vector3>,
+    pub progress: f32,
+    pub heaters: [bool; 3],
+    pub piano_locked: bool,
+    /// Validated street polyline, shared by the fleeing NPC and pursuer.
+    chase_route: Vec<Vector3>,
+    chase_world: Option<CollisionWorld>,
+    kenny_distance: f32,
+    snow_distance: f32,
+    snow_position: Vector3,
+    pub snow_yaw: f32,
+    /// Keeps the result available while restoring free exploration.
+    pub released: bool,
+}
+impl Default for ThreatDirector {
+    fn default() -> Self {
+        Self::new(ThreatConfig::default())
+    }
+}
+impl ThreatDirector {
+    pub fn new(config: ThreatConfig) -> Self {
+        Self {
+            offset: Vector3::zero(),
+            config,
+            kind: None,
+            state: ThreatState::Inactive,
+            result: None,
+            kenny_id: KENNY_ID,
+            elapsed: 0.0,
+            state_time: 0.0,
+            lights: [true; 3],
+            carrying_lid: false,
+            covered: false,
+            saved_position: None,
+            progress: 0.0,
+            heaters: [false; 3],
+            piano_locked: false,
+            chase_route: Vec::new(),
+            chase_world: None,
+            kenny_distance: 0.0,
+            snow_distance: 0.0,
+            snow_position: ThreatKind::Snowman.stage(),
+            snow_yaw: 0.0,
+            released: false,
+        }
+    }
+    pub fn running(&self) -> bool {
+        matches!(
+            self.state,
+            ThreatState::Preparing | ThreatState::Active | ThreatState::Resolving
+        )
+    }
+    pub fn owns_kenny(&self) -> bool {
+        !self.released && (self.running() || self.state == ThreatState::Failed)
+    }
+    pub fn visible_kenny(&self) -> bool {
+        self.released || self.state != ThreatState::Failed || self.state_time < 1.4
+    }
+    pub fn duration(&self) -> f32 {
+        match self.kind {
+            Some(ThreatKind::Bus) => self.config.bus_seconds,
+            Some(ThreatKind::Ufo) => self.config.ufo_seconds,
+            Some(ThreatKind::Piano) => self.config.piano_seconds,
+            Some(ThreatKind::Snowman) => {
+                48.0 / self.config.kenny_flee_speed
+                    + self.config.snowman_gap / self.config.snowman_speed
+                    + 5.0
+            }
+            _ => self.config.sewer_seconds,
+        }
+    }
+    pub fn remaining(&self) -> f32 {
+        if self.state == ThreatState::Preparing {
+            (self.config.preparation_seconds - self.state_time).max(0.0)
+        } else {
+            (self.duration() - self.elapsed).max(0.0)
+        }
+    }
+    pub fn panel_position(&self) -> Vector3 {
+        Vector3::new(-33.0, 0.0, LANE_Z + 2.0) + self.offset
+    }
+    pub fn stage(&self, kind: ThreatKind) -> Vector3 {
+        kind.stage() + self.offset
+    }
+    pub fn hazard_position(&self) -> Vector3 {
+        match self.kind {
+            Some(ThreatKind::Bus) => self.bus_position(),
+            Some(ThreatKind::Ufo) => self.ufo_position(),
+            Some(ThreatKind::Sewer) => self.hole_position(),
+            Some(ThreatKind::Piano) => self.piano_impact(),
+            Some(ThreatKind::Snowman) => self.snow_position(),
+            None => self.stage(ThreatKind::Ufo),
+        }
+    }
+    pub fn piano_impact(&self) -> Vector3 {
+        Vector3::new(-12.0, 0.0, LANE_Z) + self.offset
+    }
+    pub fn lock_position(&self) -> Vector3 {
+        Vector3::new(-32.0, 0.0, LANE_Z + 2.0) + self.offset
+    }
+    pub fn heater_position(&self, i: usize) -> Vector3 {
+        Vector3::new(-34.0 + 12.0 * i as f32, 0.0, LANE_Z + 2.0) + self.offset
+    }
+    pub fn piano_position(&self) -> Vector3 {
+        let fall = if self.state == ThreatState::Resolving {
+            (self.state_time / self.config.piano_drop_seconds)
+                .clamp(0.0, 1.0)
+                .powi(2)
+        } else if self.state == ThreatState::Failed {
+            1.0
+        } else {
+            0.0
+        };
+        self.piano_impact() + Vector3::up() * (self.config.piano_height * (1.0 - fall))
+    }
+    pub fn piano_sway(&self) -> f32 {
+        if self.state == ThreatState::Active {
+            (self.elapsed * 2.8).sin() * (0.025 + 0.045 * self.progress)
+        } else {
+            0.0
+        }
+    }
+    pub fn snow_position(&self) -> Vector3 {
+        self.snow_position
+    }
+    pub fn snow_scale(&self) -> Vector3 {
+        let t = if self.state == ThreatState::Resolving {
+            (self.state_time / self.config.melt_seconds).clamp(0.0, 1.0)
+        } else if self.state == ThreatState::Succeeded {
+            1.0
+        } else {
+            0.0
+        };
+        Vector3::new(1.0 + 0.35 * t, (1.0 - t).max(0.015), 1.0 + 0.35 * t)
+    }
+    pub fn cover_position(&self) -> Vector3 {
+        Vector3::new(-32.0, 0.0, LANE_Z + 2.0) + self.offset
+    }
+    pub fn hole_position(&self) -> Vector3 {
+        Vector3::new(-12.0, 0.0, LANE_Z) + self.offset
+    }
+    pub fn ufo_position(&self) -> Vector3 {
+        self.stage(ThreatKind::Ufo) + Vector3::up() * (6.2 + (self.elapsed * 0.8).sin() * 0.10)
+    }
+    pub fn light_position(&self, i: usize) -> Vector3 {
+        let a = (30.0 + i as f32 * 120.0).to_radians();
+        self.ufo_position() + Vector3::new(2.25 * a.cos(), -0.45, 2.25 * a.sin())
+    }
+    pub fn bus_position(&self) -> Vector3 {
+        self.stage(ThreatKind::Bus) + Vector3::new(48.0 - 52.85 * self.progress, 0.0, 0.0)
+    }
+    pub fn bus_bounds(&self) -> Aabb {
+        let p = self.bus_position();
+        Aabb::new(
+            p + Vector3::new(-3.1, 0.0, -1.22),
+            p + Vector3::new(3.1, 2.7, 1.22),
+        )
+    }
+    pub fn lid_position(&self) -> Option<Vector3> {
+        if self.covered || self.state == ThreatState::Resolving {
+            Some(
+                self.hole_position()
+                    + Vector3::up()
+                        * if self.state == ThreatState::Resolving {
+                            (1.0 - self.state_time / 0.5).max(0.0) * 0.6
+                        } else {
+                            0.0
+                        },
+            )
+        } else if self.carrying_lid {
+            None
+        } else {
+            Some(self.cover_position())
+        }
+    }
+    pub fn sprite_roll(&self) -> f32 {
+        if !self.released
+            && self.state == ThreatState::Failed
+            && matches!(
+                self.kind,
+                Some(ThreatKind::Bus | ThreatKind::Piano | ThreatKind::Snowman)
+            )
+        {
+            (self.state_time / 0.7).min(1.0) * 80.0_f32.to_radians()
+        } else {
+            0.0
+        }
+    }
+    pub fn sprite_height_scale(&self) -> f32 {
+        if !self.released
+            && self.state == ThreatState::Failed
+            && matches!(
+                self.kind,
+                Some(ThreatKind::Bus | ThreatKind::Piano | ThreatKind::Snowman)
+            )
+        {
+            1.0 - (self.state_time / 0.7).min(1.0) * 0.7
+        } else {
+            1.0
+        }
+    }
+
+    /// Validate the whole staging corridor, not only the endpoint. Bus sweep is
+    /// an expanded static AABB; these derived vehicle dimensions match Blender.
+    pub fn validate_zone(&self, kind: ThreatKind, world: &CollisionWorld) -> Result<(), String> {
+        let origin = self.stage(kind);
+        let end = match kind {
+            ThreatKind::Bus => origin - Vector3::right() * 8.0,
+            ThreatKind::Sewer => self.hole_position(),
+            ThreatKind::Ufo => origin,
+            ThreatKind::Piano => self.piano_impact(),
+            ThreatKind::Snowman => origin + Vector3::right() * 48.0,
+        };
+        for n in 0..=if kind == ThreatKind::Snowman { 0 } else { 100 } {
+            let p = origin + (end - origin) * (n as f32 / 100.0);
+            let body = world.body(p, NPC_RADIUS, NPC_HEIGHT);
+            if world
+                .obstacles
+                .iter()
+                .filter(|o| o.id != KENNY_ID && o.id != "fps-player" && !o.id.starts_with(PREFIX))
+                .any(|o| body.overlaps(o.bounds))
+            {
+                return Err("Kenny event route intersects an obstacle".into());
+            }
+        }
+        if kind == ThreatKind::Piano {
+            let min = self.piano_impact() + Vector3::new(-2.3, 0.0, -1.5);
+            let bounds = Aabb::new(min, self.piano_impact() + Vector3::new(2.3, 9.5, 1.5));
+            if world
+                .obstacles
+                .iter()
+                .filter(|o| o.id != KENNY_ID && o.id != "fps-player" && !o.id.starts_with(PREFIX))
+                .any(|o| bounds.overlaps(o.bounds))
+            {
+                return Err("Piano drop corridor is obstructed".into());
+            }
+        }
+        if kind == ThreatKind::Bus {
+            let half = Vector3::new(3.1, 1.35, 1.22);
+            let start = origin + Vector3::new(48.0, 1.35, 0.0);
+            let delta = Vector3::new(-52.85, 0.0, 0.0);
+            if world
+                .obstacles
+                .iter()
+                .filter(|o| o.id != KENNY_ID && o.id != "fps-player" && !o.id.starts_with(PREFIX))
+                .any(|o| o.bounds.expanded(half).ray(start, delta, 1.0).is_some())
+            {
+                return Err("Bus corridor is obstructed".into());
+            }
+        }
+        let prop = if kind == ThreatKind::Bus {
+            self.panel_position()
+        } else {
+            self.cover_position()
+        };
+        let approach = world.body(prop + Vector3::new(-1.0, 0.0, 0.0), 0.35, 1.8);
+        if world
+            .obstacles
+            .iter()
+            .filter(|o| o.id != KENNY_ID && o.id != "fps-player" && !o.id.starts_with(PREFIX))
+            .any(|o| approach.overlaps(o.bounds))
+        {
+            return Err("Interaction approach is blocked".into());
+        }
+        if matches!(kind, ThreatKind::Piano | ThreatKind::Snowman) {
+            for prop in self.new_prop_obstacles(kind) {
+                let approach = world.body(
+                    prop.bounds.center() + Vector3::new(-1.8, 0.0, -0.8),
+                    0.35,
+                    1.8,
+                );
+                if world
+                    .obstacles
+                    .iter()
+                    .filter(|o| {
+                        o.id != KENNY_ID && o.id != "fps-player" && !o.id.starts_with(PREFIX)
+                    })
+                    .any(|o| prop.bounds.overlaps(o.bounds) || approach.overlaps(o.bounds))
+                {
+                    return Err(format!("Blocked prop or approach: {}", prop.id));
+                }
+            }
+        }
+        Ok(())
+    }
+    pub fn start(
+        &mut self,
+        kind: ThreatKind,
+        kenny: &mut Kenny,
+        world: &CollisionWorld,
+        roads: &RoadNetwork,
+    ) -> Result<(), String> {
+        if self.running() {
+            return Err("Ya hay una amenaza en curso. F8 reinicia; F9 vuelve a explorar.".into());
+        }
+        self.validate_zone(kind, world)?;
+        let mut travel_world = world.clone();
+        travel_world
+            .obstacles
+            .retain(|o| o.id != KENNY_ID && o.id != "fps-player" && !o.id.starts_with(PREFIX));
+        travel_world.obstacles.extend(self.new_prop_obstacles(kind));
+        let mut chase_route = Vec::new();
+        let mut initial_distance = 0.0;
+        if kind == ThreatKind::Snowman {
+            let a = self.stage(kind) - Vector3::right() * self.config.snowman_gap;
+            chase_route = event_route(roads, &travel_world, a, self.stage(kind), 1.05, 3.3)?;
+            initial_distance = route_length(&chase_route);
+            let next = event_route(
+                roads,
+                &travel_world,
+                self.stage(kind),
+                self.stage(kind) + Vector3::right() * 48.0,
+                1.05,
+                3.3,
+            )?;
+            chase_route.extend(next.into_iter().skip(1));
+        }
+        let original = kenny.position();
+        if !kenny.reposition_safe(self.stage(kind), world) {
+            return Err("Event stage is occupied; step off the marked lane".into());
+        }
+        if self.saved_position.is_none() {
+            self.saved_position = Some(original);
+        }
+        self.kind = Some(kind);
+        self.state = ThreatState::Preparing;
+        self.result = None;
+        self.elapsed = 0.0;
+        self.state_time = 0.0;
+        self.lights = [true; 3];
+        self.carrying_lid = false;
+        self.covered = false;
+        self.progress = 0.0;
+        self.heaters = [false; 3];
+        self.released = false;
+        self.piano_locked = false;
+        self.kenny_distance = initial_distance;
+        self.snow_distance = 0.0;
+        self.snow_position = chase_route.first().copied().unwrap_or(self.stage(kind));
+        self.snow_yaw = -std::f32::consts::FRAC_PI_2;
+        self.chase_route = chase_route;
+        self.chase_world = Some(travel_world);
+        kenny.pause();
+        kenny.take_threat_contact();
+        kenny.request_danger_animation(true);
+        Ok(())
+    }
+    /// Catalog verification runs once, with the real static solids and road
+    /// graph. Every mechanism needs a reachable ground approach and clear ray.
+    pub fn validate_access(
+        &self,
+        kind: ThreatKind,
+        world: &CollisionWorld,
+        roads: &RoadNetwork,
+        entry: Vector3,
+    ) -> Result<Vec<Vector3>, String> {
+        self.validate_zone(kind, world)?;
+        let mut clean = world.clone();
+        clean
+            .obstacles
+            .retain(|o| o.id != KENNY_ID && o.id != "fps-player" && !o.id.starts_with(PREFIX));
+        let solid = |bounds: Aabb| clean.obstacles.iter().any(|o| bounds.overlaps(o.bounds));
+        if kind == ThreatKind::Ufo {
+            let p = self.stage(kind);
+            if solid(Aabb::new(
+                p + Vector3::new(-2.8, 0.0, -2.8),
+                p + Vector3::new(2.8, 7.8, 2.8),
+            )) {
+                return Err("UFO air/lift column obstructed".into());
+            }
+        }
+        if kind == ThreatKind::Sewer {
+            for p in [self.cover_position(), self.hole_position()] {
+                if solid(Aabb::new(
+                    p - Vector3::new(0.92, 0.0, 0.92),
+                    p + Vector3::new(0.92, 0.3, 0.92),
+                )) {
+                    return Err("Sewer surface obstructed".into());
+                }
+            }
+        }
+        clean.obstacles.extend(self.new_prop_obstacles(kind));
+        if kind == ThreatKind::Snowman {
+            event_route(
+                roads,
+                &clean,
+                self.stage(kind) - Vector3::right() * self.config.snowman_gap,
+                self.stage(kind),
+                1.05,
+                3.3,
+            )?;
+            event_route(
+                roads,
+                &clean,
+                self.stage(kind),
+                self.stage(kind) + Vector3::right() * 48.0,
+                1.05,
+                3.3,
+            )?;
+        }
+        let mut probe = Self::new(self.config.clone());
+        probe.offset = self.offset;
+        probe.kind = Some(kind);
+        probe.state = ThreatState::Active;
+        let mut targets = probe.targets();
+        if kind == ThreatKind::Sewer {
+            probe.carrying_lid = true;
+            targets.extend(probe.targets());
+        }
+        let mut approaches = Vec::new();
+        for target in targets {
+            let centre = target.bounds.center();
+            let mut found = None;
+            'candidates: for radius in [2.5, 4.0, 5.0] {
+                for i in 0..16 {
+                    let angle = i as f32 * std::f32::consts::TAU / 16.0;
+                    let p = Vector3::new(
+                        centre.x + radius * angle.cos(),
+                        clean.ground_y,
+                        centre.z + radius * angle.sin(),
+                    );
+                    if !clean.can_occupy(p, 0.35, 1.8) {
+                        continue;
+                    }
+                    let eye = p + Vector3::up() * 1.7;
+                    let delta = centre - eye;
+                    let distance = delta.length();
+                    let range = if kind == ThreatKind::Ufo {
+                        self.config.ufo_light_range
+                    } else {
+                        self.config.interaction_distance
+                    };
+                    if distance > range
+                        || clean
+                            .ray_distance_ignoring(
+                                eye,
+                                delta.normalized(),
+                                distance,
+                                Some(&target.id),
+                            )
+                            .is_some_and(|d| d < distance - 0.3)
+                    {
+                        continue;
+                    }
+                    if event_route(roads, &clean, entry, p, 0.35, 1.8).is_ok() {
+                        found = Some(p);
+                        break 'candidates;
+                    }
+                }
+            }
+            approaches.push(
+                found.ok_or_else(|| format!("No visible/reachable approach to {}", target.id))?,
+            );
+        }
+        Ok(approaches)
+    }
+    pub fn restart(
+        &mut self,
+        kenny: &mut Kenny,
+        world: &CollisionWorld,
+        roads: &RoadNetwork,
+    ) -> Result<(), String> {
+        let kind = self.kind.ok_or("No hay amenaza seleccionada")?;
+        let previous = self.state;
+        self.state = ThreatState::Inactive;
+        let result = self.start(kind, kenny, world, roads);
+        if result.is_err() {
+            self.state = previous;
+        }
+        result
+    }
+    pub fn clear(&mut self, kenny: &mut Kenny, world: &CollisionWorld) -> Result<(), String> {
+        if self.kind.is_none() {
+            return Ok(());
+        }
+        let anchor = self.saved_position.unwrap_or(ThreatKind::Ufo.stage());
+        let mut restored = false;
+        for offset in [
+            Vector3::zero(),
+            Vector3::new(0.0, 0.0, 1.7),
+            Vector3::new(0.0, 0.0, -1.7),
+            Vector3::new(-4.0, 0.0, 0.0),
+            Vector3::new(4.0, 0.0, 0.0),
+        ] {
+            if kenny.reposition_safe(anchor + offset, world) {
+                restored = true;
+                break;
+            }
+        }
+        if !restored {
+            return Err("No safe point to restore Kenny; move away and retry F9".into());
+        }
+        kenny.request_danger_animation(false);
+        kenny.resume();
+        let cfg = self.config.clone();
+        kenny.take_threat_contact();
+        *self = Self::new(cfg);
+        Ok(())
+    }
+    fn success(&mut self, kenny: &mut Kenny) {
+        self.state = ThreatState::Succeeded;
+        self.state_time = 0.0;
+        self.result = Some(ThreatResult::Survived);
+        kenny.request_danger_animation(false);
+        kenny.resume();
+    }
+    /// Remove derived props after the result has been visible. Failed Kenny is
+    /// restored safely; the result remains available to a future session flow.
+    pub fn release_completed(&mut self, kenny: &mut Kenny, world: &CollisionWorld) {
+        if self.released
+            || self.result.is_none()
+            || self.state_time < 6.0
+            || !matches!(self.kind, Some(ThreatKind::Piano | ThreatKind::Snowman))
+        {
+            return;
+        }
+        if self.state == ThreatState::Failed {
+            let anchor = self.saved_position.unwrap_or(ThreatKind::Snowman.stage());
+            if ![
+                Vector3::zero(),
+                Vector3::new(0.0, 0.0, 1.7),
+                Vector3::new(0.0, 0.0, -1.7),
+                Vector3::right() * 4.0,
+                -Vector3::right() * 4.0,
+            ]
+            .iter()
+            .any(|offset| kenny.reposition_safe(anchor + *offset, world))
+            {
+                return;
+            }
+        }
+        kenny.request_danger_animation(false);
+        kenny.resume();
+        self.released = true;
+        self.chase_world = None;
+        self.chase_route.clear();
+    }
+    fn fail(&mut self, kenny: &mut Kenny) {
+        self.state = ThreatState::Failed;
+        self.state_time = 0.0;
+        self.result = Some(ThreatResult::Died);
+        kenny.notify_threat_contact(match self.kind {
+            Some(ThreatKind::Bus) => "bus",
+            Some(ThreatKind::Ufo) => "ufo",
+            Some(ThreatKind::Piano) => "piano",
+            Some(ThreatKind::Snowman) => "snowman",
+            _ => "sewer",
+        });
+        kenny.pause();
+    }
+    pub fn update(&mut self, dt: f32, kenny: &mut Kenny) {
+        let dt = if dt.is_finite() {
+            dt.clamp(0.0, 0.1)
+        } else {
+            0.0
+        };
+        self.state_time += dt;
+        if self.released {
+            return;
+        }
+        let Some(kind) = self.kind else {
+            return;
+        };
+        if self.state == ThreatState::Preparing {
+            kenny.event_pose(self.stage(kind), dt);
+            if self.state_time >= self.config.preparation_seconds {
+                self.state = ThreatState::Active;
+                self.state_time = 0.0;
+            }
+        } else if self.state == ThreatState::Active {
+            self.elapsed = (self.elapsed + dt).min(self.duration());
+            self.progress = self.elapsed / self.duration();
+            let p = match kind {
+                ThreatKind::Bus => self.stage(kind) - Vector3::right() * (8.0 * self.progress),
+                ThreatKind::Ufo => {
+                    self.stage(kind) + Vector3::up() * (self.config.ufo_max_lift * self.progress)
+                }
+                ThreatKind::Sewer => {
+                    self.stage(kind) + (self.hole_position() - self.stage(kind)) * self.progress
+                }
+                ThreatKind::Piano => {
+                    self.stage(kind) + (self.piano_impact() - self.stage(kind)) * self.progress
+                }
+                ThreatKind::Snowman => {
+                    self.kenny_distance = (self.kenny_distance + dt * self.config.kenny_flee_speed)
+                        .min(route_length(&self.chase_route));
+                    let speed = self.config.snowman_speed
+                        - self.config.heater_slowdown
+                            * self.heaters.iter().filter(|on| **on).count() as f32;
+                    self.snow_distance = (self.snow_distance + dt * speed).min(self.kenny_distance);
+                    let goal = route_point(&self.chase_route, self.snow_distance);
+                    let delta = goal - self.snow_position;
+                    if delta.length() > 0.0001 {
+                        self.snow_yaw = (-delta.x).atan2(-delta.z);
+                    }
+                    self.snow_position = self.chase_world.as_ref().expect("Event world").move_body(
+                        self.snow_position,
+                        delta,
+                        1.05,
+                        3.3,
+                    );
+                    route_point(&self.chase_route, self.kenny_distance)
+                }
+            };
+            kenny.event_pose(p, dt);
+            let contact = kind == ThreatKind::Bus
+                && self.bus_bounds().overlaps(Aabb::new(
+                    p + Vector3::new(-NPC_RADIUS, 0.0, -NPC_RADIUS),
+                    p + Vector3::new(NPC_RADIUS, NPC_HEIGHT, NPC_RADIUS),
+                ));
+            if kind == ThreatKind::Piano
+                && self.progress >= 1.0
+                && (p - self.piano_impact()).length() < 0.05
+            {
+                self.state = ThreatState::Resolving;
+                self.state_time = 0.0;
+            } else if kind == ThreatKind::Snowman {
+                if (p - self.snow_position).length() <= 1.15 {
+                    self.fail(kenny);
+                }
+            } else if kind != ThreatKind::Piano && (self.progress >= 1.0 || contact) {
+                self.fail(kenny);
+            }
+        } else if self.state == ThreatState::Resolving {
+            if kind == ThreatKind::Piano {
+                kenny.event_pose(self.piano_impact(), dt);
+                if self.state_time >= self.config.piano_drop_seconds {
+                    self.fail(kenny);
+                }
+            } else if kind == ThreatKind::Snowman {
+                kenny.event_pose(kenny.position(), dt);
+                if self.state_time >= self.config.melt_seconds {
+                    self.success(kenny);
+                }
+            } else if kind == ThreatKind::Ufo {
+                let mut p = kenny.position();
+                p.y = (p.y - 2.0 * dt).max(0.0);
+                kenny.event_pose(p, dt);
+                if p.y <= 0.0 {
+                    self.success(kenny);
+                }
+            } else {
+                kenny.event_pose(kenny.position(), dt);
+                if self.state_time >= 0.5 {
+                    self.carrying_lid = false;
+                    self.covered = true;
+                    self.success(kenny);
+                }
+            }
+        } else if self.state == ThreatState::Failed {
+            let y = match kind {
+                ThreatKind::Sewer => -3.0 * (self.state_time / 1.2).min(1.0),
+                ThreatKind::Ufo => {
+                    self.config.ufo_max_lift + 2.0 * (self.state_time / 1.2).min(1.0)
+                }
+                ThreatKind::Bus | ThreatKind::Piano | ThreatKind::Snowman => {
+                    if self.state_time >= 1.4 {
+                        -3.0
+                    } else {
+                        0.0
+                    }
+                }
+            };
+            let mut p = kenny.position();
+            p.y = y;
+            kenny.event_pose(p, dt);
+        }
+    }
+    pub fn targets(&self) -> Vec<InteractionTarget> {
+        if self.state != ThreatState::Active {
+            return vec![];
+        }
+        let mut result = Vec::new();
+        let mut add = |id: &str, label: &str, p: Vector3, half: Vector3| {
+            result.push(InteractionTarget {
+                id: format!("{PREFIX}{id}"),
+                label: label.into(),
+                bounds: Aabb::new(p - half, p + half),
+                action: format!("{PREFIX}{id}"),
+            })
+        };
+        match self.kind {
+            Some(ThreatKind::Bus) => add(
+                "brake",
+                "Activar freno",
+                self.panel_position() + Vector3::up() * 1.5,
+                Vector3::new(0.34, 0.34, 0.18),
+            ),
+            Some(ThreatKind::Ufo) => {
+                for i in 0..3 {
+                    if self.lights[i] {
+                        add(
+                            &format!("light-{i}"),
+                            &format!("Desactivar luz {}", i + 1),
+                            self.light_position(i),
+                            Vector3::new(0.25, 0.25, 0.25),
+                        );
+                    }
+                }
+            }
+            Some(ThreatKind::Sewer) => {
+                if self.carrying_lid {
+                    add(
+                        "place",
+                        "Colocar tapa",
+                        self.hole_position() + Vector3::up() * 0.12,
+                        Vector3::new(0.86, 0.15, 0.86),
+                    );
+                } else {
+                    add(
+                        "pickup",
+                        "Recoger tapa",
+                        self.cover_position() + Vector3::up() * 0.12,
+                        Vector3::new(0.86, 0.15, 0.86),
+                    );
+                }
+            }
+            Some(ThreatKind::Piano) => add(
+                "piano-lock",
+                "Bloquear piano",
+                self.lock_position() + Vector3::up() * 1.35,
+                Vector3::new(0.4, 0.4, 0.28),
+            ),
+            Some(ThreatKind::Snowman) => {
+                for i in 0..3 {
+                    if !self.heaters[i] {
+                        add(
+                            &format!("heater-{i}"),
+                            "Encender calefactor",
+                            self.heater_position(i) + Vector3::up() * 0.85,
+                            Vector3::new(0.42, 0.6, 0.3),
+                        );
+                    }
+                }
+            }
+            None => {}
+        }
+        result
+    }
+    pub fn range(&self) -> f32 {
+        if self.kind == Some(ThreatKind::Ufo) && self.state == ThreatState::Active {
+            self.config.ufo_light_range
+        } else {
+            self.config.interaction_distance
+        }
+    }
+    pub fn refine(
+        &self,
+        id: &str,
+        origin: Vector3,
+        direction: Vector3,
+        range: f32,
+        broad: f32,
+    ) -> Option<f32> {
+        if id == "threat:pickup" || id == "threat:place" {
+            if direction.y.abs() < 0.00001 {
+                return None;
+            }
+            let center = if id == "threat:pickup" {
+                self.cover_position()
+            } else {
+                self.hole_position()
+            } + Vector3::up() * 0.12;
+            let t = (center.y - origin.y) / direction.y;
+            let p = origin + direction * t - center;
+            return (t >= 0.0 && t <= range && p.x * p.x + p.z * p.z <= 0.86 * 0.86).then_some(t);
+        }
+        if let Some(i) = id
+            .strip_prefix("threat:light-")
+            .and_then(|s| s.parse::<usize>().ok())
+            .filter(|i| *i < 3)
+        {
+            let m = origin - self.light_position(i);
+            let b = m.dot(direction);
+            let discriminant = b * b - (m.dot(m) - 0.25 * 0.25);
+            if discriminant < 0.0 {
+                return None;
+            }
+            let t = (-b - discriminant.sqrt()).max(0.0);
+            return (t <= range).then_some(t);
+        }
+        (broad <= range).then_some(broad)
+    }
+    pub fn interact(&mut self, id: &str, kenny: &mut Kenny) -> bool {
+        if self.state != ThreatState::Active {
+            return false;
+        }
+        match (self.kind, id) {
+            (Some(ThreatKind::Piano), "threat:piano-lock") if !self.piano_locked => {
+                self.piano_locked = true;
+                self.success(kenny);
+                true
+            }
+            (Some(ThreatKind::Snowman), _) => {
+                let Some(i) = id
+                    .strip_prefix("threat:heater-")
+                    .and_then(|s| s.parse::<usize>().ok())
+                    .filter(|i| *i < 3)
+                else {
+                    return false;
+                };
+                if self.heaters[i] {
+                    return false;
+                }
+                self.heaters[i] = true;
+                if self.heaters.iter().all(|on| *on) {
+                    self.state = ThreatState::Resolving;
+                    self.state_time = 0.0;
+                }
+                true
+            }
+            (Some(ThreatKind::Bus), "threat:brake") => {
+                self.success(kenny);
+                true
+            }
+            (Some(ThreatKind::Ufo), _) => {
+                let Some(i) = id
+                    .strip_prefix("threat:light-")
+                    .and_then(|s| s.parse::<usize>().ok())
+                    .filter(|i| *i < 3)
+                else {
+                    return false;
+                };
+                if !self.lights[i] {
+                    return false;
+                }
+                self.lights[i] = false;
+                if self.lights.iter().all(|on| !*on) {
+                    self.state = ThreatState::Resolving;
+                    self.state_time = 0.0;
+                }
+                true
+            }
+            (Some(ThreatKind::Sewer), "threat:pickup") if !self.carrying_lid => {
+                self.carrying_lid = true;
+                true
+            }
+            (Some(ThreatKind::Sewer), "threat:place") if self.carrying_lid => {
+                self.state = ThreatState::Resolving;
+                self.state_time = 0.0;
+                true
+            }
+            _ => false,
+        }
+    }
+    pub fn obstacles(&self) -> Vec<Obstacle> {
+        if self.released || self.state == ThreatState::Inactive {
+            return vec![];
+        }
+        if let Some(kind @ (ThreatKind::Piano | ThreatKind::Snowman)) = self.kind {
+            let mut props = self.new_prop_obstacles(kind);
+            if kind == ThreatKind::Snowman && self.running() {
+                props.push(Obstacle {
+                    id: "threat:snowman-body".into(),
+                    bounds: Aabb::new(
+                        self.snow_position + Vector3::new(-1.05, 0.0, -1.05),
+                        self.snow_position + Vector3::new(1.05, 3.3 * self.snow_scale().y, 1.05),
+                    ),
+                });
+            }
+            if kind == ThreatKind::Piano {
+                let p = self.piano_position();
+                props.push(Obstacle {
+                    id: "threat:piano-body".into(),
+                    bounds: Aabb::new(
+                        p + Vector3::new(-2.3, 0.0, -1.5),
+                        p + Vector3::new(2.3, 2.3, 1.5),
+                    ),
+                });
+            }
+            return props;
+        }
+        if self.kind == Some(ThreatKind::Bus) && self.state != ThreatState::Inactive {
+            vec![Obstacle {
+                id: "threat:bus-body".into(),
+                bounds: self.bus_bounds(),
+            }]
+        } else {
+            vec![]
+        }
+    }
+    fn new_prop_obstacles(&self, kind: ThreatKind) -> Vec<Obstacle> {
+        let prop = |id: String, p: Vector3, half: Vector3, height: f32| Obstacle {
+            id,
+            bounds: Aabb::new(p - half, p + Vector3::new(half.x, height, half.z)),
+        };
+        match kind {
+            ThreatKind::Piano => vec![
+                prop(
+                    "threat:piano-lock".into(),
+                    self.lock_position(),
+                    Vector3::new(0.4, 0.0, 0.28),
+                    1.8,
+                ),
+                prop(
+                    "threat:crane".into(),
+                    self.piano_impact() + Vector3::new(0.0, 0.0, 2.2),
+                    Vector3::new(0.45, 0.0, 0.45),
+                    9.5,
+                ),
+            ],
+            ThreatKind::Snowman => (0..3)
+                .map(|i| {
+                    prop(
+                        format!("threat:heater-{i}"),
+                        self.heater_position(i),
+                        Vector3::new(0.48, 0.0, 0.38),
+                        1.45,
+                    )
+                })
+                .collect(),
+            _ => vec![],
+        }
+    }
+}

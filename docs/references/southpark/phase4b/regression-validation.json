@@ -1,0 +1,111 @@
+{
+  "status": "PASS",
+  "rust_checks": [
+    "cargo fmt --all -- --check",
+    "cargo check --locked",
+    "cargo build --locked",
+    "cargo test --locked",
+    "cargo clippy --all-targets --locked -- -D warnings"
+  ],
+  "automated_tests_passed": 57,
+  "fps": {
+    "frames": 90,
+    "manual_hardware_input_tested": false,
+    "model": {
+      "bounds_max": [
+        370,
+        23.196308135986328,
+        160
+      ],
+      "bounds_min": [
+        -350,
+        -1,
+        -175
+      ],
+      "draw_batches": 28,
+      "material_colors_match": true,
+      "original_primitives": 2734,
+      "source_materials": 27,
+      "triangles": 76212
+    },
+    "notes": "Real OpenGL render and raylib automation events. Physical keyboard/mouse and long play sessions require manual verification.",
+    "raylib_automation": {
+      "E_confirmations": 1,
+      "Escape_recapture": true,
+      "Escape_release": true,
+      "W_Shift": true,
+      "mouse_look": true,
+      "run_blocked_at_m": 2.4999046325683594
+    },
+    "render_mean_ms": 8.939995294117647,
+    "scene_solids": 395,
+    "status": "PASS"
+  },
+  "kenny": {
+    "accepted_preparation_by_mouse": true,
+    "cancel_resumed_walk": true,
+    "closed_and_recaptured": true,
+    "dialogue_cursor_free": true,
+    "dialogue_opened_with_E": true,
+    "fps_frozen_during_dialogue": true,
+    "frames": 210,
+    "manual_hardware_input_tested": false,
+    "road_edges": 645,
+    "road_nodes": 638,
+    "status": "PASS",
+    "stopped_and_settled": true,
+    "texture": {
+      "height": 367,
+      "opaque_pixels": 566,
+      "transparent_pixels": 17087,
+      "width": 271
+    }
+  },
+  "blender_assets": {
+    "status": "PASS",
+    "assets": {
+      "piano": {
+        "editable_objects": 47,
+        "triangles": 740,
+        "max_bounds_error_m": 0
+      },
+      "piano_support": {
+        "editable_objects": 5,
+        "triangles": 124,
+        "max_bounds_error_m": 0
+      },
+      "piano_lock": {
+        "editable_objects": 5,
+        "triangles": 92,
+        "max_bounds_error_m": 2.9802322387695312e-8
+      },
+      "snowman": {
+        "editable_objects": 25,
+        "triangles": 2160,
+        "max_bounds_error_m": 5.960464477539063e-8
+      },
+      "heater": {
+        "editable_objects": 10,
+        "triangles": 120,
+        "max_bounds_error_m": 0
+      }
+    },
+    "models_saved": false
+  },
+  "town": {
+    "roads": 15,
+    "glb_reimport": "PASS",
+    "materials": 27,
+    "visual_meshes": 777,
+    "street_lane_samples": 7497,
+    "solid_proxies": 395,
+    "status": "PASS",
+    "source_unchanged": true
+  },
+  "original_assets": {
+    "changed_files": [],
+    "protected_files": 69,
+    "algorithm": "SHA256"
+  },
+  "manual_hardware_input_tested": false
+}

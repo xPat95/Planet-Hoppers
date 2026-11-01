@@ -1,0 +1,29 @@
+{
+  "status": "PASS",
+  "source_unchanged": true,
+  "source_sha256": "960590e3c4a2a564f35b7a49fcd499d94e35017460704815b0fecd7af93557e9",
+  "assets": {
+    "Buildings": 160,
+    "Mountains": 14,
+    "Trees": 220,
+    "Decoration": 1
+  },
+  "visual_meshes": 777,
+  "materials": 27,
+  "external_textures": 0,
+  "solid_proxies": 395,
+  "roads": 15,
+  "street_lane_samples": 7497,
+  "connected_navigation_cells": 3235,
+  "residential_doors_m": {
+    "min": 2.055899739265442,
+    "median": 2.055900365114212,
+    "max": 2.1945008039474487
+  },
+  "glb_reimport": "PASS",
+  "glb_bounds_max_error_m": 1.52587890625e-05,
+  "limits": [
+    "No game runtime exists yet; engine/solar regression tests unavailable.",
+    "Navigation checks validate prepared geometry, not a physics controller."
+  ]
+}

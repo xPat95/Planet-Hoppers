@@ -1,0 +1,1007 @@
+{
+  "status": "PASS",
+  "automated_tests_passed": 90,
+  "activation_limit_seconds": 20,
+  "activation_cases": [
+    {
+      "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
+      "hazard_elapsed": 0.03333333507180214,
+      "kind": "Bus",
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 0
+    },
+    {
+      "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
+      "hazard_elapsed": 0.01666666753590107,
+      "kind": "Bus",
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 0
+    },
+    {
+      "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
+      "hazard_elapsed": 0.0069444444961845875,
+      "kind": "Bus",
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
+      "site": 0
+    },
+    {
+      "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
+      "hazard_elapsed": 0.0729999989271164,
+      "kind": "Bus",
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
+      "site": 0
+    },
+    {
+      "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
+      "hazard_elapsed": 0.03333333507180214,
+      "kind": "Bus",
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 1
+    },
+    {
+      "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
+      "hazard_elapsed": 0.01666666753590107,
+      "kind": "Bus",
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 1
+    },
+    {
+      "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
+      "hazard_elapsed": 0.0069444444961845875,
+      "kind": "Bus",
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
+      "site": 1
+    },
+    {
+      "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
+      "hazard_elapsed": 0.0729999989271164,
+      "kind": "Bus",
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
+      "site": 1
+    },
+    {
+      "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
+      "hazard_elapsed": 0.03333333507180214,
+      "kind": "Bus",
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 2
+    },
+    {
+      "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
+      "hazard_elapsed": 0.01666666753590107,
+      "kind": "Bus",
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 2
+    },
+    {
+      "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
+      "hazard_elapsed": 0.0069444444961845875,
+      "kind": "Bus",
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
+      "site": 2
+    },
+    {
+      "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
+      "hazard_elapsed": 0.0729999989271164,
+      "kind": "Bus",
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
+      "site": 2
+    },
+    {
+      "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
+      "hazard_elapsed": 0.03333333507180214,
+      "kind": "Bus",
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 3
+    },
+    {
+      "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
+      "hazard_elapsed": 0.01666666753590107,
+      "kind": "Bus",
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 3
+    },
+    {
+      "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
+      "hazard_elapsed": 0.0069444444961845875,
+      "kind": "Bus",
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
+      "site": 3
+    },
+    {
+      "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
+      "hazard_elapsed": 0.0729999989271164,
+      "kind": "Bus",
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
+      "site": 3
+    },
+    {
+      "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
+      "hazard_elapsed": 0.03333333507180214,
+      "kind": "Bus",
+      "motion_update_start_seconds": 15.933334164321423,
+      "observed_active_seconds": 15.966667499393225,
+      "site": 4
+    },
+    {
+      "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
+      "hazard_elapsed": 0.01666666753590107,
+      "kind": "Bus",
+      "motion_update_start_seconds": 15.90000082924962,
+      "observed_active_seconds": 15.916667496785522,
+      "site": 4
+    },
+    {
+      "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
+      "hazard_elapsed": 0.0069444444961845875,
+      "kind": "Bus",
+      "motion_update_start_seconds": 15.875000118277967,
+      "observed_active_seconds": 15.881944562774152,
+      "site": 4
+    },
+    {
+      "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
+      "hazard_elapsed": 0.0729999989271164,
+      "kind": "Bus",
+      "motion_update_start_seconds": 15.913999766111374,
+      "observed_active_seconds": 15.98699976503849,
+      "site": 4
+    },
+    {
+      "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
+      "hazard_elapsed": 0.03333333507180214,
+      "kind": "Ufo",
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 0
+    },
+    {
+      "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
+      "hazard_elapsed": 0.01666666753590107,
+      "kind": "Ufo",
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 0
+    },
+    {
+      "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
+      "hazard_elapsed": 0.0069444444961845875,
+      "kind": "Ufo",
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
+      "site": 0
+    },
+    {
+      "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
+      "hazard_elapsed": 0.0729999989271164,
+      "kind": "Ufo",
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
+      "site": 0
+    },
+    {
+      "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
+      "hazard_elapsed": 0.03333333507180214,
+      "kind": "Ufo",
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 1
+    },
+    {
+      "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
+      "hazard_elapsed": 0.01666666753590107,
+      "kind": "Ufo",
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 1
+    },
+    {
+      "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
+      "hazard_elapsed": 0.0069444444961845875,
+      "kind": "Ufo",
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
+      "site": 1
+    },
+    {
+      "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
+      "hazard_elapsed": 0.0729999989271164,
+      "kind": "Ufo",
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
+      "site": 1
+    },
+    {
+      "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
+      "hazard_elapsed": 0.03333333507180214,
+      "kind": "Ufo",
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 2
+    },
+    {
+      "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
+      "hazard_elapsed": 0.01666666753590107,
+      "kind": "Ufo",
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 2
+    },
+    {
+      "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
+      "hazard_elapsed": 0.0069444444961845875,
+      "kind": "Ufo",
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
+      "site": 2
+    },
+    {
+      "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
+      "hazard_elapsed": 0.0729999989271164,
+      "kind": "Ufo",
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
+      "site": 2
+    },
+    {
+      "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
+      "hazard_elapsed": 0.03333333507180214,
+      "kind": "Ufo",
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 3
+    },
+    {
+      "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
+      "hazard_elapsed": 0.01666666753590107,
+      "kind": "Ufo",
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 3
+    },
+    {
+      "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
+      "hazard_elapsed": 0.0069444444961845875,
+      "kind": "Ufo",
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
+      "site": 3
+    },
+    {
+      "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
+      "hazard_elapsed": 0.0729999989271164,
+      "kind": "Ufo",
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
+      "site": 3
+    },
+    {
+      "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
+      "hazard_elapsed": 0.03333333507180214,
+      "kind": "Ufo",
+      "motion_update_start_seconds": 15.933334164321423,
+      "observed_active_seconds": 15.966667499393225,
+      "site": 4
+    },
+    {
+      "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
+      "hazard_elapsed": 0.01666666753590107,
+      "kind": "Ufo",
+      "motion_update_start_seconds": 15.90000082924962,
+      "observed_active_seconds": 15.916667496785522,
+      "site": 4
+    },
+    {
+      "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
+      "hazard_elapsed": 0.0069444444961845875,
+      "kind": "Ufo",
+      "motion_update_start_seconds": 15.875000118277967,
+      "observed_active_seconds": 15.881944562774152,
+      "site": 4
+    },
+    {
+      "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
+      "hazard_elapsed": 0.0729999989271164,
+      "kind": "Ufo",
+      "motion_update_start_seconds": 15.913999766111374,
+      "observed_active_seconds": 15.98699976503849,
+      "site": 4
+    },
+    {
+      "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
+      "hazard_elapsed": 0.03333333507180214,
+      "kind": "Sewer",
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 0
+    },
+    {
+      "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
+      "hazard_elapsed": 0.01666666753590107,
+      "kind": "Sewer",
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 0
+    },
+    {
+      "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
+      "hazard_elapsed": 0.0069444444961845875,
+      "kind": "Sewer",
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
+      "site": 0
+    },
+    {
+      "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
+      "hazard_elapsed": 0.0729999989271164,
+      "kind": "Sewer",
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
+      "site": 0
+    },
+    {
+      "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
+      "hazard_elapsed": 0.03333333507180214,
+      "kind": "Sewer",
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 1
+    },
+    {
+      "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
+      "hazard_elapsed": 0.01666666753590107,
+      "kind": "Sewer",
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 1
+    },
+    {
+      "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
+      "hazard_elapsed": 0.0069444444961845875,
+      "kind": "Sewer",
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
+      "site": 1
+    },
+    {
+      "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
+      "hazard_elapsed": 0.0729999989271164,
+      "kind": "Sewer",
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
+      "site": 1
+    },
+    {
+      "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
+      "hazard_elapsed": 0.03333333507180214,
+      "kind": "Sewer",
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 2
+    },
+    {
+      "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
+      "hazard_elapsed": 0.01666666753590107,
+      "kind": "Sewer",
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 2
+    },
+    {
+      "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
+      "hazard_elapsed": 0.0069444444961845875,
+      "kind": "Sewer",
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
+      "site": 2
+    },
+    {
+      "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
+      "hazard_elapsed": 0.0729999989271164,
+      "kind": "Sewer",
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
+      "site": 2
+    },
+    {
+      "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
+      "hazard_elapsed": 0.03333333507180214,
+      "kind": "Sewer",
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 3
+    },
+    {
+      "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
+      "hazard_elapsed": 0.01666666753590107,
+      "kind": "Sewer",
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 3
+    },
+    {
+      "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
+      "hazard_elapsed": 0.0069444444961845875,
+      "kind": "Sewer",
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
+      "site": 3
+    },
+    {
+      "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
+      "hazard_elapsed": 0.0729999989271164,
+      "kind": "Sewer",
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
+      "site": 3
+    },
+    {
+      "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
+      "hazard_elapsed": 0.03333333507180214,
+      "kind": "Sewer",
+      "motion_update_start_seconds": 15.933334164321423,
+      "observed_active_seconds": 15.966667499393225,
+      "site": 4
+    },
+    {
+      "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
+      "hazard_elapsed": 0.01666666753590107,
+      "kind": "Sewer",
+      "motion_update_start_seconds": 15.90000082924962,
+      "observed_active_seconds": 15.916667496785522,
+      "site": 4
+    },
+    {
+      "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
+      "hazard_elapsed": 0.0069444444961845875,
+      "kind": "Sewer",
+      "motion_update_start_seconds": 15.875000118277967,
+      "observed_active_seconds": 15.881944562774152,
+      "site": 4
+    },
+    {
+      "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
+      "hazard_elapsed": 0.0729999989271164,
+      "kind": "Sewer",
+      "motion_update_start_seconds": 15.913999766111374,
+      "observed_active_seconds": 15.98699976503849,
+      "site": 4
+    },
+    {
+      "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
+      "hazard_elapsed": 0.03333333507180214,
+      "kind": "Piano",
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 0
+    },
+    {
+      "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
+      "hazard_elapsed": 0.01666666753590107,
+      "kind": "Piano",
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 0
+    },
+    {
+      "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
+      "hazard_elapsed": 0.0069444444961845875,
+      "kind": "Piano",
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
+      "site": 0
+    },
+    {
+      "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
+      "hazard_elapsed": 0.0729999989271164,
+      "kind": "Piano",
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
+      "site": 0
+    },
+    {
+      "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
+      "hazard_elapsed": 0.03333333507180214,
+      "kind": "Piano",
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 1
+    },
+    {
+      "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
+      "hazard_elapsed": 0.01666666753590107,
+      "kind": "Piano",
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 1
+    },
+    {
+      "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
+      "hazard_elapsed": 0.0069444444961845875,
+      "kind": "Piano",
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
+      "site": 1
+    },
+    {
+      "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
+      "hazard_elapsed": 0.0729999989271164,
+      "kind": "Piano",
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
+      "site": 1
+    },
+    {
+      "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
+      "hazard_elapsed": 0.03333333507180214,
+      "kind": "Piano",
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 2
+    },
+    {
+      "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
+      "hazard_elapsed": 0.01666666753590107,
+      "kind": "Piano",
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 2
+    },
+    {
+      "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
+      "hazard_elapsed": 0.0069444444961845875,
+      "kind": "Piano",
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
+      "site": 2
+    },
+    {
+      "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
+      "hazard_elapsed": 0.0729999989271164,
+      "kind": "Piano",
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
+      "site": 2
+    },
+    {
+      "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
+      "hazard_elapsed": 0.03333333507180214,
+      "kind": "Piano",
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 3
+    },
+    {
+      "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
+      "hazard_elapsed": 0.01666666753590107,
+      "kind": "Piano",
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 3
+    },
+    {
+      "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
+      "hazard_elapsed": 0.0069444444961845875,
+      "kind": "Piano",
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
+      "site": 3
+    },
+    {
+      "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
+      "hazard_elapsed": 0.0729999989271164,
+      "kind": "Piano",
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
+      "site": 3
+    },
+    {
+      "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
+      "hazard_elapsed": 0.03333333507180214,
+      "kind": "Piano",
+      "motion_update_start_seconds": 15.933334164321423,
+      "observed_active_seconds": 15.966667499393225,
+      "site": 4
+    },
+    {
+      "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
+      "hazard_elapsed": 0.01666666753590107,
+      "kind": "Piano",
+      "motion_update_start_seconds": 15.90000082924962,
+      "observed_active_seconds": 15.916667496785522,
+      "site": 4
+    },
+    {
+      "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
+      "hazard_elapsed": 0.0069444444961845875,
+      "kind": "Piano",
+      "motion_update_start_seconds": 15.875000118277967,
+      "observed_active_seconds": 15.881944562774152,
+      "site": 4
+    },
+    {
+      "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
+      "hazard_elapsed": 0.0729999989271164,
+      "kind": "Piano",
+      "motion_update_start_seconds": 15.913999766111374,
+      "observed_active_seconds": 15.98699976503849,
+      "site": 4
+    },
+    {
+      "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
+      "hazard_elapsed": 0.03333333507180214,
+      "kind": "Snowman",
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 0
+    },
+    {
+      "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
+      "hazard_elapsed": 0.01666666753590107,
+      "kind": "Snowman",
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 0
+    },
+    {
+      "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
+      "hazard_elapsed": 0.0069444444961845875,
+      "kind": "Snowman",
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
+      "site": 0
+    },
+    {
+      "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
+      "hazard_elapsed": 0.0729999989271164,
+      "kind": "Snowman",
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
+      "site": 0
+    },
+    {
+      "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
+      "hazard_elapsed": 0.03333333507180214,
+      "kind": "Snowman",
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 1
+    },
+    {
+      "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
+      "hazard_elapsed": 0.01666666753590107,
+      "kind": "Snowman",
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 1
+    },
+    {
+      "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
+      "hazard_elapsed": 0.0069444444961845875,
+      "kind": "Snowman",
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
+      "site": 1
+    },
+    {
+      "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
+      "hazard_elapsed": 0.0729999989271164,
+      "kind": "Snowman",
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
+      "site": 1
+    },
+    {
+      "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
+      "hazard_elapsed": 0.03333333507180214,
+      "kind": "Snowman",
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 2
+    },
+    {
+      "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
+      "hazard_elapsed": 0.01666666753590107,
+      "kind": "Snowman",
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 2
+    },
+    {
+      "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
+      "hazard_elapsed": 0.0069444444961845875,
+      "kind": "Snowman",
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
+      "site": 2
+    },
+    {
+      "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
+      "hazard_elapsed": 0.0729999989271164,
+      "kind": "Snowman",
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
+      "site": 2
+    },
+    {
+      "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
+      "hazard_elapsed": 0.03333333507180214,
+      "kind": "Snowman",
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 3
+    },
+    {
+      "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
+      "hazard_elapsed": 0.01666666753590107,
+      "kind": "Snowman",
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
+      "site": 3
+    },
+    {
+      "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
+      "hazard_elapsed": 0.0069444444961845875,
+      "kind": "Snowman",
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
+      "site": 3
+    },
+    {
+      "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
+      "hazard_elapsed": 0.0729999989271164,
+      "kind": "Snowman",
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
+      "site": 3
+    },
+    {
+      "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
+      "hazard_elapsed": 0.03333333507180214,
+      "kind": "Snowman",
+      "motion_update_start_seconds": 15.933334164321423,
+      "observed_active_seconds": 15.966667499393225,
+      "site": 4
+    },
+    {
+      "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
+      "hazard_elapsed": 0.01666666753590107,
+      "kind": "Snowman",
+      "motion_update_start_seconds": 15.90000082924962,
+      "observed_active_seconds": 15.916667496785522,
+      "site": 4
+    },
+    {
+      "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
+      "hazard_elapsed": 0.0069444444961845875,
+      "kind": "Snowman",
+      "motion_update_start_seconds": 15.875000118277967,
+      "observed_active_seconds": 15.881944562774152,
+      "site": 4
+    },
+    {
+      "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
+      "hazard_elapsed": 0.0729999989271164,
+      "kind": "Snowman",
+      "motion_update_start_seconds": 15.913999766111374,
+      "observed_active_seconds": 15.98699976503849,
+      "site": 4
+    }
+  ],
+  "near_access_rescue_cases": 25,
+  "idle_failure_cases": 25,
+  "original_assets_checked": 145,
+  "original_assets_changed": [],
+  "threat_speeds_and_active_durations_unchanged": true,
+  "intro_unchanged": true,
+  "large_frame_retry_success_and_pause_checks": "PASS",
+  "graphical_world": {
+    "audio": {
+      "loaded": {
+        "assets/audio/music/South Park/exploration.mp3": 860.3950805664062,
+        "assets/audio/music/South Park/intro.mp3": 27.376325607299805,
+        "assets/audio/music/South Park/save_kenny.mp3": 215.71917724609375,
+        "assets/audio/sfx/South Park/danger.mp3": 5.381229400634766,
+        "assets/audio/sfx/South Park/footsteps.mp3": 7.584000110626221,
+        "assets/audio/sfx/South Park/game_over.mp3": 3.082458257675171,
+        "assets/audio/sfx/South Park/success.mp3": 3.4079999923706055,
+        "assets/audio/sfx/South Park/they_killed_kenny.mp3": 3.3436734676361084,
+        "assets/audio/sfx/South Park/victory.mp3": 3.503999948501587
+      },
+      "music_transitions": [
+        "exploration",
+        "save_kenny",
+        "silent",
+        "save_kenny",
+        "silent",
+        "exploration",
+        "save_kenny",
+        "silent",
+        "save_kenny",
+        "silent",
+        "save_kenny",
+        "silent",
+        "exploration",
+        "save_kenny",
+        "silent",
+        "exploration",
+        "silent"
+      ],
+      "plays": {
+        "danger": 9,
+        "game_over": 1,
+        "success": 5,
+        "they_killed_kenny": 3,
+        "victory": 1
+      },
+      "warnings": []
+    },
+    "automatic_progression": true,
+    "captures": [
+      "defeat.png",
+      "hud.png",
+      "kyle.png",
+      "lives.png",
+      "map-zoom.png",
+      "map.png",
+      "pause.png",
+      "search.png",
+      "stan.png",
+      "victory.png"
+    ],
+    "defeat": true,
+    "event_sites": [
+      "Infill_Main:35",
+      "North_Avenue:-145",
+      "Infill_Main:35",
+      "South_Neighborhood:80",
+      "North_Avenue:-145",
+      "South_Neighborhood:80",
+      "Residential_Avenue:-150",
+      "Infill_Main:35",
+      "Central_Avenue:-170"
+    ],
+    "five_distinct_successes": [
+      "Snowman",
+      "Piano",
+      "Ufo",
+      "Sewer",
+      "Bus"
+    ],
+    "kyle_switch_seconds": 2.180000066757202,
+    "manual_listening_verified": false,
+    "map_pause_resume_checks": 5,
+    "note": "Real renderer, native input events and shared raycasting; test player placement/aiming are automated.",
+    "pause_freezes_threat": true,
+    "physical_input_verified": false,
+    "portraits_loaded": 2,
+    "replay_reset": true,
+    "returned_to_exploration": true,
+    "status": "PASS",
+    "three_retries_same_pending_threat": [
+      "Bus",
+      "Bus",
+      "Bus"
+    ],
+    "victory": true,
+    "voice_duration_seconds": 3.3436734676361084
+  },
+  "notes": "The clock is zero before Searching. Interval, generation, relocation and previous success hold are excluded. Search and preparation share the 20-second maximum. Pause/map preserve consumed time.",
+  "activation_clock_origin": "generated_threat_and_fps_controls_available"
+}

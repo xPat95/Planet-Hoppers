@@ -1,0 +1,79 @@
+{
+  "status": "PASS",
+  "automated_tests_passed": 87,
+  "inactivity_cases": 25,
+  "running_and_raycast_rescues": 25,
+  "graphical_regressions": {
+    "fps": "PASS",
+    "kenny": "PASS",
+    "threats": "PASS",
+    "session": "PASS"
+  },
+  "graphical_intro_cases": [
+    {
+      "audio_finished": true,
+      "audio_position": 27.376325607299805,
+      "case": 0,
+      "cursor_captured": true,
+      "duration": 27.376325607299805,
+      "elapsed": 27.376325607299805,
+      "full_intro": true,
+      "kenny_distance": 7.199985504150391
+    },
+    {
+      "audio_finished": false,
+      "audio_position": 0.6000000238418579,
+      "case": 1,
+      "cursor_captured": true,
+      "duration": 27.376325607299805,
+      "elapsed": 0.6000000238418579,
+      "full_intro": true,
+      "kenny_distance": 7.199985504150391
+    },
+    {
+      "audio_finished": false,
+      "audio_position": 0.6000000238418579,
+      "case": 2,
+      "cursor_captured": true,
+      "duration": 27.376325607299805,
+      "elapsed": 0.6000000238418579,
+      "full_intro": true,
+      "kenny_distance": 7.199985504150391
+    },
+    {
+      "audio_finished": false,
+      "audio_position": null,
+      "case": 3,
+      "cursor_captured": true,
+      "duration": 0.699999988079071,
+      "elapsed": 0.70435631275177,
+      "full_intro": false,
+      "kenny_distance": 7.199985504150391
+    }
+  ],
+  "map_pause_resume_checks": 5,
+  "original_assets": {
+    "checked": 145,
+    "changed_files": []
+  },
+  "audio_loaded": 9,
+  "intro_duration_seconds": 27.376325607299805,
+  "intro_mp3_seconds": 27.376325607299805,
+  "manual_listening_verified": false,
+  "physical_input_verified": false,
+  "human_difficulty_balanced": false,
+  "solar_system_available": false,
+  "notes": "Rescue tests run the FPS controller and occluded raycasting from initial spawn; graphical world smoke automates player placement and aiming. Human playtesting remains necessary.",
+  "search_limits_seconds": [
+    10,
+    70
+  ],
+  "preparation_seconds": 2,
+  "threat_durations_seconds": {
+    "bus": 10,
+    "ufo": 12,
+    "sewer": 12,
+    "piano": 11
+  },
+  "snowman_speed": 2.35
+}

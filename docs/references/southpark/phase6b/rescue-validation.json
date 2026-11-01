@@ -1,0 +1,202 @@
+[
+  {
+    "actions": 1,
+    "hazard_seconds": 3.499997854232788,
+    "kind": "Bus",
+    "run_metres": 202.0996856689453,
+    "search_seconds": 32.084991455078125,
+    "site": 0
+  },
+  {
+    "actions": 1,
+    "hazard_seconds": 0.6500000953674316,
+    "kind": "Bus",
+    "run_metres": 531.17578125,
+    "search_seconds": 70.0,
+    "site": 1
+  },
+  {
+    "actions": 1,
+    "hazard_seconds": 3.799997568130493,
+    "kind": "Bus",
+    "run_metres": 194.213623046875,
+    "search_seconds": 30.571613311767578,
+    "site": 2
+  },
+  {
+    "actions": 1,
+    "hazard_seconds": 0.7000001072883606,
+    "kind": "Bus",
+    "run_metres": 371.0464172363281,
+    "search_seconds": 50.91280746459961,
+    "site": 3
+  },
+  {
+    "actions": 1,
+    "hazard_seconds": 0.7000001072883606,
+    "kind": "Bus",
+    "run_metres": 88.76189422607422,
+    "search_seconds": 13.867497444152832,
+    "site": 4
+  },
+  {
+    "actions": 3,
+    "hazard_seconds": 1.100000023841858,
+    "kind": "Ufo",
+    "run_metres": 97.20034790039062,
+    "search_seconds": 18.35624885559082,
+    "site": 0
+  },
+  {
+    "actions": 3,
+    "hazard_seconds": 1.100000023841858,
+    "kind": "Ufo",
+    "run_metres": 167.03311157226562,
+    "search_seconds": 27.556873321533203,
+    "site": 1
+  },
+  {
+    "actions": 3,
+    "hazard_seconds": 1.100000023841858,
+    "kind": "Ufo",
+    "run_metres": 188.90426635742188,
+    "search_seconds": 30.571613311767578,
+    "site": 2
+  },
+  {
+    "actions": 3,
+    "hazard_seconds": 1.5499995946884155,
+    "kind": "Ufo",
+    "run_metres": 376.9754943847656,
+    "search_seconds": 50.91280746459961,
+    "site": 3
+  },
+  {
+    "actions": 3,
+    "hazard_seconds": 1.5499995946884155,
+    "kind": "Ufo",
+    "run_metres": 94.72608947753906,
+    "search_seconds": 13.867497444152832,
+    "site": 4
+  },
+  {
+    "actions": 2,
+    "hazard_seconds": 3.6499977111816406,
+    "kind": "Sewer",
+    "run_metres": 114.08002471923828,
+    "search_seconds": 18.35624885559082,
+    "site": 0
+  },
+  {
+    "actions": 2,
+    "hazard_seconds": 3.6499977111816406,
+    "kind": "Sewer",
+    "run_metres": 183.83267211914062,
+    "search_seconds": 27.556873321533203,
+    "site": 1
+  },
+  {
+    "actions": 2,
+    "hazard_seconds": 4.549999237060547,
+    "kind": "Sewer",
+    "run_metres": 205.94564819335938,
+    "search_seconds": 30.571613311767578,
+    "site": 2
+  },
+  {
+    "actions": 2,
+    "hazard_seconds": 3.3999979496002197,
+    "kind": "Sewer",
+    "run_metres": 392.5171203613281,
+    "search_seconds": 50.91280746459961,
+    "site": 3
+  },
+  {
+    "actions": 2,
+    "hazard_seconds": 3.3999979496002197,
+    "kind": "Sewer",
+    "run_metres": 110.26985168457031,
+    "search_seconds": 13.867497444152832,
+    "site": 4
+  },
+  {
+    "actions": 1,
+    "hazard_seconds": 1.7999993562698364,
+    "kind": "Piano",
+    "run_metres": 101.20035552978516,
+    "search_seconds": 18.35624885559082,
+    "site": 0
+  },
+  {
+    "actions": 1,
+    "hazard_seconds": 1.8499993085861206,
+    "kind": "Piano",
+    "run_metres": 171.432861328125,
+    "search_seconds": 27.556873321533203,
+    "site": 1
+  },
+  {
+    "actions": 1,
+    "hazard_seconds": 1.8499993085861206,
+    "kind": "Piano",
+    "run_metres": 193.30380249023438,
+    "search_seconds": 30.571613311767578,
+    "site": 2
+  },
+  {
+    "actions": 1,
+    "hazard_seconds": 0.8500001430511475,
+    "kind": "Piano",
+    "run_metres": 371.8464050292969,
+    "search_seconds": 50.91280746459961,
+    "site": 3
+  },
+  {
+    "actions": 1,
+    "hazard_seconds": 0.8500001430511475,
+    "kind": "Piano",
+    "run_metres": 89.57891845703125,
+    "search_seconds": 13.867497444152832,
+    "site": 4
+  },
+  {
+    "actions": 3,
+    "hazard_seconds": 4.59999942779541,
+    "kind": "Snowman",
+    "run_metres": 122.48631286621094,
+    "search_seconds": 18.361295700073242,
+    "site": 0
+  },
+  {
+    "actions": 3,
+    "hazard_seconds": 3.6499977111816406,
+    "kind": "Snowman",
+    "run_metres": 375.8895263671875,
+    "search_seconds": 48.36967849731445,
+    "site": 1
+  },
+  {
+    "actions": 3,
+    "hazard_seconds": 3.6499977111816406,
+    "kind": "Snowman",
+    "run_metres": 351.6283874511719,
+    "search_seconds": 45.17063903808594,
+    "site": 2
+  },
+  {
+    "actions": 3,
+    "hazard_seconds": 3.6499977111816406,
+    "kind": "Snowman",
+    "run_metres": 395.4248962402344,
+    "search_seconds": 50.91280746459961,
+    "site": 3
+  },
+  {
+    "actions": 3,
+    "hazard_seconds": 3.6499977111816406,
+    "kind": "Snowman",
+    "run_metres": 113.1619873046875,
+    "search_seconds": 13.867497444152832,
+    "site": 4
+  }
+]

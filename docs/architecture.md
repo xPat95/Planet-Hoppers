@@ -2,9 +2,15 @@
 
 ## Alcance inicial
 
-Esta arquitectura organiza el trabajo sin elegir lenguaje, motor gráfico, librerías ni formatos de configuración. Por ahora solo existen documentación y carpetas reservadas; las responsabilidades siguientes guiarán la implementación futura.
+La organización inicial se definió sin elegir motor. Desde la fase 2 de South Park existe una aplicación mínima Rust/raylib-rs: `src/bin/southpark.rs` inicia el anfitrión de desarrollo de `src/scenes/southpark_dev.rs`. El resto del juego y el sistema solar continúan pendientes.
+
+El controlador, la colisión continua contra AABB, el raycasting y la lectura del manifiesto están en `src/minigames/common/`; la escena y sus tres objetos de prueba están en `src/minigames/southpark/`. `src/graphics/` carga y agrupa las mallas en memoria y aplica iluminación. La configuración de desarrollo está en `config/southpark-dev.json`. Estos módulos no importan naves, progreso, personajes ni sistema solar. Ver [detalle de fase 2](minigames/southpark-phase2.md). Las responsabilidades siguientes siguen guiando las futuras implementaciones.
 
 ## Recursos y configuración
+
+La fase 4A añade `southpark/threats.rs` para lógica/estados/resultados y `graphics/threats.rs` para representar los recursos derivados. La escena anfitriona coordina entradas y objetivos del raycasting compartido; `scenes/threat_smoke.rs` prueba los seis resultados sin integrar vidas ni puntuación. Los temporizadores son específicos de cada evento. Ver [fase 4A](minigames/southpark-phase4a.md).
+
+La fase 3 mantiene la separación: `src/minigames/southpark/kenny.rs` administra a Kenny y `navigation.rs` obtiene su red desde las calles del manifiesto. `src/graphics/billboard.rs` comparte la geometría del plano con la prueba de alfa del raycasting. `src/scenes/kenny_dialogue.rs` representa el diálogo; los estados `Closed`, `Invitation` y `Preparing` pertenecen a South Park. El FPS se detiene durante el diálogo y se retoma al cerrarlo. No se añaden dependencias ni sistemas de interacción paralelos. Ver [fase 3](minigames/southpark-phase3.md).
 
 | Carpeta | Responsabilidad |
 | --- | --- |

@@ -142,14 +142,26 @@ El [plan de desarrollo](docs/development-plan.md) describe las diez etapas y su 
 
 ## Tecnologías utilizadas
 
-**Pendiente de definir**. El equipo aún no ha elegido lenguaje, motor gráfico, librerías ni framework.
+La prueba independiente de South Park utiliza **Rust (edición 2021), raylib-rs 5.5.1 y serde/serde_json**. Renderiza el GLB real en 3D, con controlador FPS, colisiones, raycasting y Kenny como sprite con movimiento autónomo. La integración del juego completo y del sistema solar sigue pendiente.
 
 ## Instrucciones de ejecución
 
-**Pendiente de implementación**. Esta entrega contiene estructura, documentación y modelos de planetas; todavía no hay un juego ejecutable ni dependencias del juego que instalar.
+Desde la raíz del repositorio, con Rust/Cargo y las herramientas nativas de raylib instaladas:
+
+```powershell
+cargo run --locked --bin southpark
+```
+
+No requiere Blender ni teclado numérico para jugar. WASD mueve al jugador, mouse mira, Shift corre, E interactúa y Escape libera/recupera el cursor. Cerrar la ventana o Ctrl+Q termina la prueba. Ver [requisitos, configuración, pruebas y limitaciones de la fase 2](docs/minigames/southpark-phase2.md).
+
+Al entrar se reproduce una presentación 3D sincronizada con el audio completo de `intro.mp3` (**27,376 segundos**); **Espacio o Enter** la saltan. Kenny aparece visible cerca del jugador inicial. Acercarse, apuntarle y pulsar **E** abre **SAVE KENNY!**. **Comenzar desafío** inicia tres vidas y cinco amenazas automáticas en distintas zonas. La búsqueda tiene un plazo calculado por las calles: acercarse adelanta la preparación, pero el peligro comienza también al agotarse el plazo aunque el jugador siga lejos. **M** abre el mapa y pausa el mundo, incluido ese plazo; rueda acerca, arrastrar desplaza, R recentra y M/Escape cierra. P permite pausar o abandonar la partida. **Retroceso** sale de South Park durante exploración libre. Ver [intro, balance, controles y preparación de integración de fase 6B](docs/minigames/southpark-phase6b.md), [zonas y mapas de fase 6A](docs/minigames/southpark-phase6a.md) y [HUD, audio y diálogos de fase 5](docs/minigames/southpark-phase5.md).
 
 
 ## Planetas disponibles para integración
+
+Modo de desarrollo de South Park: `cargo run --locked -- --dev-threats` habilita **F5** autobús, **F6** OVNI, **F7** alcantarilla, **F8** reiniciar y **F9** volver al paseo. También: `cargo run --locked -- --threat bus` (o `ufo`, `sewer`). Estas pruebas no descuentan vidas ni suman salvadas. Ver [fase 4A: controles, recursos y validación](docs/minigames/southpark-phase4a.md).
+
+La fase 4B agrega **F10** piano y **F11** muñeco de nieve: `cargo run --locked -- --threat piano` o `cargo run --locked -- --threat snowman`. No requiere numpad. `--smoke-threats` comprueba ahora los diez resultados de las cinco amenazas. Ver [fase 4B: mecánicas, modelos, pruebas y capturas](docs/minigames/southpark-phase4b.md).
 
 Los siguientes recursos son **planetas del sistema solar**. Sus archivos Blender son las fuentes editables; las exportaciones de juego y sus límites están documentados por franquicia.
 
