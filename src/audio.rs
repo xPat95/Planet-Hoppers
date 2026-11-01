@@ -74,6 +74,8 @@ pub struct AudioController<'a> {
     music_started: [bool; 3],
     voice_started: Option<Instant>,
     intro_started: Option<Instant>,
+    paused_at: Option<Instant>,
+    voice_paused: bool,
     pub audit: AudioAudit,
 }
 impl<'a> AudioController<'a> {
@@ -146,6 +148,8 @@ impl<'a> AudioController<'a> {
             music_started: [false; 3],
             voice_started: None,
             intro_started: None,
+            paused_at: None,
+            voice_paused: false,
             audit,
         }
     }
@@ -293,10 +297,31 @@ impl<'a> AudioController<'a> {
             sound.stop();
         }
     }
+    /// Preserve the dialogue stream and its fallback clock across a pause.
+    /// Music is paused/resumed by set_music; gameplay effects stop immediately.
+    pub fn set_paused(&mut self, paused: bool) {
+        if paused && self.paused_at.is_none() {
+            self.paused_at = Some(Instant::now());
+            self.voice_paused = self.voice.as_ref().is_some_and(|v| v.is_stream_playing());
+            if self.voice_paused {
+                if let Some(v) = &self.voice { v.pause_stream(); }
+            }
+            self.stop_effects();
+        } else if !paused {
+            if let Some(at) = self.paused_at.take() {
+                if let Some(started) = &mut self.voice_started { *started += at.elapsed(); }
+                if self.voice_paused {
+                    if let Some(v) = &self.voice { v.resume_stream(); }
+                }
+                self.voice_paused = false;
+            }
+        }
+    }
     pub fn silence_voice(&mut self) {
         if let Some(v) = &self.voice {
             v.stop_stream();
         }
         self.voice_started = None;
+        self.voice_paused = false;
     }
 }

@@ -1,8 +1,8 @@
 //! Sistema solar jugable (fases 1 a 6). Une la lógica de `solar_system` (órbitas, rotación, proximidad) y `ships`
 //! (vuelo y choques) con la representación de `graphics::space`, y coordina las visitas: "Explorar planeta" cierra
 //! esta ventana, abre el minijuego y al terminar vuelve al mismo sistema solar, con la nave junto al planeta.
-use super::southpark_dev;
-use super::southpark_entry::{SouthParkExit, SouthParkVisits};
+use super::minigame_host::{self, MinigameVisits};
+use crate::minigames::common::host::{MinigameCompletion, MinigameExit, MinigameResult};
 use crate::graphics::resources::save_frame;
 use crate::graphics::space::{draw_sun_glow, Fit, Sky, SpaceModel, SpaceShader, SunShader, SKY_BACKGROUND};
 use crate::ships::{FlightInput, Ship, ShipsConfig};
@@ -63,7 +63,9 @@ struct Session {
     time_scale: f32,
     target: Option<usize>,
     show_orbits: bool,
-    southpark: SouthParkVisits,
+    minigames: MinigameVisits,
+    last_completion: Option<MinigameCompletion>,
+    return_smoke: bool,
     returning_from: Option<usize>,
     /// Prueba de ida y vuelta a un minijuego (--smoke-visit): cuántas visitas van.
     visit_smoke: Option<u32>,
@@ -113,11 +115,13 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     let mut ships_path = root.join("config/ships.json");
     let mut smoke = false;
     let mut visit_smoke = false;
+    let mut return_smoke = false;
     let mut overview = false;
     let mut args = std::env::args().skip(1);
     while let Some(arg) = args.next() {
         match arg.as_str() {
             "--smoke" => smoke = true,
+            "--smoke-returns" => { smoke = true; visit_smoke = true; return_smoke = true; }
             "--smoke-visit" => {
                 smoke = true;
                 visit_smoke = true;
@@ -130,6 +134,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
                 println!("Nave:\n{HELP_SHIP}\nVista general:\n{HELP_OVERVIEW}");
                 println!("--smoke: recorrido automático sin ventana visible; guarda capturas en target/solarsystem/");
                 println!("--smoke-visit: ida y vuelta a South Park (con su prueba de entrada) y captura al volver");
+                println!("--smoke-returns: victoria, derrota, pausa/reinicio/abandono y cuatro visitas a South Park");
                 return Ok(());
             }
             _ => return Err(format!("Opción desconocida: {arg}").into()),
@@ -155,7 +160,9 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         time_scale: 1.0,
         target: Some(0),
         show_orbits: true,
-        southpark: SouthParkVisits::default(),
+        minigames: MinigameVisits::default(),
+        last_completion: None,
+        return_smoke,
         returning_from: None,
         visit_smoke: visit_smoke.then_some(0),
     };
@@ -164,14 +171,32 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
             Exit::Quit => return Ok(()),
             Exit::Visit(i) => {
                 // La ventana del sistema solar ya se cerró: el minijuego abre la suya
-                if session.system.planets[i].config.minigame.as_deref() == Some("southpark") {
-                    // En la prueba, South Park corre su propia prueba de entrada y cierra solo
-                    let args: Vec<String> = session.visit_smoke.map(|_| "--smoke-entry".to_string()).into_iter().collect();
-                    match southpark_dev::run_visit_with_args(&mut session.southpark, args.into_iter())? {
-                        SouthParkExit::WindowClosed if session.visit_smoke.is_none() => return Ok(()),
-                        _ => {}
+                let planet = &session.system.planets[i].config;
+                let id = planet.minigame.clone().ok_or("El planeta no tiene minijuego")?;
+                let args = if session.return_smoke {
+                    let goal = ["victory", "defeat", "abandoned", "abandoned"][session.visit_smoke.unwrap() as usize];
+                    vec!["--smoke-return".into(), goal.into(), "--mute".into()]
+                } else {
+                    session.visit_smoke.map(|_| "--smoke-entry".to_string()).into_iter().collect()
+                };
+                let ship_index = session.ship_index;
+                let orbit_angles: Vec<_> = session.system.planets.iter().map(|p| p.orbit_angle).collect();
+                match minigame_host::run(&id, &mut session.minigames, args.into_iter())? {
+                    MinigameExit::WindowClosed if session.visit_smoke.is_none() => return Ok(()),
+                    MinigameExit::Returned(result) => {
+                        let completion = MinigameCompletion { planet_id: planet.id.clone(), minigame_id: id, result };
+                        println!("MINIGAME_RETURN {}", serde_json::to_string(&completion)?);
+                        session.last_completion = Some(completion);
                     }
+                    _ => {}
                 }
+                if session.return_smoke && (session.ship_index != ship_index
+                    || session.system.planets.iter().map(|p| p.orbit_angle).collect::<Vec<_>>() != orbit_angles) {
+                    return Err("La visita alteró la nave o las órbitas del anfitrión".into());
+                }
+                session.view = View::Ship;
+                session.target = Some(i);
+                session.ship.carried_by = None;
                 if let Some(n) = &mut session.visit_smoke {
                     *n += 1;
                 }
@@ -274,6 +299,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
     let mut snap = true;
     let mut fade = if smoke { 0.0 } else { 1.0_f32 }; // 1 = negro; baja al entrar
     let mut leaving: Option<usize> = None;
+    let mut interaction_armed = false;
     let mut notice: Option<(String, f32)> = None;
     let mut frame = 0u32;
     let mut shake = 0.0_f32;
@@ -297,20 +323,36 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         let mut capture: Option<String> = None;
         if let Some(visits) = s.visit_smoke {
             // Ida: estacionar junto a South Park y explorar. Vuelta: capturar la nave junto al planeta y salir
+            let total = if s.return_smoke { 4 } else { 1 };
             match (visits, frame) {
-                (0, 0) => {
+                (_, 0) => {
+                    if visits > 0 {
+                        if s.system.planet_in_reach(s.ship.position).is_some() || s.ship.speed != 0.0 {
+                            return Err("Retorno inseguro o dentro del alcance de exploración".into());
+                        }
+                        capture = Some(format!("after-return-{visits}.png"));
+                    }
+                    if visits == 0 { park_ship(&mut s.ship, &s.system.planets[southpark], 1.7, true); }
+                    snap = true;
+                }
+                (_, 1) if visits > 0 && visits < total => {
+                    s.ship_index = visits as usize % s.ships.ships.len();
+                    ship_model = load_ship_model(&mut rl, &thread, root, &shader, s);
                     park_ship(&mut s.ship, &s.system.planets[southpark], 1.7, true);
                     snap = true;
                 }
-                (0, 30) => {
+                (_, 30) if visits < total => {
                     capture = Some("before-visit.png".into());
                     if s.system.planet_in_reach(s.ship.position) != Some(southpark) {
                         return Err("La nave no quedó al alcance de South Park".into());
                     }
                     leaving = Some(southpark);
                 }
-                (1.., 60) => capture = Some("after-visit.png".into()),
-                (1.., 61) => {
+                (_, 60) if visits == total => capture = Some("after-visit.png".into()),
+                (_, 61) if visits == total => {
+                    if s.return_smoke && s.last_completion.as_ref().map(|c| c.result) != Some(MinigameResult::Abandoned) {
+                        return Err("Falta resultado del último regreso".into());
+                    }
                     println!("VISIT_SMOKE_PASS visitas={visits}");
                     return Ok(Exit::Quit);
                 }
@@ -505,14 +547,18 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                     shake = 0.25;
                 }
                 in_reach = s.system.planet_in_reach(s.ship.position);
-                let mut explore = pressed(&rl, KeyboardKey::KEY_E) || pressed(&rl, KeyboardKey::KEY_ENTER);
+                if !rl.is_key_down(KeyboardKey::KEY_E) && !rl.is_key_down(KeyboardKey::KEY_ENTER)
+                    && !rl.is_mouse_button_down(MouseButton::MOUSE_BUTTON_LEFT) {
+                    interaction_armed = true;
+                }
+                let mut explore = interaction_armed && (pressed(&rl, KeyboardKey::KEY_E) || pressed(&rl, KeyboardKey::KEY_ENTER));
                 if let Some(i) = in_reach {
                     // También se puede hacer clic en el botón con el mouse suelto
                     let (w, h) = (rl.get_screen_width() as f32, rl.get_screen_height() as f32);
                     let button = Rectangle::new(w / 2.0 - 170.0, h - 150.0, 340.0, 64.0);
                     if !smoke
                         && !rl.is_cursor_hidden()
-                        && rl.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_LEFT)
+                        && interaction_armed && rl.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_LEFT)
                         && button.check_collision_point_rec(rl.get_mouse_position())
                     {
                         explore = true;

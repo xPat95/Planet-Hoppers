@@ -32,6 +32,11 @@ pub struct SessionSmoke {
     zones: Vec<String>,
 }
 impl SessionSmoke {
+    pub fn losing() -> Self {
+        let mut smoke = Self::new();
+        smoke.phase = 3;
+        smoke
+    }
     pub fn new() -> Self {
         Self {
             phase: 0,
@@ -144,7 +149,7 @@ impl SessionSmoke {
                     return Err("Replay did not reset match".into());
                 }
                 self.replayed = true;
-                click_right(rl);
+                if s.state == Paused { click_pause(rl, 1); } else { click_right(rl); }
                 self.phase = 2;
                 self.cooldown = 0.4;
                 return Ok(());
@@ -153,7 +158,7 @@ impl SessionSmoke {
                 self.phase = 3;
             }
             3 if s.state == Defeat && s.elapsed > 0.5 => {
-                click_right(rl);
+                press(KeyboardKey::KEY_ENTER);
                 self.phase = 4;
                 self.cooldown = 0.4;
                 return Ok(());
@@ -174,12 +179,12 @@ impl SessionSmoke {
                 }
                 if self.pause_frames >= 6 {
                     self.paused = true;
-                    click_right(rl);
+                    press(KeyboardKey::KEY_ESCAPE);
                     self.cooldown = 0.4;
                 }
                 return Ok(());
             }
-            6 if s.state == Exploring => {
+            6 if s.state != Paused => {
                 self.phase = 7;
                 return Ok(());
             }
@@ -338,7 +343,7 @@ impl SessionSmoke {
     }
     pub fn finish(
         &self,
-        scene: &SouthParkScene,
+        _scene: &SouthParkScene,
         s: &SaveKennySession,
         audio: &AudioController,
         portraits: usize,
@@ -365,7 +370,7 @@ impl SessionSmoke {
             || audio.audit.plays.get("success") != Some(&5)
             || audio.audit.loaded.len() != 9
             || portraits != 2
-            || !s.assert_exploration_clean(scene)
+            || s.state == SessionState::Paused
             || self.captures.len() != if s.dynamic() { 10 } else { 8 }
             || (s.dynamic() && self.map_checks != 5)
         {
@@ -380,7 +385,7 @@ impl SessionSmoke {
         }
         let report = json!({"status":"PASS","five_distinct_successes":self.passed,"three_retries_same_pending_threat":self.retries,
             "victory":self.victory,"defeat":self.defeat,"replay_reset":self.replayed,"pause_freezes_threat":self.paused,
-            "returned_to_exploration":true,"portraits_loaded":portraits,"audio":audio.audit,
+            "resumed_after_pause":true,"portraits_loaded":portraits,"audio":audio.audit,
             "kyle_switch_seconds":s.config.kyle_switch_seconds,"voice_duration_seconds":audio.voice_duration(),
             "captures":self.captures,"manual_listening_verified":false,"physical_input_verified":false,
             "map_pause_resume_checks":self.map_checks,"event_sites":self.zones,"automatic_progression":s.dynamic(),
@@ -393,7 +398,7 @@ impl SessionSmoke {
         Ok(())
     }
 }
-fn event(kind: u32, params: [i32; 4]) {
+pub(super) fn event(kind: u32, params: [i32; 4]) {
     unsafe {
         ffi::PlayAutomationEvent(ffi::AutomationEvent {
             frame: 0,
@@ -402,10 +407,10 @@ fn event(kind: u32, params: [i32; 4]) {
         });
     }
 }
-fn press(key: KeyboardKey) {
+pub(super) fn press(key: KeyboardKey) {
     event(2, [key as i32, 0, 0, 0]);
 }
-fn click_right(rl: &RaylibHandle) {
+pub(super) fn click_right(rl: &RaylibHandle) {
     event(
         7,
         [
@@ -422,7 +427,12 @@ fn aim(scene: &mut SouthParkScene, p: Vector3) {
     scene.player.yaw = d.z.atan2(d.x);
     scene.player.pitch = d.y.asin();
 }
-fn snapshot(s: &SouthParkScene) -> Vec<f32> {
+pub(super) fn click_pause(rl: &RaylibHandle, index: usize) {
+    let r = super::session_ui::pause_buttons(rl.get_screen_width(), rl.get_screen_height())[index];
+    event(7, [(r.x + r.width * 0.5) as i32, (r.y + r.height * 0.5) as i32, 0, 0]);
+    event(6, [0, 0, 0, 0]);
+}
+pub(super) fn snapshot(s: &SouthParkScene) -> Vec<f32> {
     let mut v = vec![
         s.player.yaw,
         s.player.pitch,

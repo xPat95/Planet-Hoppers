@@ -5,6 +5,7 @@ use crate::minigames::southpark::{
 };
 use raylib::prelude::*;
 use std::path::Path;
+use crate::minigames::common::host::{MinigameResult, ReturnConfirmation};
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum SessionAction {
@@ -13,6 +14,10 @@ pub enum SessionAction {
     Replay,
     Explore,
     Pause,
+    Return(MinigameResult),
+    AskReturn,
+    CancelReturn,
+    ConfirmReturn,
 }
 pub fn threat_name(kind: ThreatKind) -> &'static str {
     match kind {
@@ -36,12 +41,34 @@ fn buttons(w: i32, h: i32) -> [Rectangle; 2] {
         ),
     ]
 }
-pub fn input(rl: &RaylibHandle, session: &SaveKennySession) -> SessionAction {
+pub fn pause_buttons(w: i32, h: i32) -> [Rectangle; 3] {
+    let width = (w as f32 - 64.0).min(560.0);
+    std::array::from_fn(|i| Rectangle::new((w as f32 - width) * 0.5, h as f32 * 0.5 + 20.0 + i as f32 * 50.0, width, 42.0))
+}
+
+pub fn input(rl: &RaylibHandle, session: &SaveKennySession, confirmation: &ReturnConfirmation) -> SessionAction {
     use SessionAction::*;
     use SessionState::*;
-    if matches!(session.state, Preparing | Active | Searching | Interlude)
-        && rl.is_key_pressed(KeyboardKey::KEY_P)
-    {
+    let clicked = rl.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_LEFT);
+    let p = rl.get_mouse_position();
+    let hit = |r: Rectangle| clicked && r.check_collision_point_rec(p);
+    let escape = rl.is_key_pressed(KeyboardKey::KEY_ESCAPE);
+    let enter = rl.is_key_pressed(KeyboardKey::KEY_ENTER);
+    if session.state == Paused {
+        if confirmation.pending {
+            let [yes, no] = buttons(rl.get_screen_width(), rl.get_screen_height());
+            if escape || hit(no) { return CancelReturn; }
+            if enter || hit(yes) { return ConfirmReturn; }
+        } else {
+            let [resume, restart, leave] = pause_buttons(rl.get_screen_width(), rl.get_screen_height());
+            if escape || enter || rl.is_key_pressed(KeyboardKey::KEY_P) || hit(resume) { return Continue; }
+            if hit(restart) { return Replay; }
+            if hit(leave) { return AskReturn; }
+        }
+        return None;
+    }
+    if !matches!(session.state, Victory | Defeat | MapOpen)
+        && (escape || rl.is_key_pressed(KeyboardKey::KEY_P)) {
         return Pause;
     }
     if session.dynamic()
@@ -59,14 +86,14 @@ pub fn input(rl: &RaylibHandle, session: &SaveKennySession) -> SessionAction {
         return None;
     }
     let [a, b] = buttons(rl.get_screen_width(), rl.get_screen_height());
-    let clicked = rl.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_LEFT);
-    let p = rl.get_mouse_position();
     let contains =
         |r: Rectangle| p.x >= r.x && p.x <= r.x + r.width && p.y >= r.y && p.y <= r.y + r.height;
-    if (clicked && contains(b))
-        || (rl.is_key_pressed(KeyboardKey::KEY_ESCAPE) && session.state != Paused)
-    {
-        return Explore;
+    if clicked && contains(b) {
+        return match session.state {
+            Victory => Return(MinigameResult::Victory),
+            Defeat => Return(MinigameResult::Defeat),
+            _ => Explore,
+        };
     }
     if rl.is_key_pressed(KeyboardKey::KEY_ENTER)
         || (clicked && contains(a))
@@ -116,8 +143,14 @@ impl SessionUi {
         event: &ThreatDirector,
         w: i32,
         h: i32,
+        confirmation: &ReturnConfirmation,
     ) {
         use SessionState::*;
+        if s.state == Paused {
+            draw_pause(d, w, h, confirmation);
+            if let Some(error) = &s.error { wrapped(d, error, 32, h - 60, w - 64, 16, Color::ORANGE); }
+            return;
+        }
         if s.state == Relocating {
             d.draw_rectangle(0, 0, w, h, Color::new(15, 30, 46, 255));
             d.draw_text(
@@ -236,14 +269,14 @@ impl SessionUi {
             return;
         }
         if !s.blocks_controls() {
-            d.draw_text("M: mapa | P: pausa", w - 230, 52, 14, Color::LIGHTGRAY);
+            d.draw_text("M: mapa | Esc/P: pausa", w - 230, 52, 14, Color::LIGHTGRAY);
             return;
         }
         let (title,body,left,right)=match s.state {
             Briefing=>(threat_name(s.current()),"Nos reunimos al inicio de North Avenue.\nConfirmá cuando estés listo: después tendrás unos segundos de preparación.","Comenzar amenaza","Volver a explorar"),
             Success=>("¡Kenny está a salvo!","Amenaza superada. La siguiente no comenzará hasta que estés listo.","Siguiente amenaza","Volver a explorar"),
-            Victory=>("¡KENNY SOBREVIVIÓ!","Lograste salvar a Kenny de las cinco amenazas.","Jugar nuevamente","Seguir explorando"),
-            Defeat=>("OH MY GOD! THEY KILLED KENNY!","GAME OVER","Reintentar","Volver a explorar"),
+            Victory=>("¡KENNY SOBREVIVIÓ!","Lograste salvar a Kenny de las cinco amenazas.","Jugar nuevamente","Regresar al sistema solar"),
+            Defeat=>("OH MY GOD! THEY KILLED KENNY!","GAME OVER","Reintentar","Regresar al sistema solar"),
             Paused=>("SAVE KENNY! — Pausa","El peligro está detenido. Podés continuar o abandonar la partida.","Continuar","Abandonar"),
             _=>return,
         };
@@ -347,6 +380,28 @@ impl SessionUi {
         wrapped(d, &revealed, x, y + 64, w - x - 38, 26, Color::WHITE);
     }
 }
+fn draw_pause(d: &mut RaylibDrawHandle, w: i32, h: i32, confirmation: &ReturnConfirmation) {
+    d.draw_rectangle(0, 0, w, h, Color::new(8, 16, 26, 210));
+    let width = (w - 32).min(640);
+    let x = (w - width) / 2;
+    let y = h / 2 - 140;
+    d.draw_rectangle(x, y, width, 330, Color::new(19, 40, 65, 255));
+    let title = if confirmation.pending { "¿Regresar al sistema solar?" } else { "SAVE KENNY! — Pausa" };
+    wrapped(d, title, x + 24, y + 22, width - 48, 24, Color::YELLOW);
+    let body = if confirmation.pending { "Se descartará el progreso de este intento.\nNo se otorgarán recompensas." } else { "La partida y todos sus temporizadores están detenidos." };
+    wrapped(d, body, x + 24, y + 70, width - 48, 18, Color::WHITE);
+    let choices: Vec<_> = if confirmation.pending {
+        buttons(w, h).into_iter().zip(["Confirmar regreso", "Cancelar"]).collect()
+    } else {
+        pause_buttons(w, h).into_iter().zip(["Continuar partida", "Reiniciar minijuego", "Regresar al sistema solar"]).collect()
+    };
+    for (rect, label) in choices {
+        d.draw_rectangle_rec(rect, Color::new(50, 77, 94, 255));
+        let size = 18;
+        d.draw_text(label, rect.x as i32 + (rect.width as i32 - d.measure_text(label, size)) / 2, rect.y as i32 + 12, size, Color::WHITE);
+    }
+}
+
 fn heart(d: &mut RaylibDrawHandle, x: f32, y: f32, color: Color) {
     d.draw_circle_v(Vector2::new(x + 7.5, y + 7.5), 7.5, color);
     d.draw_circle_v(Vector2::new(x + 21.5, y + 7.5), 7.5, color);

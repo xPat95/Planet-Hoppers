@@ -105,9 +105,9 @@ La detección y el arrastre conservan sus unidades relativas: explorar hasta 0,9
 
 - **Proximidad:** el botón **Explorar planeta** aparece cuando la superficie del planeta está a menos de 0,9 radios (`interaction_distance`).
 - **Ida:** con minijuego, la pantalla se funde a negro, la ventana del sistema solar se cierra y se abre la del minijuego. Sin minijuego, avisa que todavía no está listo.
-- **Vuelta:** al salir del minijuego (en South Park, Retroceso durante la exploración libre) vuelve a abrirse el sistema solar tal como estaba. La nave aparece junto al planeta, mirando hacia afuera. Cerrar la ventana del minijuego cierra el juego.
-- **Conexión:** South Park entra por `southpark_dev::run_visit_with_args`, con sus visitas guardadas entre entradas (la intro completa se ve una sola vez). Para conectar otro minijuego hay que poner su nombre en `minigame` y agregar su caso en `scenes/solar_system.rs` (`run`).
-- **Pendiente:** el resultado del minijuego (victoria o derrota) todavía no llega a `gameplay`; eso es la etapa 9.
+- **Vuelta:** `MinigameExit::Returned` comunica `Victory`, `Defeat` o `Abandoned`. El anfitrión conserva todo su estado en memoria y reabre su ventana con la misma nave, detenida a 2,2 radios del planeta y mirando hacia afuera. Es necesario soltar E, Enter y clic antes de volver a explorar. Cerrar la ventana del minijuego conserva el cierre explícito del juego, separado del abandono confirmado.
+- **Conexión:** `scenes::minigame_host::run` despacha por el identificador configurado en el planeta. South Park entra por `southpark_dev::run_visit_with_args`; solo conserva si ya se vio la intro, y cada visita crea un intento nuevo. Los futuros adaptadores devuelven el mismo contrato de `minigames::common::host`. Ver [resultados, pausa y regreso](minigames/host-return.md).
+- **Pendiente:** el anfitrión retiene `MinigameCompletion` con planeta, minijuego y resultado para un futuro consumidor de progreso. No otorga tokens, recompensas ni desbloqueos.
 
 ## Archivos
 
@@ -126,7 +126,8 @@ La detección y el arrastre conservan sus unidades relativas: explorar hasta 0,9
 ```powershell
 cargo test --locked --test solar_system --test ships
 cargo run --locked --bin solarsystem -- --smoke         # recorrido con capturas en target/solarsystem/
-cargo run --locked --bin solarsystem -- --smoke-visit   # ida y vuelta a South Park
+cargo run --locked --bin solarsystem -- --smoke-visit   # prueba anterior de entrada
+cargo run --locked --bin solarsystem -- --smoke-returns # cuatro visitas y los tres resultados
 ```
 
 `--smoke` captura la vista general, cada planeta desde su lado iluminado, la nave, el botón Explorar, la aproximación a South Park (`target/solarsystem/scale-approach.png`) y cada nave de costado. Además genera `sun-far.png`, `sun-medium.png` y `sun-near.png` a 14, 4 y 1,8 radios solares del centro para revisar emisión, detalle y control del halo. Las pruebas de vuelo usan la misma predicción que la escena y verifican 144 rutas: los seis destinos desde el inicio y desde los otros cinco planetas, en normal y turbo, a 60 FPS y con dt de 0,1 s. Cada ruta debe entrar al alcance de exploración en menos de 180 s simulados. También se comprueban partida segura, proporciones, colisiones y proximidad. `--smoke-visit` estaciona la nave junto a South Park, explora, deja que South Park corra su prueba de entrada (la intro dura ~27 s) y captura la vuelta.

@@ -1,4 +1,6 @@
 mod kenny_dialogue;
+pub mod minigame_host;
+mod return_smoke;
 mod session_smoke;
 mod session_ui;
 pub mod solar_system;

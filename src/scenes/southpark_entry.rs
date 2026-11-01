@@ -8,10 +8,28 @@ use std::path::Path;
 pub struct SouthParkVisits {
     pub intro_seen: bool,
 }
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum SouthParkExit {
-    ReturnToHost,
-    WindowClosed,
+/// Kept as an alias for existing callers; all minigames share this contract.
+pub use crate::minigames::common::host::MinigameExit as SouthParkExit;
+
+/// Rebuild only CPU gameplay state. GPU resources and the visit/intro lifetime stay alive.
+pub fn restart_attempt(
+    scene: &mut SouthParkScene,
+    session: &mut crate::minigames::southpark::session::SaveKennySession,
+    manifest: &crate::minigames::common::manifest::SceneManifest,
+    config: &crate::minigames::southpark::DevConfig,
+    seed: u64,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let mut fresh_scene = SouthParkScene::load(manifest, config.clone())?;
+    let mut fresh_session = crate::minigames::southpark::session::SaveKennySession::new(session.config.clone());
+    if let Some(locations) = session.locations.clone() {
+        fresh_session.enable_world(locations, seed);
+        fresh_scene.kenny_hint = false;
+        fresh_session.place_kenny_near_player(&mut fresh_scene)?;
+    }
+    fresh_session.start(&mut fresh_scene, seed)?;
+    *scene = fresh_scene;
+    *session = fresh_session;
+    Ok(())
 }
 #[derive(Clone, Deserialize)]
 #[serde(deny_unknown_fields)]

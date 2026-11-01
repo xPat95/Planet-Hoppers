@@ -382,12 +382,9 @@ impl SaveKennySession {
         Ok(())
     }
     pub fn pause(&mut self) {
-        if matches!(
+        if !matches!(
             self.state,
-            SessionState::Preparing
-                | SessionState::Active
-                | SessionState::Searching
-                | SessionState::Interlude
+            SessionState::Paused | SessionState::MapOpen | SessionState::Victory | SessionState::Defeat
         ) {
             self.paused = Some((self.state, self.elapsed));
             self.enter(SessionState::Paused);
@@ -454,6 +451,11 @@ impl SaveKennySession {
         scene: &mut SouthParkScene,
         voice: VoiceClock,
     ) -> Result<(), String> {
+        // A modal pause must freeze everything, including animation damping and
+        // the activation clock. Resuming restores the exact previous phase.
+        if matches!(self.state, SessionState::Paused | SessionState::MapOpen) {
+            return Ok(());
+        }
         let activation_dt = if dt.is_finite() { dt.max(0.0) } else { 0.0 };
         let dt = if dt.is_finite() {
             dt.clamp(0.0, 0.1)
