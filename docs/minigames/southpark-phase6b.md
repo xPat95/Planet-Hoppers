@@ -104,10 +104,10 @@ primero. Alejarse después no cancela ni reinicia la preparación. El peligro
 real empieza al terminar los **2 s** de advertencia; ningún evento espera
 indefinidamente la proximidad del jugador. Los controles continúan disponibles.
 
-**Ajuste posterior: máximo total de 15 s hasta el movimiento.** El intervalo,
+**Ajuste posterior: máximo total de 20 s hasta el movimiento.** El intervalo,
 la transición, la búsqueda y la preparación comparten un único reloj. Tras una
 salvada también cuenta el aviso de éxito; al reintentar se abre un presupuesto
-nuevo. No se suman 15 s a las otras fases. M y P conservan su pausa del mundo.
+nuevo. No se suman 20 s a las otras fases. M y P conservan su pausa del mundo.
 Ver [detalle y verificaciones del límite total](southpark-activation-deadline.md).
 
 Parámetros en `config/southpark-session.json`:
@@ -116,8 +116,8 @@ Parámetros en `config/southpark-session.json`:
 | --- | --- | --- |
 | `zone_detection_distance` | 90 m | Indica que ya se detectó la zona en el aviso |
 | `arrival_distance` | 32 m | Adelanta la preparación con visión directa |
-| `activation_max_seconds` | 15 s | Máximo total, incluyendo todas las esperas |
-| `search_min_seconds` / `search_max_seconds` | 2 / 15 s | Límites orientativos, sujetos al presupuesto restante |
+| `activation_max_seconds` | 20 s | Máximo total, incluyendo todas las esperas |
+| `search_min_seconds` / `search_max_seconds` | 2 / 20 s | Límites orientativos, sujetos al presupuesto restante |
 | `search_route_factor` | 1,05 | Margen sobre el tiempo estimado corriendo |
 | `search_orientation_seconds` | 3 s | Tiempo adicional para orientarse |
 | `world_interval_seconds` | 6 s | Intervalo entre eventos |
@@ -126,8 +126,8 @@ Parámetros en `config/southpark-session.json`:
 Se calcula una vez:
 
 ```text
-estimación = clamp(longitud_ruta / velocidad_carrera × 1,05 + 3, 2, 15)
-búsqueda = min(estimación, max(0, 15 - tiempo_acumulado - preparación))
+estimación = clamp(longitud_ruta / velocidad_carrera × 1,05 + 3, 2, 20)
+búsqueda = min(estimación, max(0, 20 - tiempo_acumulado - preparación))
 ```
 
 Se reutiliza `event_route` sobre la red de calles. Se prueban el acceso original
@@ -139,8 +139,8 @@ Si no se encuentra ruta, el respaldo documentado es distancia recta×1,8.
 La búsqueda no recalcula ni extiende su plazo al moverse el jugador.
 
 El cálculo por distancia nunca amplía el máximo total. Con los valores actuales,
-el primer evento dispone de unos 6,6 s de búsqueda después del intervalo y la
-transición; los 2 s de preparación están incluidos en los 15 s. Los recorridos
+el primer evento dispone de unos 11,6 s de búsqueda después del intervalo y la
+transición; los 2 s de preparación están incluidos en los 20 s. Los recorridos
 históricos desde el spawn inicial alcanzaban 89–531 m: el nuevo límite exige
 estar bien ubicado y no garantiza salvar a Kenny desde cualquier extremo de
 la ciudad. No se cambiaron la velocidad del jugador ni las de las amenazas.
@@ -238,7 +238,7 @@ aviso, HUD, mapas, diálogos y finales; `intro-validation.json`,
 y `regression-validation.json`.
 
 Esos archivos conservan la evidencia histórica de la entrega 6B. Las pruebas del
-ajuste posterior a 15 s están en
+ajuste posterior a 20 s están en
 [activation-deadline](../references/southpark/activation-deadline/validation.json).
 
 Las pruebas gráficas se ejecutaron silenciadas. Se verificaron carga, streams,

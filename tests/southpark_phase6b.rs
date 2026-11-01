@@ -91,10 +91,10 @@ fn total_deadline_includes_interval_relocation_search_and_preparation() {
                             "{kind:?}/{site}: active but frozen"
                         );
                         assert!(
-                            before < 15.000001,
+                            before < 20.000001,
                             "{kind:?}/{site}: motion started at {before}"
                         );
-                        assert!(time <= 15.0 + f64::from(dt) + 0.000001);
+                        assert!(time <= 20.0 + f64::from(dt) + 0.000001);
                         if kind == ThreatKind::Piano {
                             assert!(w.threats.piano_sway().abs() > 0.0);
                         }
@@ -121,7 +121,7 @@ fn deadline_is_not_extended_by_a_long_frame_or_by_retrying_after_death() {
     let mut s = SaveKennySession::default();
     s.enable_world(catalog(), 44);
     s.start(&mut w, 12).unwrap();
-    s.update(14.9, &mut w, VoiceClock::default()).unwrap();
+    s.update(19.9, &mut w, VoiceClock::default()).unwrap();
     s.update(0.1, &mut w, VoiceClock::default()).unwrap();
     assert_eq!(s.state, SessionState::Active);
     assert!(w.threats.elapsed > 0.0);
@@ -133,12 +133,12 @@ fn deadline_is_not_extended_by_a_long_frame_or_by_retrying_after_death() {
     step(&mut s, &mut w); // Restoring enters the new pending event; controls are still blocked.
     assert_eq!(s.activation_elapsed, 0.0);
     let mut time = 0.0_f64;
-    while s.state != SessionState::Active && time < 15.1 {
+    while s.state != SessionState::Active && time < 20.1 {
         step(&mut s, &mut w);
         time += 0.05;
     }
     assert_eq!(s.state, SessionState::Active);
-    assert!(time <= 15.05);
+    assert!(time <= 20.05);
     assert_eq!(s.current(), pending);
     assert_eq!((s.lives, s.saves), (2, 0));
     assert!(w.threats.elapsed > 0.0);
@@ -180,12 +180,12 @@ fn deadline_counts_success_hold_and_survives_map_and_pause_without_resetting() {
     assert_eq!(s.state, SessionState::Success);
     assert_eq!(s.activation_elapsed, 0.0);
     let mut time = 0.0;
-    while s.state != SessionState::Active && time < 15.1 {
+    while s.state != SessionState::Active && time < 20.1 {
         step(&mut s, &mut w);
         time += 0.05;
     }
     assert_eq!(s.state, SessionState::Active);
-    assert!(time <= 15.05);
+    assert!(time <= 20.05);
     assert!(w.threats.elapsed > 0.0);
     assert_eq!((s.lives, s.saves), (3, 1));
 }

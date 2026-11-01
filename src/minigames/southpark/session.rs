@@ -75,7 +75,7 @@ impl SessionConfig {
         ]
         .iter()
         .all(|v| v.is_finite() && *v > 0.0)
-            || c.activation_max_seconds > 15.0
+            || c.activation_max_seconds > 20.0
             || c.search_max_seconds < c.search_min_seconds
             || c.zone_detection_distance <= c.arrival_distance
             || c.death_animation_seconds < 1.4
@@ -478,7 +478,7 @@ impl SaveKennySession {
             )
         {
             self.activation_elapsed += f64::from(activation_dt);
-            let limit = f64::from(self.config.activation_max_seconds.min(15.0));
+            let limit = f64::from(self.config.activation_max_seconds.min(20.0));
             if self.activation_elapsed >= limit - 0.000001 {
                 if self.state == SessionState::Success {
                     self.index += 1;
@@ -670,7 +670,7 @@ impl SaveKennySession {
                         self.config.search_max_seconds,
                     )
                     .min(
-                        (f64::from(self.config.activation_max_seconds.min(15.0))
+                        (f64::from(self.config.activation_max_seconds.min(20.0))
                             - self.activation_elapsed
                             - f64::from(scene.threats.config.preparation_seconds))
                         .max(0.0) as f32,

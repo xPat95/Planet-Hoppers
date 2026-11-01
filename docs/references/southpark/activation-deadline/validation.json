@@ -1,806 +1,806 @@
 {
   "status": "PASS",
   "automated_tests_passed": 90,
-  "activation_limit_seconds": 15,
+  "activation_limit_seconds": 20,
   "activation_cases": [
     {
       "dt": 0.03333333507180214,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Bus",
-      "motion_update_start_seconds": 14.96666744723916,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
       "site": 0
     },
     {
       "dt": 0.01666666753590107,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Bus",
-      "motion_update_start_seconds": 14.983334114775062,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
       "site": 0
     },
     {
       "dt": 0.0069444444961845875,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Bus",
-      "motion_update_start_seconds": 14.993055667262524,
-      "observed_active_seconds": 15.000000111758709,
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
       "site": 0
     },
     {
       "dt": 0.0729999989271164,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Bus",
-      "motion_update_start_seconds": 14.96499978005886,
-      "observed_active_seconds": 15.037999778985977,
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
       "site": 0
     },
     {
       "dt": 0.03333333507180214,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Bus",
-      "motion_update_start_seconds": 14.96666744723916,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
       "site": 1
     },
     {
       "dt": 0.01666666753590107,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Bus",
-      "motion_update_start_seconds": 14.983334114775062,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
       "site": 1
     },
     {
       "dt": 0.0069444444961845875,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Bus",
-      "motion_update_start_seconds": 14.993055667262524,
-      "observed_active_seconds": 15.000000111758709,
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
       "site": 1
     },
     {
       "dt": 0.0729999989271164,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Bus",
-      "motion_update_start_seconds": 14.96499978005886,
-      "observed_active_seconds": 15.037999778985977,
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
       "site": 1
     },
     {
       "dt": 0.03333333507180214,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Bus",
-      "motion_update_start_seconds": 14.96666744723916,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
       "site": 2
     },
     {
       "dt": 0.01666666753590107,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Bus",
-      "motion_update_start_seconds": 14.983334114775062,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
       "site": 2
     },
     {
       "dt": 0.0069444444961845875,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Bus",
-      "motion_update_start_seconds": 14.993055667262524,
-      "observed_active_seconds": 15.000000111758709,
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
       "site": 2
     },
     {
       "dt": 0.0729999989271164,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Bus",
-      "motion_update_start_seconds": 14.96499978005886,
-      "observed_active_seconds": 15.037999778985977,
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
       "site": 2
     },
     {
       "dt": 0.03333333507180214,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Bus",
-      "motion_update_start_seconds": 14.96666744723916,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
       "site": 3
     },
     {
       "dt": 0.01666666753590107,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Bus",
-      "motion_update_start_seconds": 14.983334114775062,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
       "site": 3
     },
     {
       "dt": 0.0069444444961845875,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Bus",
-      "motion_update_start_seconds": 14.993055667262524,
-      "observed_active_seconds": 15.000000111758709,
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
       "site": 3
     },
     {
       "dt": 0.0729999989271164,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Bus",
-      "motion_update_start_seconds": 14.96499978005886,
-      "observed_active_seconds": 15.037999778985977,
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
       "site": 3
     },
     {
       "dt": 0.03333333507180214,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Bus",
-      "motion_update_start_seconds": 14.96666744723916,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
       "site": 4
     },
     {
       "dt": 0.01666666753590107,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Bus",
-      "motion_update_start_seconds": 14.983334114775062,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
       "site": 4
     },
     {
       "dt": 0.0069444444961845875,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Bus",
-      "motion_update_start_seconds": 14.993055667262524,
-      "observed_active_seconds": 15.000000111758709,
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
       "site": 4
     },
     {
       "dt": 0.0729999989271164,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Bus",
-      "motion_update_start_seconds": 14.96499978005886,
-      "observed_active_seconds": 15.037999778985977,
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
       "site": 4
     },
     {
       "dt": 0.03333333507180214,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Ufo",
-      "motion_update_start_seconds": 14.96666744723916,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
       "site": 0
     },
     {
       "dt": 0.01666666753590107,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Ufo",
-      "motion_update_start_seconds": 14.983334114775062,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
       "site": 0
     },
     {
       "dt": 0.0069444444961845875,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Ufo",
-      "motion_update_start_seconds": 14.993055667262524,
-      "observed_active_seconds": 15.000000111758709,
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
       "site": 0
     },
     {
       "dt": 0.0729999989271164,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Ufo",
-      "motion_update_start_seconds": 14.96499978005886,
-      "observed_active_seconds": 15.037999778985977,
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
       "site": 0
     },
     {
       "dt": 0.03333333507180214,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Ufo",
-      "motion_update_start_seconds": 14.96666744723916,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
       "site": 1
     },
     {
       "dt": 0.01666666753590107,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Ufo",
-      "motion_update_start_seconds": 14.983334114775062,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
       "site": 1
     },
     {
       "dt": 0.0069444444961845875,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Ufo",
-      "motion_update_start_seconds": 14.993055667262524,
-      "observed_active_seconds": 15.000000111758709,
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
       "site": 1
     },
     {
       "dt": 0.0729999989271164,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Ufo",
-      "motion_update_start_seconds": 14.96499978005886,
-      "observed_active_seconds": 15.037999778985977,
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
       "site": 1
     },
     {
       "dt": 0.03333333507180214,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Ufo",
-      "motion_update_start_seconds": 14.96666744723916,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
       "site": 2
     },
     {
       "dt": 0.01666666753590107,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Ufo",
-      "motion_update_start_seconds": 14.983334114775062,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
       "site": 2
     },
     {
       "dt": 0.0069444444961845875,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Ufo",
-      "motion_update_start_seconds": 14.993055667262524,
-      "observed_active_seconds": 15.000000111758709,
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
       "site": 2
     },
     {
       "dt": 0.0729999989271164,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Ufo",
-      "motion_update_start_seconds": 14.96499978005886,
-      "observed_active_seconds": 15.037999778985977,
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
       "site": 2
     },
     {
       "dt": 0.03333333507180214,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Ufo",
-      "motion_update_start_seconds": 14.96666744723916,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
       "site": 3
     },
     {
       "dt": 0.01666666753590107,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Ufo",
-      "motion_update_start_seconds": 14.983334114775062,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
       "site": 3
     },
     {
       "dt": 0.0069444444961845875,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Ufo",
-      "motion_update_start_seconds": 14.993055667262524,
-      "observed_active_seconds": 15.000000111758709,
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
       "site": 3
     },
     {
       "dt": 0.0729999989271164,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Ufo",
-      "motion_update_start_seconds": 14.96499978005886,
-      "observed_active_seconds": 15.037999778985977,
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
       "site": 3
     },
     {
       "dt": 0.03333333507180214,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Ufo",
-      "motion_update_start_seconds": 14.96666744723916,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
       "site": 4
     },
     {
       "dt": 0.01666666753590107,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Ufo",
-      "motion_update_start_seconds": 14.983334114775062,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
       "site": 4
     },
     {
       "dt": 0.0069444444961845875,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Ufo",
-      "motion_update_start_seconds": 14.993055667262524,
-      "observed_active_seconds": 15.000000111758709,
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
       "site": 4
     },
     {
       "dt": 0.0729999989271164,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Ufo",
-      "motion_update_start_seconds": 14.96499978005886,
-      "observed_active_seconds": 15.037999778985977,
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
       "site": 4
     },
     {
       "dt": 0.03333333507180214,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Sewer",
-      "motion_update_start_seconds": 14.96666744723916,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
       "site": 0
     },
     {
       "dt": 0.01666666753590107,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Sewer",
-      "motion_update_start_seconds": 14.983334114775062,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
       "site": 0
     },
     {
       "dt": 0.0069444444961845875,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Sewer",
-      "motion_update_start_seconds": 14.993055667262524,
-      "observed_active_seconds": 15.000000111758709,
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
       "site": 0
     },
     {
       "dt": 0.0729999989271164,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Sewer",
-      "motion_update_start_seconds": 14.96499978005886,
-      "observed_active_seconds": 15.037999778985977,
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
       "site": 0
     },
     {
       "dt": 0.03333333507180214,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Sewer",
-      "motion_update_start_seconds": 14.96666744723916,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
       "site": 1
     },
     {
       "dt": 0.01666666753590107,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Sewer",
-      "motion_update_start_seconds": 14.983334114775062,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
       "site": 1
     },
     {
       "dt": 0.0069444444961845875,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Sewer",
-      "motion_update_start_seconds": 14.993055667262524,
-      "observed_active_seconds": 15.000000111758709,
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
       "site": 1
     },
     {
       "dt": 0.0729999989271164,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Sewer",
-      "motion_update_start_seconds": 14.96499978005886,
-      "observed_active_seconds": 15.037999778985977,
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
       "site": 1
     },
     {
       "dt": 0.03333333507180214,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Sewer",
-      "motion_update_start_seconds": 14.96666744723916,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
       "site": 2
     },
     {
       "dt": 0.01666666753590107,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Sewer",
-      "motion_update_start_seconds": 14.983334114775062,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
       "site": 2
     },
     {
       "dt": 0.0069444444961845875,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Sewer",
-      "motion_update_start_seconds": 14.993055667262524,
-      "observed_active_seconds": 15.000000111758709,
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
       "site": 2
     },
     {
       "dt": 0.0729999989271164,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Sewer",
-      "motion_update_start_seconds": 14.96499978005886,
-      "observed_active_seconds": 15.037999778985977,
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
       "site": 2
     },
     {
       "dt": 0.03333333507180214,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Sewer",
-      "motion_update_start_seconds": 14.96666744723916,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
       "site": 3
     },
     {
       "dt": 0.01666666753590107,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Sewer",
-      "motion_update_start_seconds": 14.983334114775062,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
       "site": 3
     },
     {
       "dt": 0.0069444444961845875,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Sewer",
-      "motion_update_start_seconds": 14.993055667262524,
-      "observed_active_seconds": 15.000000111758709,
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
       "site": 3
     },
     {
       "dt": 0.0729999989271164,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Sewer",
-      "motion_update_start_seconds": 14.96499978005886,
-      "observed_active_seconds": 15.037999778985977,
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
       "site": 3
     },
     {
       "dt": 0.03333333507180214,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Sewer",
-      "motion_update_start_seconds": 14.96666744723916,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
       "site": 4
     },
     {
       "dt": 0.01666666753590107,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Sewer",
-      "motion_update_start_seconds": 14.983334114775062,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
       "site": 4
     },
     {
       "dt": 0.0069444444961845875,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Sewer",
-      "motion_update_start_seconds": 14.993055667262524,
-      "observed_active_seconds": 15.000000111758709,
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
       "site": 4
     },
     {
       "dt": 0.0729999989271164,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Sewer",
-      "motion_update_start_seconds": 14.96499978005886,
-      "observed_active_seconds": 15.037999778985977,
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
       "site": 4
     },
     {
       "dt": 0.03333333507180214,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Piano",
-      "motion_update_start_seconds": 14.96666744723916,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
       "site": 0
     },
     {
       "dt": 0.01666666753590107,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Piano",
-      "motion_update_start_seconds": 14.983334114775062,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
       "site": 0
     },
     {
       "dt": 0.0069444444961845875,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Piano",
-      "motion_update_start_seconds": 14.993055667262524,
-      "observed_active_seconds": 15.000000111758709,
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
       "site": 0
     },
     {
       "dt": 0.0729999989271164,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Piano",
-      "motion_update_start_seconds": 14.96499978005886,
-      "observed_active_seconds": 15.037999778985977,
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
       "site": 0
     },
     {
       "dt": 0.03333333507180214,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Piano",
-      "motion_update_start_seconds": 14.96666744723916,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
       "site": 1
     },
     {
       "dt": 0.01666666753590107,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Piano",
-      "motion_update_start_seconds": 14.983334114775062,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
       "site": 1
     },
     {
       "dt": 0.0069444444961845875,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Piano",
-      "motion_update_start_seconds": 14.993055667262524,
-      "observed_active_seconds": 15.000000111758709,
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
       "site": 1
     },
     {
       "dt": 0.0729999989271164,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Piano",
-      "motion_update_start_seconds": 14.96499978005886,
-      "observed_active_seconds": 15.037999778985977,
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
       "site": 1
     },
     {
       "dt": 0.03333333507180214,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Piano",
-      "motion_update_start_seconds": 14.96666744723916,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
       "site": 2
     },
     {
       "dt": 0.01666666753590107,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Piano",
-      "motion_update_start_seconds": 14.983334114775062,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
       "site": 2
     },
     {
       "dt": 0.0069444444961845875,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Piano",
-      "motion_update_start_seconds": 14.993055667262524,
-      "observed_active_seconds": 15.000000111758709,
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
       "site": 2
     },
     {
       "dt": 0.0729999989271164,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Piano",
-      "motion_update_start_seconds": 14.96499978005886,
-      "observed_active_seconds": 15.037999778985977,
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
       "site": 2
     },
     {
       "dt": 0.03333333507180214,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Piano",
-      "motion_update_start_seconds": 14.96666744723916,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
       "site": 3
     },
     {
       "dt": 0.01666666753590107,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Piano",
-      "motion_update_start_seconds": 14.983334114775062,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
       "site": 3
     },
     {
       "dt": 0.0069444444961845875,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Piano",
-      "motion_update_start_seconds": 14.993055667262524,
-      "observed_active_seconds": 15.000000111758709,
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
       "site": 3
     },
     {
       "dt": 0.0729999989271164,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Piano",
-      "motion_update_start_seconds": 14.96499978005886,
-      "observed_active_seconds": 15.037999778985977,
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
       "site": 3
     },
     {
       "dt": 0.03333333507180214,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Piano",
-      "motion_update_start_seconds": 14.96666744723916,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
       "site": 4
     },
     {
       "dt": 0.01666666753590107,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Piano",
-      "motion_update_start_seconds": 14.983334114775062,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
       "site": 4
     },
     {
       "dt": 0.0069444444961845875,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Piano",
-      "motion_update_start_seconds": 14.993055667262524,
-      "observed_active_seconds": 15.000000111758709,
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
       "site": 4
     },
     {
       "dt": 0.0729999989271164,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Piano",
-      "motion_update_start_seconds": 14.96499978005886,
-      "observed_active_seconds": 15.037999778985977,
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
       "site": 4
     },
     {
       "dt": 0.03333333507180214,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Snowman",
-      "motion_update_start_seconds": 14.96666744723916,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
       "site": 0
     },
     {
       "dt": 0.01666666753590107,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Snowman",
-      "motion_update_start_seconds": 14.983334114775062,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
       "site": 0
     },
     {
       "dt": 0.0069444444961845875,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Snowman",
-      "motion_update_start_seconds": 14.993055667262524,
-      "observed_active_seconds": 15.000000111758709,
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
       "site": 0
     },
     {
       "dt": 0.0729999989271164,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Snowman",
-      "motion_update_start_seconds": 14.96499978005886,
-      "observed_active_seconds": 15.037999778985977,
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
       "site": 0
     },
     {
       "dt": 0.03333333507180214,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Snowman",
-      "motion_update_start_seconds": 14.96666744723916,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
       "site": 1
     },
     {
       "dt": 0.01666666753590107,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Snowman",
-      "motion_update_start_seconds": 14.983334114775062,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
       "site": 1
     },
     {
       "dt": 0.0069444444961845875,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Snowman",
-      "motion_update_start_seconds": 14.993055667262524,
-      "observed_active_seconds": 15.000000111758709,
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
       "site": 1
     },
     {
       "dt": 0.0729999989271164,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Snowman",
-      "motion_update_start_seconds": 14.96499978005886,
-      "observed_active_seconds": 15.037999778985977,
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
       "site": 1
     },
     {
       "dt": 0.03333333507180214,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Snowman",
-      "motion_update_start_seconds": 14.96666744723916,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
       "site": 2
     },
     {
       "dt": 0.01666666753590107,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Snowman",
-      "motion_update_start_seconds": 14.983334114775062,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
       "site": 2
     },
     {
       "dt": 0.0069444444961845875,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Snowman",
-      "motion_update_start_seconds": 14.993055667262524,
-      "observed_active_seconds": 15.000000111758709,
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
       "site": 2
     },
     {
       "dt": 0.0729999989271164,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Snowman",
-      "motion_update_start_seconds": 14.96499978005886,
-      "observed_active_seconds": 15.037999778985977,
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
       "site": 2
     },
     {
       "dt": 0.03333333507180214,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Snowman",
-      "motion_update_start_seconds": 14.96666744723916,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
       "site": 3
     },
     {
       "dt": 0.01666666753590107,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Snowman",
-      "motion_update_start_seconds": 14.983334114775062,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
       "site": 3
     },
     {
       "dt": 0.0069444444961845875,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Snowman",
-      "motion_update_start_seconds": 14.993055667262524,
-      "observed_active_seconds": 15.000000111758709,
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
       "site": 3
     },
     {
       "dt": 0.0729999989271164,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Snowman",
-      "motion_update_start_seconds": 14.96499978005886,
-      "observed_active_seconds": 15.037999778985977,
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
       "site": 3
     },
     {
       "dt": 0.03333333507180214,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Snowman",
-      "motion_update_start_seconds": 14.96666744723916,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.96666770800948,
+      "observed_active_seconds": 20.000001043081284,
       "site": 4
     },
     {
       "dt": 0.01666666753590107,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Snowman",
-      "motion_update_start_seconds": 14.983334114775062,
-      "observed_active_seconds": 15.000000782310963,
+      "motion_update_start_seconds": 19.983334375545382,
+      "observed_active_seconds": 20.000001043081284,
       "site": 4
     },
     {
       "dt": 0.0069444444961845875,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Snowman",
-      "motion_update_start_seconds": 14.993055667262524,
-      "observed_active_seconds": 15.000000111758709,
+      "motion_update_start_seconds": 19.993055704515427,
+      "observed_active_seconds": 20.000000149011612,
       "site": 4
     },
     {
       "dt": 0.0729999989271164,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Snowman",
-      "motion_update_start_seconds": 14.96499978005886,
-      "observed_active_seconds": 15.037999778985977,
+      "motion_update_start_seconds": 19.928999707102776,
+      "observed_active_seconds": 20.001999706029892,
       "site": 4
     }
   ],
@@ -869,20 +869,20 @@
     "event_sites": [
       "North_Avenue:-145",
       "Infill_Main:35",
-      "South_Neighborhood:80",
+      "North_Avenue:-145",
       "Infill_Main:35",
+      "North_Avenue:-145",
+      "South_Neighborhood:80",
       "Residential_Avenue:-150",
       "North_Avenue:-145",
-      "Central_Avenue:-170",
-      "Residential_Avenue:-150",
-      "Infill_Main:35"
+      "Residential_Avenue:-150"
     ],
     "five_distinct_successes": [
+      "Sewer",
+      "Piano",
       "Ufo",
       "Bus",
-      "Piano",
-      "Snowman",
-      "Sewer"
+      "Snowman"
     ],
     "kyle_switch_seconds": 2.180000066757202,
     "manual_listening_verified": false,

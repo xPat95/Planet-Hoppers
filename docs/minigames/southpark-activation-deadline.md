@@ -1,6 +1,6 @@
 # Límite total de activación de amenazas
 
-La partida normal utiliza **un único máximo de 15 segundos**, desde el inicio
+La partida normal utiliza **un único máximo de 20 segundos**, desde el inicio
 del desafío o la salvada anterior hasta que comienza el movimiento del peligro.
 No es un plazo adicional por etapa. La exploración libre antes de aceptar el
 desafío y las cinemáticas siguen funcionando como antes.
@@ -14,12 +14,12 @@ muerte, antes de recuperar los controles.
 La búsqueda reserva los segundos de preparación dentro del tiempo restante:
 
 ```text
-búsqueda = min(estimación_por_ruta, 15 - acumulado - preparación)
+búsqueda = min(estimación_por_ruta, 20 - acumulado - preparación)
 ```
 
 Con la configuración actual, el primer evento tiene aproximadamente
-`6 + 0,4 + 6,6 + 2 = 15 s`. Después de una salvada:
-`1,3 + 6 + 0,4 + 5,3 + 2 = 15 s`.
+`6 + 0,4 + 11,6 + 2 = 20 s`. Después de una salvada:
+`1,3 + 6 + 0,4 + 10,3 + 2 = 20 s`.
 
 Acercarse todavía permite adelantar la preparación. Al vencer el máximo, la
 partida pasa a Active y actualiza el director de amenazas en ese mismo frame:
@@ -35,7 +35,7 @@ esa actualización ya está aplicado. No se modifican el intro ni sus relojes.
 
 M y P suspenden el reloj junto con el mundo. Cerrarlos conserva el tiempo ya
 consumido; no abre otro presupuesto. La configuración admite reducir el máximo,
-pero rechaza valores superiores a 15 s y aplica además ese tope en ejecución.
+pero rechaza valores superiores a 20 s y aplica además ese tope en ejecución.
 
 Las velocidades y duraciones activas permanecen intactas: autobús 10 s, OVNI y
 alcantarilla 12 s, piano 11 s, muñeco 2,35 m/s y jugador corriendo a 8 m/s.

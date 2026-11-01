@@ -9,8 +9,8 @@
   "relocation_seconds": 0.4,
   "zone_detection_distance": 90.0,
   "search_min_seconds": 2.0,
-  "search_max_seconds": 15.0,
+  "search_max_seconds": 20.0,
   "search_orientation_seconds": 3.0,
   "search_route_factor": 1.05,
-  "activation_max_seconds": 15.0
+  "activation_max_seconds": 20.0
 }
