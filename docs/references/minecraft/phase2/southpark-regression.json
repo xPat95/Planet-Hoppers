@@ -1,0 +1,489 @@
+{
+  "status": "passed",
+  "modes": [
+    {
+      "mode": "--smoke",
+      "exit_code": 0,
+      "reports": [
+        {
+          "label": "SMOKE_PASS",
+          "result": {
+            "frames": 90,
+            "manual_hardware_input_tested": false,
+            "model": {
+              "bounds_max": [
+                370.0,
+                23.196308135986328,
+                160.0
+              ],
+              "bounds_min": [
+                -350.0,
+                -1.0,
+                -175.0
+              ],
+              "draw_batches": 28,
+              "material_colors_match": true,
+              "original_primitives": 2734,
+              "source_materials": 27,
+              "triangles": 76212
+            },
+            "notes": "Real OpenGL render and raylib automation events. Physical keyboard/mouse and long play sessions require manual verification.",
+            "raylib_automation": {
+              "E_confirmations": 1,
+              "Escape_recapture": true,
+              "Escape_release": true,
+              "W_Shift": true,
+              "mouse_look": true,
+              "run_blocked_at_m": 2.4999046325683594
+            },
+            "render_mean_ms": 7.12478705882353,
+            "scene_solids": 395,
+            "status": "PASS"
+          }
+        },
+        {
+          "label": "AUDIO_RUNTIME_AUDIT",
+          "result": {
+            "loaded": {
+              "assets/audio/music/South Park/exploration.mp3": 860.3951,
+              "assets/audio/music/South Park/intro.mp3": 27.376326,
+              "assets/audio/music/South Park/save_kenny.mp3": 215.71918,
+              "assets/audio/sfx/South Park/danger.mp3": 5.3812294,
+              "assets/audio/sfx/South Park/footsteps.mp3": 7.584,
+              "assets/audio/sfx/South Park/game_over.mp3": 3.0824583,
+              "assets/audio/sfx/South Park/success.mp3": 3.408,
+              "assets/audio/sfx/South Park/they_killed_kenny.mp3": 3.3436735,
+              "assets/audio/sfx/South Park/victory.mp3": 3.504
+            },
+            "warnings": [],
+            "plays": {
+              "footsteps": 1
+            },
+            "music_transitions": [
+              "exploration",
+              "silent"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "mode": "--smoke-kenny",
+      "exit_code": 0,
+      "seconds": 2.04,
+      "reports": [
+        {
+          "label": "KENNY_SMOKE_PASS",
+          "result": {
+            "accepted_preparation_by_mouse": true,
+            "cancel_resumed_walk": true,
+            "closed_and_recaptured": true,
+            "dialogue_cursor_free": true,
+            "dialogue_opened_with_E": true,
+            "fps_frozen_during_dialogue": true,
+            "frames": 210,
+            "manual_hardware_input_tested": false,
+            "road_edges": 645,
+            "road_nodes": 638,
+            "status": "PASS",
+            "stopped_and_settled": true,
+            "texture": {
+              "height": 367,
+              "opaque_pixels": 566,
+              "transparent_pixels": 17087,
+              "width": 271
+            }
+          }
+        },
+        {
+          "label": "AUDIO_RUNTIME_AUDIT",
+          "result": {
+            "loaded": {
+              "assets/audio/music/South Park/exploration.mp3": 860.3951,
+              "assets/audio/music/South Park/intro.mp3": 27.376326,
+              "assets/audio/music/South Park/save_kenny.mp3": 215.71918,
+              "assets/audio/sfx/South Park/danger.mp3": 5.3812294,
+              "assets/audio/sfx/South Park/footsteps.mp3": 7.584,
+              "assets/audio/sfx/South Park/game_over.mp3": 3.0824583,
+              "assets/audio/sfx/South Park/success.mp3": 3.408,
+              "assets/audio/sfx/South Park/they_killed_kenny.mp3": 3.3436735,
+              "assets/audio/sfx/South Park/victory.mp3": 3.504
+            },
+            "warnings": [],
+            "plays": {
+              "footsteps": 1
+            },
+            "music_transitions": [
+              "exploration",
+              "silent"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "mode": "--smoke-threats",
+      "exit_code": 0,
+      "seconds": 3.62,
+      "reports": [
+        {
+          "label": "THREATS_SMOKE_PASS",
+          "result": {
+            "cases": [
+              {
+                "E_presses": 1,
+                "kind": "Bus",
+                "restart": "PASS",
+                "result": "Survived",
+                "return_to_exploration": "PASS"
+              },
+              {
+                "E_presses": 0,
+                "kind": "Bus",
+                "restart": "PASS",
+                "result": "Died",
+                "return_to_exploration": "PASS"
+              },
+              {
+                "E_presses": 3,
+                "kind": "Ufo",
+                "restart": "PASS",
+                "result": "Survived",
+                "return_to_exploration": "PASS"
+              },
+              {
+                "E_presses": 0,
+                "kind": "Ufo",
+                "restart": "PASS",
+                "result": "Died",
+                "return_to_exploration": "PASS"
+              },
+              {
+                "E_presses": 2,
+                "kind": "Sewer",
+                "restart": "PASS",
+                "result": "Survived",
+                "return_to_exploration": "PASS"
+              },
+              {
+                "E_presses": 0,
+                "kind": "Sewer",
+                "restart": "PASS",
+                "result": "Died",
+                "return_to_exploration": "PASS"
+              },
+              {
+                "E_presses": 1,
+                "kind": "Piano",
+                "restart": "PASS",
+                "result": "Survived",
+                "return_to_exploration": "PASS"
+              },
+              {
+                "E_presses": 0,
+                "kind": "Piano",
+                "restart": "PASS",
+                "result": "Died",
+                "return_to_exploration": "PASS"
+              },
+              {
+                "E_presses": 3,
+                "kind": "Snowman",
+                "restart": "PASS",
+                "result": "Survived",
+                "return_to_exploration": "PASS"
+              },
+              {
+                "E_presses": 0,
+                "kind": "Snowman",
+                "restart": "PASS",
+                "result": "Died",
+                "return_to_exploration": "PASS"
+              }
+            ],
+            "frames": 1258,
+            "manual_hardware_input_tested": false,
+            "model_loading_and_dimensions": "PASS",
+            "note": "Real OpenGL and shared raycasting/E input; automated player placement, aiming and cinematic capture cameras.",
+            "status": "PASS"
+          }
+        },
+        {
+          "label": "AUDIO_RUNTIME_AUDIT",
+          "result": {
+            "loaded": {
+              "assets/audio/music/South Park/exploration.mp3": 860.3951,
+              "assets/audio/music/South Park/intro.mp3": 27.376326,
+              "assets/audio/music/South Park/save_kenny.mp3": 215.71918,
+              "assets/audio/sfx/South Park/danger.mp3": 5.3812294,
+              "assets/audio/sfx/South Park/footsteps.mp3": 7.584,
+              "assets/audio/sfx/South Park/game_over.mp3": 3.0824583,
+              "assets/audio/sfx/South Park/success.mp3": 3.408,
+              "assets/audio/sfx/South Park/they_killed_kenny.mp3": 3.3436735,
+              "assets/audio/sfx/South Park/victory.mp3": 3.504
+            },
+            "warnings": [],
+            "plays": {},
+            "music_transitions": [
+              "exploration",
+              "silent"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "mode": "--smoke-world",
+      "exit_code": 0,
+      "seconds": 19.69,
+      "reports": [
+        {
+          "label": "SESSION_SMOKE_PASS",
+          "result": {
+            "audio": {
+              "loaded": {
+                "assets/audio/music/South Park/exploration.mp3": 860.3950805664062,
+                "assets/audio/music/South Park/intro.mp3": 27.376325607299805,
+                "assets/audio/music/South Park/save_kenny.mp3": 215.71917724609375,
+                "assets/audio/sfx/South Park/danger.mp3": 5.381229400634766,
+                "assets/audio/sfx/South Park/footsteps.mp3": 7.584000110626221,
+                "assets/audio/sfx/South Park/game_over.mp3": 3.082458257675171,
+                "assets/audio/sfx/South Park/success.mp3": 3.4079999923706055,
+                "assets/audio/sfx/South Park/they_killed_kenny.mp3": 3.3436734676361084,
+                "assets/audio/sfx/South Park/victory.mp3": 3.503999948501587
+              },
+              "music_transitions": [
+                "exploration",
+                "save_kenny",
+                "silent",
+                "save_kenny",
+                "silent",
+                "save_kenny",
+                "silent",
+                "save_kenny",
+                "silent",
+                "save_kenny",
+                "silent",
+                "save_kenny",
+                "silent",
+                "save_kenny",
+                "silent"
+              ],
+              "plays": {
+                "danger": 9,
+                "game_over": 1,
+                "success": 5,
+                "they_killed_kenny": 3,
+                "victory": 1
+              },
+              "warnings": []
+            },
+            "automatic_progression": true,
+            "captures": [
+              "defeat.png",
+              "hud.png",
+              "kyle.png",
+              "lives.png",
+              "map-zoom.png",
+              "map.png",
+              "pause.png",
+              "search.png",
+              "stan.png",
+              "victory.png"
+            ],
+            "defeat": true,
+            "event_sites": [
+              "South_Neighborhood:80",
+              "Infill_Main:35",
+              "North_Avenue:-145",
+              "Residential_Avenue:-150",
+              "South_Neighborhood:80",
+              "North_Avenue:-145",
+              "Residential_Avenue:-150",
+              "South_Neighborhood:80",
+              "North_Avenue:-145"
+            ],
+            "five_distinct_successes": [
+              "Ufo",
+              "Bus",
+              "Snowman",
+              "Sewer",
+              "Piano"
+            ],
+            "kyle_switch_seconds": 2.180000066757202,
+            "manual_listening_verified": false,
+            "map_pause_resume_checks": 5,
+            "note": "Real renderer, native input events and shared raycasting; test player placement/aiming are automated.",
+            "pause_freezes_threat": true,
+            "physical_input_verified": false,
+            "portraits_loaded": 2,
+            "replay_reset": true,
+            "resumed_after_pause": true,
+            "status": "PASS",
+            "three_retries_same_pending_threat": [
+              "Sewer",
+              "Sewer",
+              "Sewer"
+            ],
+            "victory": true,
+            "voice_duration_seconds": 3.3436734676361084
+          }
+        },
+        {
+          "label": "AUDIO_RUNTIME_AUDIT",
+          "result": {
+            "loaded": {
+              "assets/audio/music/South Park/exploration.mp3": 860.3951,
+              "assets/audio/music/South Park/intro.mp3": 27.376326,
+              "assets/audio/music/South Park/save_kenny.mp3": 215.71918,
+              "assets/audio/sfx/South Park/danger.mp3": 5.3812294,
+              "assets/audio/sfx/South Park/footsteps.mp3": 7.584,
+              "assets/audio/sfx/South Park/game_over.mp3": 3.0824583,
+              "assets/audio/sfx/South Park/success.mp3": 3.408,
+              "assets/audio/sfx/South Park/they_killed_kenny.mp3": 3.3436735,
+              "assets/audio/sfx/South Park/victory.mp3": 3.504
+            },
+            "warnings": [],
+            "plays": {
+              "danger": 9,
+              "game_over": 1,
+              "success": 5,
+              "they_killed_kenny": 3,
+              "victory": 1
+            },
+            "music_transitions": [
+              "exploration",
+              "save_kenny",
+              "silent",
+              "save_kenny",
+              "silent",
+              "save_kenny",
+              "silent",
+              "save_kenny",
+              "silent",
+              "save_kenny",
+              "silent",
+              "save_kenny",
+              "silent",
+              "save_kenny",
+              "silent"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "mode": "--smoke-entry",
+      "exit_code": 0,
+      "seconds": 31.15,
+      "reports": [
+        {
+          "label": "ENTRY_SMOKE_PASS",
+          "result": {
+            "audio": {
+              "loaded": {
+                "assets/audio/music/South Park/exploration.mp3": 860.3950805664062,
+                "assets/audio/music/South Park/intro.mp3": 27.376325607299805,
+                "assets/audio/music/South Park/save_kenny.mp3": 215.71917724609375,
+                "assets/audio/sfx/South Park/danger.mp3": 5.381229400634766,
+                "assets/audio/sfx/South Park/footsteps.mp3": 7.584000110626221,
+                "assets/audio/sfx/South Park/game_over.mp3": 3.082458257675171,
+                "assets/audio/sfx/South Park/success.mp3": 3.4079999923706055,
+                "assets/audio/sfx/South Park/they_killed_kenny.mp3": 3.3436734676361084,
+                "assets/audio/sfx/South Park/victory.mp3": 3.503999948501587
+              },
+              "music_transitions": [
+                "intro",
+                "exploration",
+                "intro",
+                "exploration",
+                "intro",
+                "exploration",
+                "silent",
+                "exploration"
+              ],
+              "plays": {},
+              "warnings": []
+            },
+            "cases": [
+              {
+                "audio_finished": true,
+                "audio_position": 27.376325607299805,
+                "case": 0,
+                "cursor_captured": true,
+                "duration": 27.376325607299805,
+                "elapsed": 27.376325607299805,
+                "full_intro": true,
+                "kenny_distance": 7.199985504150391
+              },
+              {
+                "audio_finished": false,
+                "audio_position": 0.6000000238418579,
+                "case": 1,
+                "cursor_captured": true,
+                "duration": 27.376325607299805,
+                "elapsed": 0.6000000238418579,
+                "full_intro": true,
+                "kenny_distance": 7.199985504150391
+              },
+              {
+                "audio_finished": false,
+                "audio_position": 0.6000000238418579,
+                "case": 2,
+                "cursor_captured": true,
+                "duration": 27.376325607299805,
+                "elapsed": 0.6000000238418579,
+                "full_intro": true,
+                "kenny_distance": 7.199985504150391
+              },
+              {
+                "audio_finished": false,
+                "audio_position": null,
+                "case": 3,
+                "cursor_captured": true,
+                "duration": 0.699999988079071,
+                "elapsed": 0.7013565897941589,
+                "full_intro": false,
+                "kenny_distance": 7.199985504150391
+              }
+            ],
+            "clock": "stream playback clock; first intro waits for natural audio completion",
+            "manual_listening_verified": false,
+            "physical_input_verified": false,
+            "status": "PASS"
+          }
+        },
+        {
+          "label": "AUDIO_RUNTIME_AUDIT",
+          "result": {
+            "loaded": {
+              "assets/audio/music/South Park/exploration.mp3": 860.3951,
+              "assets/audio/music/South Park/intro.mp3": 27.376326,
+              "assets/audio/music/South Park/save_kenny.mp3": 215.71918,
+              "assets/audio/sfx/South Park/danger.mp3": 5.3812294,
+              "assets/audio/sfx/South Park/footsteps.mp3": 7.584,
+              "assets/audio/sfx/South Park/game_over.mp3": 3.0824583,
+              "assets/audio/sfx/South Park/success.mp3": 3.408,
+              "assets/audio/sfx/South Park/they_killed_kenny.mp3": 3.3436735,
+              "assets/audio/sfx/South Park/victory.mp3": 3.504
+            },
+            "warnings": [],
+            "plays": {},
+            "music_transitions": [
+              "intro",
+              "exploration",
+              "intro",
+              "exploration",
+              "intro",
+              "exploration",
+              "silent",
+              "exploration",
+              "silent"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "note": "Extended modes muted; no manual auditory verification."
+}

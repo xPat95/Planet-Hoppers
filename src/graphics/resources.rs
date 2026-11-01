@@ -61,6 +61,13 @@ pub struct StaticModel {
     model: Model,
     shader: Shader,
     pub audit: ModelAudit,
+    surfaces: Option<Vec<Surface>>,
+}
+
+struct Surface {
+    alpha_cutoff: f32,
+    textured: i32,
+    double_sided: bool,
 }
 
 pub(crate) fn glb_document(path: &Path) -> Result<Value, Box<dyn std::error::Error>> {
@@ -119,6 +126,24 @@ impl StaticModel {
         path: &Path,
         flat_ground_material: Option<&str>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
+        Self::load_style(rl, thread, path, flat_ground_material, false)
+    }
+    /// Same GLB loader and geometry batching; opt-in pixel textures and daylight.
+    /// Existing South Park callers retain their original shader and render state.
+    pub fn load_overworld(
+        rl: &mut RaylibHandle,
+        thread: &RaylibThread,
+        path: &Path,
+    ) -> Result<Self, Box<dyn std::error::Error>> {
+        Self::load_style(rl, thread, path, None, true)
+    }
+    fn load_style(
+        rl: &mut RaylibHandle,
+        thread: &RaylibThread,
+        path: &Path,
+        flat_ground_material: Option<&str>,
+        overworld: bool,
+    ) -> Result<Self, Box<dyn std::error::Error>> {
         let gltf = glb_document(path)?;
         let source_materials = gltf["materials"]
             .as_array()
@@ -151,9 +176,58 @@ impl StaticModel {
             }
         }
         let bounds = model.get_model_bounding_box();
-        let mut shader = winter_shader(rl, thread);
+        let mut surfaces = overworld.then(|| {
+            vec![Surface {
+                alpha_cutoff: -1.0,
+                textured: 0,
+                double_sided: false,
+            }]
+        });
+        if let Some(surfaces) = &mut surfaces {
+            for (i, source) in source_materials.iter().enumerate() {
+                let textured = source["pbrMetallicRoughness"]
+                    .get("baseColorTexture")
+                    .is_some();
+                let texture = model.materials()[i + 1].maps()[0].texture;
+                if textured && (texture.id == 0 || texture.width != 16 || texture.height != 16) {
+                    return Err(
+                        format!("Missing Minecraft pixel texture: {}", source["name"]).into(),
+                    );
+                }
+                unsafe {
+                    // Texture is owned by Model; do not manufacture another owner.
+                    ffi::SetTextureFilter(texture, ffi::TextureFilter::TEXTURE_FILTER_POINT as i32);
+                    ffi::SetTextureWrap(texture, ffi::TextureWrap::TEXTURE_WRAP_REPEAT as i32);
+                }
+                surfaces.push(Surface {
+                    alpha_cutoff: if source["alphaMode"] == "MASK" {
+                        source["alphaCutoff"].as_f64().unwrap_or(0.5) as f32
+                    } else {
+                        -1.0
+                    },
+                    textured: i32::from(textured),
+                    double_sided: source["doubleSided"].as_bool().unwrap_or(false),
+                });
+            }
+        }
+        let mut shader = if overworld {
+            rl.load_shader_from_memory(
+                thread,
+                Some(include_str!("shaders/winter.vs")),
+                Some(include_str!("shaders/overworld.fs")),
+            )
+        } else {
+            winter_shader(rl, thread)
+        };
         if !shader.is_shader_valid() || shader.get_shader_location("cameraPosition") < 0 {
-            return Err("Winter lighting shader failed to compile".into());
+            return Err("Scene lighting shader failed to compile".into());
+        }
+        if overworld
+            && ["alphaCutoff", "textureIsSrgb"]
+                .iter()
+                .any(|name| shader.get_shader_location(name) < 0)
+        {
+            return Err("Overworld texture/alpha shader uniforms missing".into());
         }
         for material in model.materials_mut() {
             // WeakShader is a non-owning handle; StaticModel owns the Shader.
@@ -240,10 +314,21 @@ impl StaticModel {
             model,
             shader,
             audit,
+            surfaces,
         })
     }
     pub fn draw(&mut self, draw: &mut RaylibMode3D<RaylibDrawHandle>, camera_position: Vector3) {
         self.draw_at(draw, camera_position, Vector3::zero(), 0.0);
+    }
+    pub fn pixel_material_audit(&self) -> Option<serde_json::Value> {
+        self.surfaces.as_ref().map(|surfaces| {
+            serde_json::json!({
+                "point_filtered_textures": surfaces.iter().filter(|s| s.textured == 1).count(),
+                "alpha_mask_materials": surfaces.iter().filter(|s| s.alpha_cutoff >= 0.0).count(),
+                "double_sided_materials": surfaces.iter().filter(|s| s.double_sided).count(),
+                "color_space": "sRGB textures decoded before daylight lighting",
+            })
+        })
     }
     pub fn draw_at(
         &mut self,
@@ -273,6 +358,18 @@ impl StaticModel {
         let location = self.shader.get_shader_location("cameraPosition");
         self.shader.set_shader_value(location, camera_position);
         for batch in &self.batches {
+            if let Some(surfaces) = &self.surfaces {
+                let surface = &surfaces[batch.material];
+                let location = self.shader.get_shader_location("alphaCutoff");
+                self.shader.set_shader_value(location, surface.alpha_cutoff);
+                let location = self.shader.get_shader_location("textureIsSrgb");
+                self.shader.set_shader_value(location, surface.textured);
+                if surface.double_sided {
+                    unsafe {
+                        ffi::rlDisableBackfaceCulling();
+                    }
+                }
+            }
             // A known flat ground is a visual background. Drawing it first
             // without depth writes prevents distant roads 12 mm above it from
             // fighting the terrain's depth, without changing any asset vertices.
@@ -286,6 +383,15 @@ impl StaticModel {
                 self.model.materials()[batch.material].clone(),
                 transform,
             );
+            if self
+                .surfaces
+                .as_ref()
+                .is_some_and(|s| s[batch.material].double_sided)
+            {
+                unsafe {
+                    ffi::rlEnableBackfaceCulling();
+                }
+            }
             if batch.background {
                 unsafe {
                     ffi::rlEnableDepthMask();
