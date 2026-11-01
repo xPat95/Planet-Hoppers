@@ -258,6 +258,8 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
     let mut ship_model = load_ship_model(&mut rl, &thread, root, &shader, s);
     let sky = Sky::new();
     let outer = outer_orbit(&s.system);
+    // Las pruebas siguen a South Park por identidad, aunque cambie de órbita.
+    let southpark = s.system.planets.iter().position(|p| p.config.id == "southpark").expect("South Park validado");
     let captures = root.join("target/solarsystem");
     if smoke {
         std::fs::create_dir_all(&captures)?;
@@ -298,15 +300,15 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             // Ida: estacionar junto a South Park y explorar. Vuelta: capturar la nave junto al planeta y salir
             match (visits, frame) {
                 (0, 0) => {
-                    park_ship(&mut s.ship, &s.system.planets[1], 1.7, true);
+                    park_ship(&mut s.ship, &s.system.planets[southpark], 1.7, true);
                     snap = true;
                 }
                 (0, 30) => {
                     capture = Some("before-visit.png".into());
-                    if s.system.planet_in_reach(s.ship.position) != Some(1) {
+                    if s.system.planet_in_reach(s.ship.position) != Some(southpark) {
                         return Err("La nave no quedó al alcance de South Park".into());
                     }
-                    leaving = Some(1);
+                    leaving = Some(southpark);
                 }
                 (1.., 60) => capture = Some("after-visit.png".into()),
                 (1.., 61) => {
@@ -338,12 +340,12 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 }
                 f if f == 20 + n * 15 => {
                     s.view = View::Ship;
-                    park_ship(&mut s.ship, &s.system.planets[1], 4.0, true);
+                    park_ship(&mut s.ship, &s.system.planets[southpark], 4.0, true);
                     snap = true;
                 }
                 f if f == 35 + n * 15 => capture = Some("ship.png".into()),
                 f if f == 40 + n * 15 => {
-                    park_ship(&mut s.ship, &s.system.planets[1], 1.7, true);
+                    park_ship(&mut s.ship, &s.system.planets[southpark], 1.7, true);
                     snap = true;
                 }
                 f if f == 55 + n * 15 => capture = Some("explore.png".into()),

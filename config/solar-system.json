@@ -7,30 +7,32 @@
   "interaction_distance": 0.9,
   "planets": [
     {
-      "id": "minecraft",
-      "name": "Minecraft",
+      "id": "halloween",
+      "name": "Halloween",
       "orbit_radius": 150.0,
-      "radius": 16.0,
+      "radius": 18.0,
       "orbit_speed_degrees": 2.2,
-      "rotation_speed_degrees": 10.0,
-      "axial_tilt_degrees": 8.0,
-      "start_angle_degrees": 0.0,
-      "color": "#5daa3c",
-      "model": "assets/models/planets/minecraft/exports/minecraft_planet.glb",
+      "rotation_speed_degrees": -7.0,
+      "axial_tilt_degrees": 10.0,
+      "start_angle_degrees": 40.0,
+      "color": "#8b1a1a",
+      "model": "assets/models/planets/halloween/exports/halloween_planet.glb",
+      "model_far": "assets/models/planets/halloween/exports/halloween_planet_far.glb",
       "minigame": null
     },
     {
-      "id": "southpark",
-      "name": "South Park",
+      "id": "starwars",
+      "name": "Star Wars",
       "orbit_radius": 230.0,
-      "radius": 18.0,
+      "radius": 22.0,
       "orbit_speed_degrees": 1.5,
-      "rotation_speed_degrees": 8.0,
-      "axial_tilt_degrees": 15.0,
-      "start_angle_degrees": 140.0,
-      "color": "#e8eef2",
-      "model": "assets/models/planets/southpark/exports/southpark_planet.glb",
-      "minigame": "southpark"
+      "rotation_speed_degrees": 5.0,
+      "axial_tilt_degrees": 5.0,
+      "start_angle_degrees": 310.0,
+      "color": "#8a8f98",
+      "model": "assets/models/planets/starwars/exports/starwars_death_star_planet_near.glb",
+      "model_far": "assets/models/planets/starwars/exports/starwars_death_star_planet_far.glb",
+      "minigame": null
     },
     {
       "id": "smilingfriends",
@@ -46,17 +48,16 @@
       "minigame": null
     },
     {
-      "id": "halloween",
-      "name": "Halloween",
+      "id": "minecraft",
+      "name": "Minecraft",
       "orbit_radius": 410.0,
-      "radius": 18.0,
+      "radius": 16.0,
       "orbit_speed_degrees": 0.85,
-      "rotation_speed_degrees": -7.0,
-      "axial_tilt_degrees": 10.0,
-      "start_angle_degrees": 40.0,
-      "color": "#8b1a1a",
-      "model": "assets/models/planets/halloween/exports/halloween_planet.glb",
-      "model_far": "assets/models/planets/halloween/exports/halloween_planet_far.glb",
+      "rotation_speed_degrees": 10.0,
+      "axial_tilt_degrees": 8.0,
+      "start_angle_degrees": 0.0,
+      "color": "#5daa3c",
+      "model": "assets/models/planets/minecraft/exports/minecraft_planet.glb",
       "minigame": null
     },
     {
@@ -74,18 +75,17 @@
       "minigame": null
     },
     {
-      "id": "starwars",
-      "name": "Star Wars",
+      "id": "southpark",
+      "name": "South Park",
       "orbit_radius": 590.0,
-      "radius": 22.0,
+      "radius": 18.0,
       "orbit_speed_degrees": 0.55,
-      "rotation_speed_degrees": 5.0,
-      "axial_tilt_degrees": 5.0,
-      "start_angle_degrees": 310.0,
-      "color": "#8a8f98",
-      "model": "assets/models/planets/starwars/exports/starwars_death_star_planet_near.glb",
-      "model_far": "assets/models/planets/starwars/exports/starwars_death_star_planet_far.glb",
-      "minigame": null
+      "rotation_speed_degrees": 8.0,
+      "axial_tilt_degrees": 15.0,
+      "start_angle_degrees": 140.0,
+      "color": "#e8eef2",
+      "model": "assets/models/planets/southpark/exports/southpark_planet.glb",
+      "minigame": "southpark"
     }
   ]
 }

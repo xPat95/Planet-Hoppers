@@ -82,7 +82,7 @@ fn no_atraviesa_el_sol_ni_los_planetas() {
 #[test]
 fn acompana_al_planeta_en_su_orbita() {
     let (mut system, ships) = setup();
-    let i = 5; // Star Wars: el más lejano
+    let i = 5; // South Park: el más lejano
     let mut ship = Ship::new(beside(&system, i, 2.0), 0.0);
     let offset = ship.position - system.planets[i].position();
     for _ in 0..180 {

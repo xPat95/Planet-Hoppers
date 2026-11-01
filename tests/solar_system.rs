@@ -7,6 +7,31 @@ fn config() -> SolarSystemConfig {
 }
 
 #[test]
+fn el_orden_orbital_es_el_definitivo_sin_cambiar_las_orbitas() {
+    let config = config();
+    let actual: Vec<_> = config.planets.iter().map(|p| p.id.as_str()).collect();
+    assert_eq!(actual, ["halloween", "starwars", "smilingfriends", "minecraft", "regularshow", "southpark"]);
+    let radii: Vec<_> = config.planets.iter().map(|p| p.orbit_radius).collect();
+    assert_eq!(radii, [150.0, 230.0, 320.0, 410.0, 500.0, 590.0]);
+}
+
+#[test]
+fn la_proximidad_conserva_la_identidad_y_el_minijuego_en_las_nuevas_orbitas() {
+    let mut system = SolarSystem::new(&config());
+    system.update(120.0);
+    for id in PLANET_IDS {
+        let planet = system.planet(id).unwrap();
+        let point = planet.position() + planet.spin_axis() * planet.config.radius * 1.5;
+        let index = system.planet_in_reach(point).expect("planeta al alcance");
+        let reached = &system.planets[index].config;
+        assert_eq!(reached.id, id);
+        let expected = if id == "southpark" { Some("southpark") } else { None };
+        assert_eq!(reached.minigame.as_deref(), expected, "{id}");
+        assert!(reached.model.as_deref().unwrap().contains(&format!("/planets/{id}/")));
+    }
+}
+
+#[test]
 fn hay_seis_planetas_en_orbitas_separadas_alrededor_del_sol() {
     let config = config();
     let system = SolarSystem::new(&config);

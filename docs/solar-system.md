@@ -35,12 +35,14 @@ En las dos: O muestra u oculta las órbitas, F12 guarda una captura en `target/s
 
 | Planeta | Órbita | Radio | Traslación (°/s) | Rotación (°/s) | Eje | Minijuego |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
-| Minecraft | 150 | 16 | 2,2 | 10 | 8° | en construcción |
-| South Park | 230 | 18 | 1,5 | 8 | 15° | `southpark` |
+| Calaca (Halloween) | 150 | 18 | 2,2 | −7 (al revés) | 10° | en construcción |
+| Estrella de la Muerte (Star Wars) | 230 | 22 | 1,5 | 5 | 5° | en construcción |
 | Smiling Friends | 320 | 22 | 1,1 | 6 | 12° | en construcción |
-| Halloween | 410 | 18 | 0,85 | −7 (al revés) | 10° | en construcción |
+| Minecraft | 410 | 16 | 0,85 | 10 | 8° | en construcción |
 | Un Show Más | 500 | 20 | 0,7 | 9 | 18° | en construcción |
-| Star Wars | 590 | 22 | 0,55 | 5 | 5° | en construcción |
+| South Park | 590 | 18 | 0,55 | 8 | 15° | `southpark` |
+
+La tabla sigue el orden desde el Sol hacia el exterior. Se conservan los radios y las velocidades de las seis órbitas; cada planeta mantiene su identificador, modelos, radio, giro propio, eje, ángulo inicial y minijuego.
 
 El Sol mide 45 de radio. Las naves miden de 4 a 5 unidades de largo, así que cada planeta es unas diez veces la nave. Los de afuera giran más despacio alrededor del Sol, y ningún planeta pasa de ~6 unidades por segundo en su órbita: la nave va a 40 (130 con turbo).
 
@@ -97,7 +99,7 @@ El Sol mide 45 de radio. Las naves miden de 4 a 5 unidades de largo, así que ca
 | `src/graphics/space.rs` | Carga y ajuste de los GLB, shaders del espacio y del Sol, cielo y halo. |
 | `src/scenes/solar_system.rs` | La escena: vistas, cámara, interfaz, visitas a minijuegos y pruebas automáticas. |
 | `config/solar-system.json`, `config/ships.json` | Planetas, modelos, minijuegos, naves y vuelo. |
-| `tests/solar_system.rs`, `tests/ships.rs` | 12 pruebas: órbitas, FPS, choques, arrastre, alcance y proximidad. |
+| `tests/solar_system.rs`, `tests/ships.rs` | Pruebas de órbitas, FPS, choques, arrastre, alcance y proximidad. |
 
 ## Pruebas
 
