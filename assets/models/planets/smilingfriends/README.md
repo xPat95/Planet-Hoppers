@@ -16,7 +16,7 @@ La Tierra plana de la serie: un disco con océano, una masa de tierra central y 
 | Enchanted Forest | Parque cercado unido a la tierra central: árboles de troncos de colores, hongos, arbustos y castillo amarillo de Mip. |
 | Bosque del Forest Demon | Isla de árboles fríos y grisáceos con el Forest Demon (modelo propio importado) y puente de madera arqueado. |
 | Brasil | Isla con forma de Brasil, Corcovado con el Cristo Redentor, edificios de Río y selva. |
-| Cara inferior | Masa de océano y hielo con picos que cuelgan; cráter del infierno con llamas y Satanás jugando en su PC gamer. |
+| Cara inferior | Masa de océano y hielo con picos que cuelgan; cráter del infierno con llamas y Satanás (cuerpo esculpido, musculoso) jugando en su PC gamer. |
 
 ## Organización
 
@@ -30,11 +30,15 @@ Todo depende de `SmilingFriends_Planet_ROOT`, en el origen. Colecciones: `Planet
 
 | Medida | Valor |
 | --- | ---: |
-| Triángulos de cerca (sin contorno) | ~98 200 |
-| Triángulos de lejos (nubes `LOD_Far`) | ~82 000 |
+| Triángulos de cerca (sin contorno) | ~202 000 |
+| Triángulos de lejos (nubes `LOD_Far`) | ~162 000 |
 
-Las nubes lejanas son el mismo conjunto con menos segmentos: el motor las cambia cuando el planeta está lejos. Siguiente ahorro recomendado: versión lejana de los árboles.
+Calidad: `Q` (variable `SF_QUALITY`, 1.6 por defecto) multiplica los lados de todas las piezas redondas (árboles, nubes, arbustos, rocas, Shmaloogles...); las piezas facetadas a propósito (pirámides, agujas de 3 o 4 lados) no cambian. `SF_QUALITY=1` da la versión liviana anterior (~98 000). Satanás tiene el cuerpo esculpido (`SF_Hell_Satan_Body`: remesh y suavizado como el Forest Demon, con músculos y cara marcados; sin contorno), con `SATAN_TRIS` caras. Siguiente ahorro recomendado: versión lejana de los árboles.
 
 ## Edición
 
 **No editar el `.blend` a mano:** se regenera completo con [build_smilingfriends_planet.py](../../../../tools/blender/smilingfriends/build_smilingfriends_planet.py). Ver [instrucciones de los scripts](../../../../tools/blender/smilingfriends/README.md). El Forest Demon vive en [forest_demon.blend](../../characters/smilingfriends/forest_demon.blend) y el planeta lo importa.
+
+## Exportación para el juego
+
+[smilingfriends_planet.glb](exports/smilingfriends_planet.glb): GLB para el [sistema solar](../../../../docs/solar-system.md), generado con [export_solar_models.py](../../../../tools/blender/solarsystem/export_solar_models.py) sin modificar el `.blend` (se excluyen `Presentation`, cámaras y luces). ~221 000 triángulos, sin el contorno `Outline` ni `LOD_Far`. Volver a exportar después de cambiar el modelo.

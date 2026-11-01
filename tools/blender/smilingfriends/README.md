@@ -16,6 +16,6 @@ Desde la raíz del repositorio, en PowerShell:
 & "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" -b --factory-startup --python tools/blender/smilingfriends/build_smilingfriends_ship.py
 ```
 
-Variables opcionales (planeta): `SF_NO_RENDER=1` guarda sin renderizar; `SF_OUTLINE=0` omite el contorno de caricatura.
+Variables opcionales (planeta): `SF_NO_RENDER=1` guarda sin renderizar; `SF_OUTLINE=0` omite el contorno de caricatura; `SF_QUALITY` (1.6 por defecto) cambia la resolución de las piezas redondas.
 
 Las posiciones de la distribución usan coordenadas de píxel del [boceto](../../../docs/references/smilingfriends/smilingfriends_layout_sketch.png) (función `sk`). Al terminar, el script imprime los triángulos por colección y avisa (`WARNING`) si algo choca.

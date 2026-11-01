@@ -28,6 +28,11 @@ VERSION = "v01"
 
 SEED = 2026          # Semilla de toda la distribución procedural
 R = 24.0             # Radio del disco (South Park: esfera de radio 22)
+# Calidad: multiplica los lados de las piezas redondas (esferas, cúpulas, cilindros y ramas de 5 lados o más). Las
+# piezas facetadas a propósito (pirámides, triángulos, agujas de 3 o 4 lados) no cambian. SF_QUALITY=1 = versión
+# liviana de antes.
+Q = float(os.environ.get("SF_QUALITY", "1.6"))
+SATAN_TRIS = 16000   # Cuerpo esculpido de Satanás
 T = 2.0              # Grosor del disco
 TOP = T / 2          # Cara superior (océano)
 LAND_H = 0.25        # Altura de la tierra sobre el océano
@@ -200,10 +205,13 @@ class Part:
         self.op(m, "create_cube", size=1.0, matrix=mtx(loc, rot_z, rot_x, scale=size))
 
     def cyl(self, m, r1, r2, depth, loc, seg=16, rot_z=0.0, rot_x=0.0, caps=True, scale=(1, 1, 1)):
+        if seg >= 5:
+            seg = round(seg * Q)
         self.op(m, "create_cone", cap_ends=caps, cap_tris=False, segments=seg,
                 radius1=r1, radius2=r2, depth=depth, matrix=mtx(loc, rot_z, rot_x, scale))
 
     def sphere(self, m, r, loc, seg=10, rings=6, scale=(1, 1, 1), rot_z=0.0):
+        seg, rings = round(seg * Q), round(rings * Q)
         self.op(m, "create_uvsphere", smooth=True, u_segments=seg, v_segments=rings, radius=r,
                 matrix=mtx(loc, rot_z, scale=scale))
 
@@ -1301,6 +1309,8 @@ def seg_cyl(part, m, p0, p1, r0, r1, seg=5):
     p0, p1 = Vector(p0), Vector(p1)
     d = p1 - p0
     rot = d.to_track_quat("Z", "Y").to_matrix().to_4x4()
+    if seg >= 5:
+        seg = round(seg * Q)
     part.op(m, "create_cone", cap_ends=False, segments=seg, radius1=r0, radius2=r1, depth=d.length or 1e-4,
             matrix=Matrix.Translation((p0 + p1) / 2) @ rot)
 
@@ -2268,38 +2278,94 @@ sat = Part("SF_Hell_Satan")
 SKIN, FUR, HORN = mat("SatanSkin", "#b8322a"), mat("SatanFur", "#231c1c"), mat("SatanHorn", "#1a1414")
 WING, EYE, FANG = mat("SatanWing", "#5a3a33"), mat("SatanEyes", "#ffd23f", emit=3.0), mat("SatanTeeth", "#d8cf9a")
 UP = 1.3                                                     # El torso baja 1.3 al sentarse
+# Cuerpo esculpido: las piezas de piel y pelo van en su propia malla y después se funden en una sola superficie
+# (remesh + suavizado, como el Forest Demon), con músculos marcados. Al final se pinta: pelo abajo, piel arriba.
+satb = Part("SF_Hell_Satan_Body")
 for sx in (-1, 1):                                           # patas peludas: muslos al frente, pezuñas en el piso
     hip_, knee_, ankle_ = (sx * 0.45, 0, 1.8), (sx * 0.55, -1.3, 1.8), (sx * 0.55, -1.35, 0.3)
-    sat.sphere(FUR, 0.34, hip_, seg=8, rings=5)
-    limb(sat, FUR, hip_, knee_, 0.34, 0.27, seg=8)
-    limb(sat, FUR, knee_, ankle_, 0.27, 0.18, seg=8)
-    sat.sphere(FUR, 0.27, knee_, seg=8, rings=5)
-    sat.box(HORN, (0.4, 0.55, 0.3), (sx * 0.55, -1.45, 0.15))
-sat.sphere(FUR, 0.6, (0, 0, 3.1 - UP), seg=10, rings=6, scale=(1.1, 0.8, 0.7))     # cadera
-limb(sat, SKIN, (0, 0, 3.2 - UP), (0, -0.25, 5.0 - UP), 0.45, 0.85, seg=10)     # torso en V, inclinado al frente
-sat.sphere(SKIN, 0.8, (0, -0.3, 4.7 - UP), seg=12, rings=8, scale=(1.35, 0.75, 0.85))
+    satb.sphere(FUR, 0.36, hip_, seg=8, rings=5)
+    limb(satb, FUR, hip_, knee_, 0.36, 0.27, seg=10)
+    satb.sphere(FUR, 0.3, ((hip_[0] + knee_[0]) / 2, -0.55, 1.95), seg=8, rings=5, scale=(1, 1.4, 0.8))  # muslo
+    limb(satb, FUR, knee_, ankle_, 0.27, 0.17, seg=10)
+    satb.sphere(FUR, 0.24, (sx * 0.55, -1.25, 1.15), seg=8, rings=5, scale=(1, 0.9, 1.5))      # pantorrilla
+    satb.sphere(FUR, 0.28, knee_, seg=8, rings=5)
+satb.sphere(FUR, 0.62, (0, 0, 3.1 - UP), seg=10, rings=6, scale=(1.1, 0.8, 0.7))    # cadera
+limb(satb, SKIN, (0, 0, 3.2 - UP), (0, -0.25, 5.0 - UP), 0.45, 0.85, seg=12)    # torso en V, inclinado al frente
+satb.sphere(SKIN, 0.8, (0, -0.3, 4.7 - UP), seg=12, rings=8, scale=(1.35, 0.75, 0.85))
+for sx in (-1, 1):
+    satb.sphere(SKIN, 0.42, (sx * 0.38, -0.78, 3.5), seg=10, rings=6, scale=(1.05, 0.5, 0.78))   # pectorales
+    satb.sphere(SKIN, 0.36, (sx * 0.5, 0.05, 3.85), seg=10, rings=6, scale=(1.3, 0.8, 0.55))     # trapecios
+    for k, z in enumerate((2.55, 2.8, 3.05)):                                                    # abdominales
+        satb.sphere(SKIN, 0.15, (sx * 0.17, -0.5 - 0.04 * k, z), seg=8, rings=5, scale=(1.05, 0.55, 0.8))
 for sx in (-1, 1):                                           # brazos hacia la laptop, garras sobre el teclado
     sh, el, ha = (sx * 1.05, -0.2, 5.0 - UP), (sx * 1.25, -1.2, 2.95), (sx * 0.45, -1.75, 2.95)
-    sat.sphere(SKIN, 0.48, sh, seg=10, rings=6)
-    limb(sat, SKIN, sh, el, 0.34, 0.26, seg=8)
-    sat.sphere(SKIN, 0.26, el, seg=8, rings=5)
-    limb(sat, SKIN, el, ha, 0.26, 0.2, seg=8)
-    sat.sphere(SKIN, 0.24, ha, seg=8, rings=5, scale=(1, 1.2, 0.7))
+    satb.sphere(SKIN, 0.5, sh, seg=10, rings=6, scale=(1, 1, 0.9))                   # deltoides
+    limb(satb, SKIN, sh, el, 0.34, 0.26, seg=10)
+    mid = tuple((a + b) / 2 for a, b in zip(sh, el))
+    satb.sphere(SKIN, 0.3, (mid[0], mid[1] - 0.12, mid[2]), seg=8, rings=5, scale=(1, 1.3, 1))   # bíceps
+    satb.sphere(SKIN, 0.26, el, seg=8, rings=5)
+    limb(satb, SKIN, el, ha, 0.27, 0.2, seg=10)
+    fore = tuple(a * 0.65 + b * 0.35 for a, b in zip(el, ha))
+    satb.sphere(SKIN, 0.24, fore, seg=8, rings=5, scale=(1.2, 1, 1))                 # antebrazo
+    satb.sphere(SKIN, 0.24, ha, seg=8, rings=5, scale=(1, 1.2, 0.7))
+    for k in range(4):                                       # nudillos
+        satb.sphere(SKIN, 0.07, (ha[0] + (k - 1.5) * 0.1, ha[1] - 0.17, ha[2] + 0.05), seg=6, rings=4)
+neck0, head = (0, -0.3, 5.2 - UP), (0, -0.75, 6.0 - UP)      # cabeza agachada mirando la pantalla
+limb(satb, SKIN, neck0, (0, -0.6, 5.65 - UP), 0.34, 0.3, seg=10)
+satb.sphere(SKIN, 0.55, head, seg=12, rings=8, scale=(0.85, 0.95, 1.1))
+H = lambda x, y, z: (head[0] + x, head[1] + y + 0.18, head[2] + z - 6.05)   # Detalles de la cabeza de antes
+for sx in (-1, 1):                                           # cara: ceño marcado, pómulos, mandíbula ancha
+    satb.sphere(SKIN, 0.14, H(sx * 0.2, -0.62, 6.25), seg=8, rings=5, scale=(1.4, 0.8, 0.7))     # ceja de hueso
+    satb.sphere(SKIN, 0.13, H(sx * 0.3, -0.56, 5.95), seg=8, rings=5, scale=(1.1, 0.8, 0.9))     # pómulo
+    satb.sphere(SKIN, 0.16, H(sx * 0.3, -0.42, 5.7), seg=8, rings=5, scale=(1, 1, 1.1))          # mandíbula
+    limb(satb, SKIN, H(sx * 0.42, -0.2, 6.15), H(sx * 0.8, -0.1, 6.45), 0.12, 0.02, seg=6)       # orejas
+satb.sphere(SKIN, 0.1, H(0, -0.7, 5.98), seg=8, rings=5, scale=(0.75, 1.1, 1.4))                 # nariz
+satb.sphere(SKIN, 0.17, H(0, -0.56, 5.6), seg=8, rings=5, scale=(1.2, 0.9, 0.9))                 # mentón
+SAT_PLACE = Matrix.Translation((0, 0, -TOP - under_depth(0))) @ Matrix.Rotation(math.pi, 4, "Y")
+sat_body = satb.build(C, ROOT)
+_rm = sat_body.modifiers.new("Remesh", "REMESH")
+_rm.mode, _rm.voxel_size, _rm.adaptivity = "VOXEL", 0.035, 0.0
+_sm = sat_body.modifiers.new("Smooth", "SMOOTH")
+_sm.factor, _sm.iterations = 0.5, 5
+dg = bpy.context.evaluated_depsgraph_get()
+_dense = sat_body.evaluated_get(dg).to_mesh()
+_dense.calc_loop_triangles()
+_dec = sat_body.modifiers.new("Decimate", "DECIMATE")
+_dec.ratio = min(1.0, SATAN_TRIS / max(len(_dense.loop_triangles), 1))
+sat_body.evaluated_get(dg).to_mesh_clear()
+dg = bpy.context.evaluated_depsgraph_get()
+_sme = bpy.data.meshes.new_from_object(sat_body.evaluated_get(dg))
+for _m in list(sat_body.modifiers):
+    sat_body.modifiers.remove(_m)
+_old = sat_body.data
+sat_body.data = _sme
+bpy.data.meshes.remove(_old)
+_sme.name = "SF_Hell_Satan_Body"
+_sme.materials.clear()
+_sme.materials.append(SKIN)
+_sme.materials.append(FUR)
+for _f in _sme.polygons:                                     # Pelo en la cadera y las patas, piel arriba
+    _f.material_index = 1 if _f.center.z < 2.1 else 0
+    _f.use_smooth = True
+_sme.transform(SAT_PLACE)
+_sme.update()
+for sx in (-1, 1):                                           # pezuñas (aparte: tienen que verse duras)
+    sat.box(HORN, (0.4, 0.55, 0.3), (sx * 0.55, -1.45, 0.15))
+for sx in (-1, 1):                                           # garras
+    ha = (sx * 0.45, -1.75, 2.95)
     for k in range(4):
         base = (ha[0] + (k - 1.5) * 0.1, ha[1] - 0.15, ha[2])
-        limb(sat, HORN, base, (base[0], base[1] - 0.35, base[2] - 0.08), 0.05, 0.0, seg=4)
-neck0, head = (0, -0.3, 5.2 - UP), (0, -0.75, 6.0 - UP)      # cabeza agachada mirando la pantalla
-limb(sat, SKIN, neck0, (0, -0.6, 5.65 - UP), 0.32, 0.28, seg=8)
-sat.sphere(SKIN, 0.55, head, seg=12, rings=8, scale=(0.85, 0.95, 1.1))
-H = lambda x, y, z: (head[0] + x, head[1] + y + 0.18, head[2] + z - 6.05)   # Detalles de la cabeza de antes
+        limb(sat, HORN, base, (base[0], base[1] - 0.35, base[2] - 0.08), 0.05, 0.0, seg=5)
 for sx in (-1, 1):
     sat.sphere(EYE, 0.08, H(sx * 0.2, -0.66, 6.1), seg=6, rings=4)            # ojos amarillos
-    limb(sat, SKIN, H(sx * 0.42, -0.2, 6.15), H(sx * 0.8, -0.1, 6.45), 0.12, 0.0, seg=5)   # orejas
     pts = [H(sx * 0.3, -0.1, 6.45), H(sx * 0.65, -0.05, 6.95), H(sx * 1.15, 0.0, 7.2), H(sx * 1.55, 0.05, 7.0),
            H(sx * 1.7, 0.1, 6.55)]                      # cuernos curvos
     for k, (p0, p1) in enumerate(zip(pts, pts[1:])):
-        limb(sat, HORN, p0, p1, 0.17 * (1 - k * 0.22), 0.17 * (1 - (k + 1) * 0.22), seg=6)
-sat.box(FANG, (0.42, 0.08, 0.16), H(0, -0.66, 5.78))                            # dientes
+        limb(sat, HORN, p0, p1, 0.17 * (1 - k * 0.22), 0.17 * (1 - (k + 1) * 0.22), seg=8)
+        sat.sphere(HORN, 0.17 * (1 - (k + 1) * 0.22), p1, seg=8, rings=5)   # articulación: cuerno sin quiebres
+for k in (-1.5, -0.5, 0.5, 1.5):                             # colmillos chicos en punta (no una tabla)
+    tip_len = 0.13 if abs(k) == 1.5 else 0.09
+    limb(sat, FANG, H(k * 0.085, -0.64, 5.8), H(k * 0.085, -0.66, 5.8 - tip_len), 0.035, 0.0, seg=6)
 for sx in (-1, 1):                                           # alas de murciélago, plegadas detrás de la silla
     root, top = (sx * 0.6, 0.55, 5.0 - UP), (sx * 2.6, 1.1, 6.6 - UP)
     fingers = [(sx * 3.3, 1.2, 3.6 - UP), (sx * 2.8, 1.1, 2.9 - UP), (sx * 2.0, 0.95, 2.8 - UP)]
@@ -2338,7 +2404,7 @@ sat.box(RGB[2], (0.02, 0.85, 0.95), (0.97, -2.35, 3.46))                        
 for k, m_ in enumerate(RGB[:3]):                                                 # ventiladores al frente
     sat.cyl(m_, 0.14, 0.14, 0.03, (1.25, -2.91, 3.0 + k * 0.38), seg=10, rot_x=math.radians(90))
 # Dar vuelta: de pie -> colgando bajo el disco, sin dejar de mirar hacia -Y
-sat.place(Matrix.Translation((0, 0, -TOP - under_depth(0))) @ Matrix.Rotation(math.pi, 4, "Y"))
+sat.place(SAT_PLACE)
 sat.build(C, ROOT)
 
 # ---------------------------------------------------------------------------
@@ -2460,7 +2526,7 @@ if os.environ.get("SF_OUTLINE") != "0":
     _ob.inputs["Roughness"].default_value = 1.0
     outline.use_backface_culling = True
     for ob in list(scene.objects):
-        if ob.type != "MESH" or ob.name in ("SF_Disc", "SF_ForestDemon", "SF_Shmaloogle_Path", "SF_Road_East"):   # Demonio: plastilina; camino de la colina: cinta sin costados
+        if ob.type != "MESH" or ob.name in ("SF_Disc", "SF_ForestDemon", "SF_Hell_Satan_Body", "SF_Shmaloogle_Path", "SF_Road_East"):   # Demonio: plastilina; camino de la colina: cinta sin costados
             continue
         ob.data.materials.append(outline)
         mod = ob.modifiers.new("Outline", "SOLIDIFY")
