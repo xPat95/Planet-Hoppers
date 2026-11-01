@@ -1,0 +1,20 @@
+{
+  "valid": true,
+  "errors": [],
+  "file": "C:\\Users\\norma\\OneDrive\\Documentos\\Semestre VI\\Graficas\\ProyectoFinal\\Ciudadela_Mass_Effect\\Ciudadela_Mass_Effect.blend",
+  "mesh_objects": 50,
+  "wards": 5,
+  "materials": 16,
+  "vertices": 476942,
+  "triangles_before_modifiers": 655876,
+  "dimensions": [
+    276.75,
+    131.555,
+    125.509
+  ],
+  "non_finite_vertices": 0,
+  "degenerate_faces": 0,
+  "invalid_material_indices": 0,
+  "original_scene_preserved": true,
+  "source_file_reopened": true
+}

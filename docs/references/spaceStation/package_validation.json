@@ -1,0 +1,17 @@
+{
+  "valid": true,
+  "checks": [
+    "python_syntax",
+    "documentation_links",
+    "source_hash",
+    "self_contained_glb",
+    "five_wards",
+    "station_role",
+    "emissive_materials",
+    "glb_reimport_audit",
+    "obj_mtl",
+    "triangle_counts"
+  ],
+  "near_triangles": 683746,
+  "far_triangles": 131699
+}

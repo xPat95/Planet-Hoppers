@@ -1,0 +1,81 @@
+{
+  "asset_id": "citadel_space_station",
+  "role": "space_station",
+  "approved_source_sha256": "bd96e6adf1d6858b69124c34b61a78fb104ee7f28ac03b45fecd95dc29ed0d6e",
+  "exports": {
+    "near": {
+      "meshes": 50,
+      "triangles": 683746,
+      "degenerate_triangles": 0,
+      "bounds": [
+        [
+          -138.37501525878906,
+          138.375
+        ],
+        [
+          -65.77738952636719,
+          65.77738952636719
+        ],
+        [
+          -62.75442123413086,
+          62.754417419433594
+        ]
+      ],
+      "bytes": 39111556,
+      "sha256": "e8054952b4be34a8ffd7c8ae70230242f9909ddce75e6549414b0566e807c2a5",
+      "reimport": "OK"
+    },
+    "far": {
+      "meshes": 50,
+      "triangles": 131699,
+      "degenerate_triangles": 0,
+      "bounds": [
+        [
+          -138.3739776611328,
+          138.375
+        ],
+        [
+          -65.7705078125,
+          65.77452087402344
+        ],
+        [
+          -62.70903396606445,
+          62.735923767089844
+        ]
+      ],
+      "bytes": 10148968,
+      "sha256": "3e26ccfc238f5a13c0f4423c695df62b230696266aced79d2abf7abc8ab1451c",
+      "reimport": "OK"
+    }
+  },
+  "scale_factor": 1.0,
+  "runtime_placement": "pending",
+  "source_raw": {
+    "meshes": 50,
+    "triangles": 655876,
+    "degenerate_triangles": 0,
+    "bounds": [
+      [
+        -263.0,
+        13.75
+      ],
+      [
+        -65.77738952636719,
+        65.77738952636719
+      ],
+      [
+        -60.845924377441406,
+        64.66291809082031
+      ]
+    ]
+  },
+  "source_geometry_signature": "7dda803aa79452de773e117266c172938e2f37438721e350611a002210d5c469",
+  "source_geometry_preserved": true,
+  "integrated_source_sha256": "1791b9c614b915490c205cb1e675b62c09d80f3d0669bbbca2ef185670b29fe9",
+  "origin_shift_blender": [
+    -124.625,
+    0.0,
+    1.9084968566894531
+  ],
+  "source_unchanged_during_export": true
+}

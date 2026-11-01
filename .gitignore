@@ -57,3 +57,7 @@ Desktop.ini
 /assets/models/planets/halloween/*.blend[0-9]*
 /assets/models/characters/halloween/*.blend[0-9]*
 /tools/blender/halloween/__pycache__/
+
+# Respaldos y temporales de la estacion Ciudadela
+/assets/models/environment/spaceStation/*.blend[0-9]*
+/tools/blender/spaceStation/__pycache__/

@@ -199,3 +199,7 @@ Los siguientes modelos son naves, independientes de los planetas. Los controles,
 | `regularshow` | Carrito de Regular Show | [Fuente y exportaciones](assets/models/ships/regularshow/golfcart/README.md) |
 | `starwars` | Caza Naboo N-1 | [Fuente y exportaciones](assets/models/ships/starwars/naboo/README.md) |
 | `starwars` | N-1 del Mandaloriano | [Fuente y exportaciones](assets/models/ships/starwars/mandalorian/README.md) |
+
+## Estación espacial disponible como recurso
+
+La [Ciudadela de Mass Effect](assets/models/environment/spaceStation/README.md) es el modelo aprobado de la estación compartida: fuente Blender editable, GLB cercano y lejano, OBJ/MTL y vistas de revisión. Su colocación en el sistema solar, las colisiones, el hangar y la selección de naves siguen pendientes de implementación.
