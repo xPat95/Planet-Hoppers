@@ -52,3 +52,5 @@ Desktop.ini
 
 # Respaldos automáticos de Blender del planeta Halloween
 /assets/models/planets/halloween/*.blend[0-9]*
+/assets/models/characters/halloween/*.blend[0-9]*
+/tools/blender/halloween/__pycache__/

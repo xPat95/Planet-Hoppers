@@ -182,9 +182,10 @@ Personaje abducido: **Ghost Face**. Minijuego: escapar de personajes de terror. 
 **La Tierra después del apocalipsis**, convertida en una **calavera de roca quemada**. Referencias de Cami: una calavera de caricatura (cráneo redondo, cuencas grandes, dientes abultados) y una calavera low-poly con ojos y dientes que brillan.
 
 - **Forma:** **calavera anatómicamente correcta** (proporciones de un cráneo real), gritando: bóveda ovalada, ceja de hueso que baja al centro, órbitas cuadradas redondeadas, separadas e inclinadas en V (enojo), nariz en pera con tabique, cornetes y espina nasal, pómulos, arcos cigomáticos, maxilar, mastoides, dientes de adulto en sus arcos y **mandíbula abierta**, girada sobre su articulación (cuerpo en U, rama, cóndilo y coronoides). La cara ocupa el hemisferio frontal.
+- **Serpientes en la boca:** pocas serpientes finas y escamosas, verde oscuro mate, con la cola apoyada en el cráneo: la mayoría gatea desde adentro de la boca por los dientes de abajo y levanta la parte de adelante hacia quien mira; otras cuelgan por delante de los dientes de abajo o de los dientes de arriba, con la cabeza girada hacia adelante.
 - **Hueca:** el cráneo es una cáscara gruesa (~4.5 unidades); las órbitas, la nariz y el foramen magnum la atraviesan para poder poner cosas adentro. Adentro hay roca negra verdosa con **venas que brillan en verde cálido y pasan a naranja en el centro**; ese brillo se ve por las aberturas. Cada órbita tiene una sola pared curva, con el borde biselado, que se angosta hasta la abertura al interior; sus paredes van en roca oscura, sin venas. Una ceja de hueso baja, más baja al centro, le da el ceño enojado. La boca abierta es el espacio entre los dientes.
-- **Superficie:** tiene que verse **rocosa, como un planeta de verdad**, no hueso liso: relieve irregular, cráteres y caras planas low-poly. Color **coral de tierra quemada** (no blanco) en **estratos horizontales de tonos muy cercanos, como el Gran Cañón**: nada de manchas que contrasten.
-- **Grietas de lava:** una red de grietas con **luz naranja adentro** que cubre el cráneo, como tierra reseca. Pocas y largas; la cara queda limpia (sin arrugas: un cráneo no tiene piel).
+- **Superficie:** tiene que verse **rocosa, como un planeta de verdad**, no hueso liso: relieve irregular, cráteres y caras planas low-poly. Color **rojo de tierra quemada** (no blanco) en **estratos horizontales de tonos muy cercanos, como el Gran Cañón**: nada de manchas que contrasten.
+- **Grietas de lava:** una red de grietas con **luz roja profunda adentro** que cubre el cráneo, como tierra reseca. Pocas y largas; la cara queda limpia (sin arrugas: un cráneo no tiene piel).
 - **Ojos, nariz y boca:** aberturas con borde oscuro por las que se ve el interior encendido.
 - **Lectura desde lejos:** una calavera que brilla desde dentro. **Lectura de cerca:** las zonas de horror sobre la superficie.
 
@@ -192,20 +193,21 @@ Pautas para que dé miedo de verdad:
 
 1. **Los ojos y la boca son lo más oscuro y lo más brillante a la vez:** cavidades negras con lava al fondo, como si el planeta ardiera por dentro.
 2. **Iluminación lateral o desde abajo** (la lava ilumina hacia arriba), nunca una luz plana de frente.
-3. **Paleta limitada y pareja:** arenisca coral y óxido en tonos vecinos, roca oscura en las cavidades, el naranja de las grietas de afuera y el verde del interior. Nada más brilla.
+3. **Paleta limitada y pareja:** roca roja y óxido en tonos vecinos, roca oscura en las cavidades, el rojo profundo de las grietas de afuera y el verde del interior. Nada más brilla.
 
 ### 2.2 Zonas
 
 | Zona | Qué debe mostrarse | Ubicación |
 | --- | --- | --- |
 | Calavera | Cráneo anatómico gritando: órbitas, nariz y boca abiertas, con lava adentro. | **Hemisferio frontal.** Se deja limpio, sin zonas encima. |
+| Grieta de la frente | Una grieta de lava más ancha arriba a la izquierda de la frente (se ve de frente), curvándose hacia la coronilla con una rama; de ella y de **todas las demás grietas salen grupos de diablitos bailando**: rojo carmesí (distinto del cráneo), suaves y simples, con ojos cerrados felices y dos cuernitos del mismo rojo, con notas musicales chicas que brillan alrededor. Solo se ve la mitad de arriba. | Frente, arriba a la izquierda. |
 | Zombies y cementerio | Cementerio de lápidas y cruces torcidas de donde **salen los zombies**, y calles en ruinas **llenas de zombies** alrededor. | Costado izquierdo de la cabeza. |
 | Payasos | Payasos **destruyendo cosas**: volcando y quemando carros y rompiendo edificios y juegos de feria. Payasos sucios y siniestros, no de fiesta infantil. | Costado derecho de la cabeza. |
-| Ritual de brujas | Brujas típicas (sombrero puntiagudo, capa) en círculo alrededor de un caldero o fogata, haciendo un ritual. | Coronilla (parte de arriba). |
+| Brujas en las órbitas | Brujas de ilustración de moda (cabeza chica, piernas muy largas, colores planos): piel verde, sombrero negro de punta curvada, mini vestido negro, medias a rayas blancas y negras hasta arriba de la rodilla y botas negras de tacón; la cara solo tiene dos ojitos verdes que brillan. Abajo de cada órbita bailan en dos filas, con movimiento (cadera de lado, rodilla levantada, estocada de disco) y en parejas de la mano; arriba, unas se cuelgan del borde, otras salen gateando por encima de la órbita y otras se asoman de cabeza desde el techo, como por una ventana al revés. Alrededor de las que bailan flotan notas musicales chicas que brillan. Cada órbita tiene su propio arreglo (no en espejo) y cada bailarina tiene una sombra de contacto que la ancla al piso. | Dentro de las dos órbitas, a la vista desde el frente. |
 | Satanás destruyendo la ciudad | Satanás gigante, estilo *This Is the End*, **comiéndose y aplastando carros** entre edificios destruidos. | Nuca (parte de atrás), como sorpresa al rodear el planeta. |
 
 ```text
-                    [ Ritual de brujas ]
+            [ Brujas bailando en las órbitas ]
                          coronilla
 
   [ Zombies +          (  CALAVERA  )           [ Payasos ]
@@ -228,11 +230,10 @@ Reglas:
 
 | Modelo | Dónde | Cantidad |
 | --- | --- | --- |
-| Zombie | Cementerio y calles | **Muchos**, distribución procedural con semilla. |
+| Diablito | Grupos bailando en todas las grietas (46) | Un modelo por pose de baile (mitad de arriba), copias que comparten la malla. |
 | Lápida / cruz | Cementerio | Muchas, distribución procedural. |
 | Payaso | Zona de payasos | Varios. |
-| Bruja | Ritual | Un círculo de 5 a 7. |
-| Caldero / fogata | Ritual | 1. |
+| Bruja | Órbitas | 23: 15 bailando en dos filas (solas y en tres parejas), 3 colgadas, 3 gateando (una bien adentro, por la pared de la órbita) y 2 asomándose de cabeza. Un modelo por pose, copias que comparten la malla. |
 | Satanás | Nuca | 1, gigante. |
 | Carro | Payasos y Satanás | Varios, volteados y destrozados. |
 | Edificio en ruinas | Calles, payasos y Satanás | Varios. |
@@ -271,7 +272,7 @@ Una nave **formada por zombies**: literalmente cuerpos sobre cuerpos, amontonado
 - **Silueta clara de nave** desde lejos (forma de flecha o de nave de combate), para que se lea como nave y no como un montón informe.
 - **De cerca se notan los cuerpos:** brazos colgando y estirándose, cabezas, torsos retorcidos y manos aferradas a otras.
 - **Colores de carne podrida:** gris verdoso, morado, café y rojo oscuro. Sin brillo metálico.
-- **Propulsión:** brillo rojo/naranja de lava saliendo por detrás, conectado visualmente con el planeta.
+- **Propulsión:** brillo rojo de lava saliendo por detrás, conectado visualmente con el planeta.
 - **Low-poly:** se arma con **un solo modelo de zombie** (el mismo del planeta, o una versión aún más simple) **repetido y rotado** muchas veces sobre una forma base de nave. No se esculpe cada cuerpo.
 - La abducción de Ghost Face también sale de esta nave.
 
