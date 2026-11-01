@@ -1,6 +1,7 @@
 mod kenny_dialogue;
 pub mod front_end;
 pub mod minecraft_dev;
+mod minecraft_mine_dev;
 pub mod minigame_host;
 mod return_smoke;
 mod session_smoke;

@@ -16,11 +16,17 @@ type Error = Box<dyn std::error::Error>;
 const SKY: Color = Color::new(158, 201, 240, 255);
 
 pub fn run() -> Result<(), Error> {
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    if args.iter().any(|a| a == "--mine") {
+        return super::minecraft_mine_dev::run(args);
+    }
+    run_with_args(args.into_iter())
+}
+pub(super) fn run_with_args(mut args: impl Iterator<Item = String>) -> Result<(), Error> {
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let mut config_path = root.join("config/minecraft-dev.json");
     let mut captures = root.join("docs/references/minecraft/phase2");
     let mut test = false;
-    let mut args = std::env::args().skip(1);
     while let Some(arg) = args.next() {
         match arg.as_str() {
             "--smoke" => test = true,
@@ -32,6 +38,7 @@ pub fn run() -> Result<(), Error> {
                 println!(
                     "cargo run --bin minecraft -- [--smoke] [--config FILE] [--capture-dir DIR]"
                 );
+                println!("Mina independiente: cargo run --bin minecraft -- --mine [--smoke]");
                 println!("WASD: caminar | Mouse: mirar | Shift: correr | E: interactuar | Esc: cursor/menu | F12: captura");
                 return Ok(());
             }

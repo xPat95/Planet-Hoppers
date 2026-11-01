@@ -8,6 +8,7 @@ use crate::minigames::common::{
 use raylib::prelude::Vector3;
 use serde::Deserialize;
 use std::path::Path;
+pub mod mine;
 
 #[derive(Clone, Deserialize)]
 #[serde(deny_unknown_fields)]

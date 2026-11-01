@@ -1,0 +1,44 @@
+{
+  "status": "passed",
+  "commands": [
+    {
+      "name": "check",
+      "command": "cargo check --offline --locked",
+      "exit_code": 0,
+      "seconds": 2.74
+    },
+    {
+      "name": "build",
+      "command": "cargo build --offline --locked",
+      "exit_code": 0,
+      "seconds": 14.66
+    },
+    {
+      "name": "test",
+      "command": "cargo test --offline --locked",
+      "exit_code": 0,
+      "seconds": 31.29,
+      "passed": 131,
+      "failed": 0
+    },
+    {
+      "name": "mine",
+      "command": "cargo run --offline --locked --bin minecraft -- --mine --smoke",
+      "exit_code": 0,
+      "seconds": 5.01
+    },
+    {
+      "name": "southpark",
+      "command": "cargo run --offline --locked --bin southpark -- --smoke --mute",
+      "exit_code": 0,
+      "seconds": 3.67
+    },
+    {
+      "name": "threats",
+      "command": "cargo run --offline --locked --bin southpark -- --smoke-threats --mute",
+      "exit_code": 0,
+      "seconds": 5.41
+    }
+  ],
+  "note": "Minecraft mine smoke also enters and validates the Overworld in the same process."
+}
