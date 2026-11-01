@@ -28,9 +28,9 @@ REF_DIR = os.path.join(REPO, "docs", "references", "halloween")
 
 SEED = 666
 R = 22.0             # Radio del cráneo (South Park: 22)
-H = 0.013            # Tamaño de celda de la rejilla (en unidades de R)
+H = 0.01             # Tamaño de celda de la rejilla (en unidades de R)
 SHELL = 0.2          # Grosor de la cáscara (en unidades de R, ~4.5 unidades)
-TARGET_TRIS = 40000  # Triángulos tras simplificar (afuera y adentro)
+TARGET_TRIS = 75000  # Triángulos tras simplificar (afuera y adentro)
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
 scene = bpy.context.scene
@@ -491,6 +491,27 @@ vco[deep] *= ((ln[deep] - 0.15) / ln[deep])[:, None]
 me.vertices.foreach_set("co", vco.ravel())
 me.update()
 
+# --- Versión lejana (LOD) -----------------------------------------------------------------------------------
+# El mismo cráneo, ya pintado, con muchas menos caras; va oculto en LOD_Far y el motor lo usa cuando el planeta está
+# lejos. A esa distancia los personajes, las notas y las serpientes no se ven, así que la versión lejana no los lleva.
+FAR_TRIS = 22000
+lod = bpy.data.collections.new("LOD_Far")
+scene.collection.children.link(lod)
+fob = bpy.data.objects.new("HW_Planet_Surface_Far", me.copy())
+lod.objects.link(fob)
+fob.parent = ROOT
+me.calc_loop_triangles()
+fmod = fob.modifiers.new("Decimate", "DECIMATE")
+fmod.ratio = FAR_TRIS / len(me.loop_triangles)
+dg = bpy.context.evaluated_depsgraph_get()
+fme = bpy.data.meshes.new_from_object(fob.evaluated_get(dg))
+fob.modifiers.remove(fmod)
+fob.data = fme
+fme.name = "HW_Planet_Surface_Far"
+fob.hide_viewport = fob.hide_render = True
+fme.calc_loop_triangles()
+print("TRIS %-18s %6d (lejos)" % (fob.name, len(fme.loop_triangles)))
+
 # --- Brujas en las órbitas ---------------------------------------------------------------------------------
 # Modelos de tools/blender/halloween/build_witch.py (se ejecuta antes). Cada bruja es una copia que comparte la
 # malla de su pose. Las que bailan se paran en el piso de cada órbita (a la vista desde el frente); las que trepan
@@ -538,10 +559,10 @@ def put(kind, loc, yaw):
 LAYOUTS = {
     1: dict(floor=(("Solo_A", -0.55), ("Pair", 0.05), ("Solo_C", 0.62)), hang=(0.35,), creep=(0.05,), wall=(-1,),
             back=(("Solo_B", -0.3), ("Pair", 0.35), ("Solo_A", -0.75)),
-            peek=(-0.15,)),
+            peek=(-0.15,), sit=((0.75, -35),)),
     -1: dict(floor=(("Solo_B", -0.45), ("Solo_A", 0.2), ("Pair", 0.62)), hang=(-0.5, 0.15), creep=(0.55,), wall=(),
              back=(("Solo_C", -0.15), ("Solo_B", 0.42), ("Solo_A", -0.68)),
-             peek=(0.4,)),
+             peek=(0.4,), sit=((-0.1, None),)),
 }
 SHADOW = mat("ContactShadow", "#0c0705")                  # Sombra de contacto bajo los pies (las ancla al piso)
 shadow_v, shadow_f = [], []
@@ -630,6 +651,18 @@ for s, lay in LAYOUTS.items():
             xax = yax.cross(nrm).normalized()
             put("Crawl", loc, 0)
             witches.objects[-1].rotation_euler = Matrix((xax, yax, nrm)).transposed().to_euler()
+    # Sentadas en el borde de abajo de la órbita, de frente, columpiando las piernas por fuera, sobre la mejilla
+    for u, yaw in lay.get("sit", ()):                    # yaw: giro a mano (None = un poco al azar)
+        # La cresta del borde de abajo: rayos hacia abajo desde la boca de la órbita, del frente hacia adentro; el
+        # punto más alto es el filo entre la mejilla (afuera) y el piso de la órbita (adentro)
+        best = None
+        o = orbit_point(s, u, 0.0)
+        for yy in np.linspace(-1.0, -0.74, 27):
+            hit, loc, _, _ = ob.ray_cast(Vector((o.x, yy * R, o.z)), Vector((0, 0, -1)), distance=0.35 * R)
+            if hit and (best is None or loc.z > best.z):
+                best = loc
+        if best is not None:
+            put("Sit", best + Vector((0, -0.1, 0.05)), yaw if yaw is not None else wrng.uniform(-15, 15))
 sme = bpy.data.meshes.new("HW_Witch_Shadows")
 sme.from_pydata([tuple(v) for v in shadow_v], [], shadow_f)
 sme.materials.append(SHADOW)
@@ -638,11 +671,11 @@ witches.objects.link(sob)
 sob.parent = ROOT
 # --- Diablitos bailando en las grietas -----------------------------------------------------------------------
 # Modelos de tools/blender/halloween/build_devil.py (se ejecuta antes): solo la mitad de arriba, con el origen en la
-# cintura, que queda hundida en la grieta. Van en grupos, bailando, en todas las grietas de afuera (también la de la
+# cintura, que queda hundida en la grieta. Van repartidos, bailando, en todas las grietas de afuera (también la de la
 # frente), con notas musicales alrededor (ver más abajo).
 ZOMBIE_BLEND = os.path.join(REPO, "assets", "models", "characters", "halloween", "devil.blend")   # Diablitos
-ZOMBIE_SCALE = 3.5
-ZOMBIE_GROUPS = 18                                       # Grupos repartidos por todas las grietas
+ZOMBIE_SCALE = 4.2
+DEVIL_COUNT = 46                                         # Repartidos por todas las grietas
 with bpy.data.libraries.load(ZOMBIE_BLEND) as (src, dst):
     dst.meshes = [n for n in src.meshes if n.startswith("HW_Devil_")]
 ZMESH = {m.name.replace("HW_Devil_", ""): m for m in dst.meshes}
@@ -650,42 +683,33 @@ zombies = bpy.data.collections.new("Devils")
 zones.children.link(zombies)
 zrng = np.random.default_rng(SEED + 3)
 kinds = ("ArmsUp", "Cactus", "Point", "Sway")
-# Grupos en todas las grietas de afuera: centros bien repartidos entre las caras de lava (el más lejano de los ya
-# elegidos, cada vez) y de 3 a 5 diablitos alrededor de cada centro, sobre la misma grieta
+# Repartidos parejo a lo largo de todas las grietas de afuera: cada uno va en la cara de lava más lejana de los
+# que ya están (así no se amontonan y ninguna grieta queda vacía)
 cand = np.nonzero(is_lava & ~inner)[0]
 cdir = pd[cand]
-centers = [int(zrng.integers(len(cand)))]
-dmin = np.linalg.norm(cdir - cdir[centers[0]], axis=1)
-while len(centers) < ZOMBIE_GROUPS and dmin.max() > 0.12:
-    centers.append(int(dmin.argmax()))
-    dmin = np.minimum(dmin, np.linalg.norm(cdir - cdir[centers[-1]], axis=1))
+spots = [int(zrng.integers(len(cand)))]
+dmin = np.linalg.norm(cdir - cdir[spots[0]], axis=1)
+while len(spots) < DEVIL_COUNT:
+    spots.append(int(dmin.argmax()))
+    dmin = np.minimum(dmin, np.linalg.norm(cdir - cdir[spots[-1]], axis=1))
 n_z = 0
-for c in centers:
-    near = np.nonzero(np.linalg.norm(cdir - cdir[c], axis=1) < 0.11)[0]
-    zrng.shuffle(near)
-    taken, want = [], int(zrng.integers(3, 6))
-    for j in near:
-        if len(taken) >= want:
-            break
-        if any(np.linalg.norm(cdir[j] - cdir[k]) < 0.014 for k in taken):
-            continue
-        taken.append(j)
-        d = cdir[j]
-        hit, loc, nrm, _ = ob.ray_cast(Vector(d * 1.6 * R), Vector(-d), distance=1.2 * R)
-        if not hit:
-            continue
-        side = nrm.orthogonal().normalized()
-        face = (Matrix.Rotation(zrng.uniform(0, math.tau), 3, nrm) @ side).normalized()
-        yax = -face                                       # El modelo mira hacia -Y
-        xax = yax.cross(nrm).normalized()
-        kind = kinds[n_z % len(kinds)]
-        z = bpy.data.objects.new("HW_Devil_%s_%02d" % (kind, n_z), ZMESH[kind])
-        zombies.objects.link(z)
-        z.parent = ROOT
-        z.location = loc
-        z.rotation_euler = Matrix((xax, yax, nrm)).transposed().to_euler()
-        z.scale = (ZOMBIE_SCALE * zrng.uniform(0.9, 1.1),) * 3
-        n_z += 1
+for j in spots:
+    d = cdir[j]
+    hit, loc, nrm, _ = ob.ray_cast(Vector(d * 1.6 * R), Vector(-d), distance=1.2 * R)
+    if not hit:
+        continue
+    side = nrm.orthogonal().normalized()
+    face = (Matrix.Rotation(zrng.uniform(0, math.tau), 3, nrm) @ side).normalized()
+    yax = -face                                           # El modelo mira hacia -Y
+    xax = yax.cross(nrm).normalized()
+    kind = kinds[n_z % len(kinds)]
+    z = bpy.data.objects.new("HW_Devil_%s_%02d" % (kind, n_z), ZMESH[kind])
+    zombies.objects.link(z)
+    z.parent = ROOT
+    z.location = loc
+    z.rotation_euler = Matrix((xax, yax, nrm)).transposed().to_euler()
+    z.scale = (ZOMBIE_SCALE * zrng.uniform(0.9, 1.1),) * 3
+    n_z += 1
 print("DEVILS %d" % len(zombies.objects))
 
 # En el planeta las brujas toman la luz de la escena (los diablitos guardan su brillo para destacar sobre el cráneo) (con su luz propia de ilustración se veían pegadas encima)
@@ -701,7 +725,7 @@ print("WITCHES %d" % (len(witches.objects) - 1))
 # anillos alternados: escamas un poco más gruesas y oscuras entre bandas más claras.
 SNAKE = mat("Snake", "#3d7a2e", rough=0.8)
 SNAKE_D = mat("SnakeScales", "#24521f", rough=0.8)
-SNAKE_SIDES, SNAKE_SEGS = 5, 22
+SNAKE_SIDES, SNAKE_SEGS = 8, 40
 SNAKE_EYE = mat("SnakeEyes", "#0a0a0a", rough=0.3)
 snake_heads = []                                         # Dónde quedan las cabezas (para las notas)
 
@@ -785,6 +809,17 @@ for i, kind in enumerate(kinds_s):
     raw = np.array(path)
     for _ in range(2):                                    # Suavizar el camino
         raw[1:-1] = (raw[:-2] + 2 * raw[1:-1] + raw[2:]) / 4
+    # Todo el cuerpo ondula en S (más hacia la cabeza), para que se vea suelto y no como un tubo
+    sl0 = np.r_[0, np.cumsum(np.linalg.norm(np.diff(raw, axis=0), axis=1))]
+    tw = sl0 / max(sl0[-1], 1e-9)
+    tg = np.gradient(raw, axis=0)
+    tg /= np.maximum(np.linalg.norm(tg, axis=1), 1e-9)[:, None]
+    lat = np.cross(tg, (0.0, 0.0, 1.0))
+    bad_l = np.linalg.norm(lat, axis=1) < 0.2
+    lat[bad_l] = np.cross(tg[bad_l], (0.0, 1.0, 0.0))
+    lat /= np.maximum(np.linalg.norm(lat, axis=1), 1e-9)[:, None]
+    wave_a, wave_f, wave_p = snrng.uniform(0.008, 0.014), snrng.uniform(1.6, 2.4), snrng.uniform(0, math.tau)
+    raw = raw + lat * (wave_a * np.sin(math.tau * wave_f * tw + wave_p) * (0.25 + 0.75 * tw))[:, None]
     def resample(path, n):
         sl = np.r_[0, np.cumsum(np.linalg.norm(np.diff(path, axis=0), axis=1))]
         tt = np.linspace(0, sl[-1], n)
@@ -854,7 +889,7 @@ for i, kind in enumerate(kinds_s):
     if np.linalg.norm(side_d) < 0.2:
         side_d = np.array([1.0, 0.0, 0.0])
     side_d /= np.linalg.norm(side_d)
-    amp_d, ph_d = snrng.uniform(0.012, 0.02) * (1 if i % 2 else -1), snrng.uniform(0, math.pi)
+    amp_d, ph_d = snrng.uniform(0.018, 0.028) * (1 if i % 2 else -1), snrng.uniform(0, math.pi)
     for k in range(1, nd + 1):
         tk = k / nd
         dance[-nd - 1 + k] += side_d * amp_d * math.sin(math.pi * 1.5 * tk) * tk             + np.array([0, 0, 0.008 * math.sin(math.pi * tk + ph_d) * tk])
@@ -869,10 +904,11 @@ for i, kind in enumerate(kinds_s):
         for k, w_ in enumerate((1.0, 0.65, 0.35, 0.12)):
             pts[k] += v * w_
     up = np.array([0.0, 0.0, 1.0])
-    r0 = snrng.uniform(0.005, 0.007)
+    r0 = snrng.uniform(0.0065, 0.0085)                   # Un poco más gruesas
     tq = t / t[-1]
-    radius = r0 * (0.5 + 0.5 * np.minimum(tq * 3, 1)) * np.where(np.arange(SNAKE_SEGS) % 2 == 0, 1.15, 0.95)
-    radius[-2] *= 1.15
+    # Se afina parejo: cola fina, cuerpo lleno, se angosta un poco en el cuello antes de la cabeza; escamas sutiles
+    radius = r0 * (0.35 + 0.65 * np.minimum(tq * 2.5, 1) ** 0.7) * (1 - 0.18 * np.exp(-((tq - 0.93) / 0.05) ** 2))
+    radius *= np.where(np.arange(SNAKE_SEGS) % 2 == 0, 1.05, 0.98)
     base = len(sv)
     for j in range(SNAKE_SEGS):                           # Anillos perpendiculares al camino
         tan = pts[min(j + 1, SNAKE_SEGS - 1)] - pts[max(j - 1, 0)]

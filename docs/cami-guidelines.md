@@ -203,7 +203,7 @@ Pautas para que dé miedo de verdad:
 | Grieta de la frente | Una grieta de lava más ancha arriba a la izquierda de la frente (se ve de frente), curvándose hacia la coronilla con una rama; de ella y de **todas las demás grietas salen grupos de diablitos bailando**: rojo carmesí (distinto del cráneo), suaves y simples, con ojos cerrados felices y dos cuernitos del mismo rojo, con notas musicales chicas que brillan alrededor. Solo se ve la mitad de arriba. | Frente, arriba a la izquierda. |
 | Zombies y cementerio | Cementerio de lápidas y cruces torcidas de donde **salen los zombies**, y calles en ruinas **llenas de zombies** alrededor. | Costado izquierdo de la cabeza. |
 | Payasos | Payasos **destruyendo cosas**: volcando y quemando carros y rompiendo edificios y juegos de feria. Payasos sucios y siniestros, no de fiesta infantil. | Costado derecho de la cabeza. |
-| Brujas en las órbitas | Brujas de ilustración de moda (cabeza chica, piernas muy largas, colores planos): piel verde, sombrero negro de punta curvada, mini vestido negro, medias a rayas blancas y negras hasta arriba de la rodilla y botas negras de tacón; la cara solo tiene dos ojitos verdes que brillan. Abajo de cada órbita bailan en dos filas, con movimiento (cadera de lado, rodilla levantada, estocada de disco) y en parejas de la mano; arriba, unas se cuelgan del borde, otras salen gateando por encima de la órbita y otras se asoman de cabeza desde el techo, como por una ventana al revés. Alrededor de las que bailan flotan notas musicales chicas que brillan. Cada órbita tiene su propio arreglo (no en espejo) y cada bailarina tiene una sombra de contacto que la ancla al piso. | Dentro de las dos órbitas, a la vista desde el frente. |
+| Brujas en las órbitas | Brujas de ilustración de moda (cabeza chica, piernas muy largas, colores planos): piel verde, sombrero negro de punta curvada, mini vestido negro, medias a rayas blancas y negras hasta arriba de la rodilla y botas negras de tacón; la cara solo tiene dos ojitos verdes que brillan. Abajo de cada órbita bailan en dos filas, con movimiento (cadera de lado, rodilla levantada, estocada de disco) y en parejas de la mano; arriba, unas se cuelgan del borde, otras salen gateando por encima de la órbita y otras se asoman de cabeza desde el techo, como por una ventana al revés; abajo, algunas se sientan en el borde de la órbita columpiando las piernas por fuera. Alrededor de las que bailan flotan notas musicales chicas que brillan. Cada órbita tiene su propio arreglo (no en espejo) y cada bailarina tiene una sombra de contacto que la ancla al piso. | Dentro de las dos órbitas, a la vista desde el frente. |
 | Satanás destruyendo la ciudad | Satanás gigante, estilo *This Is the End*, **comiéndose y aplastando carros** entre edificios destruidos. | Nuca (parte de atrás), como sorpresa al rodear el planeta. |
 
 ```text
@@ -230,7 +230,7 @@ Reglas:
 
 | Modelo | Dónde | Cantidad |
 | --- | --- | --- |
-| Diablito | Grupos bailando en todas las grietas (46) | Un modelo por pose de baile (mitad de arriba), copias que comparten la malla. |
+| Diablito | Bailando, repartidos por todas las grietas (46) | Un modelo por pose de baile (mitad de arriba), copias que comparten la malla. |
 | Lápida / cruz | Cementerio | Muchas, distribución procedural. |
 | Payaso | Zona de payasos | Varios. |
 | Bruja | Órbitas | 23: 15 bailando en dos filas (solas y en tres parejas), 3 colgadas, 3 gateando (una bien adentro, por la pared de la órbita) y 2 asomándose de cabeza. Un modelo por pose, copias que comparten la malla. |

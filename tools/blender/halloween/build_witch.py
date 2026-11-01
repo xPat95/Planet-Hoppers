@@ -4,7 +4,7 @@ Uso (desde la raíz del repositorio):
     blender -b --factory-startup --python tools/blender/halloween/build_witch.py
 
 Guarda assets/models/characters/halloween/witch.blend (un modelo por pose: HW_Witch_Solo_A, Solo_B, Solo_C, Pair,
-Crawl, Climb y Peek) y capturas en docs/references/halloween/witches_*.png. El planeta las importa.
+Crawl, Climb, Peek y Sit) y capturas en docs/references/halloween/witches_*.png. El planeta las importa.
 Diseño: docs/cami-guidelines.md, sección 2.
 
 La bruja se arma sobre un esqueleto simple: cada pose es solo un juego de ángulos (cadera, torso, brazos, piernas y
@@ -46,7 +46,7 @@ MATS = [SKIN, BLACK, HAIR, BAND, EYES, WHITE]
 
 HS = 0.78                    # Escala de la cabeza (cabeza chica, como en ilustración de moda)
 THIGH, SHIN = 0.34, 0.35     # Piernas muy largas
-STRIPE = 0.05                # Ancho de cada raya de las medias
+STRIPE = 0.04                # Ancho de cada raya de las medias
 
 
 # Pose base (ángulos en grados). Frente hacia -Y. Flexión negativa = hacia adelante.
@@ -93,6 +93,13 @@ POSES = {
         "leg_R": (-4, 3, 25), "leg_L": (0, -3, 50),
         "arm_R": (22, -80, -60, 0), "arm_L": (18, -70, -75, 0),
     },
+    # Sentada en el borde de la órbita, columpiando las piernas: muslos hacia adelante, una pierna patea hacia
+    # adelante y la otra se va hacia atrás; las manos apoyadas atrás en el borde
+    "sit": {
+        "pelvis": (-8, 0, 0), "torso": (14, 0, 0), "head": (-14, 8, 0),
+        "leg_R": (-88, 6, 45), "leg_L": (-82, -6, 125),
+        "arm_R": (25, 40, -15, 0), "arm_L": (25, 40, -15, 0),
+    },
     # Colgada del borde de la órbita: brazos estirados arriba y piernas colgando, una pateando
     "climb": {
         "pelvis": (-6, 0, 0), "torso": (-4, 0, 0), "head": (-12, 0, 0),
@@ -113,6 +120,7 @@ def build_witch(pose):
     neck = chest + Rt @ Vector((0, 0, 0.07))
     head = neck + Rh @ Vector((0, 0, 0.085 * HS))
     B.chest = chest.copy()
+    B.seat = pel + Rp @ Vector((0, 0.02, -0.06))
 
     # Vestido: torso ajustado (más ancho que hondo) y falda corta con el borde en picos
     B.tube([pel + Rp @ Vector((0, 0, -0.02)), waist, chest - Rt @ Vector((0, 0, 0.03)), chest,
@@ -134,8 +142,8 @@ def build_witch(pose):
             B.add((r0 + k, r0 + k1, r1 + k1, r1 + k), BLACK)
 
     # Cuello y cabeza (cara casi sin detalle: solo dos ojitos verdes)
-    B.tube([neck - Rt @ Vector((0, 0, 0.04)), neck + Rh @ Vector((0, 0, 0.03))], [0.024, 0.022], 6, SKIN)
-    B.ellipsoid(head, Rh, (0.058 * HS, 0.064 * HS, 0.075 * HS), SKIN)
+    B.tube([neck - Rt @ Vector((0, 0, 0.04)), neck + Rh @ Vector((0, 0, 0.03))], [0.024, 0.022], 8, SKIN)
+    B.ellipsoid(head, Rh, (0.058 * HS, 0.064 * HS, 0.075 * HS), SKIN, seg=10, rings=7)
     for s in (-1, 1):
         B.ellipsoid(head + Rh @ Vector((s * 0.024, -0.052, 0.012)) * HS, Rh, (0.009 * HS, 0.006 * HS, 0.006 * HS), EYES,
                     seg=5, rings=3)
@@ -143,7 +151,7 @@ def build_witch(pose):
     # Pelo: un solo panel. Arriba envuelve toda la cabeza hasta la coronilla (sin huecos de cuero cabelludo),
     # enmarca la cara a los lados y cae ondulando por la espalda con el borde en ondas. Va con las caras para los
     # dos lados, así se ve de frente y de atrás.
-    cols, rows = 9, 8
+    cols, rows = 13, 10
     grid = []
     for j in range(rows):
         v = -0.25 + 1.25 * j / (rows - 1)                # v < 0: la parte que cubre la cabeza
@@ -175,7 +183,7 @@ def build_witch(pose):
     hb = head + Rh @ Vector((0, 0.005, 0.05)) * HS
     hr = Rh @ rx(-8)
     up, ha, hbv = hr @ Vector((0, 0, 1)), hr @ Vector((1, 0, 0)), hr @ Vector((0, 1, 0))
-    seg = 16
+    seg = 20
     outer_t = B.ring(hb + up * 0.004, ha, hbv, 0.15, seg)
     outer_b = B.ring(hb - up * 0.004, ha, hbv, 0.15, seg)
     inner_t = B.ring(hb + up * 0.004, ha, hbv, 0.066, seg)
@@ -191,8 +199,8 @@ def build_witch(pose):
             B.v[idx + k] = B.v[idx + k] - up * 0.018 * abs(math.cos(t))
     cone = [hb + up * 0.004, hb + up * 0.07, hb + up * 0.135 + hbv * 0.015, hb + up * 0.185 + hbv * 0.05,
             hb + up * 0.21 + hbv * 0.1, hb + up * 0.2 + hbv * 0.15, hb + up * 0.17 + hbv * 0.18 - ha * 0.01]
-    B.tube(cone, [0.066, 0.05, 0.036, 0.024, 0.015, 0.008, 0.002], 10, BLACK, cap1=True, ref=hbv)
-    B.tube([hb + up * 0.006, hb + up * 0.026], [0.068, 0.062], 10, BAND, ref=hbv)
+    B.tube(cone, [0.066, 0.05, 0.036, 0.024, 0.015, 0.008, 0.002], 12, BLACK, cap1=True, ref=hbv)
+    B.tube([hb + up * 0.006, hb + up * 0.026], [0.068, 0.062], 12, BAND, ref=hbv)
 
     # Brazos (piel) con manos pequeñas
     for side, key in ((1, "arm_R"), (-1, "arm_L")):
@@ -203,8 +211,8 @@ def build_witch(pose):
         Rf = Ru @ rx(elbow)
         wr = el + Rf @ Vector((0, 0, -0.155))
         B.tube([sh - Rt @ Vector((side * 0.02, 0, 0)), sh, sh.lerp(el, 0.5), el, el.lerp(wr, 0.5), wr],
-               [0.024, 0.024, 0.021, 0.016, 0.015, 0.011], 6, SKIN, cap0=True)
-        B.ellipsoid(wr + Rf @ Vector((0, 0, -0.03)), Rf, (0.012, 0.018, 0.032), SKIN, seg=6, rings=4)
+               [0.024, 0.024, 0.021, 0.016, 0.015, 0.011], 8, SKIN, cap0=True)
+        B.ellipsoid(wr + Rf @ Vector((0, 0, -0.03)), Rf, (0.012, 0.018, 0.032), SKIN, seg=8, rings=5)
         B.hands.append(wr + Rf @ Vector((0, 0, -0.062)))
 
     # Piernas (piel) y tacones de aguja negros
@@ -235,16 +243,16 @@ def build_witch(pose):
             else:
                 mats.append(WHITE if k % 2 else BLACK)
                 k += 1
-        B.tube(pts, rads, 5, mats)
+        B.tube(pts, rads, 8, mats)
         # Botas negras de tacón: caña hasta media pierna, pie en punta y tacón de aguja
         Rfoot = Rs @ rx(-55)
         toe = an + Rfoot @ Vector((0, 0, -0.105))
-        B.tube([kn.lerp(an, 0.45), kn.lerp(an, 0.75), an + Rs @ Vector((0, 0, 0.02))], [0.032, 0.025, 0.023], 8,
+        B.tube([kn.lerp(an, 0.45), kn.lerp(an, 0.75), an + Rs @ Vector((0, 0, 0.02))], [0.032, 0.025, 0.023], 10,
                BLACK)
-        B.tube([an + Rs @ Vector((0, 0, 0.02)), an, an.lerp(toe, 0.6), toe], [0.023, 0.027, 0.022, 0.006], 8, BLACK,
+        B.tube([an + Rs @ Vector((0, 0, 0.02)), an, an.lerp(toe, 0.6), toe], [0.023, 0.027, 0.022, 0.006], 10, BLACK,
                cap1=True)
         heel = an + Rs @ Vector((0, 0.016, -0.01))
-        B.tube([heel, heel + Rs @ Vector((0, 0.008, -0.085))], [0.013, 0.004], 5, BLACK, cap1=True)
+        B.tube([heel, heel + Rs @ Vector((0, 0.008, -0.085))], [0.013, 0.004], 6, BLACK, cap1=True)
 
     return B
 
@@ -264,7 +272,9 @@ def merge(parts):
 def make(name, B, anchor, x):
     """Crea la malla. anchor="feet": el origen va en el suelo, bajo los tacones; anchor="hands": el origen va en las
     manos (para colgarla del borde). x solo separa los modelos en la presentación."""
-    if anchor == "chest":                                # El borde va bajo el pecho: la cabeza queda afuera
+    if anchor == "seat":                                 # El origen va bajo la cola: se sienta en el borde
+        shift = B.seat.copy()
+    elif anchor == "chest":                                # El borde va bajo el pecho: la cabeza queda afuera
         shift = B.chest.copy()
         shift.z = min(v.z for v in B.v)
     elif anchor == "feet":
@@ -299,6 +309,7 @@ make("HW_Witch_Pair", merge([(build_witch(POSES["pair"]), rz(90), Vector((-0.27,
 make("HW_Witch_Crawl", build_witch(POSES["crawl"]), "feet", 0.7)
 make("HW_Witch_Climb", build_witch(POSES["climb"]), "hands", 1.4)
 make("HW_Witch_Peek", build_witch(POSES["peek"]), "chest", 2.2)
+make("HW_Witch_Sit", build_witch(POSES["sit"]), "seat", 3.0)
 
 # --- Presentación ------------------------------------------------------------------------------------------
 pres = bpy.data.collections.new("Presentation")

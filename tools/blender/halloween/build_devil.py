@@ -64,11 +64,16 @@ def build_devil(pose):
     head = neck + Rh @ Vector((0, 0, 0.06))
 
     # Cuerpo redondeado, cuello corto y cabeza ovalada
-    B.tube([waist, belly, chest, shoulders], [0.06, 0.065, 0.074, 0.066], 6, SKIN, sx=1.25, sy=0.85,
+    # Torso con más anillos y bordes que se afinan de a poco (como las brujas): cintura, panza, pecho y una cúpula
+    # redondeada arriba en vez de una tapa plana
+    torso = [waist, waist.lerp(belly, 0.5), belly, belly.lerp(chest, 0.5), chest, chest.lerp(shoulders, 0.6),
+             shoulders, shoulders + Rt @ Vector((0, 0, 0.018)), shoulders + Rt @ Vector((0, 0, 0.03))]
+    B.tube(torso, [0.058, 0.061, 0.064, 0.069, 0.073, 0.071, 0.062, 0.045, 0.02], 10, SKIN, sx=1.25, sy=0.85,
            ref=Rt @ Vector((0, -1, 0)), cap1=True)
-    B.tube([shoulders - Rt @ Vector((0, 0, 0.02)), neck + Rh @ Vector((0, 0, 0.015))], [0.024, 0.022], 6, SKIN)
+    B.tube([shoulders, neck, neck + Rh @ Vector((0, 0, 0.015)), head - Rh @ Vector((0, 0, 0.035))],
+           [0.03, 0.024, 0.022, 0.026], 8, SKIN)
     HR = (0.045, 0.048, 0.055)
-    B.ellipsoid(head, Rh, HR, SKIN, seg=7, rings=4)
+    B.ellipsoid(head, Rh, HR, SKIN, seg=11, rings=8)
     for s in (-1, 1):                                    # Ojos cerrados, felices (∩), porque están bailando
         arc = []
         for t in (-1.0, -0.5, 0.0, 0.5, 1.0):
@@ -80,7 +85,7 @@ def build_devil(pose):
         base = head + Rh @ Vector((s * 0.026, -0.008, 0.042))
         B.tube([base - Rh @ Vector((s * 0.006, 0, 0.014)), base, base + Rh @ Vector((s * 0.01, 0, 0.028)),
                 base + Rh @ Vector((s * 0.017, 0.003, 0.055))],
-               [0.021, 0.015, 0.009, 0.001], 4, SKIN, cap1=True)   # Nace adentro de la cabeza, base ancha
+               [0.021, 0.015, 0.009, 0.001], 6, SKIN, cap1=True)   # Nace adentro de la cabeza, base ancha
 
     # Brazos suaves con manitos
     for side, key in ((1, "arm_R"), (-1, "arm_L")):
@@ -90,11 +95,15 @@ def build_devil(pose):
         el = sh + Ru @ Vector((0, 0, -0.16))
         Rf = Ru @ rx(elbow)
         wr = el + Rf @ Vector((0, 0, -0.15))
-        B.ellipsoid(sh - Rt @ Vector((side * 0.012, 0, 0)), Rt, (0.034, 0.03, 0.032), SKIN, seg=6, rings=4)  # Hombro
-        B.tube([sh - Rt @ Vector((side * 0.035, 0, 0)), sh, el, wr], [0.027, 0.026, 0.019, 0.015], 5, SKIN,
-               cap0=True)
+        B.ellipsoid(sh - Rt @ Vector((side * 0.012, 0, 0)), Rt, (0.034, 0.03, 0.032), SKIN, seg=9, rings=6)  # Hombro
+        elbow_pt = el + (Ru @ Vector((0, 0, -1))).lerp(Rf @ Vector((0, 0, -1)), 0.5) * 0.004   # Codo redondeado
+        B.tube([sh - Rt @ Vector((side * 0.035, 0, 0)), sh, sh.lerp(el, 0.5), el.lerp(sh, 0.15), elbow_pt,
+                el.lerp(wr, 0.15), el.lerp(wr, 0.55), wr],
+               [0.027, 0.026, 0.023, 0.019, 0.018, 0.017, 0.016, 0.014], 8, SKIN, cap0=True)
         palm = wr + Rf @ Vector((0, 0, -0.025))
-        B.ellipsoid(palm, Rf, (0.017, 0.011, 0.026), SKIN, seg=5, rings=3)
+        B.ellipsoid(palm, Rf, (0.017, 0.012, 0.026), SKIN, seg=8, rings=5)
+        B.ellipsoid(palm + Rf @ Vector((side * 0.014, -0.004, 0.006)), Rf, (0.005, 0.005, 0.011), SKIN, seg=5,
+                    rings=3)                                                                     # Pulgar
         B.hands.append(palm)
     return B
 

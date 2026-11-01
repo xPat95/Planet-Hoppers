@@ -48,6 +48,7 @@ class Builder:
         self.v, self.f, self.m = [], [], []
         self.hands = []                                   # Puntas de las manos (para colgarse)
         self.chest = Vector()                             # Pecho (para asomarse por un borde)
+        self.seat = Vector()                              # Donde se sienta (para sentarla en un borde)
 
     def ring(self, c, a, b, r, n, sx=1.0, sy=1.0):
         start = len(self.v)

@@ -6,7 +6,7 @@ La Tierra después del apocalipsis con forma de calavera anatómicamente correct
 
 ## Organización
 
-Todo depende de `Halloween_Planet_ROOT`, en el origen (propiedad `radius`). Colecciones: `Planet_Base` (la superficie, `HW_Planet_Surface`), `Zones` (`HW_Mouth_Snakes`: 18 serpientes finas y escamosas con la cola apoyada en la mandíbula y los dientes: gatean hacia adelante o cuelgan de los dientes), `Zones` > `Devils` (46 diablitos rojos bailando en grupos en todas las grietas, copias de [devil.blend](../../characters/halloween/devil.blend)), `Zones` > `Witches` (23 brujas en 20 copias, sus sombras de contacto y `HW_Music_Notes`, notas que brillan alrededor de las brujas y los diablitos que bailan: copias de los modelos de [witch.blend](../../characters/halloween/witch.blend)) y `Presentation` (cámara y luces; excluir al exportar).
+Todo depende de `Halloween_Planet_ROOT`, en el origen (propiedad `radius`). Colecciones: `Planet_Base` (la superficie, `HW_Planet_Surface`), `LOD_Far` (versión lejana, oculta), `Zones` (`HW_Mouth_Snakes`: 18 serpientes finas y escamosas con la cola apoyada en la mandíbula y los dientes: gatean hacia adelante o cuelgan de los dientes), `Zones` > `Devils` (46 diablitos rojos bailando, repartidos parejo por todas las grietas, copias de [devil.blend](../../characters/halloween/devil.blend)), `Zones` > `Witches` (23 brujas en 20 copias, sus sombras de contacto y `HW_Music_Notes`, notas que brillan alrededor de las brujas y los diablitos que bailan: copias de los modelos de [witch.blend](../../characters/halloween/witch.blend)) y `Presentation` (cámara y luces; excluir al exportar).
 
 - **Tamaño:** factor 22 (igual que South Park); con proporciones de cráneo real mide ~42 de largo, ~31 de ancho y ~46 de alto con la mandíbula abierta. La cara mira hacia -Y y la coronilla hacia +Z.
 - **Sin contorno de caricatura:** caras planas low-poly.
@@ -17,12 +17,15 @@ Todo depende de `Halloween_Planet_ROOT`, en el origen (propiedad `radius`). Cole
 
 | Medida | Valor |
 | --- | ---: |
-| Triángulos (cáscara de afuera y de adentro) | ~40 000 |
-| Brujas (20 copias) | ~34 000 |
-| Diablitos (46 copias) | ~16 800 |
-| Serpientes de la boca | ~3 900 |
-| Notas musicales | ~4 300 |
-| **Total del planeta** | **~98 700** |
+| Triángulos (cáscara de afuera y de adentro) | ~65 000 |
+| Brujas (20 copias) | ~48 000 |
+| Diablitos (46 copias) | ~50 200 |
+| Serpientes de la boca | ~5 900 |
+| Notas musicales | ~5 100 |
+| **Total de cerca** | **~176 000** |
+| **Total de lejos** (`LOD_Far`: solo el cráneo) | **~22 000** |
+
+Presupuesto de cerca: ~175 000 (los planetas de Regular Show y Star Wars tienen ~500 000). De lejos, el motor cambia a `HW_Planet_Surface_Far` (colección `LOD_Far`, oculta) y deja de dibujar personajes, notas y serpientes, que a esa distancia no se ven.
 
 ## Edición
 
