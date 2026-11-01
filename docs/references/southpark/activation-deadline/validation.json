@@ -5,6 +5,7 @@
   "activation_cases": [
     {
       "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Bus",
       "motion_update_start_seconds": 19.96666770800948,
@@ -13,6 +14,7 @@
     },
     {
       "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Bus",
       "motion_update_start_seconds": 19.983334375545382,
@@ -21,6 +23,7 @@
     },
     {
       "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Bus",
       "motion_update_start_seconds": 19.993055704515427,
@@ -29,6 +32,7 @@
     },
     {
       "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Bus",
       "motion_update_start_seconds": 19.928999707102776,
@@ -37,6 +41,7 @@
     },
     {
       "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Bus",
       "motion_update_start_seconds": 19.96666770800948,
@@ -45,6 +50,7 @@
     },
     {
       "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Bus",
       "motion_update_start_seconds": 19.983334375545382,
@@ -53,6 +59,7 @@
     },
     {
       "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Bus",
       "motion_update_start_seconds": 19.993055704515427,
@@ -61,6 +68,7 @@
     },
     {
       "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Bus",
       "motion_update_start_seconds": 19.928999707102776,
@@ -69,6 +77,7 @@
     },
     {
       "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Bus",
       "motion_update_start_seconds": 19.96666770800948,
@@ -77,6 +86,7 @@
     },
     {
       "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Bus",
       "motion_update_start_seconds": 19.983334375545382,
@@ -85,6 +95,7 @@
     },
     {
       "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Bus",
       "motion_update_start_seconds": 19.993055704515427,
@@ -93,6 +104,7 @@
     },
     {
       "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Bus",
       "motion_update_start_seconds": 19.928999707102776,
@@ -101,6 +113,7 @@
     },
     {
       "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Bus",
       "motion_update_start_seconds": 19.96666770800948,
@@ -109,6 +122,7 @@
     },
     {
       "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Bus",
       "motion_update_start_seconds": 19.983334375545382,
@@ -117,6 +131,7 @@
     },
     {
       "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Bus",
       "motion_update_start_seconds": 19.993055704515427,
@@ -125,6 +140,7 @@
     },
     {
       "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Bus",
       "motion_update_start_seconds": 19.928999707102776,
@@ -133,38 +149,43 @@
     },
     {
       "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Bus",
-      "motion_update_start_seconds": 19.96666770800948,
-      "observed_active_seconds": 20.000001043081284,
+      "motion_update_start_seconds": 15.933334164321423,
+      "observed_active_seconds": 15.966667499393225,
       "site": 4
     },
     {
       "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Bus",
-      "motion_update_start_seconds": 19.983334375545382,
-      "observed_active_seconds": 20.000001043081284,
+      "motion_update_start_seconds": 15.90000082924962,
+      "observed_active_seconds": 15.916667496785522,
       "site": 4
     },
     {
       "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Bus",
-      "motion_update_start_seconds": 19.993055704515427,
-      "observed_active_seconds": 20.000000149011612,
+      "motion_update_start_seconds": 15.875000118277967,
+      "observed_active_seconds": 15.881944562774152,
       "site": 4
     },
     {
       "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Bus",
-      "motion_update_start_seconds": 19.928999707102776,
-      "observed_active_seconds": 20.001999706029892,
+      "motion_update_start_seconds": 15.913999766111374,
+      "observed_active_seconds": 15.98699976503849,
       "site": 4
     },
     {
       "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Ufo",
       "motion_update_start_seconds": 19.96666770800948,
@@ -173,6 +194,7 @@
     },
     {
       "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Ufo",
       "motion_update_start_seconds": 19.983334375545382,
@@ -181,6 +203,7 @@
     },
     {
       "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Ufo",
       "motion_update_start_seconds": 19.993055704515427,
@@ -189,6 +212,7 @@
     },
     {
       "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Ufo",
       "motion_update_start_seconds": 19.928999707102776,
@@ -197,6 +221,7 @@
     },
     {
       "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Ufo",
       "motion_update_start_seconds": 19.96666770800948,
@@ -205,6 +230,7 @@
     },
     {
       "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Ufo",
       "motion_update_start_seconds": 19.983334375545382,
@@ -213,6 +239,7 @@
     },
     {
       "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Ufo",
       "motion_update_start_seconds": 19.993055704515427,
@@ -221,6 +248,7 @@
     },
     {
       "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Ufo",
       "motion_update_start_seconds": 19.928999707102776,
@@ -229,6 +257,7 @@
     },
     {
       "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Ufo",
       "motion_update_start_seconds": 19.96666770800948,
@@ -237,6 +266,7 @@
     },
     {
       "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Ufo",
       "motion_update_start_seconds": 19.983334375545382,
@@ -245,6 +275,7 @@
     },
     {
       "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Ufo",
       "motion_update_start_seconds": 19.993055704515427,
@@ -253,6 +284,7 @@
     },
     {
       "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Ufo",
       "motion_update_start_seconds": 19.928999707102776,
@@ -261,6 +293,7 @@
     },
     {
       "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Ufo",
       "motion_update_start_seconds": 19.96666770800948,
@@ -269,6 +302,7 @@
     },
     {
       "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Ufo",
       "motion_update_start_seconds": 19.983334375545382,
@@ -277,6 +311,7 @@
     },
     {
       "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Ufo",
       "motion_update_start_seconds": 19.993055704515427,
@@ -285,6 +320,7 @@
     },
     {
       "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Ufo",
       "motion_update_start_seconds": 19.928999707102776,
@@ -293,38 +329,43 @@
     },
     {
       "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Ufo",
-      "motion_update_start_seconds": 19.96666770800948,
-      "observed_active_seconds": 20.000001043081284,
+      "motion_update_start_seconds": 15.933334164321423,
+      "observed_active_seconds": 15.966667499393225,
       "site": 4
     },
     {
       "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Ufo",
-      "motion_update_start_seconds": 19.983334375545382,
-      "observed_active_seconds": 20.000001043081284,
+      "motion_update_start_seconds": 15.90000082924962,
+      "observed_active_seconds": 15.916667496785522,
       "site": 4
     },
     {
       "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Ufo",
-      "motion_update_start_seconds": 19.993055704515427,
-      "observed_active_seconds": 20.000000149011612,
+      "motion_update_start_seconds": 15.875000118277967,
+      "observed_active_seconds": 15.881944562774152,
       "site": 4
     },
     {
       "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Ufo",
-      "motion_update_start_seconds": 19.928999707102776,
-      "observed_active_seconds": 20.001999706029892,
+      "motion_update_start_seconds": 15.913999766111374,
+      "observed_active_seconds": 15.98699976503849,
       "site": 4
     },
     {
       "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Sewer",
       "motion_update_start_seconds": 19.96666770800948,
@@ -333,6 +374,7 @@
     },
     {
       "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Sewer",
       "motion_update_start_seconds": 19.983334375545382,
@@ -341,6 +383,7 @@
     },
     {
       "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Sewer",
       "motion_update_start_seconds": 19.993055704515427,
@@ -349,6 +392,7 @@
     },
     {
       "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Sewer",
       "motion_update_start_seconds": 19.928999707102776,
@@ -357,6 +401,7 @@
     },
     {
       "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Sewer",
       "motion_update_start_seconds": 19.96666770800948,
@@ -365,6 +410,7 @@
     },
     {
       "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Sewer",
       "motion_update_start_seconds": 19.983334375545382,
@@ -373,6 +419,7 @@
     },
     {
       "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Sewer",
       "motion_update_start_seconds": 19.993055704515427,
@@ -381,6 +428,7 @@
     },
     {
       "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Sewer",
       "motion_update_start_seconds": 19.928999707102776,
@@ -389,6 +437,7 @@
     },
     {
       "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Sewer",
       "motion_update_start_seconds": 19.96666770800948,
@@ -397,6 +446,7 @@
     },
     {
       "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Sewer",
       "motion_update_start_seconds": 19.983334375545382,
@@ -405,6 +455,7 @@
     },
     {
       "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Sewer",
       "motion_update_start_seconds": 19.993055704515427,
@@ -413,6 +464,7 @@
     },
     {
       "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Sewer",
       "motion_update_start_seconds": 19.928999707102776,
@@ -421,6 +473,7 @@
     },
     {
       "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Sewer",
       "motion_update_start_seconds": 19.96666770800948,
@@ -429,6 +482,7 @@
     },
     {
       "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Sewer",
       "motion_update_start_seconds": 19.983334375545382,
@@ -437,6 +491,7 @@
     },
     {
       "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Sewer",
       "motion_update_start_seconds": 19.993055704515427,
@@ -445,6 +500,7 @@
     },
     {
       "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Sewer",
       "motion_update_start_seconds": 19.928999707102776,
@@ -453,38 +509,43 @@
     },
     {
       "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Sewer",
-      "motion_update_start_seconds": 19.96666770800948,
-      "observed_active_seconds": 20.000001043081284,
+      "motion_update_start_seconds": 15.933334164321423,
+      "observed_active_seconds": 15.966667499393225,
       "site": 4
     },
     {
       "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Sewer",
-      "motion_update_start_seconds": 19.983334375545382,
-      "observed_active_seconds": 20.000001043081284,
+      "motion_update_start_seconds": 15.90000082924962,
+      "observed_active_seconds": 15.916667496785522,
       "site": 4
     },
     {
       "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Sewer",
-      "motion_update_start_seconds": 19.993055704515427,
-      "observed_active_seconds": 20.000000149011612,
+      "motion_update_start_seconds": 15.875000118277967,
+      "observed_active_seconds": 15.881944562774152,
       "site": 4
     },
     {
       "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Sewer",
-      "motion_update_start_seconds": 19.928999707102776,
-      "observed_active_seconds": 20.001999706029892,
+      "motion_update_start_seconds": 15.913999766111374,
+      "observed_active_seconds": 15.98699976503849,
       "site": 4
     },
     {
       "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Piano",
       "motion_update_start_seconds": 19.96666770800948,
@@ -493,6 +554,7 @@
     },
     {
       "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Piano",
       "motion_update_start_seconds": 19.983334375545382,
@@ -501,6 +563,7 @@
     },
     {
       "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Piano",
       "motion_update_start_seconds": 19.993055704515427,
@@ -509,6 +572,7 @@
     },
     {
       "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Piano",
       "motion_update_start_seconds": 19.928999707102776,
@@ -517,6 +581,7 @@
     },
     {
       "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Piano",
       "motion_update_start_seconds": 19.96666770800948,
@@ -525,6 +590,7 @@
     },
     {
       "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Piano",
       "motion_update_start_seconds": 19.983334375545382,
@@ -533,6 +599,7 @@
     },
     {
       "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Piano",
       "motion_update_start_seconds": 19.993055704515427,
@@ -541,6 +608,7 @@
     },
     {
       "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Piano",
       "motion_update_start_seconds": 19.928999707102776,
@@ -549,6 +617,7 @@
     },
     {
       "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Piano",
       "motion_update_start_seconds": 19.96666770800948,
@@ -557,6 +626,7 @@
     },
     {
       "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Piano",
       "motion_update_start_seconds": 19.983334375545382,
@@ -565,6 +635,7 @@
     },
     {
       "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Piano",
       "motion_update_start_seconds": 19.993055704515427,
@@ -573,6 +644,7 @@
     },
     {
       "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Piano",
       "motion_update_start_seconds": 19.928999707102776,
@@ -581,6 +653,7 @@
     },
     {
       "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Piano",
       "motion_update_start_seconds": 19.96666770800948,
@@ -589,6 +662,7 @@
     },
     {
       "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Piano",
       "motion_update_start_seconds": 19.983334375545382,
@@ -597,6 +671,7 @@
     },
     {
       "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Piano",
       "motion_update_start_seconds": 19.993055704515427,
@@ -605,6 +680,7 @@
     },
     {
       "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Piano",
       "motion_update_start_seconds": 19.928999707102776,
@@ -613,38 +689,43 @@
     },
     {
       "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Piano",
-      "motion_update_start_seconds": 19.96666770800948,
-      "observed_active_seconds": 20.000001043081284,
+      "motion_update_start_seconds": 15.933334164321423,
+      "observed_active_seconds": 15.966667499393225,
       "site": 4
     },
     {
       "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Piano",
-      "motion_update_start_seconds": 19.983334375545382,
-      "observed_active_seconds": 20.000001043081284,
+      "motion_update_start_seconds": 15.90000082924962,
+      "observed_active_seconds": 15.916667496785522,
       "site": 4
     },
     {
       "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Piano",
-      "motion_update_start_seconds": 19.993055704515427,
-      "observed_active_seconds": 20.000000149011612,
+      "motion_update_start_seconds": 15.875000118277967,
+      "observed_active_seconds": 15.881944562774152,
       "site": 4
     },
     {
       "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Piano",
-      "motion_update_start_seconds": 19.928999707102776,
-      "observed_active_seconds": 20.001999706029892,
+      "motion_update_start_seconds": 15.913999766111374,
+      "observed_active_seconds": 15.98699976503849,
       "site": 4
     },
     {
       "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Snowman",
       "motion_update_start_seconds": 19.96666770800948,
@@ -653,6 +734,7 @@
     },
     {
       "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Snowman",
       "motion_update_start_seconds": 19.983334375545382,
@@ -661,6 +743,7 @@
     },
     {
       "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Snowman",
       "motion_update_start_seconds": 19.993055704515427,
@@ -669,6 +752,7 @@
     },
     {
       "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Snowman",
       "motion_update_start_seconds": 19.928999707102776,
@@ -677,6 +761,7 @@
     },
     {
       "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Snowman",
       "motion_update_start_seconds": 19.96666770800948,
@@ -685,6 +770,7 @@
     },
     {
       "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Snowman",
       "motion_update_start_seconds": 19.983334375545382,
@@ -693,6 +779,7 @@
     },
     {
       "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Snowman",
       "motion_update_start_seconds": 19.993055704515427,
@@ -701,6 +788,7 @@
     },
     {
       "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Snowman",
       "motion_update_start_seconds": 19.928999707102776,
@@ -709,6 +797,7 @@
     },
     {
       "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Snowman",
       "motion_update_start_seconds": 19.96666770800948,
@@ -717,6 +806,7 @@
     },
     {
       "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Snowman",
       "motion_update_start_seconds": 19.983334375545382,
@@ -725,6 +815,7 @@
     },
     {
       "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Snowman",
       "motion_update_start_seconds": 19.993055704515427,
@@ -733,6 +824,7 @@
     },
     {
       "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Snowman",
       "motion_update_start_seconds": 19.928999707102776,
@@ -741,6 +833,7 @@
     },
     {
       "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Snowman",
       "motion_update_start_seconds": 19.96666770800948,
@@ -749,6 +842,7 @@
     },
     {
       "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Snowman",
       "motion_update_start_seconds": 19.983334375545382,
@@ -757,6 +851,7 @@
     },
     {
       "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Snowman",
       "motion_update_start_seconds": 19.993055704515427,
@@ -765,6 +860,7 @@
     },
     {
       "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Snowman",
       "motion_update_start_seconds": 19.928999707102776,
@@ -773,34 +869,38 @@
     },
     {
       "dt": 0.03333333507180214,
+      "generation_completed_seconds": 6.433333668857813,
       "hazard_elapsed": 0.03333333507180214,
       "kind": "Snowman",
-      "motion_update_start_seconds": 19.96666770800948,
-      "observed_active_seconds": 20.000001043081284,
+      "motion_update_start_seconds": 15.933334164321423,
+      "observed_active_seconds": 15.966667499393225,
       "site": 4
     },
     {
       "dt": 0.01666666753590107,
+      "generation_completed_seconds": 6.400000333786011,
       "hazard_elapsed": 0.01666666753590107,
       "kind": "Snowman",
-      "motion_update_start_seconds": 19.983334375545382,
-      "observed_active_seconds": 20.000001043081284,
+      "motion_update_start_seconds": 15.90000082924962,
+      "observed_active_seconds": 15.916667496785522,
       "site": 4
     },
     {
       "dt": 0.0069444444961845875,
+      "generation_completed_seconds": 6.40277782548219,
       "hazard_elapsed": 0.0069444444961845875,
       "kind": "Snowman",
-      "motion_update_start_seconds": 19.993055704515427,
-      "observed_active_seconds": 20.000000149011612,
+      "motion_update_start_seconds": 15.875000118277967,
+      "observed_active_seconds": 15.881944562774152,
       "site": 4
     },
     {
       "dt": 0.0729999989271164,
+      "generation_completed_seconds": 6.496999904513359,
       "hazard_elapsed": 0.0729999989271164,
       "kind": "Snowman",
-      "motion_update_start_seconds": 19.928999707102776,
-      "observed_active_seconds": 20.001999706029892,
+      "motion_update_start_seconds": 15.913999766111374,
+      "observed_active_seconds": 15.98699976503849,
       "site": 4
     }
   ],
@@ -867,22 +967,22 @@
     ],
     "defeat": true,
     "event_sites": [
-      "North_Avenue:-145",
       "Infill_Main:35",
       "North_Avenue:-145",
       "Infill_Main:35",
+      "South_Neighborhood:80",
       "North_Avenue:-145",
       "South_Neighborhood:80",
       "Residential_Avenue:-150",
-      "North_Avenue:-145",
-      "Residential_Avenue:-150"
+      "Infill_Main:35",
+      "Central_Avenue:-170"
     ],
     "five_distinct_successes": [
-      "Sewer",
+      "Snowman",
       "Piano",
       "Ufo",
-      "Bus",
-      "Snowman"
+      "Sewer",
+      "Bus"
     ],
     "kyle_switch_seconds": 2.180000066757202,
     "manual_listening_verified": false,
@@ -895,12 +995,13 @@
     "returned_to_exploration": true,
     "status": "PASS",
     "three_retries_same_pending_threat": [
-      "Ufo",
-      "Ufo",
-      "Ufo"
+      "Bus",
+      "Bus",
+      "Bus"
     ],
     "victory": true,
     "voice_duration_seconds": 3.3436734676361084
   },
-  "notes": "One shared activation clock includes every waiting phase. Motion advances on the update crossing the deadline. Rendering samples that update at the next available frame. Nearby rescue tests do not guarantee arrival from every point in the city."
+  "notes": "The clock is zero before Searching. Interval, generation, relocation and previous success hold are excluded. Search and preparation share the 20-second maximum. Pause/map preserve consumed time.",
+  "activation_clock_origin": "generated_threat_and_fps_controls_available"
 }

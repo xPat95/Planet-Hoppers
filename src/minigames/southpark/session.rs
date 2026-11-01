@@ -103,7 +103,7 @@ pub struct SaveKennySession {
     pub site: Option<EventSite>,
     pub objective_distance: f32,
     pub search_budget: f32,
-    /// Shared pending-event clock: success hold, interval, relocation, search and preparation.
+    /// Generated-event clock: starts at Searching, when the event exists and controls return.
     pub activation_elapsed: f64,
     search_deadline: f64,
     pub search_route_metres: f32,
@@ -463,44 +463,23 @@ impl SaveKennySession {
         if !matches!(self.state, SessionState::Paused | SessionState::MapOpen) {
             self.elapsed += dt;
         }
-        // One deadline, never a fresh allowance for each phase. Paused/map/dialogue
-        // states do not spend game time; cinematic logic is completely separate.
+        // Generation/loading/relocation finish before this clock can start.
+        // Searching is the first state with both a generated threat and free FPS controls.
         if self.dynamic()
-            && !self.returning
-            && self.saves < 5
             && matches!(
                 self.state,
-                SessionState::Interlude
-                    | SessionState::Relocating
-                    | SessionState::Searching
-                    | SessionState::Preparing
-                    | SessionState::Success
+                SessionState::Searching | SessionState::Preparing
             )
         {
             self.activation_elapsed += f64::from(activation_dt);
             let limit = f64::from(self.config.activation_max_seconds.min(20.0));
-            if self.activation_elapsed >= limit - 0.000001 {
-                if self.state == SessionState::Success {
-                    self.index += 1;
-                    self.enter(SessionState::Relocating);
-                }
-                if matches!(
-                    self.state,
-                    SessionState::Interlude | SessionState::Relocating
-                ) {
-                    self.prepare_search(scene)?;
-                }
-                if matches!(
-                    self.state,
-                    SessionState::Searching | SessionState::Preparing
-                ) && scene.threats.state == ThreatState::Preparing
-                {
-                    // Advance on this very update: the director's usual preparation
-                    // transition alone would defer real motion until the next frame.
-                    scene.threats.state = ThreatState::Active;
-                    scene.threats.state_time = 0.0;
-                    self.enter(SessionState::Active);
-                }
+            if self.activation_elapsed >= limit - 0.000001
+                && scene.threats.state == ThreatState::Preparing
+            {
+                // Apply real danger motion on this update, without another frozen frame.
+                scene.threats.state = ThreatState::Active;
+                scene.threats.state_time = 0.0;
+                self.enter(SessionState::Active);
             }
         }
         match self.state {
@@ -662,6 +641,9 @@ impl SaveKennySession {
                     route.unwrap_or((entry, (entry - scene.player.feet).length() * 1.8));
                 self.search_entry = access;
                 self.search_route_metres = length;
+                // All props/routes are ready. The next state restores FPS control;
+                // no earlier wait or generation work consumes the event budget.
+                self.activation_elapsed = 0.0;
                 self.search_budget = (self.search_route_metres / scene.player.config.run_speed
                     * self.config.search_route_factor
                     + self.config.search_orientation_seconds)

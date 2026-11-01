@@ -66,7 +66,7 @@ fn step(s: &mut SaveKennySession, w: &mut SouthParkScene) {
     s.update(0.05, w, VoiceClock::default()).unwrap();
 }
 #[test]
-fn total_deadline_includes_interval_relocation_search_and_preparation() {
+fn deadline_starts_at_generated_threat_and_free_controls() {
     let mut report = vec![];
     for kind in ThreatKind::ALL {
         for site in 0..5 {
@@ -79,27 +79,41 @@ fn total_deadline_includes_interval_relocation_search_and_preparation() {
                 s.start(&mut w, 12).unwrap();
                 s.order[0] = kind;
                 let mut time = 0.0_f64;
+                let mut generated_at = None;
                 let mut moved = false;
                 for _ in 0..4000 {
                     let before = time;
                     s.update(dt, &mut w, VoiceClock::default()).unwrap();
                     time += f64::from(dt);
-                    if s.state == SessionState::Active {
+                    if generated_at.is_none() {
+                        assert_eq!(
+                            s.activation_elapsed, 0.0,
+                            "pre-generation wait spent the budget"
+                        );
+                        if s.state == SessionState::Searching {
+                            assert!(s.site.is_some() && w.threats.kind == Some(kind));
+                            assert!(!s.blocks_controls());
+                            generated_at = Some(time);
+                        }
+                    }
+                    if s.state == SessionState::Active && w.threats.elapsed > 0.0 {
+                        let generated = generated_at.expect("no generated playable event");
                         // The update that crosses the deadline already advances real danger.
                         assert!(
                             w.threats.elapsed > 0.0,
                             "{kind:?}/{site}: active but frozen"
                         );
                         assert!(
-                            before < 20.000001,
+                            before - generated < 20.000001,
                             "{kind:?}/{site}: motion started at {before}"
                         );
-                        assert!(time <= 20.0 + f64::from(dt) + 0.000001);
+                        assert!(time - generated <= 20.0 + f64::from(dt) + 0.000001);
                         if kind == ThreatKind::Piano {
                             assert!(w.threats.piano_sway().abs() > 0.0);
                         }
                         report.push(json!({"kind":format!("{kind:?}"),"site":site,"dt":dt,
-                            "motion_update_start_seconds":before,"observed_active_seconds":time,
+                            "generation_completed_seconds":generated,
+                            "motion_update_start_seconds":before-generated,"observed_active_seconds":time-generated,
                             "hazard_elapsed":w.threats.elapsed}));
                         moved = true;
                         break;
@@ -121,6 +135,13 @@ fn deadline_is_not_extended_by_a_long_frame_or_by_retrying_after_death() {
     let mut s = SaveKennySession::default();
     s.enable_world(catalog(), 44);
     s.start(&mut w, 12).unwrap();
+    s.update(120.0, &mut w, VoiceClock::default()).unwrap();
+    assert_eq!(s.activation_elapsed, 0.0);
+    while s.state != SessionState::Searching {
+        step(&mut s, &mut w);
+    }
+    assert!(!s.blocks_controls());
+    assert_eq!(s.activation_elapsed, 0.0);
     s.update(19.9, &mut w, VoiceClock::default()).unwrap();
     s.update(0.1, &mut w, VoiceClock::default()).unwrap();
     assert_eq!(s.state, SessionState::Active);
@@ -131,6 +152,12 @@ fn deadline_is_not_extended_by_a_long_frame_or_by_retrying_after_death() {
     assert_eq!(s.lives, 2);
     let pending = s.current();
     step(&mut s, &mut w); // Restoring enters the new pending event; controls are still blocked.
+    assert_eq!(s.activation_elapsed, 0.0);
+    while s.state != SessionState::Searching {
+        assert_eq!(s.activation_elapsed, 0.0);
+        step(&mut s, &mut w);
+    }
+    assert!(!s.blocks_controls());
     assert_eq!(s.activation_elapsed, 0.0);
     let mut time = 0.0_f64;
     while s.state != SessionState::Active && time < 20.1 {
@@ -144,7 +171,7 @@ fn deadline_is_not_extended_by_a_long_frame_or_by_retrying_after_death() {
     assert!(w.threats.elapsed > 0.0);
 }
 #[test]
-fn deadline_counts_success_hold_and_survives_map_and_pause_without_resetting() {
+fn new_generation_resets_clock_after_success_and_pause_does_not_reset_it() {
     let mut w = scene();
     let mut s = SaveKennySession::default();
     s.enable_world(catalog(), 44);
@@ -152,7 +179,9 @@ fn deadline_counts_success_hold_and_survives_map_and_pause_without_resetting() {
     while s.state != SessionState::Searching {
         step(&mut s, &mut w);
     }
+    step(&mut s, &mut w);
     let clock = s.activation_elapsed;
+    assert!(clock > 0.0);
     assert!(s.open_map());
     for _ in 0..400 {
         step(&mut s, &mut w);
@@ -179,6 +208,11 @@ fn deadline_counts_success_hold_and_survives_map_and_pause_without_resetting() {
     }
     assert_eq!(s.state, SessionState::Success);
     assert_eq!(s.activation_elapsed, 0.0);
+    while s.state != SessionState::Searching {
+        step(&mut s, &mut w);
+        assert_eq!(s.activation_elapsed, 0.0);
+    }
+    assert!(!s.blocks_controls());
     let mut time = 0.0;
     while s.state != SessionState::Active && time < 20.1 {
         step(&mut s, &mut w);

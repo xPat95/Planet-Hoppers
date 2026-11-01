@@ -104,10 +104,11 @@ primero. Alejarse después no cancela ni reinicia la preparación. El peligro
 real empieza al terminar los **2 s** de advertencia; ningún evento espera
 indefinidamente la proximidad del jugador. Los controles continúan disponibles.
 
-**Ajuste posterior: máximo total de 20 s hasta el movimiento.** El intervalo,
-la transición, la búsqueda y la preparación comparten un único reloj. Tras una
-salvada también cuenta el aviso de éxito; al reintentar se abre un presupuesto
-nuevo. No se suman 20 s a las otras fases. M y P conservan su pausa del mundo.
+**Ajuste posterior: máximo de 20 s desde la aparición jugable de la amenaza.**
+El reloj inicia en cero cuando los objetos y rutas están preparados y el FPS
+recupera el movimiento. Búsqueda y preparación comparten ese reloj; el intervalo,
+la transición y el aviso de éxito anterior no lo consumen. Al generar cada
+reintento se reinicia en cero. M y P conservan su pausa del mundo.
 Ver [detalle y verificaciones del límite total](southpark-activation-deadline.md).
 
 Parámetros en `config/southpark-session.json`:
@@ -116,7 +117,7 @@ Parámetros en `config/southpark-session.json`:
 | --- | --- | --- |
 | `zone_detection_distance` | 90 m | Indica que ya se detectó la zona en el aviso |
 | `arrival_distance` | 32 m | Adelanta la preparación con visión directa |
-| `activation_max_seconds` | 20 s | Máximo total, incluyendo todas las esperas |
+| `activation_max_seconds` | 20 s | Máximo desde la amenaza generada y los controles disponibles |
 | `search_min_seconds` / `search_max_seconds` | 2 / 20 s | Límites orientativos, sujetos al presupuesto restante |
 | `search_route_factor` | 1,05 | Margen sobre el tiempo estimado corriendo |
 | `search_orientation_seconds` | 3 s | Tiempo adicional para orientarse |
@@ -139,8 +140,9 @@ Si no se encuentra ruta, el respaldo documentado es distancia recta×1,8.
 La búsqueda no recalcula ni extiende su plazo al moverse el jugador.
 
 El cálculo por distancia nunca amplía el máximo total. Con los valores actuales,
-el primer evento dispone de unos 11,6 s de búsqueda después del intervalo y la
-transición; los 2 s de preparación están incluidos en los 20 s. Los recorridos
+la búsqueda dispone de hasta 18 s desde la generación con movimiento disponible;
+los 2 s de preparación están incluidos en los 20 s. Intervalo, generación y
+transición ya no descuentan tiempo de ese reloj. Los recorridos
 históricos desde el spawn inicial alcanzaban 89–531 m: el nuevo límite exige
 estar bien ubicado y no garantiza salvar a Kenny desde cualquier extremo de
 la ciudad. No se cambiaron la velocidad del jugador ni las de las amenazas.
