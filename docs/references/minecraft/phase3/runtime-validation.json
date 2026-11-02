@@ -1,0 +1,126 @@
+{
+  "checks": [
+    "WASD, sprint and native mouse input control grounded mine FPS",
+    "Diamond raycast selects its independent block; E does not extract it",
+    "Swept sprint stops at mine wall",
+    "Prepared passage blocks remain solid during sprint",
+    "Exit E opens development menu and releases native cursor",
+    "Exit menu freezes movement and camera",
+    "Cancel resumes mine exploration and native cursor capture",
+    "Escape releases mine cursor",
+    "Escape recaptures mine cursor",
+    "Development exit requests a normal return to village"
+  ],
+  "frames": 130,
+  "future_layout": {
+    "future_gates_open": true,
+    "reachable_chambers": [
+      "A_entry",
+      "A_junction",
+      "A_supply",
+      "B_hub",
+      "B_east",
+      "B_secret",
+      "C_lava",
+      "C_vault",
+      "C_secret"
+    ],
+    "safe_reachable_diamonds": [
+      "ORE_DIAMOND_01",
+      "ORE_DIAMOND_02",
+      "ORE_DIAMOND_03",
+      "ORE_DIAMOND_04",
+      "ORE_DIAMOND_05",
+      "ORE_DIAMOND_06",
+      "ORE_DIAMOND_07",
+      "ORE_DIAMOND_08",
+      "ORE_DIAMOND_09",
+      "ORE_DIAMOND_10",
+      "ORE_DIAMOND_11",
+      "ORE_DIAMOND_12",
+      "ORE_DIAMOND_13",
+      "ORE_DIAMOND_14"
+    ],
+    "visited_cells": 1064
+  },
+  "independent_groups": [
+    "BREAK_B_gate_32_0",
+    "BREAK_B_gate_32_1",
+    "BREAK_B_gate_32_2",
+    "BREAK_B_gate_33_0",
+    "BREAK_B_gate_33_1",
+    "BREAK_B_gate_33_2",
+    "BREAK_C_gate_50_0",
+    "BREAK_C_gate_50_1",
+    "BREAK_C_gate_50_2",
+    "BREAK_C_gate_51_0",
+    "BREAK_C_gate_51_1",
+    "BREAK_C_gate_51_2",
+    "ORE_DIAMOND_01",
+    "ORE_DIAMOND_02",
+    "ORE_DIAMOND_03",
+    "ORE_DIAMOND_04",
+    "ORE_DIAMOND_05",
+    "ORE_DIAMOND_06",
+    "ORE_DIAMOND_07",
+    "ORE_DIAMOND_08",
+    "ORE_DIAMOND_09",
+    "ORE_DIAMOND_10",
+    "ORE_DIAMOND_11",
+    "ORE_DIAMOND_12",
+    "ORE_DIAMOND_13",
+    "ORE_DIAMOND_14"
+  ],
+  "intact_layout": {
+    "future_gates_open": false,
+    "reachable_chambers": [
+      "A_entry",
+      "A_junction",
+      "A_supply",
+      "B_hub",
+      "B_east",
+      "C_lava",
+      "C_vault"
+    ],
+    "safe_reachable_diamonds": [
+      "ORE_DIAMOND_01",
+      "ORE_DIAMOND_02",
+      "ORE_DIAMOND_03",
+      "ORE_DIAMOND_04",
+      "ORE_DIAMOND_05",
+      "ORE_DIAMOND_08",
+      "ORE_DIAMOND_09",
+      "ORE_DIAMOND_10",
+      "ORE_DIAMOND_11",
+      "ORE_DIAMOND_12"
+    ],
+    "visited_cells": 916
+  },
+  "lava_sensors": 2,
+  "lights": 22,
+  "model": {
+    "bounds_max": [
+      25.0,
+      6.0,
+      3.0
+    ],
+    "bounds_min": [
+      -23.0,
+      -0.07999999821186066,
+      -59.0
+    ],
+    "draw_batches": 45,
+    "material_colors_match": true,
+    "original_primitives": 77,
+    "source_materials": 20,
+    "triangles": 19704
+  },
+  "note": "Real hidden OpenGL window, raylib automation and pose fixtures; no hardware playtest or mining.",
+  "pixel_materials": {
+    "alpha_mask_materials": 0,
+    "color_space": "sRGB textures decoded before point-light shading",
+    "double_sided_materials": 20,
+    "point_filtered_textures": 16
+  },
+  "status": "passed"
+}

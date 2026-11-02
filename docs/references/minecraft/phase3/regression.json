@@ -1,0 +1,390 @@
+{
+  "status": "passed",
+  "modes": [
+    {
+      "mode": "mine",
+      "exit_code": 0,
+      "reports": [
+        {
+          "label": "MINE_SMOKE",
+          "result": {
+            "checks": [
+              "WASD, sprint and native mouse input control grounded mine FPS",
+              "Diamond raycast selects its independent block; E does not extract it",
+              "Swept sprint stops at mine wall",
+              "Prepared passage blocks remain solid during sprint",
+              "Exit E opens development menu and releases native cursor",
+              "Exit menu freezes movement and camera",
+              "Cancel resumes mine exploration and native cursor capture",
+              "Escape releases mine cursor",
+              "Escape recaptures mine cursor",
+              "Development exit requests a normal return to village"
+            ],
+            "frames": 130,
+            "future_layout": {
+              "future_gates_open": true,
+              "reachable_chambers": [
+                "A_entry",
+                "A_junction",
+                "A_supply",
+                "B_hub",
+                "B_east",
+                "B_secret",
+                "C_lava",
+                "C_vault",
+                "C_secret"
+              ],
+              "safe_reachable_diamonds": [
+                "ORE_DIAMOND_01",
+                "ORE_DIAMOND_02",
+                "ORE_DIAMOND_03",
+                "ORE_DIAMOND_04",
+                "ORE_DIAMOND_05",
+                "ORE_DIAMOND_06",
+                "ORE_DIAMOND_07",
+                "ORE_DIAMOND_08",
+                "ORE_DIAMOND_09",
+                "ORE_DIAMOND_10",
+                "ORE_DIAMOND_11",
+                "ORE_DIAMOND_12",
+                "ORE_DIAMOND_13",
+                "ORE_DIAMOND_14"
+              ],
+              "visited_cells": 1064
+            },
+            "independent_groups": [
+              "BREAK_B_gate_32_0",
+              "BREAK_B_gate_32_1",
+              "BREAK_B_gate_32_2",
+              "BREAK_B_gate_33_0",
+              "BREAK_B_gate_33_1",
+              "BREAK_B_gate_33_2",
+              "BREAK_C_gate_50_0",
+              "BREAK_C_gate_50_1",
+              "BREAK_C_gate_50_2",
+              "BREAK_C_gate_51_0",
+              "BREAK_C_gate_51_1",
+              "BREAK_C_gate_51_2",
+              "ORE_DIAMOND_01",
+              "ORE_DIAMOND_02",
+              "ORE_DIAMOND_03",
+              "ORE_DIAMOND_04",
+              "ORE_DIAMOND_05",
+              "ORE_DIAMOND_06",
+              "ORE_DIAMOND_07",
+              "ORE_DIAMOND_08",
+              "ORE_DIAMOND_09",
+              "ORE_DIAMOND_10",
+              "ORE_DIAMOND_11",
+              "ORE_DIAMOND_12",
+              "ORE_DIAMOND_13",
+              "ORE_DIAMOND_14"
+            ],
+            "intact_layout": {
+              "future_gates_open": false,
+              "reachable_chambers": [
+                "A_entry",
+                "A_junction",
+                "A_supply",
+                "B_hub",
+                "B_east",
+                "C_lava",
+                "C_vault"
+              ],
+              "safe_reachable_diamonds": [
+                "ORE_DIAMOND_01",
+                "ORE_DIAMOND_02",
+                "ORE_DIAMOND_03",
+                "ORE_DIAMOND_04",
+                "ORE_DIAMOND_05",
+                "ORE_DIAMOND_08",
+                "ORE_DIAMOND_09",
+                "ORE_DIAMOND_10",
+                "ORE_DIAMOND_11",
+                "ORE_DIAMOND_12"
+              ],
+              "visited_cells": 916
+            },
+            "lava_sensors": 2,
+            "lights": 22,
+            "model": {
+              "bounds_max": [
+                25.0,
+                6.0,
+                3.0
+              ],
+              "bounds_min": [
+                -23.0,
+                -0.07999999821186066,
+                -59.0
+              ],
+              "draw_batches": 45,
+              "material_colors_match": true,
+              "original_primitives": 77,
+              "source_materials": 20,
+              "triangles": 19704
+            },
+            "note": "Real hidden OpenGL window, raylib automation and pose fixtures; no hardware playtest or mining.",
+            "pixel_materials": {
+              "alpha_mask_materials": 0,
+              "color_space": "sRGB textures decoded before point-light shading",
+              "double_sided_materials": 20,
+              "point_filtered_textures": 16
+            },
+            "status": "passed"
+          }
+        },
+        {
+          "label": "MINECRAFT_MODEL_AUDIT",
+          "result": {
+            "original_primitives": 383,
+            "source_materials": 32,
+            "triangles": 39176,
+            "draw_batches": 32,
+            "bounds_min": [
+              -32.0,
+              -2.0,
+              -34.0
+            ],
+            "bounds_max": [
+              32.0,
+              9.0,
+              26.0
+            ],
+            "material_colors_match": true
+          }
+        },
+        {
+          "label": "MINECRAFT_SMOKE",
+          "result": {
+            "checks": [
+              "WASD and Shift move the grounded FPS player",
+              "Mouse changes camera orientation through real input",
+              "E raycast opens the mine menu",
+              "Mine menu releases the native cursor",
+              "Modal menu blocks movement and mouse look",
+              "Cancel closes the menu; held E does not reopen it",
+              "Cancel restores native cursor capture",
+              "Start displays pending confirmation and reserves a return pose",
+              "Pending confirmation returns to exploration",
+              "Escape releases cursor during exploration",
+              "Escape recaptures cursor during exploration",
+              "Sprinting collides with the actual house",
+              "Sprinting collides with the actual oak trunk",
+              "Mine entrance remains targetable after exploration",
+              "Existing crafting table supports an occluded/ranged inspection ray"
+            ],
+            "frames": 136,
+            "limitations": [
+              "No human keyboard/mouse playtest; injected input and scene fixtures exercise the runtime.",
+              "No mining, underground scene, timer or solar integration."
+            ],
+            "method": "Hidden OpenGL window; real PlayerInput, automation events, UI loop, native cursor and renderer",
+            "model": {
+              "bounds_max": [
+                32.0,
+                9.0,
+                26.0
+              ],
+              "bounds_min": [
+                -32.0,
+                -2.0,
+                -34.0
+              ],
+              "draw_batches": 32,
+              "material_colors_match": true,
+              "original_primitives": 383,
+              "source_materials": 32,
+              "triangles": 39176
+            },
+            "pixel_materials": {
+              "alpha_mask_materials": 4,
+              "color_space": "sRGB textures decoded before daylight lighting",
+              "double_sided_materials": 32,
+              "point_filtered_textures": 27
+            },
+            "status": "passed"
+          }
+        }
+      ]
+    },
+    {
+      "mode": "southpark",
+      "exit_code": 0,
+      "reports": [
+        {
+          "label": "SMOKE_PASS",
+          "result": {
+            "frames": 90,
+            "manual_hardware_input_tested": false,
+            "model": {
+              "bounds_max": [
+                370.0,
+                23.196308135986328,
+                160.0
+              ],
+              "bounds_min": [
+                -350.0,
+                -1.0,
+                -175.0
+              ],
+              "draw_batches": 28,
+              "material_colors_match": true,
+              "original_primitives": 2734,
+              "source_materials": 27,
+              "triangles": 76212
+            },
+            "notes": "Real OpenGL render and raylib automation events. Physical keyboard/mouse and long play sessions require manual verification.",
+            "raylib_automation": {
+              "E_confirmations": 1,
+              "Escape_recapture": true,
+              "Escape_release": true,
+              "W_Shift": true,
+              "mouse_look": true,
+              "run_blocked_at_m": 2.4999046325683594
+            },
+            "render_mean_ms": 10.797008235294115,
+            "scene_solids": 395,
+            "status": "PASS"
+          }
+        },
+        {
+          "label": "AUDIO_RUNTIME_AUDIT",
+          "result": {
+            "loaded": {
+              "assets/audio/music/South Park/exploration.mp3": 860.3951,
+              "assets/audio/music/South Park/intro.mp3": 27.376326,
+              "assets/audio/music/South Park/save_kenny.mp3": 215.71918,
+              "assets/audio/sfx/South Park/danger.mp3": 5.3812294,
+              "assets/audio/sfx/South Park/footsteps.mp3": 7.584,
+              "assets/audio/sfx/South Park/game_over.mp3": 3.0824583,
+              "assets/audio/sfx/South Park/success.mp3": 3.408,
+              "assets/audio/sfx/South Park/they_killed_kenny.mp3": 3.3436735,
+              "assets/audio/sfx/South Park/victory.mp3": 3.504
+            },
+            "warnings": [],
+            "plays": {
+              "footsteps": 1
+            },
+            "music_transitions": [
+              "exploration",
+              "silent"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "mode": "threats",
+      "exit_code": 0,
+      "reports": [
+        {
+          "label": "THREATS_SMOKE_PASS",
+          "result": {
+            "cases": [
+              {
+                "E_presses": 1,
+                "kind": "Bus",
+                "restart": "PASS",
+                "result": "Survived",
+                "return_to_exploration": "PASS"
+              },
+              {
+                "E_presses": 0,
+                "kind": "Bus",
+                "restart": "PASS",
+                "result": "Died",
+                "return_to_exploration": "PASS"
+              },
+              {
+                "E_presses": 3,
+                "kind": "Ufo",
+                "restart": "PASS",
+                "result": "Survived",
+                "return_to_exploration": "PASS"
+              },
+              {
+                "E_presses": 0,
+                "kind": "Ufo",
+                "restart": "PASS",
+                "result": "Died",
+                "return_to_exploration": "PASS"
+              },
+              {
+                "E_presses": 2,
+                "kind": "Sewer",
+                "restart": "PASS",
+                "result": "Survived",
+                "return_to_exploration": "PASS"
+              },
+              {
+                "E_presses": 0,
+                "kind": "Sewer",
+                "restart": "PASS",
+                "result": "Died",
+                "return_to_exploration": "PASS"
+              },
+              {
+                "E_presses": 1,
+                "kind": "Piano",
+                "restart": "PASS",
+                "result": "Survived",
+                "return_to_exploration": "PASS"
+              },
+              {
+                "E_presses": 0,
+                "kind": "Piano",
+                "restart": "PASS",
+                "result": "Died",
+                "return_to_exploration": "PASS"
+              },
+              {
+                "E_presses": 3,
+                "kind": "Snowman",
+                "restart": "PASS",
+                "result": "Survived",
+                "return_to_exploration": "PASS"
+              },
+              {
+                "E_presses": 0,
+                "kind": "Snowman",
+                "restart": "PASS",
+                "result": "Died",
+                "return_to_exploration": "PASS"
+              }
+            ],
+            "frames": 1258,
+            "manual_hardware_input_tested": false,
+            "model_loading_and_dimensions": "PASS",
+            "note": "Real OpenGL and shared raycasting/E input; automated player placement, aiming and cinematic capture cameras.",
+            "status": "PASS"
+          }
+        },
+        {
+          "label": "AUDIO_RUNTIME_AUDIT",
+          "result": {
+            "loaded": {
+              "assets/audio/music/South Park/exploration.mp3": 860.3951,
+              "assets/audio/music/South Park/intro.mp3": 27.376326,
+              "assets/audio/music/South Park/save_kenny.mp3": 215.71918,
+              "assets/audio/sfx/South Park/danger.mp3": 5.3812294,
+              "assets/audio/sfx/South Park/footsteps.mp3": 7.584,
+              "assets/audio/sfx/South Park/game_over.mp3": 3.0824583,
+              "assets/audio/sfx/South Park/success.mp3": 3.408,
+              "assets/audio/sfx/South Park/they_killed_kenny.mp3": 3.3436735,
+              "assets/audio/sfx/South Park/victory.mp3": 3.504
+            },
+            "warnings": [],
+            "plays": {},
+            "music_transitions": [
+              "exploration",
+              "silent"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "manual_hardware_playtest": false,
+  "southpark_muted": true
+}

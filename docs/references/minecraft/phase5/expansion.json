@@ -1,0 +1,12 @@
+{
+  "status": "generated",
+  "previous_floor_cells": 1100,
+  "floor_cells": 2409,
+  "ratio": 2.19,
+  "previous_rooms": 9,
+  "rooms": 14,
+  "previous_tunnels": 10,
+  "tunnels": 18,
+  "diamonds": 16,
+  "lights": 39
+}

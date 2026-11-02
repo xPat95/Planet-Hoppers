@@ -1,0 +1,268 @@
+[
+  {
+    "file": "andesite.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "coal_ore.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "cobblestone.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "crafting_table_front.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "crafting_table_side.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "crafting_table_top.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "diamond_ore.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "diorite.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "dirt.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "dirt_path_side.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "dirt_path_top.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "farmland_moist.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "furnace_front.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "furnace_side.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "furnace_top.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "glass.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "gold_ore.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "granite.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "grass_block_side.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "grass_block_top.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "gravel.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "hay_block_side.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "hay_block_top.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "iron_ore.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "lapis_ore.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "lava_still.png",
+    "size": [
+      16,
+      320
+    ]
+  },
+  {
+    "file": "oak_door_bottom.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "oak_door_top.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "oak_leaves.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "oak_log.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "oak_log_top.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "oak_planks.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "redstone_ore.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "sand.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "snow.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "stone.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "water_static_frame_00.png",
+    "size": [
+      16,
+      16
+    ]
+  },
+  {
+    "file": "water_still.png",
+    "size": [
+      16,
+      512
+    ]
+  }
+]

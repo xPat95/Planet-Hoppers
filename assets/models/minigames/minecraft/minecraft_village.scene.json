@@ -1,0 +1,2185 @@
+{
+  "schema_version": 1,
+  "id": "minecraft.diamond-rush.environment",
+  "blend": "minecraft_village.blend",
+  "visual_asset": "minecraft_village.glb",
+  "coordinates": {
+    "units": "meters",
+    "up": "Z",
+    "gltf_up": "Y",
+    "to_gltf": "(x,y,z) -> (x,z,-y)"
+  },
+  "spawn": {
+    "position": [
+      0,
+      -21,
+      1.7
+    ],
+    "forward": [
+      0,
+      1,
+      0
+    ],
+    "eye_height": 1.7
+  },
+  "player_reference": {
+    "height": 1.8,
+    "radius": 0.35
+  },
+  "roads": [
+    {
+      "name": "House_Small_West_approach",
+      "points": [
+        [
+          0,
+          -15,
+          0
+        ],
+        [
+          -17.5,
+          -15,
+          0
+        ]
+      ],
+      "width": 3
+    },
+    {
+      "name": "House_Small_East_approach",
+      "points": [
+        [
+          0,
+          -15,
+          0
+        ],
+        [
+          15.5,
+          -15,
+          0
+        ]
+      ],
+      "width": 3
+    },
+    {
+      "name": "House_Medium_West_approach",
+      "points": [
+        [
+          -4,
+          1,
+          0
+        ],
+        [
+          -17.5,
+          1,
+          0
+        ]
+      ],
+      "width": 3
+    },
+    {
+      "name": "House_Medium_East_approach",
+      "points": [
+        [
+          4,
+          2,
+          0
+        ],
+        [
+          16.5,
+          2,
+          0
+        ]
+      ],
+      "width": 3
+    },
+    {
+      "name": "Village_Hall_approach",
+      "points": [
+        [
+          0,
+          14,
+          0
+        ],
+        [
+          -6.5,
+          14,
+          0
+        ]
+      ],
+      "width": 3
+    },
+    {
+      "name": "South_entry",
+      "points": [
+        [
+          0,
+          -21,
+          0
+        ],
+        [
+          0,
+          -3,
+          0
+        ]
+      ],
+      "width": 3
+    },
+    {
+      "name": "West_square",
+      "points": [
+        [
+          -4,
+          -3,
+          0
+        ],
+        [
+          -4,
+          7,
+          0
+        ],
+        [
+          0,
+          7,
+          0
+        ]
+      ],
+      "width": 3
+    },
+    {
+      "name": "East_square",
+      "points": [
+        [
+          0,
+          -3,
+          0
+        ],
+        [
+          4,
+          -3,
+          0
+        ],
+        [
+          4,
+          7,
+          0
+        ],
+        [
+          0,
+          7,
+          0
+        ]
+      ],
+      "width": 3
+    },
+    {
+      "name": "North_road",
+      "points": [
+        [
+          0,
+          7,
+          0
+        ],
+        [
+          0,
+          23,
+          0
+        ],
+        [
+          8.5,
+          23,
+          0
+        ],
+        [
+          8.5,
+          30,
+          0
+        ]
+      ],
+      "width": 3
+    },
+    {
+      "name": "Farm_approach",
+      "points": [
+        [
+          0,
+          13,
+          0
+        ],
+        [
+          19,
+          13,
+          0
+        ]
+      ],
+      "width": 3
+    },
+    {
+      "name": "Square_south",
+      "points": [
+        [
+          -4,
+          -3,
+          0
+        ],
+        [
+          4,
+          -3,
+          0
+        ]
+      ],
+      "width": 3
+    }
+  ],
+  "colliders": [
+    {
+      "name": "Overworld_floor",
+      "shape": "plane",
+      "role": "walkable",
+      "category": "terrain",
+      "min": [
+        -32,
+        -26
+      ],
+      "max": [
+        32,
+        34
+      ],
+      "z": 0
+    },
+    {
+      "name": "House_Small_West",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "building",
+      "min": [
+        -20,
+        -13,
+        0
+      ],
+      "max": [
+        -15,
+        -8,
+        4
+      ]
+    },
+    {
+      "name": "House_Small_East",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "building",
+      "min": [
+        13,
+        -13,
+        0
+      ],
+      "max": [
+        18,
+        -8,
+        4
+      ]
+    },
+    {
+      "name": "House_Medium_West",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "building",
+      "min": [
+        -21,
+        3,
+        0
+      ],
+      "max": [
+        -14,
+        9,
+        5
+      ]
+    },
+    {
+      "name": "House_Medium_East",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "building",
+      "min": [
+        13,
+        4,
+        0
+      ],
+      "max": [
+        20,
+        10,
+        5
+      ]
+    },
+    {
+      "name": "Village_Hall",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "building",
+      "min": [
+        -11,
+        16,
+        0
+      ],
+      "max": [
+        -2,
+        23,
+        5
+      ]
+    },
+    {
+      "name": "Hill_-32_-26",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        -32,
+        -26,
+        0
+      ],
+      "max": [
+        32,
+        -25,
+        4
+      ]
+    },
+    {
+      "name": "Hill_-32_-25",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        -32,
+        -25,
+        0
+      ],
+      "max": [
+        -31,
+        33,
+        4
+      ]
+    },
+    {
+      "name": "Hill_-31_-25",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        -31,
+        -25,
+        0
+      ],
+      "max": [
+        31,
+        -24,
+        3
+      ]
+    },
+    {
+      "name": "Hill_31_-25",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        31,
+        -25,
+        0
+      ],
+      "max": [
+        32,
+        33,
+        4
+      ]
+    },
+    {
+      "name": "Hill_-31_-24",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        -31,
+        -24,
+        0
+      ],
+      "max": [
+        -30,
+        4,
+        3
+      ]
+    },
+    {
+      "name": "Hill_-31_8",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        -31,
+        8,
+        0
+      ],
+      "max": [
+        -30,
+        12,
+        3
+      ]
+    },
+    {
+      "name": "Hill_-31_16",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        -31,
+        16,
+        0
+      ],
+      "max": [
+        -30,
+        20,
+        3
+      ]
+    },
+    {
+      "name": "Hill_-31_21",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        -31,
+        21,
+        0
+      ],
+      "max": [
+        -30,
+        32,
+        3
+      ]
+    },
+    {
+      "name": "Hill_-30_-24",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        -30,
+        -24,
+        0
+      ],
+      "max": [
+        30,
+        -23,
+        2
+      ]
+    },
+    {
+      "name": "Hill_30_-24",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        30,
+        -24,
+        0
+      ],
+      "max": [
+        31,
+        32,
+        3
+      ]
+    },
+    {
+      "name": "Hill_-30_-23",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        -30,
+        -23,
+        0
+      ],
+      "max": [
+        -29,
+        -3,
+        2
+      ]
+    },
+    {
+      "name": "Hill_-30_21",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        -30,
+        21,
+        0
+      ],
+      "max": [
+        -29,
+        31,
+        2
+      ]
+    },
+    {
+      "name": "Hill_-29_-23",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        -29,
+        -23,
+        0
+      ],
+      "max": [
+        29,
+        -22,
+        1
+      ]
+    },
+    {
+      "name": "Hill_29_-23",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        29,
+        -23,
+        0
+      ],
+      "max": [
+        30,
+        31,
+        2
+      ]
+    },
+    {
+      "name": "Hill_-29_-22",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        -29,
+        -22,
+        0
+      ],
+      "max": [
+        -28,
+        -3,
+        1
+      ]
+    },
+    {
+      "name": "Hill_-29_21",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        -29,
+        21,
+        0
+      ],
+      "max": [
+        -28,
+        30,
+        1
+      ]
+    },
+    {
+      "name": "Hill_28_-22",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        28,
+        -22,
+        0
+      ],
+      "max": [
+        29,
+        30,
+        1
+      ]
+    },
+    {
+      "name": "Hill_-30_-3",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        -30,
+        -3,
+        0
+      ],
+      "max": [
+        -23,
+        4,
+        2
+      ]
+    },
+    {
+      "name": "Hill_-30_8",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        -30,
+        8,
+        0
+      ],
+      "max": [
+        -23,
+        12,
+        2
+      ]
+    },
+    {
+      "name": "Hill_-30_16",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        -30,
+        16,
+        0
+      ],
+      "max": [
+        -23,
+        20,
+        2
+      ]
+    },
+    {
+      "name": "Hill_-31_4",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        -31,
+        4,
+        0
+      ],
+      "max": [
+        -23,
+        8,
+        3
+      ]
+    },
+    {
+      "name": "Hill_-31_12",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        -31,
+        12,
+        0
+      ],
+      "max": [
+        -23,
+        16,
+        3
+      ]
+    },
+    {
+      "name": "Hill_-31_20",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        -31,
+        20,
+        0
+      ],
+      "max": [
+        -23,
+        21,
+        3
+      ]
+    },
+    {
+      "name": "Hill_1_26",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        1,
+        26,
+        0
+      ],
+      "max": [
+        2,
+        30,
+        1
+      ]
+    },
+    {
+      "name": "Hill_2_26",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        2,
+        26,
+        0
+      ],
+      "max": [
+        3,
+        31,
+        2
+      ]
+    },
+    {
+      "name": "Hill_3_26",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        3,
+        26,
+        0
+      ],
+      "max": [
+        4,
+        32,
+        3
+      ]
+    },
+    {
+      "name": "Hill_4_26",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        4,
+        26,
+        0
+      ],
+      "max": [
+        5,
+        33,
+        4
+      ]
+    },
+    {
+      "name": "Hill_5_26",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        5,
+        26,
+        0
+      ],
+      "max": [
+        6,
+        34,
+        5
+      ]
+    },
+    {
+      "name": "Hill_11_26",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        11,
+        26,
+        0
+      ],
+      "max": [
+        13,
+        29,
+        6
+      ]
+    },
+    {
+      "name": "Hill_13_26",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        13,
+        26,
+        0
+      ],
+      "max": [
+        14,
+        34,
+        5
+      ]
+    },
+    {
+      "name": "Hill_14_26",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        14,
+        26,
+        0
+      ],
+      "max": [
+        15,
+        33,
+        4
+      ]
+    },
+    {
+      "name": "Hill_15_26",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        15,
+        26,
+        0
+      ],
+      "max": [
+        16,
+        32,
+        3
+      ]
+    },
+    {
+      "name": "Hill_16_26",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        16,
+        26,
+        0
+      ],
+      "max": [
+        17,
+        31,
+        2
+      ]
+    },
+    {
+      "name": "Hill_17_26",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        17,
+        26,
+        0
+      ],
+      "max": [
+        18,
+        30,
+        1
+      ]
+    },
+    {
+      "name": "Hill_11_29",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        11,
+        29,
+        0
+      ],
+      "max": [
+        12,
+        32,
+        7
+      ]
+    },
+    {
+      "name": "Hill_12_29",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        12,
+        29,
+        0
+      ],
+      "max": [
+        13,
+        34,
+        6
+      ]
+    },
+    {
+      "name": "Hill_-29_30",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        -29,
+        30,
+        0
+      ],
+      "max": [
+        2,
+        31,
+        1
+      ]
+    },
+    {
+      "name": "Hill_17_30",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        17,
+        30,
+        0
+      ],
+      "max": [
+        29,
+        31,
+        1
+      ]
+    },
+    {
+      "name": "Hill_-30_31",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        -30,
+        31,
+        0
+      ],
+      "max": [
+        3,
+        32,
+        2
+      ]
+    },
+    {
+      "name": "Hill_16_31",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        16,
+        31,
+        0
+      ],
+      "max": [
+        30,
+        32,
+        2
+      ]
+    },
+    {
+      "name": "Hill_-31_32",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        -31,
+        32,
+        0
+      ],
+      "max": [
+        4,
+        33,
+        3
+      ]
+    },
+    {
+      "name": "Hill_6_32",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        6,
+        32,
+        0
+      ],
+      "max": [
+        7,
+        34,
+        6
+      ]
+    },
+    {
+      "name": "Hill_7_32",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        7,
+        32,
+        0
+      ],
+      "max": [
+        12,
+        34,
+        7
+      ]
+    },
+    {
+      "name": "Hill_15_32",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        15,
+        32,
+        0
+      ],
+      "max": [
+        31,
+        33,
+        3
+      ]
+    },
+    {
+      "name": "Hill_-32_33",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        -32,
+        33,
+        0
+      ],
+      "max": [
+        5,
+        34,
+        4
+      ]
+    },
+    {
+      "name": "Hill_14_33",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "hill_boundary",
+      "min": [
+        14,
+        33,
+        0
+      ],
+      "max": [
+        32,
+        34,
+        4
+      ]
+    },
+    {
+      "name": "Well",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "decoration",
+      "min": [
+        -2,
+        0,
+        0
+      ],
+      "max": [
+        2,
+        4,
+        3.5
+      ]
+    },
+    {
+      "name": "Hay_12_19_0",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "decoration",
+      "min": [
+        12,
+        19,
+        0
+      ],
+      "max": [
+        13,
+        20,
+        1
+      ]
+    },
+    {
+      "name": "Hay_12_20_0",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "decoration",
+      "min": [
+        12,
+        20,
+        0
+      ],
+      "max": [
+        13,
+        21,
+        1
+      ]
+    },
+    {
+      "name": "Hay_12_20_1",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "decoration",
+      "min": [
+        12,
+        20,
+        1
+      ],
+      "max": [
+        13,
+        21,
+        2
+      ]
+    },
+    {
+      "name": "Hay_24_16_0",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "decoration",
+      "min": [
+        24,
+        16,
+        0
+      ],
+      "max": [
+        25,
+        17,
+        1
+      ]
+    },
+    {
+      "name": "Farm_beds",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "decoration",
+      "min": [
+        14,
+        15,
+        0
+      ],
+      "max": [
+        24,
+        24,
+        0.7
+      ]
+    },
+    {
+      "name": "Mine_post_5",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "mine_frame",
+      "min": [
+        5,
+        25.5,
+        0
+      ],
+      "max": [
+        6,
+        26.5,
+        4
+      ]
+    },
+    {
+      "name": "Mine_post_11",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "mine_frame",
+      "min": [
+        11,
+        25.5,
+        0
+      ],
+      "max": [
+        12,
+        26.5,
+        4
+      ]
+    },
+    {
+      "name": "Tunnel_wall_5",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "mine_wall",
+      "min": [
+        5,
+        26,
+        0
+      ],
+      "max": [
+        6,
+        33,
+        4
+      ]
+    },
+    {
+      "name": "Tunnel_wall_11",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "mine_wall",
+      "min": [
+        11,
+        26,
+        0
+      ],
+      "max": [
+        12,
+        33,
+        4
+      ]
+    },
+    {
+      "name": "Tunnel_ceiling",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "mine_ceiling",
+      "min": [
+        5,
+        26,
+        4
+      ],
+      "max": [
+        12,
+        33,
+        5
+      ]
+    },
+    {
+      "name": "Transition_end",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "mine_end",
+      "min": [
+        6,
+        32,
+        0
+      ],
+      "max": [
+        11,
+        33,
+        4
+      ]
+    },
+    {
+      "name": "crafting_table",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "decoration",
+      "min": [
+        3,
+        25,
+        0
+      ],
+      "max": [
+        4,
+        26,
+        1
+      ]
+    },
+    {
+      "name": "furnace",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "decoration",
+      "min": [
+        12,
+        24,
+        0
+      ],
+      "max": [
+        13,
+        25,
+        1
+      ]
+    },
+    {
+      "name": "Rubble_granite",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "decoration",
+      "min": [
+        4,
+        25,
+        0
+      ],
+      "max": [
+        5,
+        26,
+        0.5
+      ]
+    },
+    {
+      "name": "Rubble_diorite",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "decoration",
+      "min": [
+        12,
+        25,
+        0
+      ],
+      "max": [
+        13,
+        26,
+        0.5
+      ]
+    },
+    {
+      "name": "Oak_01",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "tree_trunk",
+      "min": [
+        -26,
+        -19,
+        0
+      ],
+      "max": [
+        -25,
+        -18,
+        4
+      ]
+    },
+    {
+      "name": "Oak_02",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "tree_trunk",
+      "min": [
+        -10,
+        -21,
+        0
+      ],
+      "max": [
+        -9,
+        -20,
+        4
+      ]
+    },
+    {
+      "name": "Oak_03",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "tree_trunk",
+      "min": [
+        10,
+        -21,
+        0
+      ],
+      "max": [
+        11,
+        -20,
+        4
+      ]
+    },
+    {
+      "name": "Oak_04",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "tree_trunk",
+      "min": [
+        25,
+        -20,
+        0
+      ],
+      "max": [
+        26,
+        -19,
+        4
+      ]
+    },
+    {
+      "name": "Oak_05",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "tree_trunk",
+      "min": [
+        26,
+        -7,
+        0
+      ],
+      "max": [
+        27,
+        -6,
+        4
+      ]
+    },
+    {
+      "name": "Oak_06",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "tree_trunk",
+      "min": [
+        -27,
+        -8,
+        0
+      ],
+      "max": [
+        -26,
+        -7,
+        4
+      ]
+    },
+    {
+      "name": "Oak_07",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "tree_trunk",
+      "min": [
+        -27,
+        9,
+        2
+      ],
+      "max": [
+        -26,
+        10,
+        6
+      ]
+    },
+    {
+      "name": "Oak_08",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "tree_trunk",
+      "min": [
+        -26,
+        19,
+        2
+      ],
+      "max": [
+        -25,
+        20,
+        6
+      ]
+    },
+    {
+      "name": "Oak_09",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "tree_trunk",
+      "min": [
+        -19,
+        24,
+        0
+      ],
+      "max": [
+        -18,
+        25,
+        4
+      ]
+    },
+    {
+      "name": "Oak_10",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "tree_trunk",
+      "min": [
+        -16,
+        28,
+        0
+      ],
+      "max": [
+        -15,
+        29,
+        4
+      ]
+    },
+    {
+      "name": "Oak_11",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "tree_trunk",
+      "min": [
+        -3,
+        28,
+        0
+      ],
+      "max": [
+        -2,
+        29,
+        4
+      ]
+    },
+    {
+      "name": "Oak_12",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "tree_trunk",
+      "min": [
+        21,
+        28,
+        0
+      ],
+      "max": [
+        22,
+        29,
+        4
+      ]
+    },
+    {
+      "name": "Oak_13",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "tree_trunk",
+      "min": [
+        27,
+        24,
+        0
+      ],
+      "max": [
+        28,
+        25,
+        4
+      ]
+    },
+    {
+      "name": "Oak_14",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "tree_trunk",
+      "min": [
+        28,
+        9,
+        1
+      ],
+      "max": [
+        29,
+        10,
+        5
+      ]
+    },
+    {
+      "name": "Oak_15",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "tree_trunk",
+      "min": [
+        -9,
+        8,
+        0
+      ],
+      "max": [
+        -8,
+        9,
+        4
+      ]
+    },
+    {
+      "name": "Oak_16",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "tree_trunk",
+      "min": [
+        23,
+        0,
+        0
+      ],
+      "max": [
+        24,
+        1,
+        4
+      ]
+    }
+  ],
+  "landmarks": [
+    {
+      "name": "House_Small_West",
+      "category": "building",
+      "door": [
+        -17.5,
+        -13,
+        0
+      ],
+      "approach": [
+        -17.5,
+        -15,
+        0
+      ],
+      "size": [
+        5,
+        5,
+        3
+      ]
+    },
+    {
+      "name": "House_Small_East",
+      "category": "building",
+      "door": [
+        15.5,
+        -13,
+        0
+      ],
+      "approach": [
+        15.5,
+        -15,
+        0
+      ],
+      "size": [
+        5,
+        5,
+        3
+      ]
+    },
+    {
+      "name": "House_Medium_West",
+      "category": "building",
+      "door": [
+        -17.5,
+        3,
+        0
+      ],
+      "approach": [
+        -17.5,
+        1,
+        0
+      ],
+      "size": [
+        7,
+        6,
+        4
+      ]
+    },
+    {
+      "name": "House_Medium_East",
+      "category": "building",
+      "door": [
+        16.5,
+        4,
+        0
+      ],
+      "approach": [
+        16.5,
+        2,
+        0
+      ],
+      "size": [
+        7,
+        6,
+        4
+      ]
+    },
+    {
+      "name": "Village_Hall",
+      "category": "building",
+      "door": [
+        -6.5,
+        16,
+        0
+      ],
+      "approach": [
+        -6.5,
+        14,
+        0
+      ],
+      "size": [
+        9,
+        7,
+        4
+      ]
+    },
+    {
+      "name": "Well",
+      "category": "center",
+      "position": [
+        0,
+        2,
+        0
+      ]
+    },
+    {
+      "name": "Farm",
+      "category": "farm",
+      "approach": [
+        18,
+        13,
+        0
+      ]
+    },
+    {
+      "name": "Mine_interaction_reserved",
+      "category": "future_interaction",
+      "position": [
+        8.5,
+        25,
+        1.4
+      ],
+      "approach": [
+        8.5,
+        23,
+        0
+      ],
+      "radius": 2,
+      "implemented": false
+    },
+    {
+      "name": "Mine_transition_reserved",
+      "category": "future_transition",
+      "position": [
+        8.5,
+        30,
+        0
+      ],
+      "implemented": false
+    },
+    {
+      "name": "Solar_return_reserved",
+      "category": "future_exit",
+      "position": [
+        0,
+        -21,
+        0
+      ],
+      "implemented": false
+    },
+    {
+      "name": "Oak_01",
+      "category": "tree",
+      "position": [
+        -26,
+        -19,
+        0
+      ]
+    },
+    {
+      "name": "Oak_02",
+      "category": "tree",
+      "position": [
+        -10,
+        -21,
+        0
+      ]
+    },
+    {
+      "name": "Oak_03",
+      "category": "tree",
+      "position": [
+        10,
+        -21,
+        0
+      ]
+    },
+    {
+      "name": "Oak_04",
+      "category": "tree",
+      "position": [
+        25,
+        -20,
+        0
+      ]
+    },
+    {
+      "name": "Oak_05",
+      "category": "tree",
+      "position": [
+        26,
+        -7,
+        0
+      ]
+    },
+    {
+      "name": "Oak_06",
+      "category": "tree",
+      "position": [
+        -27,
+        -8,
+        0
+      ]
+    },
+    {
+      "name": "Oak_07",
+      "category": "tree",
+      "position": [
+        -27,
+        9,
+        2
+      ]
+    },
+    {
+      "name": "Oak_08",
+      "category": "tree",
+      "position": [
+        -26,
+        19,
+        2
+      ]
+    },
+    {
+      "name": "Oak_09",
+      "category": "tree",
+      "position": [
+        -19,
+        24,
+        0
+      ]
+    },
+    {
+      "name": "Oak_10",
+      "category": "tree",
+      "position": [
+        -16,
+        28,
+        0
+      ]
+    },
+    {
+      "name": "Oak_11",
+      "category": "tree",
+      "position": [
+        -3,
+        28,
+        0
+      ]
+    },
+    {
+      "name": "Oak_12",
+      "category": "tree",
+      "position": [
+        21,
+        28,
+        0
+      ]
+    },
+    {
+      "name": "Oak_13",
+      "category": "tree",
+      "position": [
+        27,
+        24,
+        0
+      ]
+    },
+    {
+      "name": "Oak_14",
+      "category": "tree",
+      "position": [
+        28,
+        9,
+        1
+      ]
+    },
+    {
+      "name": "Oak_15",
+      "category": "tree",
+      "position": [
+        -9,
+        8,
+        0
+      ]
+    },
+    {
+      "name": "Oak_16",
+      "category": "tree",
+      "position": [
+        23,
+        0,
+        0
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "file": "assets/textures/minigames/Minecraft/grass_block_top.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "52f44b64ce884a13dfe35e4b4da2e35898b790dd4d7a5ea536f1b0c0d56d29b4",
+      "tint": [
+        0.48,
+        0.76,
+        0.27
+      ],
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/grass_block_side.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "76a677640eb91d6a9aed844bc66e329b1894f89e241a0071333b6678c0854580",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/dirt.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "67197d5371efc3ca1638217c38349665dbd5a977b47bfb20075c858dff87d510",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/stone.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "b5e10adc72442bfb257ce7ba0b9bbe36475a0c8cdfec89b80dc9517203ff3e9f",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/cobblestone.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "bcda95fdf5afa91747657aa198fc0b69ebf44141de30a718075f74045e9a5def",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/gravel.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "bc1558fa64b238fabca4cc957e61c232337d410495784b106676bf73e52e16e0",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/oak_planks.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "65665943ef9c8bcf63fc67d2083ed0c50243f724106d0e4bb1abea5d921b16d3",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/oak_log.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "61735859c9c9ea82601191a77c6f256d93619cbaf7cad998a3ed5762877a34e6",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/oak_log_top.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "a520800a833ea0c6214481245ab40397aa0c08b4ffc909046dac266386f9fc01",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/oak_leaves.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "69c9c7048695e014aee6b8a2c4cb080607bd7a2a5291c06218b8134cbfcdc04f",
+      "tint": [
+        0.34,
+        0.64,
+        0.18
+      ],
+      "alpha": "MASK"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/oak_door_top.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "0cdc592715a8145d1837f551adf774227dedf7650569e7a50f6cb831c7c0a6c6",
+      "tint": null,
+      "alpha": "MASK"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/oak_door_bottom.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "a209e7e8611d56d211445d5df23a50c31185a293c51f4e03f3cb691209a49df4",
+      "tint": null,
+      "alpha": "MASK"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/glass.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "cb89c706dce86eac3123cef087d359b5f23098b658a468fb91662b4a9922bcd0",
+      "tint": null,
+      "alpha": "MASK"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/farmland_moist.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "28d754ebc6e3aa0c7c8680dc8f3ce18304152cd2d2374a574a66237f4b5b9ecf",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/hay_block_top.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "99b8063611a6816b67c652f2f847048cd798a9b8858c84b9f597363007153693",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/hay_block_side.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "02ee6ed996363e25cf2ae47043f3af8b775ff788099ff00ebcde7c9ca9fa6cd5",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/crafting_table_front.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "1659c76a33039640e8bd5584af8db04bf626486432a389bcaf1567e1a45c6464",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/crafting_table_side.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "e9755fc6da763909b285342eae12c5f7d1cc8462fab695bb157504ea207cda8c",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/crafting_table_top.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "251e8aa014e30d040261022895853db3204bba241b9b44c11762628550986f2d",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/furnace_front.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "aae808f71f1bddf4a25592f7dd3d7f6e9b3adaa739502170766424f4eb6bf9c5",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/furnace_side.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "cada9065da8d26b3a7324a203edb42f2564975519e8504d520e10d530822bb5b",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/furnace_top.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "59e26149cde8b86ea1d165c1a4ba5c44531a4b7be134b30c93120bba1cefb162",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/andesite.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "7c7960dd3dd2084233907c1529dcbea0b8a2195fadaa608027f395b6f430fbd7",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/granite.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "9bde1239e00c17b0d2842a941cda606c395039f59ec351ec8866a27e77ee7f8b",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/diorite.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "5f44c6743cd72c00a074e6c43cc9c46b9cf54a82c0cf87c5eb675a7207cff648",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/dirt_path_top.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "653ab9be45372827da221f787435e2ad5adddc6257c29d45fe56947963784ac3",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/dirt_path_side.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "10a6c00835541537a0254f4210acc944b603ff7239dc1b458ddc5fae00686830",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/water_static_frame_00.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "145364bb4046d6a8f94185e3da316487eab930b96815d0e91489a8cd8c91c51c",
+      "tint": [
+        0.22,
+        0.48,
+        0.92
+      ],
+      "alpha": "OPAQUE"
+    }
+  ],
+  "counts": {
+    "buildings": 5,
+    "trees": 16
+  },
+  "mine_clearance": {
+    "width": 5,
+    "height": 4,
+    "depth": 6
+  },
+  "rendering": {
+    "texture_filter": "nearest",
+    "cutout": "MASK alphaCutoff=0.5",
+    "water": "static opaque"
+  },
+  "notes": [
+    "Closed houses; no interior traversal.",
+    "Hills are solid boundaries; all intended routes are at Z=0.",
+    "Reserved interaction/transition markers do not implement gameplay."
+  ]
+}
