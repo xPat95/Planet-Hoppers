@@ -1,0 +1,217 @@
+{
+  "branch": "feature/hangar",
+  "preservation": {
+    "draw_platform": {
+      "unchanged": true,
+      "sha256_normalized_text": "8e0478ea4f63e26e05aef01e67a6a86138c0217a0ccf99d75b75bd4a17d8f480"
+    },
+    "exhibit": {
+      "unchanged": true,
+      "sha256_normalized_text": "3fc8750835831914f7b4123d0d93c12f4229231dada24d925d0dfdfe7d69b285"
+    },
+    "update": {
+      "unchanged": true,
+      "sha256_normalized_text": "92b7330c01367d62d7918bd5c953791936f8d697c86c919cce1906a4ba5e48d7"
+    },
+    "src/scenes/front_end.rs": {
+      "unchanged": true
+    },
+    "src/graphics/hangar_interior.rs": {
+      "unchanged": true
+    },
+    "src/gameplay/selection.rs": {
+      "unchanged": true
+    },
+    "src/scenes/solar_system.rs": {
+      "unchanged": true
+    },
+    "config/station.json": {
+      "unchanged": true
+    },
+    "config/ships.json": {
+      "unchanged": true
+    },
+    "config/ship-selection.json": {
+      "unchanged": true
+    }
+  },
+  "approved_blend_unchanged": true,
+  "export_matches_manifest": true,
+  "camera_audit": {
+    "ship_resolution_cases": 18,
+    "distance_limit": 16,
+    "center_obstructions": 0,
+    "rotated_bounds_corner_obstructions": 0,
+    "previous_center_obstructions": 11
+  },
+  "commands": [
+    {
+      "command": "cargo check --locked",
+      "result": "PASS"
+    },
+    {
+      "command": "cargo build --locked",
+      "result": "PASS"
+    },
+    {
+      "command": "cargo test --locked --test hangar_asset --test station --test ship_selection --test ships --test minigame_returns",
+      "result": "27 PASS"
+    },
+    {
+      "command": "target/debug/planet-hoppers.exe --smoke-docking --ship minecraft",
+      "exit_code": 0,
+      "result": "PASS"
+    },
+    {
+      "command": "git diff --check",
+      "result": "PASS"
+    }
+  ],
+  "runtime_markers": [
+    "SELECTION_SMOKE_PASS {\"back_to_menu\":true,\"controls\":true,\"physical_input_verified\":false,\"previews\":[\"halloween\",\"minecraft\",\"regularshow\",\"smilingfriends\",\"southpark\",\"starwars\"],\"selected\":\"minecraft\",\"status\":\"PASS\"}",
+    "DOCK_SELECTION_SMOKE_PASS {\"back_to_menu\":false,\"controls\":false,\"physical_input_verified\":false,\"previews\":[\"minecraft\"],\"selected\":\"minecraft\",\"status\":\"PASS\"}",
+    "DOCK_SELECTION_SMOKE_PASS {\"back_to_menu\":false,\"controls\":false,\"physical_input_verified\":false,\"previews\":[\"starwars\"],\"selected\":\"starwars\",\"status\":\"PASS\"}",
+    "DOCKING_SMOKE_PASS cycles=3 same_ship=true changed_ship=true cancel=true safe_launch=true active=starwars",
+    "FRONT_END_SMOKE_PASS active=starwars initial=minecraft unlocked=2"
+  ],
+  "captures": {
+    "runtime-dock-approach-0.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "0c234c91621c0d4df4a445d0d4e8a5f734d2146aa10e0bd61033ed648d45e268"
+    },
+    "runtime-dock-approach-1.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "61e8835187a71d376a22fed2722b4f10717a3fec079d9c18342143a7094298dc"
+    },
+    "runtime-dock-approach-2.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "289fc50f0159c30daf37a4663670d9b80263846e379355bb63815d6cce8d71bc"
+    },
+    "runtime-dock-launch-0.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "74c4f0ef1a046937b1aa1f97f5835ff1f7d6946d1583c3cb528e52abce6bbb5b"
+    },
+    "runtime-dock-launch-1.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "65d0cf45abf0d1dac725d7bfab2b0a941e456f636b119fecb07b1a6eba6fcd7f"
+    },
+    "runtime-dock-launch-2.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "a4684905438b9ee6ff7b6db747c0cba31cdc09332ddb391924979c42c42ce8c7"
+    },
+    "runtime-dock-launch-3.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "a4684905438b9ee6ff7b6db747c0cba31cdc09332ddb391924979c42c42ce8c7"
+    },
+    "runtime-docked-entry.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "ecd376e7632959c5494868076577bb67abbf83061f6fd106664f87b6d8819f80"
+    },
+    "runtime-docked-selected.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "803a0efe248b311ef0c046b08e40617e00e4b32e3266b9642b34df8ab2159d74"
+    },
+    "runtime-hangar-complete.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "c9a036424df6c442fc29268cd6ba0faf82c0af82b8a2f9b23b513713c5c76403"
+    },
+    "runtime-hangar-exit.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "1c5633ad4e3e7ffe4cc4498bc486b52c85082b0b9afac223c76c8a18e0257a36"
+    },
+    "runtime-hangar-halloween.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "c16e91f251477059df360cc85880b9bb905055210866b972a3c613ba7c7bbec3"
+    },
+    "runtime-hangar-minecraft.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "cb14442b1c88ff2cf74ad3e1fe84b4cce6084ed1d82b3a6676919422bce6e219"
+    },
+    "runtime-hangar-regularshow.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "26d8a1f148926f766c767a5f72657f16ca1b7d9abd489a8124143dc37cc44914"
+    },
+    "runtime-hangar-smilingfriends-back.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "821d8d563a679c2e057f5e5a955838a72c0f0aefb3678cf846fa0214d4ba0c4d"
+    },
+    "runtime-hangar-smilingfriends-side.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "94ec1ac0b52690a5468a52c91ab5d8d7877aa0091cfbaa28701f0c8f31258c21"
+    },
+    "runtime-hangar-smilingfriends.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "a0d20ae1978815775b71d59bea1145cb82699b2c3f3436f4acbe2449f87a87ea"
+    },
+    "runtime-hangar-southpark.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "268a04815a51016dba17da11136b58b86a934e5d66560a1169a99b571ee1b0a0"
+    },
+    "runtime-hangar-starwars.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "3c4cfc3c972ceb3fe85e257645cd5af4aa0c88206969bf2bc216fe9fcde3729c"
+    }
+  },
+  "limitations": [
+    "Native raylib automation input, not physical keyboard/mouse testing.",
+    "Approaches start outside the station, not a full manual flight from a planet.",
+    "Cycles shadows, PBR metallic/roughness BRDF and procedural nebula are not reproduced exactly by the runtime shader."
+  ]
+}

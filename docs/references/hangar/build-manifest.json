@@ -1,0 +1,27 @@
+{
+  "source_sha256": "1791b9c614b915490c205cb1e675b62c09d80f3d0669bbbca2ef185670b29fe9",
+  "source_unchanged": true,
+  "glb": "assets\\models\\environment\\spaceStation\\exports\\citadel_hangar_interior.glb",
+  "bytes": 4169460,
+  "architecture_meshes": 11,
+  "materials_from_source": [
+    "Blindaje grafito",
+    "Canales",
+    "Edificios claros",
+    "Edificios oscuros",
+    "Edificios pizarra",
+    "Juntas oscuras",
+    "Luz ambar",
+    "Luz cian",
+    "Luz hielo",
+    "Luz marfil",
+    "Luz roja baliza",
+    "Marcas de panel",
+    "Parques",
+    "Placas acero",
+    "Placas plata",
+    "Titanio azulado"
+  ],
+  "units": "metres, Blender Z-up exported glTF Y-up; identity transform in Rust",
+  "preview_platform_excluded_from_glb": true
+}

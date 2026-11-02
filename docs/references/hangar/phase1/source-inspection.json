@@ -1,0 +1,4623 @@
+{
+  "sha256": "1791b9c614b915490c205cb1e675b62c09d80f3d0669bbbca2ef185670b29fe9",
+  "objects": [
+    {
+      "name": "CIUDADELA_ROOT | Transformacion general",
+      "type": "EMPTY",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "modifiers": [],
+      "polygons": 0,
+      "materials": []
+    },
+    {
+      "name": "CI | PRESIDIUM",
+      "type": "EMPTY",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "modifiers": [],
+      "polygons": 0,
+      "materials": []
+    },
+    {
+      "name": "CI | Anillo estructural octogonal",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        20.383350372314453,
+        80.0,
+        80.0
+      ],
+      "modifiers": [
+        "BEVEL"
+      ],
+      "polygons": 1920,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI | Segmentos de blindaje del Presidium",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        21.130001068115234,
+        83.20662689208984,
+        82.57968139648438
+      ],
+      "modifiers": [],
+      "polygons": 3450,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI | Aros nervios y cinco acoplamientos",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        30.87348747253418,
+        82.87071228027344,
+        81.9000015258789
+      ],
+      "modifiers": [],
+      "polygons": 6408,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI | Ciudad interior y Torre del Consejo",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        11.61093521118164,
+        58.959999084472656,
+        58.959999084472656
+      ],
+      "modifiers": [],
+      "polygons": 13848,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI | Luces del Presidium",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        19.566505432128906,
+        72.70703887939453,
+        72.70703887939453
+      ],
+      "modifiers": [],
+      "polygons": 30788,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI | BRAZO 1 | Zakera",
+      "type": "EMPTY",
+      "location": [
+        0.0,
+        2.204364281713743e-15,
+        36.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          2.204364281713743e-15
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          36.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "modifiers": [],
+      "polygons": 0,
+      "materials": []
+    },
+    {
+      "name": "CI 1 | Casco facetado continuo",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          2.204364281713743e-15
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          36.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        260.0,
+        30.15086555480957,
+        30.4140567779541
+      ],
+      "modifiers": [
+        "BEVEL"
+      ],
+      "polygons": 1202,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 1 | Escudo de raiz -1",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          2.204364281713743e-15
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          36.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        35.18869400024414,
+        12.997356414794922,
+        10.439743041992188
+      ],
+      "modifiers": [
+        "BEVEL"
+      ],
+      "polygons": 5,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 1 | Escudo de raiz +1",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          2.204364281713743e-15
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          36.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        35.18869400024414,
+        12.997356414794922,
+        10.439743041992188
+      ],
+      "modifiers": [
+        "BEVEL"
+      ],
+      "polygons": 5,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 1 | Placas y rejillas exteriores",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          2.204364281713743e-15
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          36.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        246.98001098632812,
+        30.2856388092041,
+        29.59512710571289
+      ],
+      "modifiers": [],
+      "polygons": 2328,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 1 | Costillas estructurales",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          2.204364281713743e-15
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          36.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        241.75979614257812,
+        30.43120002746582,
+        28.532941818237305
+      ],
+      "modifiers": [],
+      "polygons": 570,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 1 | Quillas rebordes y puentes",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          2.204364281713743e-15
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          36.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        250.10858154296875,
+        27.696247100830078,
+        31.292011260986328
+      ],
+      "modifiers": [],
+      "polygons": 2752,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 1 | Bloques urbanos y torres",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          2.204364281713743e-15
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          36.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        225.02777099609375,
+        17.71576499938965,
+        21.522014617919922
+      ],
+      "modifiers": [],
+      "polygons": 7260,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 1 | Parque y canal interior",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          2.204364281713743e-15
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          36.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        225.69000244140625,
+        2.549999952316284,
+        19.033432006835938
+      ],
+      "modifiers": [],
+      "polygons": 1464,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 1 | Ventanas avenidas y balizas",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          2.204364281713743e-15
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          36.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        248.32797241210938,
+        25.682415008544922,
+        27.836807250976562
+      ],
+      "modifiers": [],
+      "polygons": 38314,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI | BRAZO 2 | Kithoi",
+      "type": "EMPTY",
+      "location": [
+        0.0,
+        -34.238033294677734,
+        11.124611854553223
+      ],
+      "rotation_euler": [
+        1.2566370964050293,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.30901697278022766,
+          -0.9510565400123596,
+          -34.238033294677734
+        ],
+        [
+          0.0,
+          0.9510565400123596,
+          0.30901697278022766,
+          11.124611854553223
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "modifiers": [],
+      "polygons": 0,
+      "materials": []
+    },
+    {
+      "name": "CI 2 | Casco facetado continuo",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.30901697278022766,
+          -0.9510565400123596,
+          -34.238033294677734
+        ],
+        [
+          0.0,
+          0.9510565400123596,
+          0.30901697278022766,
+          11.124611854553223
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        260.0,
+        30.15086555480957,
+        30.4140567779541
+      ],
+      "modifiers": [
+        "BEVEL"
+      ],
+      "polygons": 1202,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 2 | Escudo de raiz -1",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.30901697278022766,
+          -0.9510565400123596,
+          -34.238033294677734
+        ],
+        [
+          0.0,
+          0.9510565400123596,
+          0.30901697278022766,
+          11.124611854553223
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        35.18869400024414,
+        12.997356414794922,
+        10.439743041992188
+      ],
+      "modifiers": [
+        "BEVEL"
+      ],
+      "polygons": 5,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 2 | Escudo de raiz +1",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.30901697278022766,
+          -0.9510565400123596,
+          -34.238033294677734
+        ],
+        [
+          0.0,
+          0.9510565400123596,
+          0.30901697278022766,
+          11.124611854553223
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        35.18869400024414,
+        12.997356414794922,
+        10.439743041992188
+      ],
+      "modifiers": [
+        "BEVEL"
+      ],
+      "polygons": 5,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 2 | Placas y rejillas exteriores",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.30901697278022766,
+          -0.9510565400123596,
+          -34.238033294677734
+        ],
+        [
+          0.0,
+          0.9510565400123596,
+          0.30901697278022766,
+          11.124611854553223
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        246.98001098632812,
+        30.2856388092041,
+        29.59512710571289
+      ],
+      "modifiers": [],
+      "polygons": 2328,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 2 | Costillas estructurales",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.30901697278022766,
+          -0.9510565400123596,
+          -34.238033294677734
+        ],
+        [
+          0.0,
+          0.9510565400123596,
+          0.30901697278022766,
+          11.124611854553223
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        241.75979614257812,
+        30.43120002746582,
+        28.532941818237305
+      ],
+      "modifiers": [],
+      "polygons": 570,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 2 | Quillas rebordes y puentes",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.30901697278022766,
+          -0.9510565400123596,
+          -34.238033294677734
+        ],
+        [
+          0.0,
+          0.9510565400123596,
+          0.30901697278022766,
+          11.124611854553223
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        250.10858154296875,
+        27.696247100830078,
+        31.361934661865234
+      ],
+      "modifiers": [],
+      "polygons": 2752,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 2 | Bloques urbanos y torres",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.30901697278022766,
+          -0.9510565400123596,
+          -34.238033294677734
+        ],
+        [
+          0.0,
+          0.9510565400123596,
+          0.30901697278022766,
+          11.124611854553223
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        225.11395263671875,
+        17.7620849609375,
+        21.592708587646484
+      ],
+      "modifiers": [],
+      "polygons": 7308,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 2 | Parque y canal interior",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.30901697278022766,
+          -0.9510565400123596,
+          -34.238033294677734
+        ],
+        [
+          0.0,
+          0.9510565400123596,
+          0.30901697278022766,
+          11.124611854553223
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        225.69000244140625,
+        2.549999952316284,
+        19.033432006835938
+      ],
+      "modifiers": [],
+      "polygons": 1464,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 2 | Ventanas avenidas y balizas",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.30901697278022766,
+          -0.9510565400123596,
+          -34.238033294677734
+        ],
+        [
+          0.0,
+          0.9510565400123596,
+          0.30901697278022766,
+          11.124611854553223
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        248.32797241210938,
+        25.682415008544922,
+        27.90673065185547
+      ],
+      "modifiers": [],
+      "polygons": 37731,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI | BRAZO 3 | Tayseri",
+      "type": "EMPTY",
+      "location": [
+        0.0,
+        -21.160268783569336,
+        -29.124610900878906
+      ],
+      "rotation_euler": [
+        2.5132741928100586,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -0.8090170621871948,
+          -0.5877851843833923,
+          -21.160268783569336
+        ],
+        [
+          0.0,
+          0.5877851843833923,
+          -0.8090170621871948,
+          -29.124610900878906
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "modifiers": [],
+      "polygons": 0,
+      "materials": []
+    },
+    {
+      "name": "CI 3 | Casco facetado continuo",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -0.8090170621871948,
+          -0.5877851843833923,
+          -21.160268783569336
+        ],
+        [
+          0.0,
+          0.5877851843833923,
+          -0.8090170621871948,
+          -29.124610900878906
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        260.0,
+        30.15086555480957,
+        30.4140567779541
+      ],
+      "modifiers": [
+        "BEVEL"
+      ],
+      "polygons": 1202,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 3 | Escudo de raiz -1",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -0.8090170621871948,
+          -0.5877851843833923,
+          -21.160268783569336
+        ],
+        [
+          0.0,
+          0.5877851843833923,
+          -0.8090170621871948,
+          -29.124610900878906
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        35.18869400024414,
+        12.997356414794922,
+        10.439743041992188
+      ],
+      "modifiers": [
+        "BEVEL"
+      ],
+      "polygons": 5,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 3 | Escudo de raiz +1",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -0.8090170621871948,
+          -0.5877851843833923,
+          -21.160268783569336
+        ],
+        [
+          0.0,
+          0.5877851843833923,
+          -0.8090170621871948,
+          -29.124610900878906
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        35.18869400024414,
+        12.997356414794922,
+        10.439743041992188
+      ],
+      "modifiers": [
+        "BEVEL"
+      ],
+      "polygons": 5,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 3 | Placas y rejillas exteriores",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -0.8090170621871948,
+          -0.5877851843833923,
+          -21.160268783569336
+        ],
+        [
+          0.0,
+          0.5877851843833923,
+          -0.8090170621871948,
+          -29.124610900878906
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        246.98001098632812,
+        30.2856388092041,
+        29.59512710571289
+      ],
+      "modifiers": [],
+      "polygons": 2328,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 3 | Costillas estructurales",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -0.8090170621871948,
+          -0.5877851843833923,
+          -21.160268783569336
+        ],
+        [
+          0.0,
+          0.5877851843833923,
+          -0.8090170621871948,
+          -29.124610900878906
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        241.75979614257812,
+        30.43120002746582,
+        28.532941818237305
+      ],
+      "modifiers": [],
+      "polygons": 570,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 3 | Quillas rebordes y puentes",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -0.8090170621871948,
+          -0.5877851843833923,
+          -21.160268783569336
+        ],
+        [
+          0.0,
+          0.5877851843833923,
+          -0.8090170621871948,
+          -29.124610900878906
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        250.10858154296875,
+        27.696247100830078,
+        31.149904251098633
+      ],
+      "modifiers": [],
+      "polygons": 2752,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 3 | Bloques urbanos y torres",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -0.8090170621871948,
+          -0.5877851843833923,
+          -21.160268783569336
+        ],
+        [
+          0.0,
+          0.5877851843833923,
+          -0.8090170621871948,
+          -29.124610900878906
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        225.14260864257812,
+        17.681476593017578,
+        21.368852615356445
+      ],
+      "modifiers": [],
+      "polygons": 7320,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 3 | Parque y canal interior",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -0.8090170621871948,
+          -0.5877851843833923,
+          -21.160268783569336
+        ],
+        [
+          0.0,
+          0.5877851843833923,
+          -0.8090170621871948,
+          -29.124610900878906
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        225.69000244140625,
+        2.549999952316284,
+        19.033432006835938
+      ],
+      "modifiers": [],
+      "polygons": 1464,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 3 | Ventanas avenidas y balizas",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -0.8090170621871948,
+          -0.5877851843833923,
+          -21.160268783569336
+        ],
+        [
+          0.0,
+          0.5877851843833923,
+          -0.8090170621871948,
+          -29.124610900878906
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        248.32797241210938,
+        25.686851501464844,
+        27.694700241088867
+      ],
+      "modifiers": [],
+      "polygons": 38286,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI | BRAZO 4 | Bachjret",
+      "type": "EMPTY",
+      "location": [
+        0.0,
+        21.160268783569336,
+        -29.124610900878906
+      ],
+      "rotation_euler": [
+        3.769911289215088,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -0.8090169429779053,
+          0.5877853631973267,
+          21.160268783569336
+        ],
+        [
+          0.0,
+          -0.5877853631973267,
+          -0.8090169429779053,
+          -29.124610900878906
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "modifiers": [],
+      "polygons": 0,
+      "materials": []
+    },
+    {
+      "name": "CI 4 | Casco facetado continuo",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -0.8090169429779053,
+          0.5877853631973267,
+          21.160268783569336
+        ],
+        [
+          0.0,
+          -0.5877853631973267,
+          -0.8090169429779053,
+          -29.124610900878906
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        260.0,
+        30.15086555480957,
+        30.4140567779541
+      ],
+      "modifiers": [
+        "BEVEL"
+      ],
+      "polygons": 1202,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 4 | Escudo de raiz -1",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -0.8090169429779053,
+          0.5877853631973267,
+          21.160268783569336
+        ],
+        [
+          0.0,
+          -0.5877853631973267,
+          -0.8090169429779053,
+          -29.124610900878906
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        35.18869400024414,
+        12.997356414794922,
+        10.439743041992188
+      ],
+      "modifiers": [
+        "BEVEL"
+      ],
+      "polygons": 5,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 4 | Escudo de raiz +1",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -0.8090169429779053,
+          0.5877853631973267,
+          21.160268783569336
+        ],
+        [
+          0.0,
+          -0.5877853631973267,
+          -0.8090169429779053,
+          -29.124610900878906
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        35.18869400024414,
+        12.997356414794922,
+        10.439743041992188
+      ],
+      "modifiers": [
+        "BEVEL"
+      ],
+      "polygons": 5,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 4 | Placas y rejillas exteriores",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -0.8090169429779053,
+          0.5877853631973267,
+          21.160268783569336
+        ],
+        [
+          0.0,
+          -0.5877853631973267,
+          -0.8090169429779053,
+          -29.124610900878906
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        246.98001098632812,
+        30.2856388092041,
+        29.59512710571289
+      ],
+      "modifiers": [],
+      "polygons": 2328,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 4 | Costillas estructurales",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -0.8090169429779053,
+          0.5877853631973267,
+          21.160268783569336
+        ],
+        [
+          0.0,
+          -0.5877853631973267,
+          -0.8090169429779053,
+          -29.124610900878906
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        241.75979614257812,
+        30.43120002746582,
+        28.532941818237305
+      ],
+      "modifiers": [],
+      "polygons": 570,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 4 | Quillas rebordes y puentes",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -0.8090169429779053,
+          0.5877853631973267,
+          21.160268783569336
+        ],
+        [
+          0.0,
+          -0.5877853631973267,
+          -0.8090169429779053,
+          -29.124610900878906
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        250.10858154296875,
+        27.696247100830078,
+        30.921125411987305
+      ],
+      "modifiers": [],
+      "polygons": 2752,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 4 | Bloques urbanos y torres",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -0.8090169429779053,
+          0.5877853631973267,
+          21.160268783569336
+        ],
+        [
+          0.0,
+          -0.5877853631973267,
+          -0.8090169429779053,
+          -29.124610900878906
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        225.40467834472656,
+        17.726457595825195,
+        20.853029251098633
+      ],
+      "modifiers": [],
+      "polygons": 7236,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 4 | Parque y canal interior",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -0.8090169429779053,
+          0.5877853631973267,
+          21.160268783569336
+        ],
+        [
+          0.0,
+          -0.5877853631973267,
+          -0.8090169429779053,
+          -29.124610900878906
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        225.69000244140625,
+        2.549999952316284,
+        19.033432006835938
+      ],
+      "modifiers": [],
+      "polygons": 1464,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 4 | Ventanas avenidas y balizas",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -0.8090169429779053,
+          0.5877853631973267,
+          21.160268783569336
+        ],
+        [
+          0.0,
+          -0.5877853631973267,
+          -0.8090169429779053,
+          -29.124610900878906
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        248.32797241210938,
+        25.682415008544922,
+        27.3717098236084
+      ],
+      "modifiers": [],
+      "polygons": 38975,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI | BRAZO 5 | Shalta",
+      "type": "EMPTY",
+      "location": [
+        0.0,
+        34.238033294677734,
+        11.124611854553223
+      ],
+      "rotation_euler": [
+        5.026548385620117,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.3090171217918396,
+          0.9510564804077148,
+          34.238033294677734
+        ],
+        [
+          0.0,
+          -0.9510564804077148,
+          0.3090171217918396,
+          11.124611854553223
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "modifiers": [],
+      "polygons": 0,
+      "materials": []
+    },
+    {
+      "name": "CI 5 | Casco facetado continuo",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.3090171217918396,
+          0.9510564804077148,
+          34.238033294677734
+        ],
+        [
+          0.0,
+          -0.9510564804077148,
+          0.3090171217918396,
+          11.124611854553223
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        260.0,
+        30.15086555480957,
+        30.4140567779541
+      ],
+      "modifiers": [
+        "BEVEL"
+      ],
+      "polygons": 1202,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 5 | Escudo de raiz -1",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.3090171217918396,
+          0.9510564804077148,
+          34.238033294677734
+        ],
+        [
+          0.0,
+          -0.9510564804077148,
+          0.3090171217918396,
+          11.124611854553223
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        35.18869400024414,
+        12.997356414794922,
+        10.439743041992188
+      ],
+      "modifiers": [
+        "BEVEL"
+      ],
+      "polygons": 5,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 5 | Escudo de raiz +1",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.3090171217918396,
+          0.9510564804077148,
+          34.238033294677734
+        ],
+        [
+          0.0,
+          -0.9510564804077148,
+          0.3090171217918396,
+          11.124611854553223
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        35.18869400024414,
+        12.997356414794922,
+        10.439743041992188
+      ],
+      "modifiers": [
+        "BEVEL"
+      ],
+      "polygons": 5,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 5 | Placas y rejillas exteriores",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.3090171217918396,
+          0.9510564804077148,
+          34.238033294677734
+        ],
+        [
+          0.0,
+          -0.9510564804077148,
+          0.3090171217918396,
+          11.124611854553223
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        246.98001098632812,
+        30.2856388092041,
+        29.59512710571289
+      ],
+      "modifiers": [],
+      "polygons": 2328,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 5 | Costillas estructurales",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.3090171217918396,
+          0.9510564804077148,
+          34.238033294677734
+        ],
+        [
+          0.0,
+          -0.9510564804077148,
+          0.3090171217918396,
+          11.124611854553223
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        241.75979614257812,
+        30.43120002746582,
+        28.532941818237305
+      ],
+      "modifiers": [],
+      "polygons": 570,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 5 | Quillas rebordes y puentes",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.3090171217918396,
+          0.9510564804077148,
+          34.238033294677734
+        ],
+        [
+          0.0,
+          -0.9510564804077148,
+          0.3090171217918396,
+          11.124611854553223
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        250.10858154296875,
+        27.696247100830078,
+        30.921125411987305
+      ],
+      "modifiers": [],
+      "polygons": 2752,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 5 | Bloques urbanos y torres",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.3090171217918396,
+          0.9510564804077148,
+          34.238033294677734
+        ],
+        [
+          0.0,
+          -0.9510564804077148,
+          0.3090171217918396,
+          11.124611854553223
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        225.06500244140625,
+        17.75623321533203,
+        20.360525131225586
+      ],
+      "modifiers": [],
+      "polygons": 7128,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 5 | Parque y canal interior",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.3090171217918396,
+          0.9510564804077148,
+          34.238033294677734
+        ],
+        [
+          0.0,
+          -0.9510564804077148,
+          0.3090171217918396,
+          11.124611854553223
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        225.69000244140625,
+        2.549999952316284,
+        19.033432006835938
+      ],
+      "modifiers": [],
+      "polygons": 1464,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI 5 | Ventanas avenidas y balizas",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.3090171217918396,
+          0.9510564804077148,
+          34.238033294677734
+        ],
+        [
+          0.0,
+          -0.9510564804077148,
+          0.3090171217918396,
+          11.124611854553223
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        248.32797241210938,
+        25.686851501464844,
+        27.3717098236084
+      ],
+      "modifiers": [],
+      "polygons": 38106,
+      "materials": [
+        "CI | Titanio azulado",
+        "CI | Blindaje grafito",
+        "CI | Placas plata",
+        "CI | Placas acero",
+        "CI | Juntas oscuras",
+        "CI | Edificios pizarra",
+        "CI | Edificios claros",
+        "CI | Edificios oscuros",
+        "CI | Parques",
+        "CI | Canales",
+        "CI | Luz ambar",
+        "CI | Luz marfil",
+        "CI | Luz cian",
+        "CI | Luz hielo",
+        "CI | Luz roja baliza",
+        "CI | Marcas de panel"
+      ]
+    },
+    {
+      "name": "CI CAM | Principal",
+      "type": "CAMERA",
+      "location": [
+        260.0,
+        -290.0,
+        165.0
+      ],
+      "rotation_euler": [
+        1.2332446575164795,
+        -1.0147385864911485e-07,
+        0.9060217142105103
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          0.6168817281723022,
+          -0.26065558195114136,
+          0.7426409721374512,
+          260.0
+        ],
+        [
+          0.7870558500289917,
+          0.20429754257202148,
+          -0.5820701122283936,
+          -290.0
+        ],
+        [
+          1.0147385864911485e-07,
+          0.9435683488845825,
+          0.3311779201030731,
+          165.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "modifiers": [],
+      "polygons": 0,
+      "materials": []
+    },
+    {
+      "name": "CI CAM | Anillo frontal",
+      "type": "CAMERA",
+      "location": [
+        330.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        1.5707963705062866,
+        -0.0,
+        1.5707963705062866
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          -4.371138828673793e-08,
+          4.371138828673793e-08,
+          1.0,
+          330.0
+        ],
+        [
+          1.0,
+          1.910685676922942e-15,
+          4.371138828673793e-08,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          -4.371138828673793e-08,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "modifiers": [],
+      "polygons": 0,
+      "materials": []
+    },
+    {
+      "name": "CI CAM | Perfil",
+      "type": "CAMERA",
+      "location": [
+        -115.0,
+        -350.0,
+        75.0
+      ],
+      "rotation_euler": [
+        1.3597331047058105,
+        1.1549701195434636e-09,
+        0.017141181975603104
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          0.9998530745506287,
+          -0.003590894630178809,
+          0.016759976744651794,
+          -115.0
+        ],
+        [
+          0.0171403419226408,
+          0.20946887135505676,
+          -0.9776650667190552,
+          -350.0
+        ],
+        [
+          -1.1549701195434636e-09,
+          0.9778087139129639,
+          0.20949964225292206,
+          75.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "modifiers": [],
+      "polygons": 0,
+      "materials": []
+    },
+    {
+      "name": "CI CAM | Distritos interiores",
+      "type": "CAMERA",
+      "location": [
+        -185.0,
+        -68.0,
+        58.0
+      ],
+      "rotation_euler": [
+        1.2655695676803589,
+        8.57145110444435e-09,
+        -0.7448797821998596
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          0.7351694107055664,
+          0.2037103921175003,
+          -0.6465508937835693,
+          -185.0
+        ],
+        [
+          -0.6778834462165833,
+          0.22092536091804504,
+          -0.7011890411376953,
+          -68.0
+        ],
+        [
+          -8.57145110444435e-09,
+          0.953778862953186,
+          0.3005094528198242,
+          58.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "modifiers": [],
+      "polygons": 0,
+      "materials": []
+    },
+    {
+      "name": "CI LUZ | Sol frio",
+      "type": "LIGHT",
+      "location": [
+        20.0,
+        -180.0,
+        280.0
+      ],
+      "rotation_euler": [
+        0.670449435710907,
+        1.9723970012819336e-08,
+        0.6254852414131165
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          0.8106791377067566,
+          -0.45875683426856995,
+          0.36378777027130127,
+          20.0
+        ],
+        [
+          0.5854907035827637,
+          0.6352015137672424,
+          -0.5037059187889099,
+          -180.0
+        ],
+        [
+          -1.9723970012819336e-08,
+          0.6213381886482239,
+          0.7835425138473511,
+          280.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "modifiers": [],
+      "polygons": 0,
+      "materials": []
+    },
+    {
+      "name": "CI LUZ | Rebote violeta",
+      "type": "LIGHT",
+      "location": [
+        -100.0,
+        160.0,
+        40.0
+      ],
+      "rotation_euler": [
+        1.326276183128357,
+        4.5308539142752124e-08,
+        3.0791738033294678
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          -0.9980525970458984,
+          -0.015101260505616665,
+          0.06052278354763985,
+          -100.0
+        ],
+        [
+          0.06237832456827164,
+          -0.2416193187236786,
+          0.9683641195297241,
+          160.0
+        ],
+        [
+          -4.5308539142752124e-08,
+          0.970253586769104,
+          0.24209077656269073,
+          40.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "modifiers": [],
+      "polygons": 0,
+      "materials": []
+    },
+    {
+      "name": "CI LUZ | Luz de anillo",
+      "type": "LIGHT",
+      "location": [
+        200.0,
+        15.0,
+        -80.0
+      ],
+      "rotation_euler": [
+        1.8230679035186768,
+        4.656330432339928e-08,
+        1.6191458702087402
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          -0.04833070933818817,
+          0.24931257963180542,
+          0.9672163128852844,
+          200.0
+        ],
+        [
+          0.9988313913345337,
+          0.012063596397638321,
+          0.04680093005299568,
+          15.0
+        ],
+        [
+          -4.656330432339928e-08,
+          0.9683479070663452,
+          -0.24960428476333618,
+          -80.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "modifiers": [],
+      "polygons": 0,
+      "materials": []
+    },
+    {
+      "name": "CI LUZ | Reflejo amplio",
+      "type": "LIGHT",
+      "location": [
+        -70.0,
+        -160.0,
+        190.0
+      ],
+      "rotation_euler": [
+        0.7229306697845459,
+        4.655793262031693e-08,
+        0.30288487672805786
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "matrix_world": [
+        [
+          0.954479992389679,
+          -0.2236674576997757,
+          0.19733433425426483,
+          -70.0
+        ],
+        [
+          0.2982749938964844,
+          0.7157359719276428,
+          -0.6314697265625,
+          -160.0
+        ],
+        [
+          -4.655793262031693e-08,
+          0.6615851521492004,
+          0.7498700618743896,
+          190.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "dimensions": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "modifiers": [],
+      "polygons": 0,
+      "materials": []
+    }
+  ],
+  "materials": {
+    "CI | Blindaje grafito": {
+      "Base Color": [
+        0.07999999821186066,
+        0.10499999672174454,
+        0.15000000596046448,
+        1.0
+      ],
+      "Metallic": 0.4000000059604645,
+      "Roughness": 0.47999998927116394,
+      "Emission Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Emission Strength": 0.0
+    },
+    "CI | Canales": {
+      "Base Color": [
+        0.010999999940395355,
+        0.1599999964237213,
+        0.20000000298023224,
+        1.0
+      ],
+      "Metallic": 0.6000000238418579,
+      "Roughness": 0.18000000715255737,
+      "Emission Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Emission Strength": 0.0
+    },
+    "CI | Edificios claros": {
+      "Base Color": [
+        0.20000000298023224,
+        0.23000000417232513,
+        0.2800000011920929,
+        1.0
+      ],
+      "Metallic": 0.550000011920929,
+      "Roughness": 0.47999998927116394,
+      "Emission Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Emission Strength": 0.0
+    },
+    "CI | Edificios oscuros": {
+      "Base Color": [
+        0.02500000037252903,
+        0.04100000113248825,
+        0.06800000369548798,
+        1.0
+      ],
+      "Metallic": 0.6000000238418579,
+      "Roughness": 0.5,
+      "Emission Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Emission Strength": 0.0
+    },
+    "CI | Edificios pizarra": {
+      "Base Color": [
+        0.06499999761581421,
+        0.09000000357627869,
+        0.12999999523162842,
+        1.0
+      ],
+      "Metallic": 0.47999998927116394,
+      "Roughness": 0.6000000238418579,
+      "Emission Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Emission Strength": 0.0
+    },
+    "CI | Juntas oscuras": {
+      "Base Color": [
+        0.00800000037997961,
+        0.013000000268220901,
+        0.024000000208616257,
+        1.0
+      ],
+      "Metallic": 0.4000000059604645,
+      "Roughness": 0.6499999761581421,
+      "Emission Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Emission Strength": 0.0
+    },
+    "CI | Luz ambar": {
+      "Base Color": [
+        1.0,
+        0.38999998569488525,
+        0.0949999988079071,
+        1.0
+      ],
+      "Metallic": 0.10000000149011612,
+      "Roughness": 0.4000000059604645,
+      "Emission Color": [
+        1.0,
+        0.38999998569488525,
+        0.0949999988079071,
+        1.0
+      ],
+      "Emission Strength": 3.200000047683716
+    },
+    "CI | Luz cian": {
+      "Base Color": [
+        0.11999999731779099,
+        0.6499999761581421,
+        1.0,
+        1.0
+      ],
+      "Metallic": 0.10000000149011612,
+      "Roughness": 0.4000000059604645,
+      "Emission Color": [
+        0.11999999731779099,
+        0.6499999761581421,
+        1.0,
+        1.0
+      ],
+      "Emission Strength": 3.5
+    },
+    "CI | Luz hielo": {
+      "Base Color": [
+        0.6399999856948853,
+        0.8500000238418579,
+        1.0,
+        1.0
+      ],
+      "Metallic": 0.10000000149011612,
+      "Roughness": 0.4000000059604645,
+      "Emission Color": [
+        0.6399999856948853,
+        0.8500000238418579,
+        1.0,
+        1.0
+      ],
+      "Emission Strength": 4.0
+    },
+    "CI | Luz marfil": {
+      "Base Color": [
+        1.0,
+        0.7900000214576721,
+        0.46000000834465027,
+        1.0
+      ],
+      "Metallic": 0.10000000149011612,
+      "Roughness": 0.4000000059604645,
+      "Emission Color": [
+        1.0,
+        0.7900000214576721,
+        0.46000000834465027,
+        1.0
+      ],
+      "Emission Strength": 3.799999952316284
+    },
+    "CI | Luz roja baliza": {
+      "Base Color": [
+        1.0,
+        0.03999999910593033,
+        0.014999999664723873,
+        1.0
+      ],
+      "Metallic": 0.10000000149011612,
+      "Roughness": 0.4000000059604645,
+      "Emission Color": [
+        1.0,
+        0.03999999910593033,
+        0.014999999664723873,
+        1.0
+      ],
+      "Emission Strength": 4.0
+    },
+    "CI | Marcas de panel": {
+      "Base Color": [
+        0.3799999952316284,
+        0.46000000834465027,
+        0.550000011920929,
+        1.0
+      ],
+      "Metallic": 0.550000011920929,
+      "Roughness": 0.4000000059604645,
+      "Emission Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Emission Strength": 0.0
+    },
+    "CI | Parques": {
+      "Base Color": [
+        0.017000000923871994,
+        0.05999999865889549,
+        0.04800000041723251,
+        1.0
+      ],
+      "Metallic": 0.10000000149011612,
+      "Roughness": 0.9399999976158142,
+      "Emission Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Emission Strength": 0.0
+    },
+    "CI | Placas acero": {
+      "Base Color": [
+        0.11800000071525574,
+        0.15000000596046448,
+        0.20800000429153442,
+        1.0
+      ],
+      "Metallic": 0.47999998927116394,
+      "Roughness": 0.46000000834465027,
+      "Emission Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Emission Strength": 0.0
+    },
+    "CI | Placas plata": {
+      "Base Color": [
+        0.25,
+        0.30000001192092896,
+        0.3799999952316284,
+        1.0
+      ],
+      "Metallic": 0.5799999833106995,
+      "Roughness": 0.3700000047683716,
+      "Emission Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Emission Strength": 0.0
+    },
+    "CI | Titanio azulado": {
+      "Base Color": [
+        0.14000000059604645,
+        0.17499999701976776,
+        0.23499999940395355,
+        1.0
+      ],
+      "Metallic": 0.46000000834465027,
+      "Roughness": 0.4300000071525574,
+      "Emission Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Emission Strength": 0.0
+    },
+    "Material": {
+      "Base Color": [
+        0.800000011920929,
+        0.800000011920929,
+        0.800000011920929,
+        1.0
+      ],
+      "Metallic": 0.0,
+      "Roughness": 0.5,
+      "Emission Color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Emission Strength": 0.0
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "baseline_at_start": {
+    "src/graphics/hangar.rs": "fe6e0c0a966b7be4986f8e0057e9bc7f4464d5df27872dc6cd6709880acaa272",
+    "src/scenes/front_end.rs": "335eff2fe49df366a9163780a1586ad8500ba8a618ac300799414c6ec1234ff1",
+    "src/scenes/solar_system.rs": "1935f7eb93a509083cd42e64836edf9a5cf64f3707a8fa67af4875be0a501ea9",
+    "src/gameplay/station.rs": "cb4355cf9b448ee6aa1545d381207f92a17e5f2ea073a12ced1256a32e252746",
+    "src/gameplay/selection.rs": "7005e7521eabb26737fdb50a741aa5deb046988d3ec76d629817fb5aa4b86831",
+    "config/station.json": "0e77e8c0dd5bcc696cbad27496a763956f9a86a09ace3f52b78abdd861c902be",
+    "config/ships.json": "1bcc5bf6cb98b377011e7bc80dc07f4ab95a8f860dfa91f603bde9a3cf266306",
+    "config/ship-selection.json": "f84bb29e5b6b2d45de1c959e1ee3713f2ae5e6f2876c0f5aebe571438f3f32cb",
+    "assets/models/environment/spaceStation/citadel_space_station.blend": "1791b9c614b915490c205cb1e675b62c09d80f3d0669bbbca2ef185670b29fe9"
+  },
+  "unchanged_files": {
+    "src/scenes/front_end.rs": true,
+    "src/scenes/solar_system.rs": true,
+    "src/gameplay/station.rs": true,
+    "src/gameplay/selection.rs": true,
+    "config/station.json": true,
+    "config/ships.json": true,
+    "config/ship-selection.json": true,
+    "assets/models/environment/spaceStation/citadel_space_station.blend": true
+  },
+  "hangar_environment_only": true,
+  "method": "Reversing only the asset path, environment shader field/load and architecture draw changes reconstructs the exact pre-task SHA-256 of hangar.rs. All platform, camera, exhibit, update, ship and input code is otherwise byte-identical after normalizing line endings."
+}

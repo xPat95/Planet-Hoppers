@@ -1,5 +1,11 @@
 # Menú principal y selección de naves
 
+> Presentación actual: cámara de la vista general aprobada, iluminación de Cycles horneada y nebulosa original en la salida. [Comparación Blender/juego, capturas y verificaciones](references/hangar/presentation/README.md). No se rediseñó el modelo ni se modificaron plataforma, naves o mecánicas.
+
+> Estado actual — Fase 2: el selector usa `citadel_hangar_reconstructed.glb`, exportado del Blender aprobado. [Integración, capturas reales, ajuste de cámara por clipping y verificación funcional](references/hangar/integration/README.md). Las descripciones de implementaciones anteriores que siguen abajo son históricas.
+
+> Actualización visual: el entorno procedural descrito históricamente abajo fue sustituido por `citadel_hangar_interior.glb`, construido en Blender desde la referencia aprobada. La plataforma circular de radio 4.5 y el giro de 10°/s están restaurados. [Informe actual con renders, capturas reales y validaciones](references/hangar/README.md).
+
 ## Entrada normal y acceso de desarrollo
 
 ```powershell
@@ -39,38 +45,32 @@ Las flechas de pantalla o izquierda/derecha recorren el catálogo de forma circu
 - `Initial` crea un estado nuevo solo al confirmar; todas las opciones son elegibles.
 - `Change` permite visualizar todas, pero únicamente confirma una desbloqueada. Devuelve una copia actualizada conservando nave inicial y propiedad; no crea otra partida.
 
-El punto de entrada `scenes::front_end::select(mode, game)` reutiliza la misma vista para una futura visita a la estación. Al cancelar devuelve `None`. Al cambiar devuelve `SelectionTransition::ChangedShip`; el futuro anfitrión debe aplicar ese estado a su sesión solar existente, sin volver a ejecutar el inicio del sistema solar.
+El punto de entrada `scenes::front_end::select(mode, game)` comparte la vista con `front_end::dock`, ya conectado a la sesión solar. Al cancelar devuelve `None`. Al cambiar devuelve `SelectionTransition::ChangedShip`; el anfitrión aplica ese estado sin volver a ejecutar el inicio del sistema solar.
 
 Al confirmar una selección inicial se devuelve `SelectionTransition::StartAdventure(game)`. `front_end::run` entrega ese estado a `solar_system::run_with_game`. Allí se resuelve el modelo por identidad y se fija la nave activa antes de crear la sesión espacial. El catálogo no sustituye la selección por `active_ship` predeterminada del archivo. El estado permanece dentro de la sesión solar durante las visitas a South Park y se devuelve al terminar.
 
-El acceso directo de desarrollo mantiene N para recorrer todos los modelos. En una aventura, N únicamente recorre las naves desbloqueadas; al comienzo solo está disponible la elegida. No se añaden controles de estación ni un sistema de progreso.
+El acceso directo de desarrollo mantiene N para recorrer todos los modelos. En una aventura, N únicamente recorre las naves disponibles; al comienzo solo está disponible la elegida. El cambio libre en el hangar incorpora la nave confirmada a la sesión, sin tokens ni guardado.
 
-## Hangar circular inspirado en la estación
+## Interior del hangar y ciclo con la estación
 
-`graphics::hangar` contiene únicamente la presentación:
+El hangar ahora es una bahía complementaria en el sector inferior del anillo de la Ciudadela. Tiene suelo de estacionamiento, paredes, techo completo achaflanado, arcos concéntricos, pasarelas técnicas y una abertura de salida. La nave queda apoyada sobre el suelo y no gira automáticamente. No se usa el modelo exterior como fondo ni se modifica su fuente.
 
-- `HangarStyle` centraliza tamaño de exhibición (6 unidades), plataforma (radio 4,5), giro (10°/s), posición de la luz local, ambiente (0,55), estilo del interior y transformación de un eventual modelo interior.
-- `HangarCamera` conserva el encuadre de la esfera que contiene la nave en cualquier ángulo de giro, considerando encabezado, pie y flechas. Dirección, distancia mínima (11), margen (1,08) y FOV (42°) quedan configurables por separado.
-- `graphics::hangar_interior` construye solamente el entorno visual. `InteriorStyle` centraliza radio (12), altura (6,8), 60 segmentos, cinco accesos radiales y paleta de grafito, titanio azulado, plata, cian y hielo.
-- La referencia es el anillo del Presidium y los cinco acoplamientos del [modelo aprobado de la Ciudadela](../assets/models/environment/spaceStation/README.md), especialmente [Ciudadela_Anillo.png](references/spaceStation/Ciudadela_Anillo.png). Se traducen sus placas segmentadas, bandas concéntricas, nervios y pequeñas ventanas a una sala circular. Los accesos usan marcos sucesivos y guías de suelo para sugerir profundidad hacia los brazos.
-- El lado cercano se presenta como un corte arquitectónico: omite pared y franja de techo frente a la cámara para que nunca oculten la nave. El suelo circular permanece completo. La parte superior es una corona abierta; no se pretende construir una estación visitable.
-- El entorno usa primitivas batched de raylib con colores de caras preajustados y pequeñas franjas luminosas sin iluminación dinámica adicional, bloom, texturas nuevas ni sombras. La nave conserva sus materiales/texturas y el shader existente con luz local. La plataforma tiene tapa de grafito y un borde cian discreto; sus marcas y la nave siguen girando juntas.
-- Las pequeñas ventanas superiores repiten las bandas habitadas del exterior aprobado: luz hielo y algunos acentos ámbar sobre el titanio frío. La estación real ya aparece fija sobre el sistema solar; su [posición, aproximación y controles](solar-system.md#estación-espacial-fija) se configuran por separado del visor. La interacción exterior todavía no abre el selector.
+La compuerta exterior, el interior y el punto de despegue comparten `config/station.json::dock`. La entrada desde el vuelo ya abre el selector; al salir se reutiliza la misma sesión solar. El modo `Docked` permite probar las seis naves mediante cambios gratuitos durante la sesión, sin tokens ni guardado; `Initial` y `Change` conservan sus contratos anteriores.
 
-Para integrar un GLB interior definitivo se configura `HangarStyle.station_model`, junto con `station_length`, `station_position` y `station_rotation`. El adaptador `draw_backdrop` sustituye el entorno procedural por ese recurso; conserva plataforma, nave, selección, desbloqueos, cámara y transiciones. El GLB exterior aprobado no se carga como habitación: contiene el conjunto completo y no define un espacio interior preparado para exhibición. No se modifica su fuente Blender ni sus exportaciones.
+`HangarStyle` conserva luz local/ambiente y parámetros de cámara; las dimensiones interiores proceden de la compuerta configurada. V alterna la nave, la bahía completa y la vista de salida. Se conserva el adaptador de un futuro GLB interior, independiente del catálogo y de las transiciones.
 
-Se puede expandir o reemplazar únicamente `InteriorStyle::draw` para incorporar pasarelas, techos o módulos interiores completos. Ambos modos del selector comparten este mismo entorno. Quedan pendientes el modelo interior final, materiales PBR específicos si se desean, sombras de contacto y una medición sostenida de rendimiento en el hardware objetivo; no se necesitan para el flujo actual.
-
-La escala de exhibición es una transformación local del visor. El vuelo sigue utilizando los largos originales de 4–5 unidades, su radio de colisión y las velocidades existentes. No se modifican mallas de Blender, planetas, órbitas, skybox ni shaders del Sol.
+Ver [arquitectura, transformaciones, controles, recorridos y capturas](station-hangar-cycle.md). Las versiones anteriores del entorno circular y su verificación quedan reemplazadas por este ciclo funcional.
 
 ## Puntos de extensión
 
 - La abducción inicial se insertará al consumir `StartAdventure`, antes de `run_with_game`.
 - Un futuro consumidor de progreso decidirá cuándo invocar `GameState::unlock`, con las reglas de tokens y sus posibles cinemáticas. El mutador actual solo actualiza propiedad y no concede recompensas.
-- La entrada física a la estación invocará el selector en modo `Change` y aplicará `ChangedShip` a la sesión solar existente.
-- No se implementan guardado, Continuar, tokens, recompensas, cinemáticas ni acceso a la estación definitiva.
+- La entrada física al hangar ya invoca el selector compartido y aplica `ChangedShip` a la sesión solar existente. El modo restringido `Change` queda disponible para futuras reglas de progreso.
+- No se implementan guardado, Continuar, tokens, recompensas, cinemáticas ni una estación recorrible a pie.
 
-## Verificación reproducible
+## Verificación del visor anterior (histórica)
+
+La verificación actual del ciclo completo se documenta en [Hangar del Presidium](station-hangar-cycle.md). Los resultados siguientes corresponden a la implementación anterior, antes de integrar los cambios de `main` y el ciclo de entrada/despegue.
 
 ```powershell
 cargo build --locked --bins

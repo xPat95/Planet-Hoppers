@@ -27,7 +27,8 @@ fn station_is_fixed_above_every_orbit_and_sun_with_a_safe_entry_anchor() {
             assert!((p.position() - initial).length() > station.collision_radius + p.config.radius);
         }
     }
-    assert!(station.in_reach(station.approach()));
+    assert!(station.in_reach(station.dock_target()));
+    assert!(!station.in_reach(station.approach()));
     assert!(station
         .push_out(station.approach(), station.approach(), ships.flight.radius)
         .is_none());
@@ -95,20 +96,21 @@ fn shared_autopilot_reaches_the_station_safely_in_normal_and_turbo_flight() {
             if station.in_reach(ship.position) {
                 break;
             }
-            let aim_at = Some(ship.autopilot_to(station.approach(), &ships.flight, &system));
-            let before = ship.position;
-            system.update(1.0 / 60.0);
-            ship.update(
-                1.0 / 60.0,
-                &FlightInput {
-                    throttle: 1.0,
-                    boost,
-                    aim_at,
-                    ..Default::default()
-                },
+            let aim_at = Some(ship.autopilot_to(
+                station.navigation_target(ship.position),
                 &ships.flight,
                 &system,
-            );
+            ));
+            let before = ship.position;
+            system.update(1.0 / 60.0);
+            let mut input = FlightInput {
+                throttle: 1.0,
+                boost,
+                aim_at,
+                ..Default::default()
+            };
+            station.assist_approach(&ship, &mut input, &ships.flight);
+            ship.update(1.0 / 60.0, &input, &ships.flight, &system);
             assert!(station
                 .push_out(before, ship.position, ships.flight.radius)
                 .is_none());
@@ -119,4 +121,58 @@ fn shared_autopilot_reaches_the_station_safely_in_normal_and_turbo_flight() {
             "no llegó con turbo={boost}"
         );
     }
+}
+
+#[test]
+fn docking_waypoint_follows_translation_rotation_and_fitted_scale() {
+    let (mut station, _, ships) = setup();
+    for angles in [[0.0, -90.0, 0.0], [22.0, 37.0, 13.0], [0.0, 180.0, 0.0]] {
+        station.rotation_degrees = angles;
+        station.position = [400.0, 8200.0, -700.0];
+        let expected = station.center()
+            + Vector3::new(
+                station.dock.local_position[0],
+                station.dock.local_position[1],
+                station.dock.local_position[2],
+            )
+            .transform_with(station.rotation())
+                * station.length;
+        assert!((expected - station.exit_position()).length() < 0.001);
+        let offset = station.dock_target() - station.exit_position();
+        assert!((offset.length() - station.dock.departure_clearance).abs() < 0.001);
+        assert!(offset.normalized().dot(station.exit_forward()) > 0.999);
+        assert!(station.in_reach(station.dock_target()));
+        assert!(station
+            .push_out(
+                station.dock_target(),
+                station.dock_target(),
+                ships.flight.radius
+            )
+            .is_none());
+        assert!(!station.in_reach(station.exit_position() - station.exit_forward() * 2.0));
+        assert!(
+            !station.in_reach(station.dock_target() + station.exit_right() * station.dock.width)
+        );
+    }
+}
+
+#[test]
+fn dock_access_carves_only_the_configured_lane_not_the_rest_of_the_hull() {
+    let (station, _, ships) = setup();
+    let p = station.dock_target();
+    assert!(station
+        .push_out(station.approach(), p, ships.flight.radius)
+        .is_none());
+    assert!(station
+        .push_out(p, p - station.exit_forward() * 100.0, ships.flight.radius)
+        .is_some());
+    assert!(station
+        .push_out(p, p + station.exit_right() * 1000.0, ships.flight.radius)
+        .is_some());
+    assert!(station
+        .push_out(p, p + station.exit_up() * 50.0, ships.flight.radius)
+        .is_some());
+    assert!(station
+        .push_out(p, p + station.exit_forward() * 1000.0, ships.flight.radius)
+        .is_none());
 }

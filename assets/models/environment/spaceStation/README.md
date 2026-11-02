@@ -1,5 +1,9 @@
 # Estacion espacial: Ciudadela de Mass Effect
 
+## Módulo interior de hangar
+
+`citadel_hangar_interior.blend` y `exports/citadel_hangar_interior.glb` son un módulo complementario construido usando la fuente aprobada y sus materiales. El original `citadel_space_station.blend` permanece intacto. Rust carga el nuevo GLB en el selector y dibuja separadamente la plataforma circular histórica y la nave giratoria. [Inspección de la fuente, renders, capturas de raylib y validación](../../../../docs/references/hangar/README.md).
+
 Modelo aprobado por el usuario el 1 de noviembre de 2026, incorporado como recurso de la estacion espacial compartida de Planet-Hoppers.
 
 Fuente editable: [citadel_space_station.blend](citadel_space_station.blend), Blender 5.2.3 LTS. El original aprobado permanece conservado en `ProyectoFinal/Ciudadela_Mass_Effect`.
@@ -32,4 +36,4 @@ La adaptacion preserva la geometria aprobada. La triangulacion, limpieza y simpl
 
 [Manifest](asset.json), [auditoria de exportacion y reimportacion](../../../../docs/references/spaceStation/integration_audit.json), [vistas y referencias](../../../../docs/references/spaceStation/README.md), [scripts de construccion y exportacion](../../../../tools/blender/spaceStation/README.md).
 
-Este paquete conserva el modelo aprobado. El sistema solar ya carga sus LOD como estacion fija, con posicion, escala y zona de aproximacion en `config/station.json`; ver `docs/solar-system.md`. El selector inicial usa un interior circular inspirado en su anillo y sus cinco acoplamientos. La entrada desde el vuelo al hangar y el cambio de nave dentro de la partida siguen pendientes. No incorpora otra tematica, planeta ni token. El LOD cercano sigue siendo de alto detalle; los recuentos y limites de ambos niveles se registran en la auditoria de exportacion, cuyo campo `runtime_placement` refleja el momento de preparacion del recurso.
+Este paquete conserva el modelo aprobado. El sistema solar carga sus LOD como estacion fija; `config/station.json::dock` configura la compuerta inferior, aproximacion, entrada y despegue. Una bahia interior complementaria ocupa ese sector del anillo, con techo, suelo, paredes y abertura coherentes con su marco exterior, sin modificar Blender ni los GLB. La entrada desde el vuelo y el cambio de nave durante la sesion ya estan conectados. Ver `docs/station-hangar-cycle.md`. No incorpora otra tematica, planeta ni token. El LOD cercano sigue siendo de alto detalle; los recuentos y limites de ambos niveles se registran en la auditoria de exportacion, cuyo campo `runtime_placement` refleja el momento de preparacion del recurso.

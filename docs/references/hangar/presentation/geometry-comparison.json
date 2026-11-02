@@ -1,0 +1,7 @@
+{
+  "before_objects": 241,
+  "after_objects": 241,
+  "mismatches": [],
+  "note": "Canonical triangle positions, independent of winding/UVs",
+  "coordinate_precision": 1e-05
+}

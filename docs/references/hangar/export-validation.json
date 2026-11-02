@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "triangles": 74748,
+  "meshes": 11,
+  "max_vertices_per_primitive": 17280,
+  "materials": 11,
+  "external_dependencies": 0,
+  "textures": "Not required: original constant PBR/emissive materials",
+  "source_unchanged": true,
+  "source_sha256": "1791b9c614b915490c205cb1e675b62c09d80f3d0669bbbca2ef185670b29fe9",
+  "blender_reimport": false
+}

@@ -1,0 +1,18 @@
+{
+  "position": [
+    10.8,
+    7.2,
+    12.6
+  ],
+  "target": [
+    0,
+    4.8,
+    -5.5
+  ],
+  "base_fov": 70,
+  "environment_resources_unchanged": true,
+  "camera_cases_passed": 18,
+  "cargo_build": "PASS",
+  "ship_selection_tests": "7 PASS",
+  "runtime_smoke_exit_code": 0
+}

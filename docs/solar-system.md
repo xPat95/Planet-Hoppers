@@ -6,7 +6,7 @@ El Sol en el centro, los seis planetas de Blender en sus órbitas y una nave par
 cargo run --locked --bin solarsystem
 ```
 
-Requisitos de Windows al final. El flujo normal comienza en el [menú y hangar inicial](hangar.md) con `cargo run --locked`; el comando anterior conserva el acceso de desarrollo. La entrada física a la estación, el desbloqueo por progreso, los tokens y el final siguen pendientes (etapas 8 a 10).
+Requisitos de Windows al final. El flujo normal comienza en el [menú y hangar inicial](hangar.md) con `cargo run --locked`; el comando anterior conserva el acceso de desarrollo. La entrada a la estación y el regreso al vuelo ya funcionan. El desbloqueo por progreso, los tokens y el final siguen pendientes.
 
 ## Controles
 
@@ -30,19 +30,11 @@ En las dos: O muestra u oculta las órbitas, F12 guarda una captura en `target/s
 
 ## Estación espacial fija
 
-La Ciudadela aprobada aparece como objeto independiente de `SolarSystem.planets`; no tiene órbita ni giro automático. `config/station.json` centraliza sus recursos, posición, orientación, largo, LOD y márgenes de aproximación. Se reutilizan los GLB de `assets/models/environment/spaceStation/exports`, sin modificar Blender ni las exportaciones. A más de 2200 unidades se usa el LOD de 131 699 triángulos; cerca se usa el de 683 746. Se descarta el dibujo cuando toda su envolvente queda detrás de la cámara. No se añaden shaders ni luces globales.
+La Ciudadela permanece fija en **(0, 6200, 0)**, con **1400 unidades de largo**, por encima del plano orbital. Conserva ambos LOD originales y el descarte detrás de la cámara. No se modifica el tamaño del sistema solar, sus órbitas ni los modelos aprobados.
 
-Su centro es **(0, 6200, 0)**, por encima del plano XZ de las órbitas. Tiene **1400 unidades de largo**, frente a las 4–5 de las naves. La altura deja incluso su envolvente exterior por encima del Sol y todos los planetas, sin cambiar radios ni distancias orbitales. Desde el inicio se llega en aproximadamente 15 segundos de vuelo directo con turbo, más el tiempo de orientación/aceleración.
+La partida comienza fuera de su compuerta inferior y mirando hacia el espacio libre. El punto de salida sigue la posición y rotación configuradas de la estación. Tab selecciona la estación, B orienta hacia su aproximación y limita la velocidad cerca de la entrada mientras se alinea. Al acercarse a la puerta real aparece **[E] Entrar a la estación espacial**. La esfera de seguridad conserva un único corredor de acceso alineado; no se puede entrar por otra cara del blindaje.
 
-Tab permite seleccionarla en vuelo y seguirla en vista general. Un rombo cian y su nombre/distancia la diferencian de los planetas; el indicador del objetivo permanece en pantalla cuando queda fuera del campo visual. B utiliza la misma ruta que evita el Sol y orienta hacia el ancla de aproximación **(0, 6200, 1120)**. El jugador sigue acelerando/frenando. No hay atraque automático.
-
-La envolvente de seguridad es una esfera conservadora de radio **860**, suficiente para contener la caja del modelo ajustado, con colisión barrida que evita atravesarla incluso con turbo. La cámara también se mantiene fuera. Por ahora no se atraviesan los huecos entre brazos. Al llegar a menos de **160 unidades del ancla**, aparece la indicación de Ciudadela; E confirma el contacto y muestra que el acceso al hangar está pendiente. No abre otra escena ni reinicia la partida.
-
-El futuro ingreso al hangar puede consumir esa interacción, llamar al selector existente en modo `Change`, aplicar `ChangedShip` a la sesión y devolver la nave al ancla exterior, conservando propiedad y progreso. No se implementan todavía atraque, tokens ni desbloqueos.
-
-Verificación: `cargo test --locked --test station` comprueba separación orbital, posición fija, ascenso independiente del FPS, colisión barrida y llegada con piloto en normal/turbo. `cargo run --locked --bin solarsystem -- --smoke-station` ejercita eventos nativos de Espacio, B y E y guarda `station-overview.png`, `station-exterior.png`, `station-approach.png` y `station-contact.png` en `target/solarsystem/`.
-
-La integración compiló con `cargo build --locked --bins`; la suite completa aprobó 161 pruebas. El recorrido `planet-hoppers --smoke-returns --ship starwars` pasó menú, las seis exhibiciones y cuatro visitas a South Park (victoria, derrota y dos abandonos), conservando la nave inicial/activa y una sola desbloqueada. También pasó `STATION_SMOKE_PASS`, incluido Tab para seleccionar la estación, Espacio sin orientación automática, B para orientar y E en proximidad. Informes: `target/station-tests.log`, `target/station-smoke.log` y `target/station-flow-smoke.log`. Se revisaron capturas; no se realizó una partida con entrada física ni un benchmark sostenido. Raylib avisa de conversiones de índices u32 a u16 en mallas grandes del planeta Star Wars y la estación; el cargador `SpaceModel` existente reconstruye esas primitivas desde los índices originales del GLB.
+E abre el hangar conservando la sesión, la nave, las órbitas y el estado de los minijuegos. Confirmar otra nave aplica su modelo y vuelve a despegar; Esc/Volver cancela sin cambiarla. No se vuelve al menú ni se reinicia el sistema solar. El detalle del contrato de compuerta, configuración y pruebas está en [Hangar del Presidium](station-hangar-cycle.md).
 
 ## Fase 1: estructura
 
@@ -78,7 +70,7 @@ La tabla muestra valores efectivos, desde el Sol hacia el exterior. Cada planeta
 
 `travel_scale() = sqrt(WORLD_SCALE)` deriva el balance del mismo factor: velocidades lineales y aceleración se multiplican por √12; velocidades angulares orbitales se dividen por √12. Así se mantienen los tiempos de aceleración y la ventaja de velocidad de las naves sobre los planetas, pero los viajes y períodos orbitales duran unas 3,46 veces más. La rotación propia no cambia. Como referencia geométrica, recorrer 7080 unidades toma unos 16 s con turbo o 51 s en normal, sin contar aceleración, rodeos ni aproximación.
 
-La detección y el arrastre conservan sus unidades relativas: explorar hasta 0,9 radios desde la superficie del elipsoide de colisión (aproximadamente 173–238 unidades para una esfera), arrastre a 3 radios del centro y LOD a 9 radios. Las formas de choque se recalculan al cargar los modelos escalados; la nave conserva su radio. El Sol sigue teniendo 2,05–2,81 veces el radio de un planeta. El inicio queda en medio del espacio libre entre el Sol y Calaca (a 1062 unidades del centro solar), y el estacionamiento y el regreso mantienen sus márgenes relativos.
+La detección y el arrastre conservan sus unidades relativas: explorar hasta 0,9 radios desde la superficie del elipsoide de colisión (aproximadamente 173–238 unidades para una esfera), arrastre a 3 radios del centro y LOD a 9 radios. Las formas de choque se recalculan al cargar los modelos escalados; la nave conserva su radio. El Sol sigue teniendo 2,05–2,81 veces el radio de un planeta. El inicio jugable se calcula desde la compuerta de la estación. `departure_position()` conserva el punto entre Sol y Calaca como referencia de las pruebas de rutas planetarias; el regreso de minijuegos mantiene sus márgenes existentes.
 
 ## Fase 2: traslación y rotación
 

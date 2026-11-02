@@ -1,0 +1,50 @@
+{
+  "source": "assets\\models\\environment\\spaceStation\\citadel_hangar_reconstructed.blend",
+  "source_sha256": "c13b3677c2a8331e8e1803e4d52c4819078124a7b420f3077de4d9bc2d21491a",
+  "source_unchanged": true,
+  "export": "assets\\models\\environment\\spaceStation\\exports\\citadel_hangar_reconstructed.glb",
+  "export_sha256": "c0ee15f3987da944fb33ec67b7100a1c8b18d72e13ec749b4350a43067753d67",
+  "export_bytes": 6139568,
+  "architecture_objects": 241,
+  "reimported_meshes": 241,
+  "collections": [
+    "01 | Componentes originales reutilizados",
+    "02 | Componentes adaptados - arquitectura principal",
+    "03 | Conexiones y suelo nuevo",
+    "04 | Detalles mecanicos originales"
+  ],
+  "excluded": [
+    "platform proxy",
+    "reference ship",
+    "clearance envelope",
+    "lights",
+    "cameras",
+    "procedural world"
+  ],
+  "bounds_blender": {
+    "min": [
+      -26.626121520996094,
+      -25.714994430541992,
+      -7.406000137329102
+    ],
+    "max": [
+      26.626121520996094,
+      29.763776779174805,
+      25.748001098632812
+    ]
+  },
+  "game_half_extents_from_origin": [
+    26.626121520996094,
+    25.748001098632812,
+    29.763776779174805
+  ],
+  "units": "unchanged game units; Blender (x,y,z) -> glTF/raylib (x,z,-y)",
+  "transform": "identity; no recentering or automatic fit",
+  "clearance": {
+    "radius": 4.8,
+    "height": 6.9,
+    "surface_intersections": 0,
+    "interior_vertices": 0
+  },
+  "presentation": "World shader, Cycles area lights and AgX are not exported. Runtime uses its existing sky and architecture shader."
+}

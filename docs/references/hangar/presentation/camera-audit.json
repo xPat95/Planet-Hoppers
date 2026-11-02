@@ -1,0 +1,380 @@
+[
+  {
+    "ship": "halloween",
+    "viewport": [
+      960,
+      640
+    ],
+    "eye_blender": [
+      12.0,
+      -14.0,
+      8.0
+    ],
+    "target_blender": [
+      0.0,
+      7.0,
+      6.0
+    ],
+    "fov_y": 86.79760825911956,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "halloween",
+    "viewport": [
+      1280,
+      800
+    ],
+    "eye_blender": [
+      12.0,
+      -14.0,
+      8.0
+    ],
+    "target_blender": [
+      0.0,
+      7.0,
+      6.0
+    ],
+    "fov_y": 76.93219822739702,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "halloween",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "eye_blender": [
+      12.0,
+      -14.0,
+      8.0
+    ],
+    "target_blender": [
+      0.0,
+      7.0,
+      6.0
+    ],
+    "fov_y": 74.0,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "starwars",
+    "viewport": [
+      960,
+      640
+    ],
+    "eye_blender": [
+      12.0,
+      -14.0,
+      8.0
+    ],
+    "target_blender": [
+      0.0,
+      7.0,
+      6.0
+    ],
+    "fov_y": 82.52886139909432,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "starwars",
+    "viewport": [
+      1280,
+      800
+    ],
+    "eye_blender": [
+      12.0,
+      -14.0,
+      8.0
+    ],
+    "target_blender": [
+      0.0,
+      7.0,
+      6.0
+    ],
+    "fov_y": 74.0,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "starwars",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "eye_blender": [
+      12.0,
+      -14.0,
+      8.0
+    ],
+    "target_blender": [
+      0.0,
+      7.0,
+      6.0
+    ],
+    "fov_y": 74.0,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "smilingfriends",
+    "viewport": [
+      960,
+      640
+    ],
+    "eye_blender": [
+      12.0,
+      -14.0,
+      8.0
+    ],
+    "target_blender": [
+      0.0,
+      7.0,
+      6.0
+    ],
+    "fov_y": 83.12133176908493,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "smilingfriends",
+    "viewport": [
+      1280,
+      800
+    ],
+    "eye_blender": [
+      12.0,
+      -14.0,
+      8.0
+    ],
+    "target_blender": [
+      0.0,
+      7.0,
+      6.0
+    ],
+    "fov_y": 74.0,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "smilingfriends",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "eye_blender": [
+      12.0,
+      -14.0,
+      8.0
+    ],
+    "target_blender": [
+      0.0,
+      7.0,
+      6.0
+    ],
+    "fov_y": 74.0,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "minecraft",
+    "viewport": [
+      960,
+      640
+    ],
+    "eye_blender": [
+      12.0,
+      -14.0,
+      8.0
+    ],
+    "target_blender": [
+      0.0,
+      7.0,
+      6.0
+    ],
+    "fov_y": 83.95541879160851,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "minecraft",
+    "viewport": [
+      1280,
+      800
+    ],
+    "eye_blender": [
+      12.0,
+      -14.0,
+      8.0
+    ],
+    "target_blender": [
+      0.0,
+      7.0,
+      6.0
+    ],
+    "fov_y": 74.17093032828778,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "minecraft",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "eye_blender": [
+      12.0,
+      -14.0,
+      8.0
+    ],
+    "target_blender": [
+      0.0,
+      7.0,
+      6.0
+    ],
+    "fov_y": 74.0,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "regularshow",
+    "viewport": [
+      960,
+      640
+    ],
+    "eye_blender": [
+      12.0,
+      -14.0,
+      8.0
+    ],
+    "target_blender": [
+      0.0,
+      7.0,
+      6.0
+    ],
+    "fov_y": 83.69841865198289,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "regularshow",
+    "viewport": [
+      1280,
+      800
+    ],
+    "eye_blender": [
+      12.0,
+      -14.0,
+      8.0
+    ],
+    "target_blender": [
+      0.0,
+      7.0,
+      6.0
+    ],
+    "fov_y": 74.0,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "regularshow",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "eye_blender": [
+      12.0,
+      -14.0,
+      8.0
+    ],
+    "target_blender": [
+      0.0,
+      7.0,
+      6.0
+    ],
+    "fov_y": 74.0,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "southpark",
+    "viewport": [
+      960,
+      640
+    ],
+    "eye_blender": [
+      12.0,
+      -14.0,
+      8.0
+    ],
+    "target_blender": [
+      0.0,
+      7.0,
+      6.0
+    ],
+    "fov_y": 83.68626287591361,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "southpark",
+    "viewport": [
+      1280,
+      800
+    ],
+    "eye_blender": [
+      12.0,
+      -14.0,
+      8.0
+    ],
+    "target_blender": [
+      0.0,
+      7.0,
+      6.0
+    ],
+    "fov_y": 74.0,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "southpark",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "eye_blender": [
+      12.0,
+      -14.0,
+      8.0
+    ],
+    "target_blender": [
+      0.0,
+      7.0,
+      6.0
+    ],
+    "fov_y": 74.0,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  }
+]

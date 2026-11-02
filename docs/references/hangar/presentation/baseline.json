@@ -1,0 +1,974 @@
+{
+  "files": {
+    "src/graphics/hangar.rs": "4b63987926b13518cdc12f366e2f5532b8275d80866f79ca7694d37893c3db2b",
+    "src/graphics/shaders/hangar.fs": "2f7a92b837be6c5f699d2a6f3ead400cf5ffae69d2bc3ac4938a0ce9c0540069",
+    "src/scenes/front_end.rs": "335eff2fe49df366a9163780a1586ad8500ba8a618ac300799414c6ec1234ff1",
+    "assets/models/environment/spaceStation/citadel_hangar_reconstructed.blend": "c13b3677c2a8331e8e1803e4d52c4819078124a7b420f3077de4d9bc2d21491a"
+  },
+  "geometry": {
+    "CUBIERTA NUEVA | Conexion 00": {
+      "triangles": 68,
+      "sha256": "6ec91cafc1b3e6e3feef2ef6cd6f2984d290661d012c26e92955ac234754cea8"
+    },
+    "CUBIERTA NUEVA | Conexion 01": {
+      "triangles": 68,
+      "sha256": "ee16934a4cf9caf0280151ea1843390d91862bc33f44d48676d61ff3c953e298"
+    },
+    "CUBIERTA NUEVA | Conexion 04": {
+      "triangles": 68,
+      "sha256": "82ab5abc372553bc608d7a97fcdea9b75223f0d8a777918ea8289ed3b8b72eea"
+    },
+    "CUBIERTA NUEVA | Conexion 05": {
+      "triangles": 68,
+      "sha256": "34765efb59a4c1fa8e099b6f0b465590b7a698b625d7e955f782cea5720e8f21"
+    },
+    "CUBIERTA NUEVA | Conexion 06": {
+      "triangles": 68,
+      "sha256": "51c18102e830a8cee0c732d8cefa1ef66a48c12c3cdd26cbce8851d44f3561e6"
+    },
+    "CUBIERTA NUEVA | Conexion 07": {
+      "triangles": 68,
+      "sha256": "982c89e2bfbfc59a65dee780017b0e07eea515f928725a66ba42172131fabe7c"
+    },
+    "CUBIERTA NUEVA | Conexion 08": {
+      "triangles": 68,
+      "sha256": "59727adffca4024fae6976e3a367187f1887ea9e83882e8f0db0a03fc3a77740"
+    },
+    "CUBIERTA NUEVA | Conexion 09": {
+      "triangles": 68,
+      "sha256": "f181db9f0f96e7be8c490eedd2faa6d9f600e692c32b88184cae269d53c6f10b"
+    },
+    "CUBIERTA NUEVA | Conexion 10": {
+      "triangles": 68,
+      "sha256": "ae9ef61aef75adc3a6fdfe48100a4159d955d041175abe32184bc32f1ed5e51f"
+    },
+    "CUBIERTA NUEVA | Conexion 11": {
+      "triangles": 68,
+      "sha256": "a9d2d780f1f9cb5b6e759398de5bf6c9cb3dad71db430c6f06dfb0a6f20c62df"
+    },
+    "CUBIERTA | Casco facetado Zakera": {
+      "triangles": 388,
+      "sha256": "0f1346553b11821d236f029f646a9f0b00f596b007d8a9e6d63ffc28e0a00719"
+    },
+    "CUBIERTA | Costilla original Y 5": {
+      "triangles": 80,
+      "sha256": "aa95ad3224fee9bbb8404c57660f708c4939802f9991f1cf3e6c6e0207019cb1"
+    },
+    "CUBIERTA | Costilla original Y 13": {
+      "triangles": 80,
+      "sha256": "117f8ae414cc3df1cafae89c95c01254cf84aaf4a9913b2a3af8e484d8ae56b7"
+    },
+    "CUBIERTA | Costilla original Y -3": {
+      "triangles": 80,
+      "sha256": "e2c66114121618f631a69895847f885772862d94255cc950456bab390ff78fbf"
+    },
+    "CUBIERTA | Costilla original Y -11": {
+      "triangles": 80,
+      "sha256": "a09cd8285dc0975ffdf7cf563775282dc2abad8c31e71459d789edefc1682cef"
+    },
+    "CUBIERTA | Placas y rejillas": {
+      "triangles": 628,
+      "sha256": "6121a0a83e614a27558da78da2fcfc2bdc5b0ed9782ce93796edb0fb2069791e"
+    },
+    "GALERIA | Bloques del distrito": {
+      "triangles": 22330,
+      "sha256": "0c0a89ed472e1b2e0938783f2e65094ed296cb221118d6faad8b8ba1efbbf846"
+    },
+    "GALERIA | Luminarias originales": {
+      "triangles": 9672,
+      "sha256": "b44ae09954d1626333cc609793d8283ffcced58f9a1446b13d1be19f18339c0c"
+    },
+    "GUIA NUEVA | Radial 00": {
+      "triangles": 12,
+      "sha256": "a5d11e28a6cb0edfbba1666dccc7d2d35118cce5dcf8ad6fd6249efa9c150679"
+    },
+    "GUIA NUEVA | Radial 01": {
+      "triangles": 12,
+      "sha256": "7627a37d1ee67f0fcb76606f29ee14eb8ffaa6164693c0b271af7cc7d6b3adda"
+    },
+    "GUIA NUEVA | Radial 02": {
+      "triangles": 12,
+      "sha256": "0b470450a78c61016d491c55ab4bf613aafafcf1db49e284fb393934aa5f6193"
+    },
+    "GUIA NUEVA | Radial 03": {
+      "triangles": 12,
+      "sha256": "da01592d98057017e92b5f53f97ee71db79303d64bfe14d591fb72def6ce051d"
+    },
+    "GUIA NUEVA | Radial 04": {
+      "triangles": 12,
+      "sha256": "22c36d6f5890bce9d69b5d3fdeaf12c2b075bf7106adb100741f1367ad844e4d"
+    },
+    "GUIA NUEVA | Radial 05": {
+      "triangles": 12,
+      "sha256": "f22c57b2bc1090df7638d2692b81be3a737bcb51315553704228da3ecb2fd1f9"
+    },
+    "GUIA NUEVA | Radial 06": {
+      "triangles": 12,
+      "sha256": "c24cba005c60585a36561f5d142b2d2a5ed74dfd5ff642edaba03bbe63638087"
+    },
+    "GUIA NUEVA | Radial 07": {
+      "triangles": 12,
+      "sha256": "ef7137f254aab514c7822128e199cbb5579ac0e5a2baf1181c90011f0ac4bb58"
+    },
+    "GUIA NUEVA | Radial 08": {
+      "triangles": 12,
+      "sha256": "c57c795a6fc9f56bb13e1e531b8a5d0d25b501641ef67b57912269d274e9187d"
+    },
+    "GUIA NUEVA | Radial 09": {
+      "triangles": 12,
+      "sha256": "10a2f69bdd4cd3bbd423a0b422b91ad1929c26b08f5ea0d3a4ad11fcec5e2d1d"
+    },
+    "GUIA NUEVA | Radial 10": {
+      "triangles": 12,
+      "sha256": "a7bcdf3658df63659726f8ea85071c3e4648c0adbe1fb4b8644f78f79c84b607"
+    },
+    "GUIA NUEVA | Radial 11": {
+      "triangles": 12,
+      "sha256": "2fa0953898de7f83eda9017ca120f5b158202b592266f5a3b907fee80e118cb9"
+    },
+    "HOMBRO | Escudo 1": {
+      "triangles": 16,
+      "sha256": "d93b4071fcc352556d5b315e621f983f9a6317891285ce2f6ee0ff7c5e6f464b"
+    },
+    "HOMBRO | Escudo -1": {
+      "triangles": 16,
+      "sha256": "760ef34becea0259e3aa3c13b055cc6567a206ea911a898eed373a10288e647b"
+    },
+    "PRESIDIUM | Blindaje radial": {
+      "triangles": 5560,
+      "sha256": "6b9ddb2c0763d7673a804a809a4d7b6953eb5fc6dd79e22fe4b0982d0217675d"
+    },
+    "PRESIDIUM | Nervios y acoplamientos": {
+      "triangles": 10426,
+      "sha256": "fb2b686b6d9591b1cabd3b25bc5deb04fe7ab6c90f49745c6ce39bd9ccaef50b"
+    },
+    "PRESIDIUM | Perfil portante": {
+      "triangles": 3116,
+      "sha256": "4e43078b28b03c5a550b2a669947162aff5864ee9529d4b696a5062d2bdacd24"
+    },
+    "SALIDA EXTERIOR | Blindaje exterior": {
+      "triangles": 6900,
+      "sha256": "66270c98733b779512a39de994407fb7521603a2fb2ffcf1805a0bed20d42774"
+    },
+    "SALIDA EXTERIOR | Segundo perfil": {
+      "triangles": 3840,
+      "sha256": "55533fc347b282dbe6c7b3af5a6db083083cce8a7de50a3b583aff187edefd10"
+    },
+    "SALIDA EXTERIOR | Soportes del blindaje exterior": {
+      "triangles": 12892,
+      "sha256": "7d5899d1232706d3339eaf9a77fe4c16aecee05274e8c114148027cf40628acf"
+    },
+    "SALIDA NUEVA | Guia": {
+      "triangles": 12,
+      "sha256": "a87274b6dda9bd9424cf4bdc1c6a75bd37cd98ae3f2b8bf917fe50cd9213a6be"
+    },
+    "SALIDA NUEVA | Guia.001": {
+      "triangles": 12,
+      "sha256": "21972df42bc7b551a7d40b9f38ad79a3cf73ccbd0f80cbfd5f82f6f077d493cf"
+    },
+    "SALIDA NUEVA | Transicion octogonal perforada": {
+      "triangles": 964,
+      "sha256": "eaaf8ff3643da802d1f5f7a7d277a1dbb1e9c1d72ccc606676c53edb2bbe0151"
+    },
+    "SALIDA NUEVA | Umbral": {
+      "triangles": 12,
+      "sha256": "21a4e5dceb062e9698302c0d3ed0837cec941fac84eedd253b609988d7086442"
+    },
+    "SALIDA | Aros y cinco acoplamientos": {
+      "triangles": 12892,
+      "sha256": "1fea4408f9f72658514e79fa41dd20cc1dd2cc26977016fe8691c4ca01335a73"
+    },
+    "SALIDA | Escamas": {
+      "triangles": 6900,
+      "sha256": "c1536b1a34b52a388af44a1cc1533d9784203f86ad98c9e646317b39f78fae60"
+    },
+    "SALIDA | Luminarias originales": {
+      "triangles": 9368,
+      "sha256": "bc0f01aae0cc2721e7ed0fcffa9b12ad7640e9c90f0b801214aa7723d38feefb"
+    },
+    "SALIDA | Perfil escalonado": {
+      "triangles": 3840,
+      "sha256": "29ef89dc315b2205cf2af068e4533f18089a1b4dd08857e22ffcfa4e0f9b5ec6"
+    },
+    "SUELO NUEVO | Dovela 00": {
+      "triangles": 20,
+      "sha256": "b215dadf9a30361b0b915182b4ec19299cd7ab1d7ce90055f5cacf6fba84e701"
+    },
+    "SUELO NUEVO | Dovela 01": {
+      "triangles": 20,
+      "sha256": "df7930ee079087dad8ba8ef2ffc27cfde39152667cc138880908ceb53e9e5a37"
+    },
+    "SUELO NUEVO | Dovela 02": {
+      "triangles": 20,
+      "sha256": "4a83b9df42e237715bc737caeb9c93b8df015dc246770167af195e2e477e936c"
+    },
+    "SUELO NUEVO | Dovela 03": {
+      "triangles": 20,
+      "sha256": "2f7f906ce3862fa3691f455d0b22b15c1c35efaf5e9b7d927a51030a146cb085"
+    },
+    "SUELO NUEVO | Dovela 04": {
+      "triangles": 20,
+      "sha256": "6e8ac3c1acfa16d0c186e3393fa4494303beeea2effd1045bf5c3be0e3c962ba"
+    },
+    "SUELO NUEVO | Dovela 05": {
+      "triangles": 20,
+      "sha256": "605220a582e21ef9424c94591f0f64f61c6e96468e23617a16b37041a09e3221"
+    },
+    "SUELO NUEVO | Dovela 06": {
+      "triangles": 20,
+      "sha256": "c5155eb898c89f85a15c65252d35ede591d38090da9b88c21caa61d3e7a5afe8"
+    },
+    "SUELO NUEVO | Dovela 07": {
+      "triangles": 20,
+      "sha256": "437c94a19b663c0084243a8fbe740607c753524b12d3adc412adb555fc6034a5"
+    },
+    "SUELO NUEVO | Dovela 08": {
+      "triangles": 20,
+      "sha256": "c602994277620104e291922210a99444f179f4cb99d64f106b29c082e662e5cc"
+    },
+    "SUELO NUEVO | Dovela 09": {
+      "triangles": 20,
+      "sha256": "2fd932014010f590dfbfda7b0708b011dc1fcb6c8545d90f8a5a91e6374ed6dd"
+    },
+    "SUELO NUEVO | Dovela 10": {
+      "triangles": 20,
+      "sha256": "8fc8d6fe0d74986b764ef832f908e00f3772b9c333d13ae0e2db4ac8d4e18d6a"
+    },
+    "SUELO NUEVO | Dovela 11": {
+      "triangles": 20,
+      "sha256": "2ee56bf5546d4f8a14598e4bcf483268e067fabf3745387fa4e086639f063177"
+    },
+    "SUELO NUEVO | Dovela 12": {
+      "triangles": 20,
+      "sha256": "1dac18913e60f20feb759f981c897e29670783a3df389f0da832976cf70d0988"
+    },
+    "SUELO NUEVO | Dovela 13": {
+      "triangles": 20,
+      "sha256": "4aade8ca9811968aeadbf90c590826325c257a0f6d9bddfe8a4d661324fe41dc"
+    },
+    "SUELO NUEVO | Dovela 14": {
+      "triangles": 20,
+      "sha256": "e7d32770e06e1f1f4382ff9780de3dabb53e48b64866c6c22d35e2cc02fc54b4"
+    },
+    "SUELO NUEVO | Dovela 15": {
+      "triangles": 20,
+      "sha256": "816b8b0d1856b1a29dddadfb4083378a0c6b4fe8996d940618739a4cec640773"
+    },
+    "SUELO NUEVO | Dovela 16": {
+      "triangles": 20,
+      "sha256": "7fcad9c14b80ebbb75e3d7624e02ee6ea49302c554bc382ec03d703fb5807063"
+    },
+    "SUELO NUEVO | Dovela 17": {
+      "triangles": 20,
+      "sha256": "5b506c3cb7086b5b29ee36cae7ef9c7ddc25e7dbe03746ab6e1f763d05258511"
+    },
+    "SUELO NUEVO | Dovela 18": {
+      "triangles": 20,
+      "sha256": "62cd5c05034a33564da1d997415e287af7bb56ea554b10df25f1af2d81e8d9ea"
+    },
+    "SUELO NUEVO | Dovela 19": {
+      "triangles": 20,
+      "sha256": "97070a8d283b6fe84c81dc1a2881bef06908215631a346a6d82ada17b9f70480"
+    },
+    "SUELO NUEVO | Dovela 20": {
+      "triangles": 20,
+      "sha256": "8d4190141a4f7236231e5b69ce27308e304456d663249f11f8232df9bace448c"
+    },
+    "SUELO NUEVO | Dovela 21": {
+      "triangles": 20,
+      "sha256": "3ffe962715734818d44df2d51171aaeacc75101dde5935fad1e4699ed3835ecd"
+    },
+    "SUELO NUEVO | Dovela 22": {
+      "triangles": 20,
+      "sha256": "7f1d734f7a70ff11d6d9048cba19691c1bad1a0aeab94d4dbbfd483fbd5d9c7d"
+    },
+    "SUELO NUEVO | Dovela 23": {
+      "triangles": 20,
+      "sha256": "59a240a01cd38aedea60d46323b698bccb3b9da93aad9d627c8b754da48c276d"
+    },
+    "SUELO NUEVO | Dovela 24": {
+      "triangles": 20,
+      "sha256": "d6975966dea7bb274390a2b8a285083d5cbb0d21be753181b4502710558a2bd8"
+    },
+    "SUELO NUEVO | Dovela 25": {
+      "triangles": 20,
+      "sha256": "e58948c956ee825ffb9c612a1aa01580590273f432008dd28daf4e631ea002cf"
+    },
+    "SUELO NUEVO | Dovela 26": {
+      "triangles": 20,
+      "sha256": "22df9a502606b74e9863eaf6c01d8d2059a63d73e16176355c9819d417b05898"
+    },
+    "SUELO NUEVO | Dovela 27": {
+      "triangles": 20,
+      "sha256": "039aeeafc4ed8850c5deebc675773b78cd2b3042bec0e4769e30bcfc469ef31e"
+    },
+    "SUELO NUEVO | Dovela 28": {
+      "triangles": 20,
+      "sha256": "75cd8fa920aa61def07de15c64ab00cf567b5782f867c3647f17f6f20a09d4ea"
+    },
+    "SUELO NUEVO | Dovela 29": {
+      "triangles": 20,
+      "sha256": "1959fd3957dfd02bb0dd7d7e50f3b443032d712d0e5b812884418c2c2eea033a"
+    },
+    "SUELO NUEVO | Dovela 30": {
+      "triangles": 20,
+      "sha256": "49528fec4d48ce3e6a846c734268c51385d4e22e3cf0e960b60cad84622b7d98"
+    },
+    "SUELO NUEVO | Dovela 31": {
+      "triangles": 20,
+      "sha256": "33d9373d651f22472c1c807b87fda03b27b9e61e6ced8cf74300dffd764ab558"
+    },
+    "SUELO NUEVO | Dovela 32": {
+      "triangles": 20,
+      "sha256": "cc08dfc5a37cc48c719d89abc1b8e535ff27fcd3d0a6777fc25b87731350cc09"
+    },
+    "SUELO NUEVO | Dovela 33": {
+      "triangles": 20,
+      "sha256": "1c5215cabb799db39b1eda3f45a888c04e937c4d3fdcaaaf9890b2fad7c6c647"
+    },
+    "SUELO NUEVO | Dovela 34": {
+      "triangles": 20,
+      "sha256": "ee55cff57e4d79a8106abd7398b783fd795ff8c517e31d5ad212552ddfa0395e"
+    },
+    "SUELO NUEVO | Dovela 35": {
+      "triangles": 20,
+      "sha256": "1c4d90724837962bcca7b1c6c2356a744d93a95b452c2e894d9195052d395222"
+    },
+    "SUELO NUEVO | Dovela 36": {
+      "triangles": 20,
+      "sha256": "74bda9812ef51cdb1f9e10ede09af1f76748f26cf31ae08ae3dc1ecccfbc1361"
+    },
+    "SUELO NUEVO | Dovela 37": {
+      "triangles": 20,
+      "sha256": "e281882c71e6fbc9aac9d76ffb007efbf6e28bc06660b5fb9217dd7e9484d176"
+    },
+    "SUELO NUEVO | Dovela 38": {
+      "triangles": 20,
+      "sha256": "672aa16d3480bb96b8dfc03e26459c81079102906f5558ceeaebe727de795ae3"
+    },
+    "SUELO NUEVO | Dovela 39": {
+      "triangles": 20,
+      "sha256": "9d13f987fb9e4adbced659ca10504d5973bad0a575456eeb5588463a358db31b"
+    },
+    "SUELO NUEVO | Dovela 40": {
+      "triangles": 20,
+      "sha256": "266d5d8344791ecd906dff4870abe7286505912dec60060a92b72eb99c41795d"
+    },
+    "SUELO NUEVO | Dovela 41": {
+      "triangles": 20,
+      "sha256": "57a2c7cd1c08c36876150994229197104694e2bc123a2acb82f45cbed3eed24e"
+    },
+    "SUELO NUEVO | Dovela 42": {
+      "triangles": 20,
+      "sha256": "e5b31a9d2f2b8c9bfd6b58db96ef134ffde988c576a2812c1f2d81d907d49fc1"
+    },
+    "SUELO NUEVO | Dovela 43": {
+      "triangles": 20,
+      "sha256": "a97106845abe63089ecb29e28b242a1243b71ba4cfe2958e154d6ca976d38d36"
+    },
+    "SUELO NUEVO | Dovela 44": {
+      "triangles": 20,
+      "sha256": "5ab138d3d5aac2139a6988b2f9ed85a9ad94a068dc6291dd3233cdedb103a6db"
+    },
+    "SUELO NUEVO | Dovela 45": {
+      "triangles": 20,
+      "sha256": "f7c04747ef7c723964771dd5bd15b44489d2d1ba31825117f5c7ee4ab4f76ad1"
+    },
+    "SUELO NUEVO | Dovela 46": {
+      "triangles": 20,
+      "sha256": "1ebd10b21baa35820e3ae667a3ff254332ca750e8228660a95c8637b471dbfe1"
+    },
+    "SUELO NUEVO | Dovela 47": {
+      "triangles": 20,
+      "sha256": "7b09d154882eb06419916e59064d02506f5f6660395c60f7724891be723b252f"
+    },
+    "SUELO NUEVO | Placa 00 5.2": {
+      "triangles": 20,
+      "sha256": "6e55c800ab52e1482065779eb9e2c1f8df67a56a9a552f2b6e042849eb6fcba8"
+    },
+    "SUELO NUEVO | Placa 00 9.1": {
+      "triangles": 20,
+      "sha256": "d6fb23b8a74e23e1b5731a6db470eed26d6454465f6cba5eb9d9360adc5f7a08"
+    },
+    "SUELO NUEVO | Placa 00 15.8": {
+      "triangles": 20,
+      "sha256": "ae34a0718572cdb9431422d65ae3ea03e7bc3c9a4ae016b774be95b5d21edf86"
+    },
+    "SUELO NUEVO | Placa 01 5.2": {
+      "triangles": 20,
+      "sha256": "87183e0c1fbbdb16a6736cd802920c1cd7ef7eb4db5bece5e0716a932378e18f"
+    },
+    "SUELO NUEVO | Placa 01 9.1": {
+      "triangles": 20,
+      "sha256": "a0bec0afd337f833dfe4f48b23abbdb4ca212d555631aac3ccc50ec507dd325a"
+    },
+    "SUELO NUEVO | Placa 01 15.8": {
+      "triangles": 20,
+      "sha256": "f8a563cdb55b77babe67d48e23ed474e42ec1d9c5145b1ac323ded5faf280c1f"
+    },
+    "SUELO NUEVO | Placa 02 5.2": {
+      "triangles": 20,
+      "sha256": "f4b1cb78a9a8d95951d4090716a6699ee6e7ab8dca69ee91f1633b058972fefc"
+    },
+    "SUELO NUEVO | Placa 02 9.1": {
+      "triangles": 20,
+      "sha256": "92ba964394cd239c717b45606fdf7e26215dce528a0148b03665d14d98003e6b"
+    },
+    "SUELO NUEVO | Placa 02 15.8": {
+      "triangles": 20,
+      "sha256": "13c657361c5be2284130d0966bfbcf937cce3c7fb5666859044176eb9c059e6a"
+    },
+    "SUELO NUEVO | Placa 03 5.2": {
+      "triangles": 20,
+      "sha256": "cfc110a4125779a1e5481e8348fed8ddf1cea54bc981f5aee25bc277f3238624"
+    },
+    "SUELO NUEVO | Placa 03 9.1": {
+      "triangles": 20,
+      "sha256": "af9a09fa78487a2473173cb257d6173f24a921d95d1d52f932ba051633242a70"
+    },
+    "SUELO NUEVO | Placa 03 15.8": {
+      "triangles": 20,
+      "sha256": "78c6144bef40ec7725e4990154356d2c0a4bf4e446e525ab39e3cc0cb9927cf5"
+    },
+    "SUELO NUEVO | Placa 04 5.2": {
+      "triangles": 20,
+      "sha256": "d0c5937ca1cfe6fe00f8c824476c05a26b261953e8428a344bcf9ab6cb6b41a6"
+    },
+    "SUELO NUEVO | Placa 04 9.1": {
+      "triangles": 20,
+      "sha256": "db8fb2a774f7cbd027a2812b70a72c721006fb1e380df58a1754655dc53768b2"
+    },
+    "SUELO NUEVO | Placa 04 15.8": {
+      "triangles": 20,
+      "sha256": "90f7f172632b3b16d47bc07c0d080e865a965ba16c940b4387424fc0a8a6b9ef"
+    },
+    "SUELO NUEVO | Placa 05 5.2": {
+      "triangles": 20,
+      "sha256": "71b62f135b84b66ed800210986352b2b65aecebe172b5333641f6b83b78eb3d9"
+    },
+    "SUELO NUEVO | Placa 05 9.1": {
+      "triangles": 20,
+      "sha256": "f7e6553d0ac88d566b3b27b1a86dfeab956dcec6d280006ac66a31582f6e868a"
+    },
+    "SUELO NUEVO | Placa 05 15.8": {
+      "triangles": 20,
+      "sha256": "a3b864274192360ef1eea844219ff4fc5d68c2634512cd1f26e4df42d5afd3f1"
+    },
+    "SUELO NUEVO | Placa 06 5.2": {
+      "triangles": 20,
+      "sha256": "a61580457311d39ac25cb1da8817749075f91c5e5ec1bcae2a46bc600701fa5c"
+    },
+    "SUELO NUEVO | Placa 06 9.1": {
+      "triangles": 20,
+      "sha256": "c0122f7088c217dd342cbe48d882c3094c9f83196abce5af3d9daa64703f20ad"
+    },
+    "SUELO NUEVO | Placa 06 15.8": {
+      "triangles": 20,
+      "sha256": "b896e2187ff72673b8d303a5451e48ab969baa89ff2424f4907d79b4bf6c0c19"
+    },
+    "SUELO NUEVO | Placa 07 5.2": {
+      "triangles": 20,
+      "sha256": "e65b4c793e4bd836b27f711688224df41cd0dc7f32af72d18e84c1adfd7f1232"
+    },
+    "SUELO NUEVO | Placa 07 9.1": {
+      "triangles": 20,
+      "sha256": "ff8f579bbcc95879a4dfc19d77adb4e05ef402f6835d01dfadc95de7fc85aa84"
+    },
+    "SUELO NUEVO | Placa 07 15.8": {
+      "triangles": 20,
+      "sha256": "2bf24853658797935f18870566a205f23b48d886ee83fbdaa208bd9164e5a397"
+    },
+    "SUELO NUEVO | Placa 08 5.2": {
+      "triangles": 20,
+      "sha256": "bf730c180eba5d83b4f6d95fbd158d812ba0e31bd877da91e3a3875d7e172e17"
+    },
+    "SUELO NUEVO | Placa 08 9.1": {
+      "triangles": 20,
+      "sha256": "3e9b2663f037e2c408c71976a19e2faaac314f6d5fe272dfea3f37e22378a5bf"
+    },
+    "SUELO NUEVO | Placa 08 15.8": {
+      "triangles": 20,
+      "sha256": "dff898e02077e1b65e886c0ca266d1e669e7f75882d78a1c3acfaef1d3d72f66"
+    },
+    "SUELO NUEVO | Placa 09 5.2": {
+      "triangles": 20,
+      "sha256": "7331b16a398b9dcadccc324dd846f20fd11c64d677e1fe7508a8c3bc823069cf"
+    },
+    "SUELO NUEVO | Placa 09 9.1": {
+      "triangles": 20,
+      "sha256": "ed6ba12f4e79beaba6b2c8f8314f098da5f747bfeca9062a2bb4e7faee025332"
+    },
+    "SUELO NUEVO | Placa 09 15.8": {
+      "triangles": 20,
+      "sha256": "1f840db825b002d1a95ce322c61187a929bf8144d16f8ec10d802b8d23a6ec19"
+    },
+    "SUELO NUEVO | Placa 10 5.2": {
+      "triangles": 20,
+      "sha256": "e47d33af29d352ffa53d18e70f0b882c8a58a28a93e5326da18ee2f518680edb"
+    },
+    "SUELO NUEVO | Placa 10 9.1": {
+      "triangles": 20,
+      "sha256": "aefa245049d535254018d6b052f8bcf1d9312bcb1dc391cba2ed44a926d5ded7"
+    },
+    "SUELO NUEVO | Placa 10 15.8": {
+      "triangles": 20,
+      "sha256": "31134396e8cfacb7f7800c53ba3bb2b1a3449e330d6a219e71cafbf9faf1e5a5"
+    },
+    "SUELO NUEVO | Placa 11 5.2": {
+      "triangles": 20,
+      "sha256": "7a2ac6add6c5bcb6045b1e6efb64a0c2db0c36de985530671da8f2e9e497100a"
+    },
+    "SUELO NUEVO | Placa 11 9.1": {
+      "triangles": 20,
+      "sha256": "a10cbf427c0d91ddfe159a0192ebb1013d34382ed47c2fe975ab4a5830d106b9"
+    },
+    "SUELO NUEVO | Placa 11 15.8": {
+      "triangles": 20,
+      "sha256": "cbff3c7907a257605c9a0a21ccfad645899ae5d0763d95a8d22f414b90163856"
+    },
+    "SUELO NUEVO | Placa 12 5.2": {
+      "triangles": 20,
+      "sha256": "bb557df4b9f4f92239760c17012c6961161a4de97284579fe91d124b6e72c494"
+    },
+    "SUELO NUEVO | Placa 12 9.1": {
+      "triangles": 20,
+      "sha256": "0c21c1c4eac2ffc1be17938b79d1d53bb4a638e6830d4dd16c6dfb30652f8560"
+    },
+    "SUELO NUEVO | Placa 12 15.8": {
+      "triangles": 20,
+      "sha256": "d9e53fe8fa1c8f1137cabcebf4c028ed50d59ad881be1ca48161acbc40017497"
+    },
+    "SUELO NUEVO | Placa 13 5.2": {
+      "triangles": 20,
+      "sha256": "97960735aaf4c4bf7fb54053c47f916c8c511ac18de5e3eceb0f2f01f0ade5df"
+    },
+    "SUELO NUEVO | Placa 13 9.1": {
+      "triangles": 20,
+      "sha256": "8561a9d0daa7fb160ccf19ebc465183d085653e32c68cef6dba1e58ae8b3566a"
+    },
+    "SUELO NUEVO | Placa 13 15.8": {
+      "triangles": 20,
+      "sha256": "4ed0b66ea9e46dbcabc36a354253f9a70e5c2fa7128222a410a6352b7e1410e2"
+    },
+    "SUELO NUEVO | Placa 14 5.2": {
+      "triangles": 20,
+      "sha256": "7445051ff6affa1762a64c50ce4aa41558d5a14240b3213aa8bd443376c67419"
+    },
+    "SUELO NUEVO | Placa 14 9.1": {
+      "triangles": 20,
+      "sha256": "7d60eca0121a35e64e29823a48240ac35953344748177683603a59077af9d295"
+    },
+    "SUELO NUEVO | Placa 14 15.8": {
+      "triangles": 20,
+      "sha256": "766d92b8c748b9c6b51c1adf22cd94053a411dd800b93bb7b80e273fe5f3e253"
+    },
+    "SUELO NUEVO | Placa 15 5.2": {
+      "triangles": 20,
+      "sha256": "0812a814fbc7084824fcd1725e4ca1cfb593745afec95524ccbae401aacdf0b5"
+    },
+    "SUELO NUEVO | Placa 15 9.1": {
+      "triangles": 20,
+      "sha256": "6fb0d7e469823be5306ecb6cbfa5633ecfbb6fa23ec5f0cf60a56b86f23cf4d3"
+    },
+    "SUELO NUEVO | Placa 15 15.8": {
+      "triangles": 20,
+      "sha256": "fb850e0e9a0ea1480054ec0c2f2ba886f606d195780b59b1368063dd0d203652"
+    },
+    "SUELO NUEVO | Placa 16 5.2": {
+      "triangles": 20,
+      "sha256": "e01d67aca6578ed23758339b95e5480bc1197055c0c3f9ea731311d14e1a2498"
+    },
+    "SUELO NUEVO | Placa 16 9.1": {
+      "triangles": 20,
+      "sha256": "72a346fd65ed5dfe3f290a7e13fc991d7276d3a1cee70e113b8de5dce475f87f"
+    },
+    "SUELO NUEVO | Placa 16 15.8": {
+      "triangles": 20,
+      "sha256": "8917b613233373de75ac6c3b9b329e27ed5c5845a22eac193d156776c0a813fb"
+    },
+    "SUELO NUEVO | Placa 17 5.2": {
+      "triangles": 20,
+      "sha256": "a10b0a93da68b1886dc473c885c88768d21ca64897e6db671f8213b2ce458b8b"
+    },
+    "SUELO NUEVO | Placa 17 9.1": {
+      "triangles": 20,
+      "sha256": "741c2c0f0c303adc5b910be0bcc2567ce01aa1d3113d5564373bed54a7f2227c"
+    },
+    "SUELO NUEVO | Placa 17 15.8": {
+      "triangles": 20,
+      "sha256": "c3b24b56cf020123c9a8803abc8afbe57e1bc1666cc4fdfc023a9e61ed8447cb"
+    },
+    "SUELO NUEVO | Placa 18 5.2": {
+      "triangles": 20,
+      "sha256": "9f2eab62428887812b1b170929ad602e834703a9dd84284ea9684d99d642e38a"
+    },
+    "SUELO NUEVO | Placa 18 9.1": {
+      "triangles": 20,
+      "sha256": "cb88a1f9de53ddd491106dc57980ee97bfbeeb59faf1927a58062dde999fe8c2"
+    },
+    "SUELO NUEVO | Placa 18 15.8": {
+      "triangles": 20,
+      "sha256": "703c0ad81afa0212691f7f809b0922cce83dd9ce7d7a096a9007ac7d758353d9"
+    },
+    "SUELO NUEVO | Placa 19 5.2": {
+      "triangles": 20,
+      "sha256": "098dab66e7f613b96544dd4c7d6660dff5500a007c4082d96642203ac29956a4"
+    },
+    "SUELO NUEVO | Placa 19 9.1": {
+      "triangles": 20,
+      "sha256": "45232612efff8a3b63aa2c0ab8eb77f4fe00f4982e67f1cbb58ff82d3f3cc7a6"
+    },
+    "SUELO NUEVO | Placa 19 15.8": {
+      "triangles": 20,
+      "sha256": "6a07299b79d0e86c7134d141be6f31cb72e8cbc42f0b7a8c42232e3f4a16dbaa"
+    },
+    "SUELO NUEVO | Placa 20 5.2": {
+      "triangles": 20,
+      "sha256": "da7137b8702572d20f29aea4d4c818354f5ddcd84ecd55aebdd8ae9da349bd32"
+    },
+    "SUELO NUEVO | Placa 20 9.1": {
+      "triangles": 20,
+      "sha256": "660a5253ddae0b8563527df884c6b89826c5ff89edc5acc14bcf07baa7be44c6"
+    },
+    "SUELO NUEVO | Placa 20 15.8": {
+      "triangles": 20,
+      "sha256": "a12297a37b0655f3dfc085527220929e0f18d233c4a648ba594cc81fe04d9954"
+    },
+    "SUELO NUEVO | Placa 21 5.2": {
+      "triangles": 20,
+      "sha256": "3e8b07786b9d4be098b331b0837de7868a338c0439781e91ca1064c788fd41fe"
+    },
+    "SUELO NUEVO | Placa 21 9.1": {
+      "triangles": 20,
+      "sha256": "8cfd9d1c0cd53a3b03976d9719582c42778728ceb50bbe6444993597c5c4e9cc"
+    },
+    "SUELO NUEVO | Placa 21 15.8": {
+      "triangles": 20,
+      "sha256": "4c15690e33cb3710a9129d160d677e87ea903acd92194b5978bc7edbd74891d5"
+    },
+    "SUELO NUEVO | Placa 22 5.2": {
+      "triangles": 20,
+      "sha256": "813f994fa2374e097772dd2aa158216e243f6fe7c69fb772dd63445c2889af8c"
+    },
+    "SUELO NUEVO | Placa 22 9.1": {
+      "triangles": 20,
+      "sha256": "e283e106eaac61588fb35b20465a2a633e8f805f0fee86dc25f6418cc54facbe"
+    },
+    "SUELO NUEVO | Placa 22 15.8": {
+      "triangles": 20,
+      "sha256": "2fc0ddffb39a929fe84b7c87537d3f6095bfe52dd0b8d3d34d428fd0a2c2e37f"
+    },
+    "SUELO NUEVO | Placa 23 5.2": {
+      "triangles": 20,
+      "sha256": "31c5b62010cff0f65746642a316a9ec68dfa1f7c3dc84895477a30cd015f548d"
+    },
+    "SUELO NUEVO | Placa 23 9.1": {
+      "triangles": 20,
+      "sha256": "c5ef08831cd7d2b2e12f678ac3473ffba7ba43612d14aff9788448c8a9fd5925"
+    },
+    "SUELO NUEVO | Placa 23 15.8": {
+      "triangles": 20,
+      "sha256": "1c981a49a94f19e910245fdc558ba3d9646006141409b8b93207f753d83d624d"
+    },
+    "SUELO NUEVO | Placa 24 5.2": {
+      "triangles": 20,
+      "sha256": "815e91e7f60b71580d46248aef0039dfb810a1e91f8d3cf84ab2c212e41870db"
+    },
+    "SUELO NUEVO | Placa 24 9.1": {
+      "triangles": 20,
+      "sha256": "d566783979ad5753070160d3419d15e55bce013724d66a9f0a43a9faa974af35"
+    },
+    "SUELO NUEVO | Placa 24 15.8": {
+      "triangles": 20,
+      "sha256": "8ae6b818d483bf968127ab617e0fdac4e70751fd00e4f78a543a72856698c72e"
+    },
+    "SUELO NUEVO | Placa 25 5.2": {
+      "triangles": 20,
+      "sha256": "3a2d2cee9ab8c05061ce95b384e6d950eb46bb89e92148c3a066cf3d886909d7"
+    },
+    "SUELO NUEVO | Placa 25 9.1": {
+      "triangles": 20,
+      "sha256": "406d9ef9e0e0c3b8f2724b4318e55c9221738ea76054bf49705d5c40a53650f7"
+    },
+    "SUELO NUEVO | Placa 25 15.8": {
+      "triangles": 20,
+      "sha256": "9995dc8b87afe0d2c3d45aa792c890183e4852feef15aad21e62b586c0d269af"
+    },
+    "SUELO NUEVO | Placa 26 5.2": {
+      "triangles": 20,
+      "sha256": "23e9da059365202f269817740b760d7f0c9b6bda8515be2d8ddf0c58befbe63a"
+    },
+    "SUELO NUEVO | Placa 26 9.1": {
+      "triangles": 20,
+      "sha256": "e01a3147b2b05a434a4d12f275dc9fc4c8b5d7d8d6b0f30ced4282931b710d89"
+    },
+    "SUELO NUEVO | Placa 26 15.8": {
+      "triangles": 20,
+      "sha256": "a570afa127302c827582f7e843c157690442cee9ee04a51e5df1ec37e866ad98"
+    },
+    "SUELO NUEVO | Placa 27 5.2": {
+      "triangles": 20,
+      "sha256": "0418a404384398c51605d55880378b89c04ae40040ed4590cff3bac5c5f67788"
+    },
+    "SUELO NUEVO | Placa 27 9.1": {
+      "triangles": 20,
+      "sha256": "dd0bc44cb0b13fe5f46b8c47631b526975acba80204aaa13fcb8bdae694b3d6c"
+    },
+    "SUELO NUEVO | Placa 27 15.8": {
+      "triangles": 20,
+      "sha256": "63ceb222bb6e6f4a64dbb7f7173931c2107d2fe049d09db7d116f292c783d4d1"
+    },
+    "SUELO NUEVO | Placa 28 5.2": {
+      "triangles": 20,
+      "sha256": "9e43bd0ab7bf329b3a133b778fb197965cedd7abe2fa3566ae3cd08166d59f8e"
+    },
+    "SUELO NUEVO | Placa 28 9.1": {
+      "triangles": 20,
+      "sha256": "609794e4d4a76d5a80dfb72847d9b0530bee368289f1ff2efa848516e11eba2d"
+    },
+    "SUELO NUEVO | Placa 28 15.8": {
+      "triangles": 20,
+      "sha256": "c206c9f8d82df13250916db5b98e29a776af9d24059c94af6b082044c295f2c3"
+    },
+    "SUELO NUEVO | Placa 29 5.2": {
+      "triangles": 20,
+      "sha256": "76a40dd57548a5953efc005719cfb6d051b0380539736cdc3e8b3799f0cd33f2"
+    },
+    "SUELO NUEVO | Placa 29 9.1": {
+      "triangles": 20,
+      "sha256": "ae5f5c47dbc12249d0ed56c8815426a859f0a4877d97d845f72a3cc86dc10bfe"
+    },
+    "SUELO NUEVO | Placa 29 15.8": {
+      "triangles": 20,
+      "sha256": "3e0bc30f5d9cd9112aae861d91e9a41cc83f66cf9c87da9b631c9621e6f5065b"
+    },
+    "SUELO NUEVO | Placa 30 5.2": {
+      "triangles": 20,
+      "sha256": "18cbf34586b26c5dbf58c60da7e71820b0ba845ec0605fcb425bf3ff74fb5799"
+    },
+    "SUELO NUEVO | Placa 30 9.1": {
+      "triangles": 20,
+      "sha256": "b55bd782dea2e975c4510fb311f20e47d247b5f316ea215db75278cb427d0a01"
+    },
+    "SUELO NUEVO | Placa 30 15.8": {
+      "triangles": 20,
+      "sha256": "3c644d68b564a37c78e4f57608b4cb2d083377eed230542cf85f51a8b404e732"
+    },
+    "SUELO NUEVO | Placa 31 5.2": {
+      "triangles": 20,
+      "sha256": "681634abeae39c1a72dd203e919285be91b8e7e9e351a600d8790bdb4ffa3c9b"
+    },
+    "SUELO NUEVO | Placa 31 9.1": {
+      "triangles": 20,
+      "sha256": "ed19b1150da60af2a0321f3f771190cba27590e625694e77ccc47b1fa70352da"
+    },
+    "SUELO NUEVO | Placa 31 15.8": {
+      "triangles": 20,
+      "sha256": "26b04be9f63b26e6658d07e9a1e18a1fd807cdc76d7aab85cf1ac008c159ed26"
+    },
+    "SUELO NUEVO | Placa 32 5.2": {
+      "triangles": 20,
+      "sha256": "0e4950e3d75e8fbecc2810b14149aeda5d855997f302eeb1b914125d85c7220b"
+    },
+    "SUELO NUEVO | Placa 32 9.1": {
+      "triangles": 20,
+      "sha256": "8d652d5ae9923032d61760fa922eeec8d47f1761883235d7b3ceca8907f55985"
+    },
+    "SUELO NUEVO | Placa 32 15.8": {
+      "triangles": 20,
+      "sha256": "83693b822562fdff34f6009f679ee48c82ddd10c52ea3d7f1f67f77c14245629"
+    },
+    "SUELO NUEVO | Placa 33 5.2": {
+      "triangles": 20,
+      "sha256": "e29e49d1f26183920be605662019db2ca5f9944307dc70f60a69eb3ba019a42e"
+    },
+    "SUELO NUEVO | Placa 33 9.1": {
+      "triangles": 20,
+      "sha256": "ac6cd61c191dae6a2aa691ee16f6ee67cfa35abd484287414b0eacc2f823ab6b"
+    },
+    "SUELO NUEVO | Placa 33 15.8": {
+      "triangles": 20,
+      "sha256": "f2e2ad1ddbe26a00c705dfbf4658a5633e599b406df00a95126be54c6baf59fd"
+    },
+    "SUELO NUEVO | Placa 34 5.2": {
+      "triangles": 20,
+      "sha256": "ad6a373e855de209ab84579578fd1c08ce75b1d95a1e6f887d77ae92ed9105f7"
+    },
+    "SUELO NUEVO | Placa 34 9.1": {
+      "triangles": 20,
+      "sha256": "1ff62f29990bfb3a536de0cf3d55e229a96d98ea950afc0de644a54b3efc602e"
+    },
+    "SUELO NUEVO | Placa 34 15.8": {
+      "triangles": 20,
+      "sha256": "7f00496a31e25f84d1638d0be5809f9dbcab3a798948ce5a220788d2acbeb8ec"
+    },
+    "SUELO NUEVO | Placa 35 5.2": {
+      "triangles": 20,
+      "sha256": "e50075b57b01670b382b351595a51780441e14762a2f3b6ba0c5f2b48b9c606a"
+    },
+    "SUELO NUEVO | Placa 35 9.1": {
+      "triangles": 20,
+      "sha256": "b0348ecd32060367d9d9f10d25ca265d9a46f774021e5302bc40949d4ce92168"
+    },
+    "SUELO NUEVO | Placa 35 15.8": {
+      "triangles": 20,
+      "sha256": "fc2a563b8329bf44579b069b77584b61e6356fbe8c5d84d6cffa8b0ebf6ef2a8"
+    },
+    "SUELO NUEVO | Placa 36 5.2": {
+      "triangles": 20,
+      "sha256": "1afd147b24a07e93fbc8a0e8bce32411d6d1f97e976962608ab3c97c16a50a77"
+    },
+    "SUELO NUEVO | Placa 36 9.1": {
+      "triangles": 20,
+      "sha256": "eaa536319ba0ebf0c4fb49494bb2c15c7f7ccee7c7d30ede62308f7ca00a7d34"
+    },
+    "SUELO NUEVO | Placa 36 15.8": {
+      "triangles": 20,
+      "sha256": "b84fd25a8147ef38ec5fc074744090aadaceaf5a1b7b13475171f657017a4f30"
+    },
+    "SUELO NUEVO | Placa 37 5.2": {
+      "triangles": 20,
+      "sha256": "3fb302ac2fd4084606bf9366fd029282e2929f5ce05b4beecb5c2d985d472399"
+    },
+    "SUELO NUEVO | Placa 37 9.1": {
+      "triangles": 20,
+      "sha256": "26ab45890782ee207b46eca5fd7796ef94fd8a9345cb9ab496541e19e43258b9"
+    },
+    "SUELO NUEVO | Placa 37 15.8": {
+      "triangles": 20,
+      "sha256": "abf5d7034e20c2af1ffe7a284236422d9c33d7cbfcb448b8c0e0e02d01082fbf"
+    },
+    "SUELO NUEVO | Placa 38 5.2": {
+      "triangles": 20,
+      "sha256": "55c914fe52087a5f502147bf0d6a3f69521d00feabf2dc363fb900d93b78b2d0"
+    },
+    "SUELO NUEVO | Placa 38 9.1": {
+      "triangles": 20,
+      "sha256": "1fd52fa8144e4a46ee8e2bea37c0fc6f6f25a7175a467670168af246f30d356c"
+    },
+    "SUELO NUEVO | Placa 38 15.8": {
+      "triangles": 20,
+      "sha256": "79febd833168db77984d782546f87eb612981f494e61883b6eb4e331352c4d17"
+    },
+    "SUELO NUEVO | Placa 39 5.2": {
+      "triangles": 20,
+      "sha256": "ef422b608bdca148e73620b72ac45cb28084163055c2b8bb50c1cc6b639fcd6a"
+    },
+    "SUELO NUEVO | Placa 39 9.1": {
+      "triangles": 20,
+      "sha256": "e56442fa44b2431a2e02e207d871df8ca93e85b3ca7eb17a9f5abc93a70b80c6"
+    },
+    "SUELO NUEVO | Placa 39 15.8": {
+      "triangles": 20,
+      "sha256": "74dd5c9d5889583ac411c1f53160b035eb047f1bbff9d41384b7a26396201a8f"
+    },
+    "SUELO NUEVO | Placa 40 5.2": {
+      "triangles": 20,
+      "sha256": "caee90e6b449169cf2cdcfd37e19716c71796ec7c36d5e05644f27fb72bf93ee"
+    },
+    "SUELO NUEVO | Placa 40 9.1": {
+      "triangles": 20,
+      "sha256": "726edc70d82d674578726ec9d520dd6f5f0f605185cb35b29ed8a4721d92ee6d"
+    },
+    "SUELO NUEVO | Placa 40 15.8": {
+      "triangles": 20,
+      "sha256": "7729033bf4f2f0889b4d10f06f90578cd9208ea99a123720b5e1d16aede49b1e"
+    },
+    "SUELO NUEVO | Placa 41 5.2": {
+      "triangles": 20,
+      "sha256": "47e169df9295423e8717d75e873e9ab3cc8035e9ce0fd4bc2976ab6bc62a6080"
+    },
+    "SUELO NUEVO | Placa 41 9.1": {
+      "triangles": 20,
+      "sha256": "f3e96fdd104fa17c15cc2f5976897e8048d1ce343ace183c536c289049480091"
+    },
+    "SUELO NUEVO | Placa 41 15.8": {
+      "triangles": 20,
+      "sha256": "5bb1b97e47f0939c66f95ecad737e9d9a7d0adcf35c93008fc1dc3c991670e58"
+    },
+    "SUELO NUEVO | Placa 42 5.2": {
+      "triangles": 20,
+      "sha256": "77dc1caf1b2b7c4c931302c4a9d27d48706fe2ab1be710ce86291b4225195c9b"
+    },
+    "SUELO NUEVO | Placa 42 9.1": {
+      "triangles": 20,
+      "sha256": "f00840b0d2e9bd82aff93361d27bcbbdb04a921946716fad778b97c7162eb112"
+    },
+    "SUELO NUEVO | Placa 42 15.8": {
+      "triangles": 20,
+      "sha256": "fedb01194d917d6c18861bdc1d722d66e85e53fcd4820bdec2c3afddb04ca314"
+    },
+    "SUELO NUEVO | Placa 43 5.2": {
+      "triangles": 20,
+      "sha256": "2e58f96cb2b056eb681c55956b5dbb2f64495a721a2e7ee3167df8e959f9dc23"
+    },
+    "SUELO NUEVO | Placa 43 9.1": {
+      "triangles": 20,
+      "sha256": "f603a64972c5d4198031ed857a04714a70b1f70079a22cb1704cefadb7b4ea27"
+    },
+    "SUELO NUEVO | Placa 43 15.8": {
+      "triangles": 20,
+      "sha256": "835ea7e8751e3c5ded23bf6b7ca457b406b71bb9d22d888e33e3e19378edd9c8"
+    },
+    "SUELO NUEVO | Placa 44 5.2": {
+      "triangles": 20,
+      "sha256": "91d591d6429791f8313ffdc3efa07b8584d45e68f8e6837ff3ffa4d0793f899b"
+    },
+    "SUELO NUEVO | Placa 44 9.1": {
+      "triangles": 20,
+      "sha256": "013d04c0598ef80074b90d842f6c47ec11c416f00c274db89fdb8305ac61b152"
+    },
+    "SUELO NUEVO | Placa 44 15.8": {
+      "triangles": 20,
+      "sha256": "116043b2c2df4887e3e1c0c7a69f330f7c20cb6585298976c033b1e8122bf471"
+    },
+    "SUELO NUEVO | Placa 45 5.2": {
+      "triangles": 20,
+      "sha256": "5e02c825d03f784871d8b2637bab7765454c68ba5de71c9c351b4a635b37865c"
+    },
+    "SUELO NUEVO | Placa 45 9.1": {
+      "triangles": 20,
+      "sha256": "88faf3d52cf28bfd3b68484f12ccb1aa3c2e6f7306c7edefa93563573b9b0019"
+    },
+    "SUELO NUEVO | Placa 45 15.8": {
+      "triangles": 20,
+      "sha256": "bad1e0e0792e00c43c8c06d34d20a43a60202b4c55e9dc8b3fc2cdf4e1ba6af4"
+    },
+    "SUELO NUEVO | Placa 46 5.2": {
+      "triangles": 20,
+      "sha256": "ce890e8f7f085a9fbc75752fd62b67dfbccbf71f7d97bffc82622118d00ea4f1"
+    },
+    "SUELO NUEVO | Placa 46 9.1": {
+      "triangles": 20,
+      "sha256": "b7e062e27b528fea7cdfefabbef4cff762efdc4ca0d77d41f9d983e25c802294"
+    },
+    "SUELO NUEVO | Placa 46 15.8": {
+      "triangles": 20,
+      "sha256": "9f9a8d4cfadb736e6f5c3967b2342571b922c4249972bc878ad390be52d0e8e5"
+    },
+    "SUELO NUEVO | Placa 47 5.2": {
+      "triangles": 20,
+      "sha256": "e9fe1bf06f23459750debe552dabb9b8ff492276a4a0930dc7e217e51ce45c80"
+    },
+    "SUELO NUEVO | Placa 47 9.1": {
+      "triangles": 20,
+      "sha256": "eb1b96abd4e34b610717f37ec5563bed630fedd4e04282002e0c23573d6f0e52"
+    },
+    "SUELO NUEVO | Placa 47 15.8": {
+      "triangles": 20,
+      "sha256": "a90a55037858899b263d438016c5488ea570a90452b48cebb4a639b999c3f3a3"
+    },
+    "SUELO | Collar tubular original": {
+      "triangles": 2648,
+      "sha256": "0da8cfc573fa47b134537ab6f74aead0d42a5d49f032ee5044756ba2d705a1e3"
+    },
+    "SUELO | Perfil Exterior": {
+      "triangles": 3840,
+      "sha256": "b05eef5b6181b98eb21b35323b42a12678818e5dcb824e47bd25f7c73086d4e5"
+    },
+    "SUELO | Perfil Interior": {
+      "triangles": 3840,
+      "sha256": "363749863419885ff7ce11efa6b790ee5f2a34aff81696310b8782b9c073cc0e"
+    }
+  }
+}
