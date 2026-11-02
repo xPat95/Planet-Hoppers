@@ -5,6 +5,7 @@ mod minecraft_mine_dev;
 pub mod minecraft_rush;
 pub mod minigame_host;
 pub mod smilingfriends_entry;
+pub mod smilingfriends_game;
 mod return_smoke;
 mod session_smoke;
 mod session_ui;
