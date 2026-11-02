@@ -1,0 +1,12 @@
+{
+  "name": "Ciudadela / Estación espacial",
+  "model": "assets/models/environment/spaceStation/exports/citadel_space_station_near.glb",
+  "model_far": "assets/models/environment/spaceStation/exports/citadel_space_station_far.glb",
+  "position": [0.0, 6200.0, 0.0],
+  "rotation_degrees": [0.0, -90.0, 0.0],
+  "length": 1400.0,
+  "collision_radius": 860.0,
+  "approach_margin": 260.0,
+  "interaction_margin": 420.0,
+  "lod_distance": 2200.0
+}

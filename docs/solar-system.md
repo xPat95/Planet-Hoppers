@@ -17,15 +17,32 @@ Requisitos de Windows al final. El flujo normal comienza en el [menú y hangar i
 | W / S (o flechas) | Acelerar / frenar y retroceder |
 | Mouse, A / D, R / F | Girar la nariz (izquierda/derecha, arriba/abajo) |
 | Shift | Turbo |
-| Tab | Elegir el planeta objetivo (marcado en amarillo, con flecha si está fuera de la pantalla) |
-| Espacio (mantener) | Piloto automático: apunta adonde va a estar el objetivo |
+| Tab | Recorrer los seis planetas, la estación y ningún objetivo; la estación usa un rombo cian |
+| Espacio (mantener) | Subir en el eje vertical del mundo; Shift también acelera este ascenso |
+| B (mantener) | Piloto automático: orientar hacia el destino, con predicción orbital para planetas; W y Shift siguen controlando el avance |
 | E, Enter o clic en el botón | Explorar el planeta cercano |
 | N | Probar otra nave (la estación las elegirá en la etapa 8) |
 | Esc | Soltar o volver a capturar el mouse |
 
-**Vista general** (C cambia entre las dos): arrastrar gira la cámara, la rueda acerca hasta 3,5 veces el sistema, Tab sigue a un planeta, Espacio pausa y Arriba/Abajo cambian la velocidad del tiempo (×0,125 a ×16).
+**Vista general** (C cambia entre las dos): arrastrar gira la cámara, la rueda acerca hasta 3,5 veces el sistema, Tab sigue a un planeta o la estación, P pausa y Arriba/Abajo cambian la velocidad del tiempo (×0,125 a ×16). Espacio queda reservado para ascender en vuelo.
 
 En las dos: O muestra u oculta las órbitas, F12 guarda una captura en `target/solarsystem.png` y Ctrl+Q sale.
+
+## Estación espacial fija
+
+La Ciudadela aprobada aparece como objeto independiente de `SolarSystem.planets`; no tiene órbita ni giro automático. `config/station.json` centraliza sus recursos, posición, orientación, largo, LOD y márgenes de aproximación. Se reutilizan los GLB de `assets/models/environment/spaceStation/exports`, sin modificar Blender ni las exportaciones. A más de 2200 unidades se usa el LOD de 131 699 triángulos; cerca se usa el de 683 746. Se descarta el dibujo cuando toda su envolvente queda detrás de la cámara. No se añaden shaders ni luces globales.
+
+Su centro es **(0, 6200, 0)**, por encima del plano XZ de las órbitas. Tiene **1400 unidades de largo**, frente a las 4–5 de las naves. La altura deja incluso su envolvente exterior por encima del Sol y todos los planetas, sin cambiar radios ni distancias orbitales. Desde el inicio se llega en aproximadamente 15 segundos de vuelo directo con turbo, más el tiempo de orientación/aceleración.
+
+Tab permite seleccionarla en vuelo y seguirla en vista general. Un rombo cian y su nombre/distancia la diferencian de los planetas; el indicador del objetivo permanece en pantalla cuando queda fuera del campo visual. B utiliza la misma ruta que evita el Sol y orienta hacia el ancla de aproximación **(0, 6200, 1120)**. El jugador sigue acelerando/frenando. No hay atraque automático.
+
+La envolvente de seguridad es una esfera conservadora de radio **860**, suficiente para contener la caja del modelo ajustado, con colisión barrida que evita atravesarla incluso con turbo. La cámara también se mantiene fuera. Por ahora no se atraviesan los huecos entre brazos. Al llegar a menos de **160 unidades del ancla**, aparece la indicación de Ciudadela; E confirma el contacto y muestra que el acceso al hangar está pendiente. No abre otra escena ni reinicia la partida.
+
+El futuro ingreso al hangar puede consumir esa interacción, llamar al selector existente en modo `Change`, aplicar `ChangedShip` a la sesión y devolver la nave al ancla exterior, conservando propiedad y progreso. No se implementan todavía atraque, tokens ni desbloqueos.
+
+Verificación: `cargo test --locked --test station` comprueba separación orbital, posición fija, ascenso independiente del FPS, colisión barrida y llegada con piloto en normal/turbo. `cargo run --locked --bin solarsystem -- --smoke-station` ejercita eventos nativos de Espacio, B y E y guarda `station-overview.png`, `station-exterior.png`, `station-approach.png` y `station-contact.png` en `target/solarsystem/`.
+
+La integración compiló con `cargo build --locked --bins`; la suite completa aprobó 161 pruebas. El recorrido `planet-hoppers --smoke-returns --ship starwars` pasó menú, las seis exhibiciones y cuatro visitas a South Park (victoria, derrota y dos abandonos), conservando la nave inicial/activa y una sola desbloqueada. También pasó `STATION_SMOKE_PASS`, incluido Tab para seleccionar la estación, Espacio sin orientación automática, B para orientar y E en proximidad. Informes: `target/station-tests.log`, `target/station-smoke.log` y `target/station-flow-smoke.log`. Se revisaron capturas; no se realizó una partida con entrada física ni un benchmark sostenido. Raylib avisa de conversiones de índices u32 a u16 en mallas grandes del planeta Star Wars y la estación; el cargador `SpaceModel` existente reconstruye esas primitivas desde los índices originales del GLB.
 
 ## Fase 1: estructura
 

@@ -1,5 +1,6 @@
 pub mod billboard;
 pub mod hangar;
+mod hangar_interior;
 pub mod lighting;
 pub mod mining;
 pub mod resources;

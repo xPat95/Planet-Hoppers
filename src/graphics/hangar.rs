@@ -1,4 +1,5 @@
 //! Exhibition only: no ownership or selection rules. Replace the backdrop independently.
+pub use super::hangar_interior::InteriorStyle;
 use super::space::{Fit, SpaceModel, SpaceShader};
 use crate::ships::ShipModel;
 use raylib::prelude::*;
@@ -9,7 +10,10 @@ pub struct HangarStyle {
     pub platform_radius: f32,
     pub platform_top: f32,
     pub rotation_degrees_per_second: f32,
-    /// Future station GLB. None keeps the inexpensive temporary interior.
+    pub interior: InteriorStyle,
+    pub light_position: Vector3,
+    pub ambient: f32,
+    /// Interior GLB override. The exterior station is not an interior room.
     pub station_model: Option<String>,
     pub station_length: f32,
     pub station_position: Vector3,
@@ -22,6 +26,9 @@ impl Default for HangarStyle {
             platform_radius: 4.5,
             platform_top: 0.8,
             rotation_degrees_per_second: 10.0,
+            interior: InteriorStyle::default(),
+            light_position: Vector3::new(-4.0, 9.0, 5.0),
+            ambient: 0.55,
             station_model: None,
             station_length: 22.0,
             station_position: Vector3::new(0.0, 4.0, 0.0),
@@ -33,12 +40,16 @@ impl Default for HangarStyle {
 pub struct HangarCamera {
     pub fov: f32,
     pub framing_margin: f32,
+    pub direction: Vector3,
+    pub minimum_distance: f32,
 }
 impl Default for HangarCamera {
     fn default() -> Self {
         Self {
             fov: 42.0,
-            framing_margin: 0.80,
+            framing_margin: 1.08,
+            direction: Vector3::new(0.9, 0.6, 1.4),
+            minimum_distance: 11.0,
         }
     }
 }
@@ -59,9 +70,10 @@ impl HangarCamera {
         let half_angle = (tangent * usable_height)
             .atan()
             .min((tangent * aspect * usable_width).atan());
-        let distance = (half_extents.length() / half_angle.sin() * self.framing_margin).max(8.0);
+        let distance = (half_extents.length() / half_angle.sin() * self.framing_margin)
+            .max(self.minimum_distance);
         Camera3D::perspective(
-            center + Vector3::new(0.9, 0.6, 1.4).normalized() * distance,
+            center + self.direction.normalized() * distance,
             center,
             Vector3::up(),
             self.fov,
@@ -153,10 +165,13 @@ impl Hangar {
             .camera(self.center, self.half_extents, viewport, insets)
     }
     pub fn draw(&mut self, d: &mut impl RaylibDraw3D, camera: Camera3D) {
-        self.shader
-            .begin_frame(Vector3::new(-4.0, 9.0, 5.0), camera.position, 0.55);
-        self.draw_backdrop(d);
-        let base = Color::new(24, 38, 53, 255);
+        self.shader.begin_frame(
+            self.style.light_position,
+            camera.position,
+            self.style.ambient,
+        );
+        self.draw_backdrop(d, camera);
+        let base = self.style.interior.titanium;
         d.draw_cylinder(
             Vector3::new(0.0, 0.0, 0.0),
             self.style.platform_radius,
@@ -165,13 +180,21 @@ impl Hangar {
             64,
             base,
         );
-        d.draw_cylinder_wires(
-            Vector3::new(0.0, 0.0, 0.0),
-            self.style.platform_radius,
-            self.style.platform_radius + 0.2,
-            self.style.platform_top,
+        d.draw_cylinder(
+            Vector3::new(0.0, self.style.platform_top - 0.08, 0.0),
+            self.style.platform_radius + 0.04,
+            self.style.platform_radius + 0.04,
+            0.04,
             64,
-            Color::new(50, 122, 148, 255),
+            self.style.interior.cyan,
+        );
+        d.draw_cylinder(
+            Vector3::new(0.0, self.style.platform_top, 0.0),
+            self.style.platform_radius - 0.15,
+            self.style.platform_radius - 0.15,
+            0.02,
+            64,
+            self.style.interior.graphite,
         );
         for i in 0..12 {
             let angle = self.angle.to_radians() + i as f32 * std::f32::consts::TAU / 12.0;
@@ -196,49 +219,12 @@ impl Hangar {
             );
         }
     }
-    fn draw_backdrop(&mut self, d: &mut impl RaylibDraw3D) {
+    fn draw_backdrop(&mut self, d: &mut impl RaylibDraw3D, camera: Camera3D) {
         if let Some(model) = &self.station {
             let p = self.style.station_position;
             model.draw(d, &mut self.shader, Matrix::translate(p.x, p.y, p.z));
             return;
         }
-        // Temporary room; the station adapter above leaves selection/camera unchanged.
-        d.draw_cube(
-            Vector3::new(0.0, -0.2, 0.0),
-            24.0,
-            0.4,
-            24.0,
-            Color::new(10, 17, 26, 255),
-        );
-        d.draw_cube(
-            Vector3::new(0.0, 5.0, -10.0),
-            24.0,
-            10.0,
-            0.3,
-            Color::new(13, 23, 35, 255),
-        );
-        d.draw_cube(
-            Vector3::new(-12.0, 5.0, 0.0),
-            0.3,
-            10.0,
-            24.0,
-            Color::new(10, 20, 31, 255),
-        );
-        for x in [-9.0, -6.0, 6.0, 9.0] {
-            d.draw_cube(
-                Vector3::new(x, 4.0, -9.7),
-                0.18,
-                7.0,
-                0.12,
-                Color::new(64, 137, 165, 255),
-            );
-        }
-        for x in [-8.0, 8.0] {
-            d.draw_line_3D(
-                Vector3::new(x, 0.01, -9.0),
-                Vector3::new(x, 0.01, 9.0),
-                Color::new(35, 65, 83, 255),
-            );
-        }
+        self.style.interior.draw(d, camera);
     }
 }

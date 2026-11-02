@@ -20,5 +20,5 @@
   "export_center": "bounding_box",
   "scale_factor": 1.0,
   "runtime_scale": null,
-  "runtime_placement": "pending"
+  "runtime_placement": "config/station.json"
 }

@@ -72,6 +72,8 @@ impl ShipsConfig {
 /// Lo que pide el jugador en este cuadro.
 #[derive(Debug, Clone, Copy, Default)]
 pub struct FlightInput {
+    /// Ascenso vertical en el eje Y del mundo, independiente de la orientación.
+    pub ascend: bool,
     /// -1 (frenar / reversa) a 1 (acelerar).
     pub throttle: f32,
     pub boost: bool,
@@ -128,6 +130,11 @@ impl Ship {
         let eta = (p.position() - self.position).length() / self.speed.abs().max(flight.cruise_speed);
         let angle = p.orbit_angle + p.config.orbit_speed_degrees.to_radians() * eta;
         let target = Vector3::new(angle.cos(), 0.0, -angle.sin()) * p.config.orbit_radius;
+        self.autopilot_to(target, flight, system)
+    }
+
+    /// Ruta compartida para objetivos orbitales y puntos de interés fijos.
+    pub fn autopilot_to(&self, target: Vector3, flight: &FlightConfig, system: &SolarSystem) -> Vector3 {
         // Un destino al otro lado del Sol necesita un rodeo. La ruta directa
         // dejaría al piloto empujando contra su colisión, especialmente en normal.
         let route = target - self.position;
@@ -187,7 +194,8 @@ impl Ship {
             })
             .map(|(i, _)| i);
         let carry = self.carried_by.map_or(Vector3::zero(), |i| system.planets[i].velocity());
-        self.position += (self.forward() * self.speed + carry) * dt;
+        let ascent = if input.ascend { Vector3::up() * top } else { Vector3::zero() };
+        self.position += (self.forward() * self.speed + carry + ascent) * dt;
         self.resolve_collisions(flight, system);
     }
 
