@@ -22,3 +22,8 @@ Capturas generadas por los scripts de `tools/blender/smilingfriends/`. Son refer
 | Brasil | [smilingfriends_v01_brazil.png](smilingfriends_v01_brazil.png) |
 | Familias de nubes | [smilingfriends_v01_cloud_families.png](smilingfriends_v01_cloud_families.png) |
 | Forest Demon (modelo propio) | [forest_demon_front.png](forest_demon_front.png), [forest_demon_three_quarter.png](forest_demon_three_quarter.png) |
+| Pim y Charlie, recortes en la cabina | [ship_figures.png](ship_figures.png), [ship_cabin.png](ship_cabin.png) |
+| Siluetas negras desde atrás | [ship_figures_back.png](ship_figures_back.png) |
+| Recortes en el juego, frente | [ship_game_front.png](ship_game_front.png) |
+| Recortes en el juego, costado | [ship_game_side.png](ship_game_side.png) |
+| Siluetas en el juego, atrás | [ship_game_back.png](ship_game_back.png) |

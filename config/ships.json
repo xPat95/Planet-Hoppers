@@ -5,7 +5,12 @@
       "id": "smilingfriends",
       "name": "Nave de Smiling Friends",
       "model": "assets/models/ships/smilingfriends/exports/smilingfriends_ship.glb",
-      "length": 4.0
+      "length": 6.0,
+      "model_rotation_degrees": [
+        0.0,
+        180.0,
+        0.0
+      ]
     },
     {
       "id": "minecraft",

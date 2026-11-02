@@ -546,7 +546,8 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                     if (f - 60 - n * 15) % 10 == 0 {
                         s.ship_index = k;
                         ship_model = load_ship_model(&mut rl, &thread, root, &shader, s);
-                        s.ship.position = Vector3::new(0.0, 80.0, 0.0);
+                        // Por encima del Sol, lejos de su superficie (el Sol se escala con el mundo)
+                        s.ship.position = Vector3::new(0.0, s.system.sun.radius * 2.5, 0.0);
                         s.ship.yaw = std::f32::consts::FRAC_PI_2; // nariz hacia -X
                         s.ship.pitch = 0.0;
                         s.ship.speed = 0.0;
@@ -558,7 +559,26 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                             45.0,
                         ));
                     }
-                    if (f - 60 - n * 15) % 10 == 8 {
+                    let phase = (f - 60 - n * 15) % 10;
+                    if s.ships.ships[k].id == "smilingfriends" && (phase == 4 || phase == 6) {
+                        let direction = if phase == 4 { s.ship.forward() } else { -s.ship.forward() };
+                        let len = s.ships.ships[k].length;
+                        side_camera = Some(Camera3D::perspective(
+                            s.ship.position + direction * (len * 1.30) + Vector3::up() * (len * 0.55),
+                            s.ship.position + Vector3::up() * (len * 0.25),
+                            Vector3::up(),
+                            45.0,
+                        ));
+                        capture = Some(format!("ship-smilingfriends-{}.png", if phase == 4 { "front" } else { "back" }));
+                    }
+                    if phase == 8 {
+                        let len = s.ships.ships[k].length;
+                        side_camera = Some(Camera3D::perspective(
+                            s.ship.position + Vector3::new(0.0, len * 0.4, len * 2.2),
+                            s.ship.position,
+                            Vector3::up(),
+                            45.0,
+                        ));
                         capture = Some(format!("ship-{}.png", s.ships.ships[k].id));
                     }
                 }

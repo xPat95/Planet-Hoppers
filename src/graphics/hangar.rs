@@ -150,15 +150,15 @@ impl Hangar {
             .ship
             .as_ref()
             .map_or(Vector3::new(2.3, 0.8, 3.0), |s| s.half_extents);
-        self.center = Vector3::new(
-            0.0,
-            self.style.platform_top + self.half_extents.y + 0.6,
-            0.0,
-        );
+        self.center = Vector3::new(0.0, self.style.platform_top + self.half_extents.y, 0.0);
         self.angle = 25.0;
     }
     pub fn update(&mut self, dt: f32) {
         self.angle = (self.angle + dt * self.style.rotation_degrees_per_second).rem_euclid(360.0);
+    }
+    /// Fixed viewpoints for the automated cutout preview.
+    pub fn set_preview_angle(&mut self, angle: f32) {
+        self.angle = angle;
     }
     pub fn camera(&self, viewport: Vector2, insets: Vector2) -> Camera3D {
         self.camera

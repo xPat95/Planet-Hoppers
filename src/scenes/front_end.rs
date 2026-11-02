@@ -93,52 +93,184 @@ pub fn select(
     view(Screen::Hangar, mode, game, None)
 }
 
-const MENU_BUTTON_HEIGHT: f32 = 48.0;
 const MENU_BUTTON_GAP: f32 = 14.0;
+/// Recorte del logo dentro de `newertitle.png` (1920x1080, el resto es transparente).
+const TITLE_SOURCE: (f32, f32, f32, f32) = (338.0, 101.0, 1332.0, 926.0);
+const TITLE_ASPECT: f32 = TITLE_SOURCE.2 / TITLE_SOURCE.3;
+/// Entrada del menú: el logo crece desde chico (con un rebote) y después suben los botones, uno tras otro.
+const TITLE_INTRO: f32 = 0.9;
+const BUTTONS_DELAY: f32 = 0.55;
+const BUTTON_STAGGER: f32 = 0.12;
+const BUTTON_INTRO: f32 = 0.45;
 
-struct MainMenuLayout {
-    top: f32,
-    planet_y: f32,
-    hoppers_y: f32,
-    tagline_y: f32,
-    buttons_y: f32,
-    bottom: f32,
+/// Sube rápido, se pasa un poco y vuelve (0 → 1).
+fn ease_out_back(t: f32) -> f32 {
+    let (c1, c3) = (1.70158, 2.70158);
+    1.0 + c3 * (t - 1.0).powi(3) + c1 * (t - 1.0).powi(2)
 }
-impl MainMenuLayout {
-    fn new(height: i32) -> Self {
-        let accent_height = 3.0;
-        let planet_size = 40.0;
-        let hoppers_size = 76.0;
-        let tagline_size = 18.0;
-        let title_gap = 18.0;
-        let title_line_gap = 6.0;
-        let button_top_gap = 30.0;
-        let title_height = accent_height + title_gap + planet_size + title_line_gap
-            + hoppers_size + title_gap + tagline_size;
-        let buttons_height = 3.0 * MENU_BUTTON_HEIGHT + 2.0 * MENU_BUTTON_GAP;
-        let content_height = title_height + button_top_gap + buttons_height;
-        let top = (height as f32 - content_height) * 0.5;
-        let planet_y = top + accent_height + title_gap;
-        let hoppers_y = planet_y + planet_size + title_line_gap;
-        let tagline_y = hoppers_y + hoppers_size + title_gap;
-        let buttons_y = top + title_height + button_top_gap;
-        Self { top, planet_y, hoppers_y, tagline_y, buttons_y, bottom: top + content_height }
+
+struct MenuGalaxy {
+    shader: Shader,
+    resolution: i32,
+    time: i32,
+}
+
+impl MenuGalaxy {
+    fn load(rl: &mut RaylibHandle, thread: &RaylibThread) -> Result<Self, Error> {
+        let shader = rl.load_shader_from_memory(
+            thread,
+            None,
+            Some(include_str!("../graphics/shaders/menu_galaxy.fs")),
+        );
+        let resolution = shader.get_shader_location("resolution");
+        let time = shader.get_shader_location("time");
+        if !shader.is_shader_valid() || resolution < 0 || time < 0 {
+            return Err("Menu galaxy shader failed to compile".into());
+        }
+        Ok(Self {
+            shader,
+            resolution,
+            time,
+        })
+    }
+
+    fn draw(&mut self, d: &mut RaylibDrawHandle, width: i32, height: i32, time: f32) {
+        self.shader
+            .set_shader_value(self.resolution, Vector2::new(width as f32, height as f32));
+        self.shader.set_shader_value(self.time, time);
+        let mut layer = d.begin_shader_mode(&mut self.shader);
+        layer.draw_rectangle(0, 0, width, height, Color::WHITE);
     }
 }
 
-fn centered_text(d: &mut RaylibDrawHandle, text: &str, width: i32, y: i32, size: i32, color: Color) {
-    d.draw_text(text, (width - d.measure_text(text, size)) / 2, y, size, color);
+struct MainMenuLayout {
+    title_y: f32,
+    title_height: f32,
+    buttons_y: f32,
+    button_height: f32,
+}
+impl MainMenuLayout {
+    fn new(width: i32, height: i32) -> Self {
+        // The artwork rises to the right, leaving room for the buttons below that end.
+        let title_height = (height as f32 * 0.77).min((width as f32 - 70.0) / TITLE_ASPECT);
+        let title_y = ((height as f32 - title_height) * 0.30 + height as f32 * 0.035).max(0.0);
+        let button_height = (height as f32 * 0.06).clamp(48.0, 66.0);
+        let buttons_y = height as f32 * 0.76;
+        Self {
+            title_y,
+            title_height,
+            buttons_y,
+            button_height,
+        }
+    }
 }
 
 fn menu_button(w: i32, h: i32, row: usize) -> Rectangle {
-    let width = 310.0_f32.min((w as f32 - 64.0).max(1.0));
-    let layout = MainMenuLayout::new(h);
+    let row_width = w as f32 * 0.42;
+    let width = (row_width - 2.0 * MENU_BUTTON_GAP) / 3.0;
+    let layout = MainMenuLayout::new(w, h);
     Rectangle::new(
-        (w as f32 - width) * 0.5,
-        layout.buttons_y + row as f32 * (MENU_BUTTON_HEIGHT + MENU_BUTTON_GAP),
+        w as f32 * 0.52 + row as f32 * (width + MENU_BUTTON_GAP),
+        layout.buttons_y,
         width,
-        MENU_BUTTON_HEIGHT,
+        layout.button_height,
     )
+}
+
+/// Degradé del logo, de arriba (t = 0) hacia abajo (t = 1): cielo azul que se aclara hasta casi blanco, un
+/// horizonte marcado y después naranja que se vuelve amarillo claro.
+const CHROME: [(f32, (u8, u8, u8)); 6] = [
+    (0.0, (38, 128, 226)),
+    (0.46, (226, 246, 255)),
+    (0.5, (160, 58, 30)),
+    (0.64, (238, 104, 48)),
+    (0.84, (255, 196, 74)),
+    (1.0, (255, 244, 196)),
+];
+/// Inclinación de los botones (como las letras del logo): cuánto se corre el borde de arriba a la derecha.
+const BUTTON_SLANT: f32 = 0.32;
+
+fn chrome(t: f32, lift: f32) -> Color {
+    let i = CHROME.iter().rposition(|(at, _)| *at <= t).unwrap_or(0).min(CHROME.len() - 2);
+    let ((a, ca), (b, cb)) = (CHROME[i], CHROME[i + 1]);
+    let k = ((t - a) / (b - a)).clamp(0.0, 1.0);
+    let mix = |x: u8, y: u8| {
+        let v = x as f32 + (y as f32 - x as f32) * k;
+        (v + (255.0 - v) * lift) as u8
+    };
+    Color::new(mix(ca.0, cb.0), mix(ca.1, cb.1), mix(ca.2, cb.2), 255)
+}
+
+/// Paralelogramo inclinado, línea por línea: `color(t)` da el color de cada fila (t de 0 arriba a 1 abajo).
+fn slanted(d: &mut RaylibDrawHandle, x: f32, y: f32, w: f32, h: f32, color: impl Fn(f32) -> Color) {
+    let rows = h.round().max(1.0) as i32;
+    for k in 0..rows {
+        let t = (k as f32 + 0.5) / rows as f32;
+        let shift = (1.0 - t) * h * BUTTON_SLANT;
+        d.draw_rectangle((x + shift).round() as i32, (y + k as f32).round() as i32, w.round() as i32, 1, color(t));
+    }
+}
+
+fn draw_menu_button(
+    d: &mut RaylibDrawHandle,
+    font: &Font,
+    rect: Rectangle,
+    label: &str,
+    mouse: Vector2,
+) {
+    let hovered = rect.check_collision_point_rec(mouse);
+    let lift = if hovered { 3.0 } else { 0.0 };
+    // El paralelogramo entra en el rectángulo del botón (que es el que recibe los clics)
+    let skew = rect.height * BUTTON_SLANT;
+    let (x, y, w, h) = (rect.x, rect.y - lift, rect.width - skew, rect.height);
+    let cyan = Color::new(99, 205, 255, 255);
+    let cobalt = Color::new(19, 4, 146, 255);
+    // Sombra dura hacia abajo, borde celeste y borde azul oscuro, como el logo
+    slanted(d, x + 3.0, y + 6.0 + lift, w, h, |_| Color::new(10, 2, 70, 255));
+    slanted(d, x - 3.0, y - 3.0, w + 6.0, h + 6.0, |_| cyan);
+    slanted(d, x, y, w, h, |_| cobalt);
+    slanted(d, x + 3.0, y + 3.0, w - 6.0, h - 6.0, |t| chrome(t, if hovered { 0.18 } else { 0.0 }));
+    // Mismo tamaño en los tres botones: el más grande que deja entrar "CONTROLES" (la palabra más larga)
+    let fit = font.measure_text("CONTROLES", 100.0, 1.0).x / 100.0;
+    let size = (h * 0.66).min((w - 30.0) / fit).max(12.0);
+    let text = font.measure_text(label, size, 1.0);
+    let at = Vector2::new(
+        x + skew * 0.5 + (w - text.x) * 0.5,
+        y + (h - text.y) * 0.5,
+    );
+    // Letras blancas con contorno celeste completo (el texto repetido en un círculo alrededor)
+    let outline = Color::new(38, 150, 235, 255);
+    let r = (size * 0.09).max(2.0);
+    for k in 0..16 {
+        let a = k as f32 / 16.0 * std::f32::consts::TAU;
+        d.draw_text_ex(font, label, at + Vector2::new(a.cos() * r, a.sin() * r), size, 1.0, outline);
+    }
+    d.draw_text_ex(font, label, at, size, 1.0, Color::WHITE);
+}
+
+fn menu_random(index: u32, salt: u32) -> f32 {
+    let mut x = index.wrapping_mul(0x9e37_79b9) ^ salt;
+    x ^= x >> 16;
+    x = x.wrapping_mul(0x7feb_352d);
+    x ^= x >> 15;
+    (x >> 8) as f32 / 16_777_216.0
+}
+
+fn draw_moving_stars(d: &mut RaylibDrawHandle, width: i32, height: i32, time: f32) {
+    for i in 0..130 {
+        let speed = 2.0 + menu_random(i, 0x2345) * 5.0;
+        let x = (menu_random(i, 0x7183) * width as f32 + time * speed).rem_euclid(width as f32);
+        let y = (menu_random(i, 0x9e12) * height as f32 + time * speed * 0.28)
+            .rem_euclid(height as f32);
+        let twinkle = 0.72 + 0.28 * (time * (0.8 + speed * 0.1) + i as f32).sin();
+        let alpha = (135.0 * twinkle) as u8;
+        let tint = if i % 3 == 0 {
+            Color::new(131, 222, 255, alpha)
+        } else {
+            Color::new(169, 209, 255, alpha)
+        };
+        d.draw_circle_v(Vector2::new(x, y), if i % 7 == 0 { 1.5 } else { 0.8 }, tint);
+    }
 }
 fn back_button(w: i32) -> Rectangle {
     Rectangle::new(w as f32 - 182.0, 24.0, 150.0, 42.0)
@@ -239,6 +371,18 @@ fn view(
         rl.set_window_state(WindowState::default().set_window_hidden(true));
     }
     let sky = Sky::new();
+    let title_card = rl.load_texture(&thread, &root.join("newertitle.png").to_string_lossy())?;
+    let mut galaxy = MenuGalaxy::load(&mut rl, &thread)?;
+    let menu_font = rl.load_font_ex(
+        &thread,
+        &root
+            .join("assets/fonts/Bungee-Regular.ttf")
+            .to_string_lossy(),
+        64,
+        None,
+    )?;
+    // Fuente nítida al achicarla (se carga grande y se escala según el botón)
+    unsafe { ffi::SetTextureFilter(menu_font.texture, ffi::TextureFilter::TEXTURE_FILTER_BILINEAR as i32) };
     let mut hangar = Hangar::load(&mut rl, &thread, &root, HangarStyle::default())?;
     let captures = root.join("target/front-end");
     if smoke_goal.is_some() {
@@ -248,6 +392,8 @@ fn view(
     let mut controls_seen = false;
     let mut back_seen = false;
     let mut frame = 0u32;
+    // Segundos en el menú principal (la entrada se ve una vez, al abrir el juego). En las pruebas ya terminó.
+    let mut intro = if smoke_goal.is_some() { 10.0f32 } else { 0.0 };
     loop {
         if rl.window_should_close()
             || ((rl.is_key_down(KeyboardKey::KEY_LEFT_CONTROL)
@@ -349,35 +495,75 @@ fn view(
             rl.get_frame_time().min(0.1)
         };
         hangar.update(dt);
+        if screen == Screen::Main {
+            intro += dt;
+        }
+        if smoke_goal.is_some() && catalog.choices[selection.index].id == "smilingfriends" {
+            match frame {
+                47 => hangar.set_preview_angle(115.0),
+                48 => hangar.set_preview_angle(205.0),
+                _ => {}
+            }
+        }
         let camera = if screen == Screen::Hangar {
             hangar.camera(
                 Vector2::new(w as f32, h as f32),
                 Vector2::new(HANGAR_HEADER, HANGAR_FOOTER),
             )
         } else {
+            let time = rl.get_time() as f32;
             Camera3D::perspective(
                 Vector3::zero(),
-                Vector3::new(0.0, 0.0, -1.0),
+                Vector3::new(
+                    (time * 0.07).sin() * 0.025,
+                    (time * 0.05).sin() * 0.016,
+                    -1.0,
+                ),
                 Vector3::up(),
                 50.0,
             )
         };
         let sky_frame = sky.project(&rl, camera);
+        let menu_time = rl.get_time() as f32;
         let mut d = rl.begin_drawing(&thread);
         d.clear_background(SKY_BACKGROUND);
+        if screen == Screen::Main {
+            galaxy.draw(&mut d, w, h, menu_time);
+        }
         sky.draw(&mut d, &sky_frame);
+        if matches!(screen, Screen::Main | Screen::Controls) {
+            draw_moving_stars(&mut d, w, h, menu_time);
+        }
         match screen {
             Screen::Main => {
-                let layout = MainMenuLayout::new(h);
-                d.draw_rectangle((w - 44) / 2, layout.top as i32, 44, 3, CYAN);
-                centered_text(&mut d, "PLANET", w, layout.planet_y as i32, 40, MUTED);
-                centered_text(&mut d, "HOPPERS", w, layout.hoppers_y as i32, 76, INK);
-                centered_text(&mut d, "TU VIAJE EMPIEZA AQUÍ", w, layout.tagline_y as i32, 18, CYAN);
-                for (i, label) in ["Nueva partida", "Controles", "Salir"].iter().enumerate() {
-                    button(&mut d, menu_button(w, h, i), label, mouse, true, i == 0);
+                let layout = MainMenuLayout::new(w, h);
+                // El logo crece desde su centro, del 12 % a su tamaño, y aparece de a poco
+                let t = (intro / TITLE_INTRO).min(1.0);
+                let grow = 0.12 + 0.88 * ease_out_back(t);
+                let title_height = layout.title_height * grow;
+                let title_width = title_height * TITLE_ASPECT;
+                let center_y = layout.title_y + layout.title_height * 0.5;
+                let (sx, sy, sw, sh) = TITLE_SOURCE;
+                d.draw_texture_pro(
+                    &title_card,
+                    Rectangle::new(sx, sy, sw, sh),
+                    Rectangle::new(
+                        (w as f32 - title_width) * 0.5,
+                        center_y - title_height * 0.5,
+                        title_width,
+                        title_height,
+                    ),
+                    Vector2::zero(),
+                    0.0,
+                    Color::new(255, 255, 255, ((t * 3.0).min(1.0) * 255.0) as u8),
+                );
+                for (i, label) in ["JUGAR", "CONTROLES", "SALIR"].iter().enumerate() {
+                    // Cada botón sube desde abajo de la pantalla cuando el logo ya creció
+                    let bt = ((intro - BUTTONS_DELAY - i as f32 * BUTTON_STAGGER) / BUTTON_INTRO).clamp(0.0, 1.0);
+                    let mut rect = menu_button(w, h, i);
+                    rect.y += (1.0 - bt).powi(3) * h as f32 * 0.45;
+                    draw_menu_button(&mut d, &menu_font, rect, label, mouse);
                 }
-                centered_text(&mut d, "ELIGE TU NAVE.  EXPLORA SEIS MUNDOS.  UNA AVENTURA TE ESPERA.", w, (layout.bottom + 28.0) as i32, 14, MUTED);
-                centered_text(&mut d, "ESTACIÓN ORBITAL  /  SECTOR 06", w, h - 54, 16, MUTED);
             }
             Screen::Controls => {
                 d.draw_text("CONTROLES", 70, 75, 44, INK);
@@ -509,6 +695,15 @@ fn view(
                     Some(format!(
                         "hangar-{}.png",
                         catalog.choices[selection.index].id
+                    ))
+                }
+                47 | 48
+                    if screen == Screen::Hangar
+                        && catalog.choices[selection.index].id == "smilingfriends" =>
+                {
+                    Some(format!(
+                        "hangar-smilingfriends-{}.png",
+                        if frame == 47 { "side" } else { "back" }
                     ))
                 }
                 102 => {
