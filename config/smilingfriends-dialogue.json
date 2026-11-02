@@ -1,0 +1,336 @@
+{
+  "laugh_goal": 100,
+  "max_strikes": 3,
+  "victory_line": "Three smiles! I'm so proud of you. Kind of. Pretty much. Now get out of my break room.",
+  "defeat_line": "Three bad jokes. Everyone's still sad. Well, tomorrow's another day.",
+  "boss": {
+    "name": "MR. BOSS",
+    "background": "break_room.jpg",
+    "lines": [
+      {
+        "pose": "boss_full.png",
+        "text": "Ah, the new guy! Welcome to Smiling Friends. We're a small company with a big mission: making people smile."
+      },
+      {
+        "pose": "boss_pointing.png",
+        "text": "Your first assignment is easy. You have to make THREE clients smile. Three. Not one more, not one less... well, more is fine."
+      },
+      {
+        "pose": "boss_full.png",
+        "text": "Choose your words carefully. Screw up three times and the company loses faith in you. And so do I. No pressure."
+      },
+      {
+        "pose": "boss_pointing.png",
+        "text": "Go get 'em, champ! The world isn't going to smile by itself."
+      }
+    ]
+  },
+  "encounters": [
+    {
+      "name": "THE BAR",
+      "background": "bar.jpg",
+      "effect": "disco",
+      "cast": [
+        {
+          "name": "NATASHA",
+          "image": "natasha.png",
+          "laugh_image": "landlord.png",
+          "laugh_name": "ALAN'S LANDLORD",
+          "laugh_size": 0.58,
+          "laugh_floor": 0.8
+        }
+      ],
+      "intro": {
+        "text": "Hi, I'm Natasha. Alan said he'd meet me here. He keeps saying he's busy. I thought tonight might be different."
+      },
+      "rounds": [
+        {
+          "prompt": "I got all dressed up for him. Do I look \"stood up\" to you?",
+          "choices": [
+            {
+              "text": "You look great. Alan missed out on a fun night.",
+              "laugh": 45,
+              "reply": "Aww... HEH! I mean, tee-hee!",
+              "reaction": "HEH!"
+            },
+            {
+              "text": "Maybe he's just running late?",
+              "laugh": 20,
+              "reply": "Two hours late? Yeah. Sounds like Alan.",
+              "reaction": "hmm..."
+            },
+            {
+              "text": "Yeah, kind of.",
+              "laugh": 0,
+              "reply": "Wow. Thanks.",
+              "reaction": "*stares*"
+            }
+          ]
+        },
+        {
+          "prompt": "I've been trying to get Alan to hang out for months. He keeps slipping away. It's starting to feel personal.",
+          "choices": [
+            {
+              "text": "Are you sure this is about a date? You sound like his landlord.",
+              "laugh": 45,
+              "reply": "His landlord? What? No. I just... know where he lives. Heh. You're quick.",
+              "reaction": "*coughs in a deep voice*"
+            },
+            {
+              "text": "Maybe you could ask him to hang out somewhere else.",
+              "laugh": 20,
+              "reply": "I tried. He said the park was too far. It's across the street.",
+              "reaction": "heh"
+            },
+            {
+              "text": "Why do you have a beard?",
+              "laugh": 0,
+              "reply": "I don't have a beard! It's... a shadow. From the disco ball.",
+              "reaction": "*fixes wig*"
+            }
+          ]
+        },
+        {
+          "prompt": "Let's dance. Maybe if I have a good night, Alan will finally want to hang out with me. Just once.",
+          "choices": [
+            {
+              "text": "I dance like Alan when you call: straight for the exit.",
+              "laugh": 45,
+              "reply": "HAHAHA! He does! But I think he almost waved last time.",
+              "reaction": "HAHAHA!"
+            },
+            {
+              "text": "Okay, just one little step.",
+              "laugh": 20,
+              "reply": "One little step. Maybe Alan would do one too.",
+              "reaction": "*dances weird*"
+            },
+            {
+              "text": "I don't dance.",
+              "laugh": 0,
+              "reply": "And Alan won't hang out. What a night.",
+              "reaction": "*sighs deeply*"
+            }
+          ]
+        }
+      ],
+      "laugh_line": {
+        "text": "HAHAHA! Okay, you got me. I'm not Natasha. I'm Alan's landlord. I set this up because he keeps dodging me. I just want to hang out with the guy! Tell him I'm still here."
+      },
+      "fail_line": {
+        "text": "Well, that didn't work. Maybe Alan will want to hang out next time. I should probably take this wig off."
+      }
+    },
+    {
+      "name": "THE FOREST",
+      "background": "forest.png",
+      "cast": [
+        {
+          "name": "MR. FROG",
+          "image": "mr_frog.png",
+          "x": 0.2,
+          "size": 0.88
+        },
+        {
+          "name": "GLEP",
+          "image": "glep_frog.png",
+          "laugh_image": "glep.png",
+          "laugh_name": "GLEP (FREE!)",
+          "x": 0.41,
+          "size": 0.3,
+          "floor": 0.74,
+          "laugh_size": 0.35
+        }
+      ],
+      "intro": {
+        "speaker": 0,
+        "text": "Welcome to my forest. Hello. This is my new son, Froggy. Hello. He used to be Glep. Hello."
+      },
+      "rounds": [
+        {
+          "speaker": 1,
+          "prompt": "Glep glorp! Glep! (Translation: help me, he makes me eat flies.)",
+          "choices": [
+            {
+              "text": "Don't worry, Glep. We're getting you out of here!",
+              "laugh": 50,
+              "speaker": 0,
+              "reply": "Nobody leaves the forest. Hello. But I like your attitude. Hello.",
+              "reaction": "*croaks*"
+            },
+            {
+              "text": "So how are the flies?",
+              "laugh": 35,
+              "reply": "Glep! (Crunchy. Don't tell anyone.)",
+              "reaction": "*giggles*"
+            },
+            {
+              "text": "I can't understand a word he says.",
+              "laugh": 0,
+              "reply": "GLEP! (There are subtitles!)",
+              "reaction": "*turns angry green*"
+            }
+          ]
+        },
+        {
+          "speaker": 0,
+          "prompt": "Frogs don't pay taxes. Hello. Frogs don't go to work. Hello. Is this not the perfect life? Hello.",
+          "choices": [
+            {
+              "text": "Honestly? You're the king of this forest, Mr. Frog.",
+              "laugh": 50,
+              "reply": "King of the forest. Hello. I will need a crown. Hello.",
+              "reaction": "HA!"
+            },
+            {
+              "text": "The no-taxes thing does sound nice.",
+              "laugh": 35,
+              "reply": "The government cannot find me here. Hello.",
+              "reaction": "*puffs throat*"
+            },
+            {
+              "text": "This is a kidnapping.",
+              "laugh": 0,
+              "reply": "This is a legal adoption. Hello. There is paperwork. Hello.",
+              "reaction": "*stares*"
+            }
+          ]
+        },
+        {
+          "speaker": 0,
+          "prompt": "Make me laugh and Froggy can go home. Hello. Tell me a frog joke. Hello.",
+          "choices": [
+            {
+              "text": "What's a frog's favorite drink? Croak-a-Cola!",
+              "laugh": 50,
+              "reply": "HAHAHA! Croak-a-Cola! Hello! That is terrible! Hello!",
+              "reaction": "HAHAHA!"
+            },
+            {
+              "text": "Ribbit, ribbit.",
+              "laugh": 35,
+              "reply": "Ribbit. Hello. Your accent is good. Hello.",
+              "reaction": "*happy croak*"
+            },
+            {
+              "text": "Frogs aren't funny.",
+              "laugh": 0,
+              "reply": "Take that back. Hello. Froggy, bite him. Hello.",
+              "reaction": "GRRR-IBBIT!"
+            }
+          ]
+        }
+      ],
+      "laugh_line": {
+        "speaker": 1,
+        "text": "GLEP GLEP GLORP! (I'm free! Thank you!)"
+      },
+      "fail_line": {
+        "speaker": 0,
+        "text": "Froggy stays with me. Hello. Come back with a better joke. Hello."
+      }
+    },
+    {
+      "name": "THE STREET",
+      "background": "street_graffiti.png",
+      "effect": "bomb",
+      "cast": [
+        {
+          "name": "DESMOND",
+          "image": "desmond.png",
+          "size": 0.74,
+          "floor": 1.02,
+          "laugh_image": "desmond_happy.png",
+          "laugh_name": "A CHANGED MAN"
+        }
+      ],
+      "intro": {
+        "text": "Yeah. I'm Desmond. I called because everything feels kind of pointless. I don't know. You can try."
+      },
+      "rounds": [
+        {
+          "prompt": "I got up, looked around, and couldn't think of a reason to do any of it. So... now you're here.",
+          "choices": [
+            {
+              "text": "You know what you need? A rollercoaster. Come on, my treat.",
+              "laugh": 35,
+              "reply": "A rollercoaster. Sure. I haven't got anything else going on.",
+              "reaction": "*looks up*"
+            },
+            {
+              "text": "Well... one day at a time, right?",
+              "laugh": 20,
+              "reply": "Yeah. I know. There are a lot of them.",
+              "reaction": "hmm..."
+            },
+            {
+              "text": "I don't know, honestly.",
+              "laugh": 0,
+              "reply": "Right. Same.",
+              "reaction": "*sighs*"
+            }
+          ]
+        },
+        {
+          "scene_card": "LATER, AT DAVE ROLLERCOASTER...",
+          "background": "rollercoaster.jpg",
+          "image": "desmond_after_ride.png",
+          "prompt": "We rode it. I yelled. Now I'm standing here. Still feels pretty much the same.",
+          "choices": [
+            {
+              "text": "You screamed the whole way down. That's not nothing!",
+              "laugh": 30,
+              "reply": "Yeah. I screamed. That's something, I guess.",
+              "reaction": "*tiny smile*"
+            },
+            {
+              "text": "Want to go again?",
+              "laugh": 20,
+              "reply": "Maybe. Not right now.",
+              "reaction": "*shrugs*"
+            },
+            {
+              "text": "Well, that was a waste of money.",
+              "laugh": 0,
+              "reply": "Yeah. I figured you'd say that.",
+              "reaction": "*looks at the ground*"
+            }
+          ],
+          "place": "DAVE ROLLERCOASTER"
+        },
+        {
+          "prompt": "Maybe I expected a ride to fix everything. That's stupid. I still feel stuck.",
+          "choices": [
+            {
+              "text": "You're not broken. You came out today, rode Dave Rollercoaster three times and kept that cotton candy. That's a guy who wants to stick around.",
+              "laugh": 45,
+              "reply": "...I kept the cotton candy. Didn't have to, I guess. Maybe I do want another day.",
+              "reaction": "*almost smiles*"
+            },
+            {
+              "text": "Everyone feels broken sometimes.",
+              "laugh": 20,
+              "reply": "Maybe. Doesn't make this part go away.",
+              "reaction": "hm."
+            },
+            {
+              "text": "Maybe you are.",
+              "laugh": 0,
+              "reply": "Yeah. Probably.",
+              "reaction": "*awkward silence*"
+            }
+          ]
+        }
+      ],
+      "laugh_line": {
+        "text": "Hey. It's Desmond. I got a job, and I don't hate it. Things still get weird sometimes, but I'm doing okay. I wouldn't have gone on that ride if you hadn't shown up. So... thanks. - Desmond."
+      },
+      "fail_line": {
+        "text": "Well. Thanks for trying, I guess."
+      },
+      "laugh_background": "desmond_end_street.png",
+      "laugh_scene_card": "SOME TIME LATER...",
+      "card_backdrop": "desmond_end_street.png"
+    }
+  ]
+}

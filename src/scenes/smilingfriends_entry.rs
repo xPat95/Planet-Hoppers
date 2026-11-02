@@ -1,5 +1,6 @@
-//! Smiling Friends entry: play the supplied clip before the temporary game screen.
+//! Smiling Friends entry: play the supplied clip, then the minigame (`smilingfriends_game`).
 use crate::graphics::resources::save_frame;
+use super::smilingfriends_game::{draw_intro, skip_button};
 use crate::minigames::common::host::{MinigameExit, MinigameResult};
 use raylib::prelude::*;
 use std::path::Path;
@@ -88,53 +89,6 @@ fn update_frame(
     Ok(())
 }
 
-fn draw_video(d: &mut RaylibDrawHandle<'_>, texture: &Texture2D, width: i32, height: i32) {
-    d.clear_background(Color::BLACK);
-    let scale = (width as f32 / texture.width as f32).min(height as f32 / texture.height as f32);
-    let dest = Rectangle::new(
-        (width as f32 - texture.width as f32 * scale) / 2.0,
-        (height as f32 - texture.height as f32 * scale) / 2.0,
-        texture.width as f32 * scale,
-        texture.height as f32 * scale,
-    );
-    d.draw_texture_pro(
-        texture,
-        Rectangle::new(0.0, 0.0, texture.width as f32, texture.height as f32),
-        dest,
-        Vector2::zero(),
-        0.0,
-        Color::WHITE,
-    );
-}
-
-fn draw_construction(d: &mut RaylibDrawHandle<'_>, width: i32, height: i32) {
-    d.clear_background(Color::new(18, 29, 42, 255));
-    let title = "SMILING FRIENDS";
-    let status = "EN CONSTRUCCION";
-    let hint = "Enter o Esc: volver al sistema solar";
-    d.draw_text(
-        title,
-        (width - d.measure_text(title, 52)) / 2,
-        height / 2 - 96,
-        52,
-        Color::new(255, 223, 68, 255),
-    );
-    d.draw_text(
-        status,
-        (width - d.measure_text(status, 30)) / 2,
-        height / 2 - 23,
-        30,
-        Color::new(245, 245, 245, 255),
-    );
-    d.draw_text(
-        hint,
-        (width - d.measure_text(hint, 20)) / 2,
-        height / 2 + 47,
-        20,
-        Color::new(173, 201, 212, 255),
-    );
-}
-
 pub fn run(args: impl Iterator<Item = String>) -> Result<MinigameExit, Box<dyn std::error::Error>> {
     let mut smoke = false;
     let mut mute = false;
@@ -160,6 +114,8 @@ pub fn run(args: impl Iterator<Item = String>) -> Result<MinigameExit, Box<dyn s
         rl.set_window_state(WindowState::default().set_window_hidden(true));
     }
     let mut texture = rl.load_texture_from_image(&thread, &first)?;
+    texture.set_texture_filter(&thread, TextureFilter::TEXTURE_FILTER_BILINEAR);
+    let font = rl.load_font_ex(&thread, &root.join("assets/fonts/Bungee-Regular.ttf").to_string_lossy(), 64, None)?;
     let device = if mute {
         None
     } else {
@@ -179,7 +135,7 @@ pub fn run(args: impl Iterator<Item = String>) -> Result<MinigameExit, Box<dyn s
         let (w, h) = (rl.get_screen_width(), rl.get_screen_height());
         {
             let mut d = rl.begin_drawing(&thread);
-            draw_video(&mut d, &texture, w, h);
+            draw_intro(&mut d, &texture, &font, 1.0, Vector2::zero());
             save_frame(&dir.join("intro-first.png"), w, h)?;
         }
         for frame in 1..frames.spans.len() {
@@ -187,13 +143,13 @@ pub fn run(args: impl Iterator<Item = String>) -> Result<MinigameExit, Box<dyn s
         }
         {
             let mut d = rl.begin_drawing(&thread);
-            draw_video(&mut d, &texture, w, h);
+            draw_intro(&mut d, &texture, &font, 2.0, Vector2::zero());
             save_frame(&dir.join("intro-last.png"), w, h)?;
         }
-        {
-            let mut d = rl.begin_drawing(&thread);
-            draw_construction(&mut d, w, h);
-            save_frame(&dir.join("construction.png"), w, h)?;
+        // El juego completo, jugado solo con las mejores respuestas
+        let result = super::smilingfriends_game::play(&mut rl, &thread, root, true)?;
+        if result != Some(MinigameResult::Victory) {
+            return Err(format!("La prueba del minijuego terminó en {result:?}").into());
         }
         println!(
             "SMILINGFRIENDS_ENTRY_SMOKE_PASS frames={} duration={:.2}s audio={audio_length:?}",
@@ -204,13 +160,17 @@ pub fn run(args: impl Iterator<Item = String>) -> Result<MinigameExit, Box<dyn s
     }
     let started = Instant::now();
     let mut current = 0usize;
-    let mut construction = false;
+    let mut construction = false;                       // true: terminó el video, empieza el juego
     while !rl.window_should_close() {
         if let Some(track) = music.as_mut() {
             track.update_stream();
         }
         if !construction {
-            if rl.is_key_pressed(KeyboardKey::KEY_ESCAPE)
+            let skip_clicked = rl.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_LEFT)
+                && skip_button(rl.get_screen_width() as f32, rl.get_screen_height() as f32)
+                    .check_collision_point_rec(rl.get_mouse_position());
+            if skip_clicked
+                || rl.is_key_pressed(KeyboardKey::KEY_ESCAPE)
                 || rl.is_key_pressed(KeyboardKey::KEY_SPACE)
                 || rl.is_key_pressed(KeyboardKey::KEY_ENTER)
             {
@@ -230,18 +190,16 @@ pub fn run(args: impl Iterator<Item = String>) -> Result<MinigameExit, Box<dyn s
                     current = frame;
                 }
             }
-        } else if rl.is_key_pressed(KeyboardKey::KEY_ENTER)
-            || rl.is_key_pressed(KeyboardKey::KEY_ESCAPE)
-        {
-            return Ok(MinigameExit::Returned(MinigameResult::Abandoned));
-        }
-        let (w, h) = (rl.get_screen_width(), rl.get_screen_height());
-        let mut d = rl.begin_drawing(&thread);
-        if construction {
-            draw_construction(&mut d, w, h);
         } else {
-            draw_video(&mut d, &texture, w, h);
+            return Ok(match super::smilingfriends_game::play(&mut rl, &thread, root, false)? {
+                Some(result) => MinigameExit::Returned(result),
+                None => MinigameExit::WindowClosed,
+            });
         }
+        let mouse = rl.get_mouse_position();
+        let time = started.elapsed().as_secs_f32();
+        let mut d = rl.begin_drawing(&thread);
+        draw_intro(&mut d, &texture, &font, time, mouse);
     }
     Ok(MinigameExit::WindowClosed)
 }
