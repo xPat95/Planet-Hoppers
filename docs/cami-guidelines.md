@@ -156,12 +156,13 @@ Cada elemento grande se modela **por separado** (edificio, cada bosque, infierno
 
 ### 1.7 Nave: OVNI
 
-Basada en el platillo volador de T2 EP6 "Charlie, Pim, and Bill vs. the Alien". Debe ser **simple**.
+Basada en el platillo volador de T2 EP6 "Charlie, Pim, and Bill vs. the Alien", con **Pim y Charlie visibles adentro**. Calidad de referencia: el carrito de Un Show Más.
 
-- Platillo plateado y metálico, con paneles marcados por líneas finas.
-- Cúpula negra brillante encima.
+- Platillo plateado y metálico, con paneles marcados por líneas finas. Más grande que antes (radio 3) para que entren los dos.
+- Cúpula de **vidrio transparente**, sin costillas ni tubos, para ver la cabina.
+- Cabina como en la escena de la serie: piso verde azulado y dos asientos con respaldo ovalado de borde claro. Adelante, un **tablero de mando chico** (pantallas, botones, palancas), más bajo que ellos.
+- **Pim y Charlie mirándose** delante de sus asientos: Pim gritando con los brazos arriba; Charlie saludándolo con la boca abierta. Son **figuras 3D descargadas** (STL), pintadas por zonas y con contorno negro, no modelos hechos a mano: los intentos a mano no se parecían lo suficiente.
 - Haz de abducción verde translúcido que sale por debajo; es el mismo que se usa para abducir a Pim y Charlie.
-- Low-poly: un disco aplanado más una media esfera bastan.
 
 ### 1.8 Decisiones abiertas
 

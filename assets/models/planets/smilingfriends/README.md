@@ -23,15 +23,15 @@ La Tierra plana de la serie: un disco con océano, una masa de tierra central y 
 Todo depende de `SmilingFriends_Planet_ROOT`, en el origen. Colecciones: `Planet_Base`, `Land`, `Rim` (nubes), `Hell`, `Zones` (una subcolección por zona y `Roads`), `LOD_Far` (nubes lejanas, ocultas) y `Presentation` (cámara y luces; excluir al exportar).
 
 - **Radio del disco:** 24 unidades (South Park: esfera de radio 22).
-- **Contorno de caricatura:** modificador `Outline` (Solidify invertido) en casi todas las mallas, solo para la vista en Blender. No es geometría del modelo: omitirlo al exportar; en el motor se hará como shader de contorno. El Forest Demon no lleva contorno (estilo plastilina).
+- **Contorno de caricatura:** modificador `Outline` (Solidify invertido) en casi todas las mallas, solo para la vista en Blender. La exportación al juego lo conserva como geometría y el juego lo dibuja en negro. El Forest Demon no lleva contorno (estilo plastilina).
 - **Materiales:** colores planos con prefijo `SF_`, sin texturas externas. Los letreros son texto convertido a malla.
 
 ## Presupuesto
 
 | Medida | Valor |
 | --- | ---: |
-| Triángulos de cerca (sin contorno) | ~202 000 |
-| Triángulos de lejos (nubes `LOD_Far`) | ~162 000 |
+| Triángulos de cerca (sin contorno) | ~361 000 |
+| Triángulos de lejos (nubes `LOD_Far`) | ~248 000 |
 
 Calidad: `Q` (variable `SF_QUALITY`, 1.6 por defecto) multiplica los lados de todas las piezas redondas (árboles, nubes, arbustos, rocas, Shmaloogles...); las piezas facetadas a propósito (pirámides, agujas de 3 o 4 lados) no cambian. `SF_QUALITY=1` da la versión liviana anterior (~98 000). Satanás tiene el cuerpo esculpido (`SF_Hell_Satan_Body`: remesh y suavizado como el Forest Demon, con músculos y cara marcados; sin contorno), con `SATAN_TRIS` caras. Siguiente ahorro recomendado: versión lejana de los árboles.
 
@@ -41,4 +41,12 @@ Calidad: `Q` (variable `SF_QUALITY`, 1.6 por defecto) multiplica los lados de to
 
 ## Exportación para el juego
 
-[smilingfriends_planet.glb](exports/smilingfriends_planet.glb): GLB para el [sistema solar](../../../../docs/solar-system.md), generado con [export_solar_models.py](../../../../tools/blender/solarsystem/export_solar_models.py) sin modificar el `.blend` (se excluyen `Presentation`, cámaras y luces). ~221 000 triángulos, sin el contorno `Outline` ni `LOD_Far`. Volver a exportar después de cambiar el modelo.
+[smilingfriends_planet.glb](exports/smilingfriends_planet.glb): GLB para el [sistema solar](../../../../docs/solar-system.md), generado con [export_solar_models.py](../../../../tools/blender/solarsystem/export_solar_models.py) sin modificar el `.blend` (se excluyen `Presentation`, cámaras y luces). ~736 000 triángulos: lleva el contorno `Outline` como geometría (material `SF_Outline`, que el juego dibuja en negro), sin `LOD_Far`. Volver a exportar después de cambiar el modelo.
+
+## Mejoras de calidad (noviembre 2026)
+
+- Nubes más redondas (más lados por bola) y todos los árboles iguales: los cuatro de la calle de la ciudad usan el mismo árbol de copas redondas que el resto, y todas las copas tienen más lados.
+- Casas Shmaloogle de una sola pieza (perfil girado, sin costura entre pared y cúpula), con puerta de arco y marco pegados a la pared, escalón, y ventana redonda hundida con su cruz.
+- Edificios de Río con bandas de ventanas por piso y cornisa en el techo.
+- Picos de hielo de la cara inferior: racimos de cristales hexagonales facetados con la punta más clara.
+- Cristo Redentor modelado: pedestal escalonado, túnica que se angosta en la faja, brazos abiertos con las mangas colgando, manos, cuello y cabeza; el Corcovado es un cerro redondeado.

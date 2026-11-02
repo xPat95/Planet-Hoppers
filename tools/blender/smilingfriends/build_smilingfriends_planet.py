@@ -222,6 +222,30 @@ class Part:
         low = [v for v in self.bm.verts if v not in before and v.co.z < loc[2] - 1e-4]
         bmesh.ops.delete(self.bm, geom=low, context="VERTS")
 
+    def lathe(self, m, profile, loc, seg=24, scale=(1, 1, 1), rot_z=0.0, smooth=True):
+        """Superficie de revolución: profile = [(radio, z), ...] de abajo hacia arriba; radio 0 cierra en punta.
+        scale aplasta o estira la pieza (por ejemplo, una túnica más plana de frente que de costado)."""
+        bm = self.bm
+        before = set(bm.faces)
+        M_ = mtx(loc, rot_z, scale=scale)
+        rings_ = []
+        for r, z in profile:
+            if r < 1e-6:
+                rings_.append([bm.verts.new(M_ @ Vector((0, 0, z)))])
+            else:
+                rings_.append([bm.verts.new(M_ @ Vector((r * math.cos(a), r * math.sin(a), z)))
+                               for a in (k / seg * math.tau for k in range(seg))])
+        for r0, r1 in zip(rings_, rings_[1:]):
+            for k in range(seg):
+                k1 = (k + 1) % seg
+                if len(r0) == 1:
+                    bm.faces.new((r0[0], r1[k1], r1[k]))
+                elif len(r1) == 1:
+                    bm.faces.new((r0[k], r0[k1], r1[0]))
+                else:
+                    bm.faces.new((r0[k], r0[k1], r1[k1], r1[k]))
+        self._tag(before, m, smooth)
+
     def ico(self, m, r, loc, subdiv=1, scale=(1, 1, 1)):
         self.op(m, "create_icosphere", subdivisions=subdiv, radius=r, matrix=mtx(loc, scale=scale))
 
@@ -686,8 +710,8 @@ def _puff(part, cx, cy, cz, r, flat=0.85):
     if CLOUD_LOD:
         part.sphere(M["cloud"], r, (cx, cy, cz), seg=5, rings=3, scale=(1, 1, flat))
         return
-    small = r < 0.6
-    part.sphere(M["cloud"], r, (cx, cy, cz), seg=7 if small else 9, rings=4 if small else 5, scale=(1, 1, flat))
+    small = r < 0.6                                     # Más lados que antes: bolas redondas, no facetadas
+    part.sphere(M["cloud"], r, (cx, cy, cz), seg=10 if small else 12, rings=6 if small else 7, scale=(1, 1, flat))
 
 
 def _at(cx, cy, t, d, n=0.0):
@@ -871,6 +895,30 @@ for f in faces:
     f.normal_update()
     if f.normal.z > 0:
         f.normal_flip()
+def crystal(part, m, tip_m, base, direction, r, length):
+    """Cristal de hielo facetado: prisma hexagonal y punta, de `base` hacia `direction`, con la punta más clara."""
+    d = Vector(direction).normalized()
+    rot = d.to_track_quat("Z", "Y").to_matrix().to_4x4()
+    body = length * 0.68
+    for mm, r1, r2, z0, z1 in ((m, r, r * 0.92, 0.0, body), (tip_m, r * 0.92, 0.0, body, length)):
+        part.op(mm, "create_cone", cap_ends=False, segments=6, radius1=r1, radius2=r2, depth=z1 - z0,
+                matrix=Matrix.Translation(Vector(base) + d * (z0 + z1) / 2) @ rot)
+
+
+def ice_cluster(part, pal, x, y, z0, r, h, rnd):
+    """Racimo de cristales hacia abajo: uno grande al centro y dos o tres chicos inclinados hacia afuera."""
+    base = (x, y, z0)
+    a0 = rnd.uniform(0, math.tau)
+    tip = pal[0] if pal is ICE else ICE[0]
+    crystal(part, pal[rnd.randrange(3)], tip, base, (0, 0, -1), r, h)
+    for j in range(rnd.choice((2, 3))):
+        a = a0 + j * math.tau / 3 + rnd.uniform(-0.4, 0.4)
+        lean = rnd.uniform(0.35, 0.7)
+        off = Vector((math.cos(a), math.sin(a), 0)) * r * 0.9
+        crystal(part, pal[rnd.randrange(3)], tip, Vector(base) + off,
+                (math.cos(a) * lean, math.sin(a) * lean, -1), r * rnd.uniform(0.45, 0.65), h * rnd.uniform(0.4, 0.65))
+
+
 # Picos de hielo que salen de la masa: más azules y cortos hacia el borde, más claros y largos hacia adentro
 for x, y in scatter(hrng, 190, R - 0.4, 0.95):
     r = math.hypot(x, y)
@@ -881,7 +929,7 @@ for x, y in scatter(hrng, 190, R - 0.4, 0.95):
     w = (0.5 + 0.55 * k) * hrng.uniform(0.8, 1.2)
     z0 = -TOP - under_depth(r) + 0.35                 # Nace dentro de la masa: no queda flotando
     pal = ICE_EDGE if k < 0.45 else ICE
-    under.cyl(pal[hrng.randrange(3)], 0.0, w, h, (x, y, z0 - h / 2), seg=6, rot_z=hrng.uniform(0, 1))
+    ice_cluster(under, pal, x, y, z0, w * 0.55, h, hrng)
 # Cráter del infierno: llamas, picos de roca roja y brillo en el borde
 FIRE = [mat("FireRed", "#ff3a10", emit=0.9), mat("FireOrange", "#ff8a00", emit=1.3), mat("FireYellow", "#ffd000", emit=1.8)]
 for x, y in scatter(hrng, 46, HELL_R - 0.6, 1.0):          # Llamas: tres conos (rojo, naranja, amarillo) por llama
@@ -1178,12 +1226,7 @@ skyline(backdrop, mat("SkylineNear", "#b783c6"), SF_FRONT + BACKDROP_Y[0], 3.1, 
 backdrop.place(CITY)
 backdrop.build(C_SF, ROOT)
 
-st = Part("SF_City_StreetTrees")
-for x, y in ((8.6, SF_FRONT - 0.3), (-8.9, SF_FRONT - 0.3), (1.3, FF_FRONT + 0.3), (-7.6, FF_FRONT + 0.3)):
-    st.cyl(M["crust"], 0.07, 0.07, 0.9, (x, y, 0.45), seg=6)
-    st.ico(M["leaf"], 0.42, (x, y, 1.15), subdiv=1, scale=(1, 1, 1.15))
-st.place(CITY)
-st.build(C_SF, ROOT)
+STREET_TREES = ((8.6, SF_FRONT - 0.3), (-8.9, SF_FRONT - 0.3), (1.3, FF_FRONT + 0.3), (-7.6, FF_FRONT + 0.3))
 
 
 def in_city(p, margin=0.0):
@@ -1328,10 +1371,17 @@ def puffy_tree(part, x, y, z, h, leaf, trunk=None):
     seg_cyl(part, tr, (x, y, z), fork, 0.075 * h, 0.05 * h, 5)
     seg_cyl(part, tr, fork, b1, 0.045 * h, 0.022 * h, 4)
     seg_cyl(part, tr, fork, b2, 0.045 * h, 0.022 * h, 4)
-    part.sphere(leaf, 0.3 * h, (x + ca * 0.03 * h, y + sa * 0.03 * h, z + 0.82 * h), seg=6, rings=3, scale=(1, 1, 0.85))
-    part.sphere(leaf, 0.23 * h, (b1[0], b1[1], b1[2] + 0.08 * h), seg=6, rings=3, scale=(1, 1, 0.85))
-    part.sphere(leaf, 0.21 * h, (b2[0], b2[1], b2[2] + 0.07 * h), seg=6, rings=3, scale=(1, 1, 0.85))
+    part.sphere(leaf, 0.3 * h, (x + ca * 0.03 * h, y + sa * 0.03 * h, z + 0.82 * h), seg=9, rings=5, scale=(1, 1, 0.85))
+    part.sphere(leaf, 0.23 * h, (b1[0], b1[1], b1[2] + 0.08 * h), seg=9, rings=5, scale=(1, 1, 0.85))
+    part.sphere(leaf, 0.21 * h, (b2[0], b2[1], b2[2] + 0.07 * h), seg=9, rings=5, scale=(1, 1, 0.85))
 
+
+# Árboles de la calle: los mismos árboles redondos del resto del planeta
+st = Part("SF_City_StreetTrees")
+for x, y in STREET_TREES:
+    puffy_tree(st, x, y, 0.0, 1.35, M["leaf"])
+st.place(CITY)
+st.build(C_SF, ROOT)
 
 central_trees = Part("SF_Central_Trees")
 HILL_S = (2.5, 2.5, 3.3)   # Colina redonda y alta (radio, radio, alto), como una casa Shmaloogle
@@ -1923,10 +1973,15 @@ def facing(x, y):
 
 
 def gumdrop(part, x, y, r, h, m):
-    """Casa en forma de gomita: cilindro y cúpula alargada encima. Devuelve la altura de la cima."""
-    part.cyl(m, r, r, h, (x, y, LAND + h / 2), seg=14)
-    part.dome(m, r, (x, y, LAND + h), seg=14, rings=8, scale=(1, 1, 0.9))
-    return LAND + h + r * 0.9
+    """Casa en forma de gomita, de una sola pieza: base apenas más ancha, paredes que se curvan solas hasta una
+    cúpula alargada (sin costura entre cilindro y techo). Devuelve la altura de la cima."""
+    top = h + r * 0.9
+    prof = [(r * 1.04, 0.0), (r * 1.02, h * 0.15), (r, h * 0.55), (r * 0.99, h)]
+    for k in range(1, 9):                                 # Cúpula: un cuarto de elipse
+        a = k / 8 * math.pi / 2
+        prof.append((r * 0.99 * math.cos(a), h + r * 0.9 * math.sin(a)))
+    part.lathe(m, prof, (x, y, LAND), seg=26)
+    return LAND + top
 
 
 def spiral_stalk(part, base, height, size, turn):
@@ -1960,13 +2015,18 @@ for i, (x, y) in enumerate(houses_xy):
     village.detail = True
     # Puerta de arco y ventana redonda en cruz, en la cara que mira al espectador
     door = Part("_d")
-    door.box(DOOR, (0.3, 0.06, 0.32), (0, -r - 0.01, LAND + 0.16))
-    door.cyl(DOOR, 0.15, 0.15, 0.06, (0, -r - 0.01, LAND + 0.32), seg=10, rot_x=math.radians(90))
+    # Puerta de arco pegada a la pared (sigue la curva) con su marco, y escalón redondo delante
+    door.box(WIN_RIM, (0.36, 0.05, 0.36), (0, -r + 0.005, LAND + 0.18))
+    door.cyl(WIN_RIM, 0.18, 0.18, 0.05, (0, -r + 0.005, LAND + 0.36), seg=14, rot_x=math.radians(90))
+    door.box(DOOR, (0.28, 0.06, 0.32), (0, -r - 0.005, LAND + 0.16))
+    door.cyl(DOOR, 0.14, 0.14, 0.06, (0, -r - 0.005, LAND + 0.32), seg=14, rot_x=math.radians(90))
+    door.cyl(WIN_RIM, 0.24, 0.24, 0.05, (0, -r - 0.12, LAND + 0.025), seg=16, scale=(1, 0.6, 1))
     wz = LAND + h * 0.85
-    door.cyl(WIN_RIM, 0.17, 0.17, 0.06, (0, -r - 0.01, wz), seg=12, rot_x=math.radians(90))
-    door.cyl(WIN_IN, 0.12, 0.12, 0.06, (0, -r - 0.03, wz), seg=12, rot_x=math.radians(90))
-    door.box(WIN_RIM, (0.24, 0.05, 0.035), (0, -r - 0.05, wz))
-    door.box(WIN_RIM, (0.035, 0.05, 0.24), (0, -r - 0.05, wz))
+    # Ventana redonda hundida: marco grueso, vidrio un poco adentro y la cruz
+    door.cyl(WIN_RIM, 0.18, 0.18, 0.07, (0, -r + 0.01, wz), seg=18, rot_x=math.radians(90))
+    door.cyl(WIN_IN, 0.13, 0.13, 0.07, (0, -r - 0.005, wz), seg=18, rot_x=math.radians(90))
+    door.box(WIN_RIM, (0.26, 0.045, 0.035), (0, -r - 0.03, wz))
+    door.box(WIN_RIM, (0.035, 0.045, 0.26), (0, -r - 0.03, wz))
     door.place(fw)
     door.detail = True
     merge(village, door)
@@ -2243,27 +2303,52 @@ for _t in (i / 20 for i in range(21)):                     # Corcovado: de Río 
         break
 rock, jungle = mat("CorcovadoRock", "#7d8572"), M["land"]   # Base del cerro: mismo pasto que la isla
 # Corcovado: cerro empinado y rocoso, con la cumbre corrida a un lado y la base cubierta de selva
-bz.cyl(jungle, 1.7, 0.9, 1.0, (cx_, cy_, LAND + 0.5), seg=10)
-bz.cyl(rock, 1.0, 0.32, 2.6, (cx_ + 0.15, cy_ - 0.1, LAND + 1.0 + 1.3), seg=8, rot_z=0.3)   # cumbre plana
-bz.cyl(rock, 0.7, 0.0, 1.8, (cx_ - 0.55, cy_ + 0.35, LAND + 1.0 + 0.9), seg=7, rot_z=1.1)
-bz.cyl(jungle, 1.15, 0.7, 0.6, (cx_ + 0.1, cy_, LAND + 1.3), seg=9, rot_z=0.5)
-peak = (cx_ + 0.15, cy_ - 0.1, LAND + 1.0 + 2.6 - 0.05)    # Sobre la cumbre plana
-# Cristo Redentor, más grande, de frente a la ciudad
+bz.lathe(jungle, [(1.75, 0.0), (1.55, 0.45), (1.1, 0.95), (0.85, 1.25)], (cx_, cy_, LAND), seg=28)   # Ladera de selva
+bz.lathe(rock, [(1.0, 0.9), (0.82, 1.7), (0.55, 2.5), (0.42, 3.15), (0.34, 3.5), (0.0, 3.55)],
+         (cx_ + 0.15, cy_ - 0.1, LAND), seg=26, scale=(1, 0.85, 1))                                # Cumbre redondeada
+bz.lathe(rock, [(0.7, 0.9), (0.5, 1.6), (0.25, 2.3), (0.0, 2.55)], (cx_ - 0.55, cy_ + 0.35, LAND), seg=20)
+peak = (cx_ + 0.15, cy_ - 0.1, LAND + 3.5)                # Sobre la cumbre
+# Cristo Redentor de frente a la ciudad: pedestal escalonado, túnica que se angosta en la faja, brazos abiertos
+# con las mangas colgando, manos, cuello y cabeza levemente inclinada
 stone = mat("Statue", "#e3e1d8")
-k = 1.15
-bz.box(stone, (0.4 * k, 0.4 * k, 0.3 * k), (peak[0], peak[1], peak[2] + 0.1 * k))
-bz.cyl(stone, 0.26 * k, 0.14 * k, 1.2 * k, (peak[0], peak[1], peak[2] + 0.85 * k), seg=10)
-bz.box(stone, (1.4 * k, 0.14 * k, 0.14 * k), (peak[0], peak[1], peak[2] + 1.3 * k))
-bz.sphere(stone, 0.13 * k, (peak[0], peak[1], peak[2] + 1.58 * k), seg=8, rings=5)
+stone_d = mat("StatueShade", "#cfccc2")
+jesus = Part("_jesus")
+jesus.box(stone_d, (0.62, 0.62, 0.14), (0, 0, 0.07))
+jesus.box(stone, (0.5, 0.5, 0.42), (0, 0, 0.35))
+jesus.box(stone_d, (0.58, 0.58, 0.07), (0, 0, 0.595))
+jesus.lathe(stone, [(0.27, 0.63), (0.25, 0.9), (0.215, 1.25), (0.19, 1.45), (0.205, 1.58), (0.235, 1.78),
+                    (0.225, 1.92), (0.16, 2.0), (0.07, 2.04), (0.0, 2.05)], (0, 0, 0), seg=24, scale=(1, 0.72, 1))
+jesus.lathe(stone_d, [(0.198, 1.43), (0.205, 1.46), (0.205, 1.5), (0.198, 1.53)], (0, 0, 0), seg=24, scale=(1, 0.74, 1))
+for sx in (-1, 1):
+    shoulder, hand = Vector((sx * 0.2, 0, 1.92)), Vector((sx * 0.98, 0, 1.9))
+    seg_cyl(jesus, stone, shoulder, hand, 0.085, 0.06, 12)
+    jesus.sphere(stone, 0.075, tuple(shoulder), seg=10, rings=6)
+    jesus.sphere(stone, 0.06, tuple(hand + Vector((sx * 0.04, 0, 0))), seg=10, rings=6, scale=(1.3, 0.7, 1))
+    # Manga: tela que cuelga del brazo hasta el costado de la túnica (la silueta de la estatua)
+    jesus.prism(stone, [(sx * 0.2, -0.05, 1.88), (sx * 0.72, -0.05, 1.86), (sx * 0.24, -0.05, 1.47)], (0, 0.1, 0))
+jesus.cyl(stone, 0.065, 0.075, 0.12, (0, 0, 2.08), seg=12)
+jesus.sphere(stone, 0.12, (0, -0.015, 2.24), seg=14, rings=9, scale=(0.92, 0.95, 1.08))
+jesus.sphere(stone_d, 0.125, (0, 0.01, 2.27), seg=14, rings=9, scale=(0.95, 0.92, 0.95))   # Pelo
+k = 1.05
+face_rio = math.atan2(rio[1] - peak[1], rio[0] - peak[0]) + math.pi / 2   # Frente (-Y local) hacia Río
+jesus.place(Matrix.Translation(peak) @ Matrix.Rotation(face_rio, 4, "Z") @ Matrix.Diagonal((k, k, k, 1)))
+merge(bz, jesus)
 # Ciudad: edificios claros alrededor del Corcovado, sin subir al cerro
+rio_roof, rio_glass = mat("RioRoof", "#b9b2a4"), mat("RioGlass", "#4e6f96")
 city_cols = [mat("RioWhite", "#f1eee6"), mat("RioCream", "#e8d9b8"), mat("RioPeach", "#efb99a"),
              mat("RioBlue", "#a9c8e0"), mat("RioPink", "#e7a8b4")]
 for x, y in scatter_poly(brng, 30, LANDW["Brazil"], 0.5,
                          ok=lambda q: math.dist(q, rio) < 3.6 and math.dist(q, (cx_, cy_)) > 1.9
                          and dist_to_path(q, LANDW["Brazil"] + LANDW["Brazil"][:1]) > 0.35):
     w, h = brng.uniform(0.28, 0.45), brng.uniform(0.35, 1.3)
-    bz.box(city_cols[brng.randrange(len(city_cols))], (w, w * brng.uniform(0.8, 1.2), h), (x, y, LAND + h / 2),
-           rot_z=brng.uniform(0, 0.4))
+    d = w * brng.uniform(0.8, 1.2)
+    rz = brng.uniform(0, 0.4)
+    bz.box(city_cols[brng.randrange(len(city_cols))], (w, d, h), (x, y, LAND + h / 2), rot_z=rz)
+    bz.box(rio_roof, (w + 0.05, d + 0.05, 0.05), (x, y, LAND + h + 0.02), rot_z=rz)        # Cornisa del techo
+    bz.detail = True                                       # Pisos: bandas de ventanas alrededor del edificio
+    for fz in [z for z in (0.2 + 0.2 * i for i in range(8)) if z < h - 0.1]:
+        bz.box(rio_glass, (w + 0.012, d + 0.012, 0.07), (x, y, LAND + fz), rot_z=rz)
+    bz.detail = False
 # Selva amazónica en el norte de la isla
 for x, y in scatter_poly(brng, 70, LANDW["Brazil"], 0.72,
                          ok=lambda q: math.dist(q, rio) > 3.7 and math.dist(q, (cx_, cy_)) > 2.0

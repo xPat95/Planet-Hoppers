@@ -10,7 +10,7 @@ Uso (desde la raíz del repositorio):
 Abre cada .blend, toma todo lo que cuelga de su raíz (`*_ROOT`) y lo exporta, sin guardar nunca el .blend: los
 archivos originales no cambian. Los tintes que glTF no soporta (Minecraft) se hornean en copias de las imágenes. Se dejan afuera la cámara y las luces (`Presentation`) y las versiones lejanas
 (`LOD_Far`), salvo en la exportación lejana, que usa solo eso. El contorno de caricatura (modificador `Outline`) se
-apaga: en el juego no es geometría. Ejes: Y arriba, como las demás exportaciones del repositorio.
+apaga, salvo en la nave y el planeta de Smiling Friends, que lo llevan como geometría (`SF_Outline`) y el juego lo dibuja. Ejes: Y arriba, como las demás exportaciones del repositorio.
 """
 
 import bpy
@@ -21,7 +21,7 @@ import sys
 REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", ".."))
 
 # id: (archivo .blend, raíz, archivo de salida, colecciones que se usan: "near" = todo menos LOD_Far, "far" = solo
-# LOD_Far)
+# LOD_Far; y si conserva el contorno de caricatura como geometría)
 EXPORTS = {
     "minecraft": ("assets/models/planets/minecraft/minecraft_planet_textured_v02.blend", "Minecraft_Planet_ROOT",
                   "assets/models/planets/minecraft/exports/minecraft_planet.glb", "near"),
@@ -29,14 +29,14 @@ EXPORTS = {
                   "assets/models/planets/southpark/exports/southpark_planet.glb", "near"),
     "smilingfriends": ("assets/models/planets/smilingfriends/smilingfriends_planet.blend",
                        "SmilingFriends_Planet_ROOT",
-                       "assets/models/planets/smilingfriends/exports/smilingfriends_planet.glb", "near"),
+                       "assets/models/planets/smilingfriends/exports/smilingfriends_planet.glb", "near", True),
     "halloween": ("assets/models/planets/halloween/halloween_planet.blend", "Halloween_Planet_ROOT",
                   "assets/models/planets/halloween/exports/halloween_planet.glb", "near"),
     "halloween_far": ("assets/models/planets/halloween/halloween_planet.blend", "Halloween_Planet_ROOT",
                       "assets/models/planets/halloween/exports/halloween_planet_far.glb", "far"),
     "smilingfriends_ship": ("assets/models/ships/smilingfriends/smilingfriends_ship.blend",
                             "SmilingFriends_Ship_ROOT",
-                            "assets/models/ships/smilingfriends/exports/smilingfriends_ship.glb", "near"),
+                            "assets/models/ships/smilingfriends/exports/smilingfriends_ship.glb", "near", True),
     "minecraft_ship": ("assets/models/ships/minecraft/end_ship.blend", "EndShip_ROOT",
                        "assets/models/ships/minecraft/exports/end_ship.glb", "near"),
 }
@@ -89,7 +89,8 @@ def bake_multiply_tints():
 
 
 def export(key):
-    blend, root_name, out, part = EXPORTS[key]
+    blend, root_name, out, part, *flags = EXPORTS[key]
+    keep_outline = bool(flags and flags[0])
     bpy.ops.wm.open_mainfile(filepath=os.path.join(REPO, blend))
     root = bpy.data.objects[root_name]
     # Algunos archivos traen otra escena con el cubo por defecto: se borra (el .blend no se guarda) para que el
@@ -102,6 +103,10 @@ def export(key):
     keep = []
     for ob in bpy.context.scene.objects:
         if not under(ob, root) or ob.type in {"CAMERA", "LIGHT"} or in_collection(ob, "presentation"):
+            continue
+        # The abduction beam is an optional effect, not part of the ship's visible hull.
+        # Including it also makes fit-to-bounds previews tiny and lifts the saucer off its platform.
+        if key == "smilingfriends_ship" and ob.name == "SF_Ship_Beam":
             continue
         far = in_collection(ob, "lod_far")
         if (part == "far") != far and ob != root:
@@ -120,9 +125,23 @@ def export(key):
         layer_col.hide_viewport = False
     for ob in keep:
         ob.select_set(True)
+        if ob.name in ("SF_Pim", "SF_Charlie"):           # Figuras de caras parejas (para pintar): más livianas en el juego
+            dec = ob.modifiers.new("Decimate", "DECIMATE")
+            dec.ratio = 0.4
+            bpy.context.view_layer.objects.active = ob
+            with bpy.context.temp_override(object=ob):
+                bpy.ops.object.modifier_move_to_index(modifier=dec.name, index=0)
         for m in getattr(ob, "modifiers", []):
-            if m.name == "Outline":                       # Contorno solo de vista: en el juego es un shader
+            if m.name == "Outline" and not keep_outline:  # Contorno solo de vista (salvo donde el juego lo dibuja)
                 m.show_viewport = m.show_render = False
+    if keep_outline:
+        # El contorno va como geometría: casco invertido negro. El juego lo dibuja descartando las caras de
+        # adelante, así solo se ve el borde. Su material (con nodos que glTF no entiende) pasa a negro liso.
+        ol = bpy.data.materials.get("SF_Outline")
+        if ol and ol.use_nodes:
+            nt = ol.node_tree
+            bsdf = next(n for n in nt.nodes if n.type == "BSDF_PRINCIPLED")
+            nt.links.new(bsdf.outputs[0], next(n for n in nt.nodes if n.type == "OUTPUT_MATERIAL").inputs["Surface"])
     path = os.path.join(REPO, out)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     bpy.ops.export_scene.gltf(filepath=path, export_format="GLB", use_selection=True, export_apply=True,

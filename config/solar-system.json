@@ -45,7 +45,7 @@
       "start_angle_degrees": 260.0,
       "color": "#f5d33b",
       "model": "assets/models/planets/smilingfriends/exports/smilingfriends_planet.glb",
-      "minigame": null
+      "minigame": "smilingfriends"
     },
     {
       "id": "minecraft",

@@ -1,6 +1,7 @@
 mod kenny_dialogue;
 pub mod front_end;
 pub mod minigame_host;
+pub mod smilingfriends_entry;
 mod return_smoke;
 mod session_smoke;
 mod session_ui;

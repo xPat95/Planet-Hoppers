@@ -6,7 +6,8 @@ Los scripts construyen su escena desde cero, guardan el `.blend` y renderizan ca
 | --- | --- |
 | `build_forest_demon.py` | `assets/models/characters/smilingfriends/forest_demon.blend` y `docs/references/smilingfriends/forest_demon_*.png`. |
 | `build_smilingfriends_planet.py` | `assets/models/planets/smilingfriends/smilingfriends_planet.blend` y `docs/references/smilingfriends/smilingfriends_v01_*.png`. Importa el Forest Demon, así que se ejecuta después. |
-| `build_smilingfriends_ship.py` | `assets/models/ships/smilingfriends/smilingfriends_ship.blend` y `docs/references/smilingfriends/ship_*.png`. |
+| `import_figures.py` | `assets/models/characters/smilingfriends/pim.blend` y `charlie.blend` a partir de las figuras STL de `source/` (alivianadas y pintadas por zonas) y `docs/references/smilingfriends/pim_*.png` y `charlie_*.png`. |
+| `build_smilingfriends_ship.py` | `assets/models/ships/smilingfriends/smilingfriends_ship.blend` y `docs/references/smilingfriends/ship_*.png`. Usa los PNG transparentes de `assets/models/characters/smilingfriends/cutouts/`. |
 
 Desde la raíz del repositorio, en PowerShell:
 

@@ -9,6 +9,7 @@ uniform vec3 lightPosition;
 uniform vec3 cameraPosition;
 uniform vec3 emissive;
 uniform float ambient;
+uniform float outline;   // 1 = contorno de caricatura: negro liso; 2 = personaje plano (sin luz)
 out vec4 finalColor;
 void main() {
     // Las imágenes vienen en sRGB y los factores de glTF son lineales: todo se pasa a lineal antes de iluminar
@@ -31,4 +32,10 @@ void main() {
              + rim * 0.05 * vec3(0.35, 0.45, 1.0);   // contorno azulado tenue del lado oscuro
     // Los colores de glTF son lineales: se pasan a la pantalla (raylib no corrige la gamma)
     finalColor = vec4(pow(max(lit, vec3(0.0)), vec3(1.0 / 2.2)), base.a);
+    if (outline > 1.5) {
+        // Personaje de caricatura: los colores planos de su dibujo, sin luz
+        finalColor = vec4(tex.rgb, 1.0);
+    } else if (outline > 0.5) {
+        finalColor = vec4(0.02, 0.02, 0.03, 1.0);
+    }
 }
