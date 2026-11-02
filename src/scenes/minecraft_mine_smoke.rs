@@ -105,7 +105,7 @@ impl Smoke {
             36 => check(
                 s.selected
                     .is_some_and(|i| s.targets[i].id == "ORE_DIAMOND_11")
-                    && s.data.interactive_blocks.len() == 26,
+                    && s.data.interactive_blocks.len() >= 26,
                 "Diamond raycast selects its independent block; E does not extract it",
             )?,
             81 => check(
@@ -167,7 +167,7 @@ impl Smoke {
             || !returned
             || intact.safe_reachable_diamonds.len() < 8
             || future.safe_reachable_diamonds.len() != 14
-            || m.independent_groups().len() != 26
+            || m.independent_groups().len() != s.data.interactive_blocks.len()
         {
             return Err("Mine runtime/layout audit incomplete".into());
         }

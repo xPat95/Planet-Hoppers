@@ -1,0 +1,61 @@
+{
+  "status": "passed",
+  "commands": [
+    {
+      "name": "format",
+      "command": "rustfmt --check --edition 2021 --config skip_children=true src/graphics/mod.rs src/graphics/mining.rs src/graphics/resources.rs src/minigames/minecraft/mod.rs src/minigames/minecraft/mine.rs src/minigames/minecraft/mining.rs src/scenes/minecraft_mine_dev.rs src/scenes/minecraft_mine_smoke.rs src/scenes/minecraft_mining_smoke.rs tests/minecraft_mining.rs",
+      "exit_code": 0,
+      "seconds": 0.11
+    },
+    {
+      "name": "check",
+      "command": "cargo check --offline --locked",
+      "exit_code": 0,
+      "seconds": 1.88
+    },
+    {
+      "name": "build",
+      "command": "cargo build --offline --locked",
+      "exit_code": 0,
+      "seconds": 12.5
+    },
+    {
+      "name": "tests",
+      "command": "cargo test --offline --locked",
+      "exit_code": 0,
+      "seconds": 30.59,
+      "passed": 147,
+      "failed": 0
+    },
+    {
+      "name": "mining",
+      "command": "cargo run --offline --locked --bin minecraft -- --mine --smoke-mining",
+      "exit_code": 0,
+      "seconds": 7.38
+    },
+    {
+      "name": "mine_regression",
+      "command": "cargo run --offline --locked --bin minecraft -- --mine --smoke --capture-dir C:\\Users\\pablo\\AppData\\Local\\Temp\\phase4_mine_regression",
+      "exit_code": 0,
+      "seconds": 4.08
+    },
+    {
+      "name": "southpark",
+      "command": "cargo run --offline --locked --bin southpark -- --smoke --mute",
+      "exit_code": 0,
+      "seconds": 3.06
+    },
+    {
+      "name": "threats",
+      "command": "cargo run --offline --locked --bin southpark -- --smoke-threats --mute",
+      "exit_code": 0,
+      "seconds": 4.46
+    }
+  ],
+  "global_fmt": "cargo fmt --check reports existing formatting differences in untouched files; scoped rustfmt --check passed on every changed Rust file.",
+  "global_format_check": {
+    "command": "cargo fmt --check",
+    "exit_code": 1,
+    "reason": "Pre-existing formatting differences in untouched files, including src/audio.rs; equivalent scoped check passes for all changed Rust files."
+  }
+}

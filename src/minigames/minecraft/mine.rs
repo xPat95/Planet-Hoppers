@@ -26,6 +26,10 @@ pub struct MineBlock {
     pub approach: Option<[f32; 3]>,
     pub initial_visible: bool,
     pub initial_solid: bool,
+    #[serde(default)]
+    pub gate: Option<String>,
+    #[serde(default)]
+    pub occluded_by: Vec<String>,
 }
 #[derive(Deserialize)]
 pub struct LavaRegion {
@@ -126,7 +130,7 @@ impl MineScene {
         }];
         for b in &data.interactive_blocks {
             if !ids.insert(&b.id)
-                || !matches!(b.kind.as_str(), "diamond" | "breakable")
+                || super::mining::BlockKind::from_manifest(&b.kind).is_none()
                 || !b.initial_visible
                 || !b.initial_solid
                 || !b.min.iter().chain(b.max.iter()).all(|n| n.is_finite())

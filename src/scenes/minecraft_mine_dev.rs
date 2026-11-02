@@ -1,5 +1,7 @@
 //! Independent mine preview. Return closes its context normally, then opens the village.
+use crate::minigames::minecraft::mining::{MiningConfig, MiningEvent, MiningSession};
 use crate::{
+    graphics::mining::MiningVisuals,
     graphics::resources::{save_frame, StaticModel},
     minigames::{
         common::fps::{CursorCapture, PlayerInput},
@@ -8,6 +10,8 @@ use crate::{
 };
 use raylib::{ffi, prelude::*};
 use std::path::{Path, PathBuf};
+#[path = "minecraft_mining_smoke.rs"]
+mod mining_smoke;
 #[path = "minecraft_mine_smoke.rs"]
 mod smoke;
 type Error = Box<dyn std::error::Error>;
@@ -15,26 +19,35 @@ type Error = Box<dyn std::error::Error>;
 pub fn run(args: Vec<String>) -> Result<(), Error> {
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let mut config = root.join("config/minecraft-dev.json");
-    let mut output = root.join("docs/references/minecraft/phase3");
+    let mut output = root.join("docs/references/minecraft/phase4");
+    let mut mining_config = root.join("config/minecraft-mining.json");
+    let mut mining_test = false;
     let mut test = false;
     let mut args = args.into_iter();
     while let Some(arg) = args.next() {
         match arg.as_str() {
             "--mine" => {}
             "--smoke" => test = true,
+            "--smoke-mining" => {
+                test = true;
+                mining_test = true;
+            }
+            "--mining-config" => {
+                mining_config = PathBuf::from(args.next().ok_or("Missing mining config")?)
+            }
             "--config" => config = PathBuf::from(args.next().ok_or("Missing config path")?),
             "--capture-dir" => {
                 output = PathBuf::from(args.next().ok_or("Missing capture directory")?)
             }
             "--help" | "-h" => {
-                println!("cargo run --bin minecraft -- --mine [--smoke] [--capture-dir DIR]");
-                println!("WASD/mouse/Shift: FPS. E at SALIDA or Backspace: development exit. Esc: cursor/menu. F12: capture.");
+                println!("cargo run --bin minecraft -- --mine [--smoke | --smoke-mining] [--mining-config FILE] [--capture-dir DIR]");
+                println!("WASD/mouse/Shift: FPS. Mantener clic izquierdo: picar. R: reiniciar. E en SALIDA / Backspace: salir. Esc: cursor/menu. F12: captura.");
                 return Ok(());
             }
             _ => return Err(format!("Unknown mine option: {arg}").into()),
         }
     }
-    let return_to_surface = window(&root, &config, &output, test)?;
+    let return_to_surface = window(&root, &config, &mining_config, &output, test, mining_test)?;
     if return_to_surface {
         println!("MINE_DEV_RETURN_SURFACE");
         if test {
@@ -54,9 +67,18 @@ pub fn run(args: Vec<String>) -> Result<(), Error> {
     Ok(())
 }
 
-fn window(root: &Path, config: &Path, output: &Path, test: bool) -> Result<bool, Error> {
-    let manifest = root.join("assets/models/minigames/minecraft/mine/minecraft_mine.scene.json");
+fn window(
+    root: &Path,
+    config: &Path,
+    mining_config: &Path,
+    output: &Path,
+    test: bool,
+    mining_test: bool,
+) -> Result<bool, Error> {
+    let manifest = root.join("assets/models/minigames/minecraft/mining/minecraft_mine.scene.json");
     let mut scene = MineScene::load(&manifest, MinecraftConfig::load(config)?)?;
+    let mut mining = MiningSession::new(&scene, MiningConfig::load(mining_config)?);
+    let visuals = MiningVisuals::default();
     let (mut rl, thread) = raylib::init()
         .size(1280, 800)
         .resizable()
@@ -84,12 +106,16 @@ fn window(root: &Path, config: &Path, output: &Path, test: bool) -> Result<bool,
     let mut return_to_surface = false;
     let mut frame = 0;
     let mut smoke = smoke::Smoke::default();
+    let mut mining_smoke = mining_smoke::Smoke::new(&scene);
     while !rl.window_should_close() {
-        if test {
+        if mining_test {
+            mining_smoke.before(frame, &mut scene, &mining, &rl);
+        } else if test {
             smoke.before(frame, &mut scene, &rl);
         }
         let focused = test || rl.is_window_focused();
         let was_menu = menu;
+        let was_captured = cursor.captured;
         let mut input = PlayerInput::read(&rl);
         if menu {
             if focused && rl.is_key_pressed(KeyboardKey::KEY_ESCAPE) {
@@ -133,13 +159,62 @@ fn window(root: &Path, config: &Path, output: &Path, test: bool) -> Result<bool,
             cursor.captured = !menu;
             cursor.apply(&mut rl);
         }
-        if test {
+        let dt = if test {
+            1.0 / 60.0
+        } else {
+            rl.get_frame_time()
+        };
+        let reset = !menu && cursor.captured && focused && rl.is_key_pressed(KeyboardKey::KEY_R);
+        if reset {
+            mining.reset_mining_session(&mut scene);
+        }
+        mining.update(
+            &mut scene,
+            rl.is_mouse_button_down(MouseButton::MOUSE_BUTTON_LEFT),
+            !reset
+                && !menu
+                && !was_menu
+                && was_captured
+                && cursor.captured
+                && focused
+                && !return_to_surface,
+            dt,
+        );
+        let events = mining.drain_events();
+        for event in &events {
+            match event {
+                MiningEvent::BlockDestroyed { block, .. } => {
+                    if !model.set_group_visible(block, false) {
+                        return Err(format!("Missing render group {block}").into());
+                    }
+                }
+                MiningEvent::SessionReset => {
+                    for block in &mining.blocks {
+                        model.set_group_visible(&block.id, true);
+                    }
+                }
+                _ => {}
+            }
+        }
+        if mining_test {
+            mining_smoke.after(
+                frame,
+                &scene,
+                &mining,
+                &model,
+                menu,
+                return_to_surface,
+                &events,
+            )?;
+        } else if test {
             smoke.after(frame, &scene, &cursor, &rl, menu, return_to_surface)?;
         }
         let camera = scene.player.camera();
         let w = rl.get_screen_width();
         let h = rl.get_screen_height();
-        let capture = if test {
+        let capture = if mining_test {
+            mining_smoke.capture(frame, &mining)
+        } else if test {
             smoke::capture(frame)
         } else if rl.is_key_pressed(KeyboardKey::KEY_F12) {
             Some("runtime_manual.png")
@@ -152,6 +227,10 @@ fn window(root: &Path, config: &Path, output: &Path, test: bool) -> Result<bool,
             {
                 let mut view = d.begin_mode3D(camera);
                 model.draw(&mut view, camera.position);
+                visuals.draw_cracks(&mut view, &mining);
+            }
+            if !menu {
+                visuals.draw_pickaxe(&mut d, w, h, &mining);
             }
             d.draw_rectangle(0, 0, w, 62, Color::new(8, 13, 18, 235));
             d.draw_text(
@@ -162,18 +241,18 @@ fn window(root: &Path, config: &Path, output: &Path, test: bool) -> Result<bool,
                 Color::new(112, 233, 236, 255),
             );
             d.draw_text(
-                "Exploración de desarrollo - minerales y lava sin mecánicas",
+                "Minería selectiva - sin tiempo límite ni peligros activos",
                 20,
                 41,
                 16,
                 Color::LIGHTGRAY,
             );
             d.draw_rectangle(0, h - 35, w, 35, Color::new(8, 13, 18, 235));
-            d.draw_text("WASD / Mouse / Shift    E: salida    Backspace: volver    Esc: cursor    F12: captura",14,h-25,16,Color::WHITE);
+            d.draw_text("WASD / Mouse / Shift   Clic: picar   R: reiniciar   E: salida   Backspace: volver   Esc: cursor",14,h-25,16,Color::WHITE);
             d.draw_line(w / 2 - 5, h / 2, w / 2 + 5, h / 2, Color::WHITE);
             d.draw_line(w / 2, h / 2 - 5, w / 2, h / 2 + 5, Color::WHITE);
             if !menu {
-                if let Some(i) = scene.selected.filter(|_| cursor.captured) {
+                if let Some(i) = scene.selected.filter(|i| cursor.captured && *i == 0) {
                     let text = if i == 0 {
                         "[E] Salir del modo de prueba".to_string()
                     } else {
@@ -189,6 +268,7 @@ fn window(root: &Path, config: &Path, output: &Path, test: bool) -> Result<bool,
                     );
                     d.draw_text(&text, (w - width) / 2, h / 2 + 31, 21, Color::YELLOW);
                 }
+                visuals.draw_hud(&mut d, w, h, &mining);
                 if !cursor.captured {
                     d.draw_text(
                         "Cursor libre. Clic o Esc para continuar.",
@@ -210,12 +290,14 @@ fn window(root: &Path, config: &Path, output: &Path, test: bool) -> Result<bool,
         if return_to_surface {
             break;
         }
-        if test && frame > smoke::LAST_FRAME {
+        if test && frame > if mining_test { 4000 } else { smoke::LAST_FRAME } {
             return Err("Mine smoke did not choose development exit".into());
         }
     }
     rl.enable_cursor();
-    if test {
+    if mining_test {
+        mining_smoke.finish(output, &scene, &mining, &model, frame, return_to_surface)?;
+    } else if test {
         smoke.finish(output, &scene, &model, frame, return_to_surface)?;
     }
     Ok(return_to_surface)

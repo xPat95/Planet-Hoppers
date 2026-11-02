@@ -1,0 +1,17 @@
+{
+  "status": "passed",
+  "checks": [
+    "Editable blend opens; all 86 extractable cubes have stable IDs, UVs and exclusive collider volumes",
+    "Original PNGs untouched; packed images use Closest; common ore faces removed only from derived static shell",
+    "74 ore niches have structural backing after all blocks are hidden in a disposable scene",
+    "GLB roundtrip preserves geometry, UVs, material palette, independent nodes, axes and scale"
+  ],
+  "original_files": 227,
+  "extractable_blocks": 86,
+  "ore_niches": 74,
+  "meshes": 105,
+  "triangles": 20840,
+  "materials": 20,
+  "images": 16,
+  "solid_colliders": 391
+}

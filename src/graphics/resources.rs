@@ -400,6 +400,12 @@ impl StaticModel {
         }
         found
     }
+    pub fn group_visible(&self, id: &str) -> Option<bool> {
+        self.batches
+            .iter()
+            .find(|b| b.group.as_deref() == Some(id))
+            .map(|b| b.visible)
+    }
     pub fn set_mine_lights(
         &mut self,
         positions: &[Vector3],
