@@ -28,10 +28,18 @@ impl ShipModel {
     /// Model fitting, hangar scale and physical dimensions stay unchanged.
     pub fn camera_length(&self) -> f32 {
         if self.model.contains("/starwars/") {
-            self.length * 0.90
+            self.length * 0.60
         } else {
             self.length
         }
+    }
+    /// Correct the prepared N-1's +Z nose only while loading the flight view.
+    pub fn flight_rotation_degrees(&self) -> [f32; 3] {
+        let mut rotation = self.model_rotation_degrees;
+        if self.model.contains("/starwars/") {
+            rotation[1] += 180.0;
+        }
+        rotation
     }
 }
 

@@ -1,0 +1,87 @@
+cargo :    Compiling planet-hoppers v0.1.0 (C:\Documentos\Pat\uvg\6to Semestre\Graficas\proyecto final\Planet-Hoppers)
+En línea: 7 Carácter: 1
++ cargo test --locked --test station_collision --test station_departure ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (   Compiling pl...Planet-Hoppers):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+    Finished `test` profile [optimized + debuginfo] target(s) in 1.10s
+     Running tests\minigame_returns.rs (target\debug\deps\minigame_returns-65ea1d5eb5ac21a4.exe)
+
+running 4 tests
+test abandonment_requires_a_pending_confirmation_and_cancel_discards_it ... ok
+test result_contract_preserves_identity_for_all_six_minigames ... ok
+test pause_freezes_every_gameplay_phase_and_restores_its_exact_clock ... ok
+test retry_rebuilds_the_whole_attempt_without_changing_balance ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.35s
+
+     Running tests\ship_presentation.rs (target\debug\deps\ship_presentation-b2f3f5b371568cdb.exe)
+
+running 4 tests
+test exhaust_stays_behind_the_hull_and_shrinks_at_cruise_and_boost ... ok
+test flight_camera_is_closer_without_changing_ship_geometry_or_fov ... ok
+test n1_flight_nose_matches_controller_without_altering_hangar_configuration ... ok
+test six_exhibits_show_a_thirty_degree_front_and_rotate_toward_the_viewer ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\ship_selection.rs (target\debug\deps\ship_selection-0396f3c6ac34dfe3.exe)
+
+running 7 tests
+test exhibition_camera_fits_rotating_bounds_between_header_and_footer ... ok
+test new_game_discards_old_ownership_only_after_confirmation ... ok
+test all_six_initial_choices_are_free_and_unlock_exactly_one_ship ... ok
+test browsing_and_cancelling_do_not_mutate_the_current_adventure ... ok
+test launch_resolves_each_identity_without_changing_flight_scale_or_models ... ok
+test docked_fleet_changes_are_confirmed_and_preserve_the_first_ship ... ok
+test change_mode_previews_locked_ships_but_cannot_activate_them ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\ships.rs (target\debug\deps\ships-d3abf296b57cf7de.exe)
+
+running 8 tests
+test avanza_hacia_donde_apunta ... ok
+test explorar_solo_cerca_del_planeta ... ok
+test acompana_al_planeta_en_su_orbita ... ok
+test la_escala_de_vuelo_conserva_naves_y_tiempos_de_aceleracion ... ok
+test el_vuelo_no_depende_de_los_fps ... ok
+test las_naves_del_config_existen ... ok
+test no_atraviesa_el_sol_ni_los_planetas ... ok
+test puede_alcanzar_cualquier_planeta ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+     Running tests\station.rs (target\debug\deps\station-7870e87cc6da13f9.exe)
+
+running 6 tests
+test vertical_ascent_is_independent_of_heading_and_frame_rate_and_respects_turbo ... ok
+test station_is_fixed_above_every_orbit_and_sun_with_a_safe_entry_anchor ... ok
+test docking_waypoint_follows_translation_rotation_and_fitted_scale ... ok
+test station_collision_blocks_turbo_tunnelling_and_recovers_embedded_ship_or_camera ... ok
+test empty_space_outside_the_door_is_free_but_its_frame_is_solid ... ok
+test shared_autopilot_reaches_the_station_safely_in_normal_and_turbo_flight ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.89s
+
+     Running tests\station_collision.rs (target\debug\deps\station_collision-9a175e1cb1360e19.exe)
+
+running 3 tests
+test collision_alignment_uses_the_visual_fit_origin ... ok
+test old_spherical_barrier_was_not_a_world_limit_and_empty_space_is_now_free ... ok
+test transformed_real_surface_blocks_sweeps_and_recovers_without_jitter ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.18s
+
+     Running tests\station_departure.rs (target\debug\deps\station_departure-48d1d2cc63765d18.exe)
+
+running 5 tests
+test all_six_real_ship_bounds_launch_beyond_visual_and_collision_hulls ... ok
+test legacy_dock_lane_does_not_disguise_an_unsafe_launch_and_return_still_works ... ok
+test entry_is_reachable_before_collision_for_all_six_ship_envelopes ... ok
+test first_updates_are_stable_and_forward_input_moves_away_without_collision ... ok
+test departure_respects_rotations_translation_scale_and_mismatched_colliders ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.64s
+

@@ -41,17 +41,19 @@ fn station_is_fixed_above_every_orbit_and_sun_with_a_safe_entry_anchor() {
 #[test]
 fn station_collision_blocks_turbo_tunnelling_and_recovers_embedded_ship_or_camera() {
     let (station, _, ships) = setup();
-    let c = station.center();
-    let offset = Vector3::new(0.0, 0.0, 3000.0);
+    let (lo, hi) = station.hull.boxes().next().unwrap();
+    let c = station.collision_point((lo + hi) * 0.5);
+    let offset = station.exit_forward() * 3000.0;
     let hit = station
         .push_out(c + offset, c - offset, ships.flight.radius)
         .unwrap();
-    assert!(hit.z > c.z);
-    assert!((hit - c).length() >= station.collision_radius + ships.flight.radius);
+    assert!((hit - c).dot(offset) > 0.0);
+    assert!(station.push_out(hit, hit, ships.flight.radius).is_none());
     assert!(station
         .push_out(c + offset, c + offset * 2.0, 1.0)
         .is_none());
-    assert!((station.push_out(c, c, 1.0).unwrap() - c).length() > station.collision_radius);
+    let recovered = station.push_out(c, c, 1.0).unwrap();
+    assert!(station.push_out(recovered, recovered, 1.0).is_none());
 }
 
 #[test]
@@ -168,22 +170,29 @@ fn docking_waypoint_follows_translation_rotation_and_fitted_scale() {
 }
 
 #[test]
-fn dock_access_carves_only_the_configured_lane_not_the_rest_of_the_hull() {
+fn empty_space_outside_the_door_is_free_but_its_frame_is_solid() {
     let (station, _, ships) = setup();
     let p = station.dock_target();
     assert!(station
         .push_out(station.approach(), p, ships.flight.radius)
         .is_none());
     assert!(station
-        .push_out(p, p - station.exit_forward() * 100.0, ships.flight.radius)
-        .is_some());
-    assert!(station
         .push_out(p, p + station.exit_right() * 1000.0, ships.flight.radius)
-        .is_some());
+        .is_none());
     assert!(station
         .push_out(p, p + station.exit_up() * 50.0, ships.flight.radius)
-        .is_some());
+        .is_none());
     assert!(station
         .push_out(p, p + station.exit_forward() * 1000.0, ships.flight.radius)
         .is_none());
+    let post = station.exit_position()
+        + station.exit_right() * (station.dock.width * 0.5 + 0.5)
+        + station.exit_forward() * 4.0;
+    assert!(station
+        .push_out(
+            post + station.exit_forward() * 50.0,
+            post,
+            ships.flight.radius
+        )
+        .is_some());
 }

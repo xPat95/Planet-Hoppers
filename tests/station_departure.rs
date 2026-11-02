@@ -242,14 +242,16 @@ fn entry_is_reachable_before_collision_for_all_six_ship_envelopes() {
             // Off-axis manual approach, outside the narrow corridor, is also usable.
             let near = anchor + station.exit_right() * 25.0 + station.exit_forward() * 10.0;
             let far = near + station.exit_forward() * 200.0;
-            assert!((near - station.center()).length() > station.collision_radius + radius);
+            assert!((near - station.exit_position()).dot(station.exit_forward()) > radius);
             assert!(station.push_out(far, near, radius).is_none());
             assert!(station.in_reach(near, radius));
             assert!(!station.in_reach(far, radius));
             assert!(!station.in_reach(station.center(), radius));
             assert!(!station.in_reach(station.center() - station.exit_forward() * 1000.0, radius));
             // The hull remains solid away from its existing corridor.
-            assert!(station.push_out(near, station.center(), radius).is_some());
+            let (lo, hi) = station.hull.boxes().next().unwrap();
+            let solid = station.collision_point((lo + hi) * 0.5);
+            assert!(station.push_out(near, solid, radius).is_some());
             let plan = station.departure(b).unwrap();
             assert!(!station.in_reach(plan.ship.position, radius));
         }
@@ -341,11 +343,13 @@ fn legacy_dock_lane_does_not_disguise_an_unsafe_launch_and_return_still_works() 
         assert!(station
             .push_out(station.approach(), old, ships.flight.radius)
             .is_none());
-        // Outside the lane, the station's collision remains fully active.
+        // Actual occupied geometry remains solid; the old spherical void does not.
+        let (lo, hi) = station.hull.boxes().next().unwrap();
+        let solid = station.collision_point((lo + hi) * 0.5);
         assert!(station
             .push_out(
-                station.center() + station.exit_right() * station.collision_radius * 2.0,
-                station.center(),
+                solid + station.exit_forward() * 3000.0,
+                solid,
                 ships.flight.radius
             )
             .is_some());

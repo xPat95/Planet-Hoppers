@@ -41,7 +41,7 @@ fn flight_camera_is_closer_without_changing_ship_geometry_or_fov() {
         let camera = chase_position(position, forward, model.camera_length());
         let rear = -(camera - position).dot(forward);
         let expected_ratio = if model.model.contains("/starwars/") {
-            0.828
+            0.552
         } else {
             0.92
         };
@@ -71,6 +71,36 @@ fn exhaust_stays_behind_the_hull_and_shrinks_at_cruise_and_boost() {
                 - rear;
             assert!(extent / old_extent < 0.30);
             assert!(spheres[0].1 / (length * 0.12 * (0.6 + throttle)) < 0.30);
+        }
+    }
+}
+
+#[test]
+fn n1_flight_nose_matches_controller_without_altering_hangar_configuration() {
+    use planet_hoppers::ships::Ship;
+    let root = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let ships = ShipsConfig::load(&root.join("config/ships.json")).unwrap();
+    for model in ships
+        .ships
+        .iter()
+        .filter(|m| m.model.contains("/starwars/"))
+    {
+        assert_eq!(model.model_rotation_degrees, [0.0; 3]);
+        assert_eq!(hangar_nose(model), Vector3::new(0.0, 0.0, 1.0));
+        let r = model.flight_rotation_degrees();
+        let import = Matrix::rotate_x(r[0].to_radians())
+            * Matrix::rotate_y(r[1].to_radians())
+            * Matrix::rotate_z(r[2].to_radians());
+        for yaw in [0.0, 0.7, 3.14, 5.1] {
+            for pitch in [-1.2, 0.0, 0.8] {
+                let mut ship = Ship::new(Vector3::zero(), yaw);
+                ship.pitch = pitch;
+                ship.bank = 0.4;
+                let world =
+                    Matrix::rotate_z(ship.bank) * Matrix::rotate_x(pitch) * Matrix::rotate_y(yaw);
+                let nose = Vector3::new(0.0, 0.0, 1.0).transform_with(import * world);
+                assert!(nose.dot(ship.forward()) > 0.9999);
+            }
         }
     }
 }

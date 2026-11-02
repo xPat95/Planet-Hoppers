@@ -1,0 +1,27 @@
+[
+  {
+    "run": "debug",
+    "exit_code": 0,
+    "passed": true
+  },
+  {
+    "run": "starwars",
+    "exit_code": 0,
+    "passed": true
+  },
+  {
+    "run": "smilingfriends",
+    "exit_code": 0,
+    "passed": true
+  },
+  {
+    "run": "return-starwars",
+    "exit_code": 0,
+    "passed": true
+  },
+  {
+    "run": "return-smilingfriends",
+    "exit_code": 0,
+    "passed": true
+  }
+]

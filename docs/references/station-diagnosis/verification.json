@@ -1,0 +1,41 @@
+{
+  "branch": "main",
+  "cause": "station spherical collider, not a world position limit",
+  "tests_passed": 37,
+  "cargo_check": "PASS",
+  "cargo_build": "PASS",
+  "native_runs": [
+    {
+      "run": "debug",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "run": "starwars",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "run": "smilingfriends",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "run": "return-starwars",
+      "exit_code": 0,
+      "passed": true
+    },
+    {
+      "run": "return-smilingfriends",
+      "exit_code": 0,
+      "passed": true
+    }
+  ],
+  "collision_source_sha256": "e8054952b4be34a8ffd7c8ae70230242f9909ddce75e6549414b0566e807c2a5",
+  "source_model_hash_matches": true,
+  "original_models_hangar_camera_platform_config_orbits_unchanged": true,
+  "debug_default": "OFF, F3 toggle",
+  "cell_size": 4.0,
+  "surface_boxes": 22424,
+  "png_count": 25
+}

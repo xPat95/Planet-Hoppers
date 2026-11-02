@@ -96,6 +96,7 @@ struct Session {
     return_smoke: bool,
     launch_smoke: bool,
     station_smoke: bool,
+    collision_debug: bool,
     docking_smoke: Option<u32>,
     departing: bool,
     game: Option<GameState>,
@@ -181,6 +182,7 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
     let mut return_smoke = false;
     let mut launch_smoke = false;
     let mut station_smoke = false;
+    let mut collision_debug = false;
     let mut docking_smoke = false;
     let mut overview = false;
     let mut args = args;
@@ -189,6 +191,7 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
             "--smoke" => smoke = true,
             "--smoke-launch" => { smoke = true; launch_smoke = true; }
             "--smoke-station" => { smoke = true; station_smoke = true; }
+            "--debug-collisions" => collision_debug = true,
             "--smoke-docking" => { smoke = true; docking_smoke = true; }
             "--smoke-returns" => { smoke = true; visit_smoke = true; return_smoke = true; }
             "--smoke-visit" => {
@@ -199,6 +202,7 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
             "--config" => config_path = PathBuf::from(args.next().ok_or("--config necesita la ruta de un JSON")?),
             "--ships" => ships_path = PathBuf::from(args.next().ok_or("--ships necesita la ruta de un JSON")?),
             "--help" | "-h" => {
+                println!("--debug-collisions: F3 toggles collision surfaces and diagnostics during flight");
                 println!("cargo run --bin solarsystem -- [--overview] [--config PATH] [--ships PATH] [--smoke]");
                 println!("Nave:\n{HELP_SHIP}\nVista general:\n{HELP_OVERVIEW}");
                 println!("--smoke: recorrido automático sin ventana visible; guarda capturas en target/solarsystem/");
@@ -245,6 +249,7 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
         return_smoke,
         launch_smoke,
         station_smoke,
+        collision_debug,
         docking_smoke: docking_smoke.then_some(0),
         departing: true,
         game,
@@ -368,7 +373,7 @@ fn load_ship_model(
 ) -> Option<SpaceModel> {
     let s = &session.ships.ships[session.ship_index];
     if s.model.is_empty() { return None; }
-    SpaceModel::load(rl, thread, &root.join(&s.model), shader, s.model_rotation_degrees, Fit::Length(s.length))
+    SpaceModel::load(rl, thread, &root.join(&s.model), shader, s.flight_rotation_degrees(), Fit::Length(s.length))
         .map_err(|e| eprintln!("Aviso: nave {}: {e}", s.id))
         .ok()
 }
@@ -410,6 +415,10 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
     let station_far = SpaceModel::load(&mut rl, &thread, &root.join(&s.station.model_far), &shader,
         [0.0;3], Fit::Same(station_near.fit, station_near.half_extents))?;
     let mut ship_model = load_ship_model(&mut rl, &thread, root, &shader, s);
+    s.station.align_collision(station_near.fit);
+    if smoke {
+        println!("COLLISION_HULL boxes={} cell={} offset_fraction={:?} world_limit=none",s.station.hull.rows.len(),s.station.hull.cell,s.station.hull.offset_fraction);
+    }
     let departing = std::mem::take(&mut s.departing);
     let departure = if departing {
         let length = s.ships.ships[s.ship_index].length;
@@ -457,6 +466,8 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
     }
     let mut chase = chase_position(s.ship.position, s.ship.forward(), s.ships.ships[s.ship_index].camera_length());
     let mut previous_ship_position = s.ship.position;
+    let mut debug_last = "ninguna".to_owned();
+    let mut debug_camera;
     let mut snap = true;
     let mut fade = if smoke { 0.0 } else { 1.0_f32 }; // 1 = negro; baja al entrar
     let mut leaving: Option<usize> = None;
@@ -482,6 +493,8 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         let accepts_input = (!smoke || s.launch_smoke || s.station_smoke || s.docking_smoke.is_some()) && leaving.is_none() && !entering_station;
         let pressed = |rl: &RaylibHandle, k: KeyboardKey| accepts_input && rl.is_key_pressed(k);
         let down = |rl: &RaylibHandle, k: KeyboardKey| accepts_input && rl.is_key_down(k);
+        if pressed(&rl,KeyboardKey::KEY_F3) {s.collision_debug=!s.collision_debug;}
+        debug_camera="ninguna";
 
         // --- Recorrido automático de prueba (--smoke) -------------------------------------------------------
         let mut capture: Option<String> = None;
@@ -517,7 +530,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 if s.station.in_reach(s.ship.position, station_ship_radius(s, &ship_model)) || entering_station {
                     if !entering_station {
                         let radius=station_ship_radius(s,&ship_model);
-                        if (s.ship.position-s.station.center()).length()<=s.station.collision_radius+radius || s.ship.bumped {
+                        if s.station.push_out(s.ship.position,s.ship.position,radius).is_some() || s.ship.bumped {
                             return Err("La interacción no es accesible fuera del colisionador".into());
                         }
                         println!("ENTRY_OUTSIDE ship={} radius={} centre_distance={}",s.ships.ships[s.ship_index].id,radius,(s.ship.position-s.station.center()).length());
@@ -547,13 +560,47 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             match frame {
                 0 => { s.view = View::Overview; s.focus = None; }
                 10 => capture = Some("station-overview.png".into()),
+                20 => {
+                    s.view=View::Ship;
+                    s.ship=Ship::new(s.station.center()+Vector3::up()*500.0,0.0);
+                    s.ship.look_at(s.station.center());
+                    snap=true;
+                }
+                22 => {
+                    if s.ship.bumped || (s.ship.position-s.station.center()-Vector3::up()*500.0).length()>0.01 {
+                        return Err("Barrera invisible en espacio vacio sobre estacion".into());
+                    }
+                    capture=Some("station-debug-above.png".into());
+                }
+                25 => {
+                    let (lo,hi)=s.station.hull.boxes().next().ok_or("Colisionador vacio")?;
+                    s.ship=Ship::new(s.station.collision_point((lo+hi)*0.5),0.0);
+                    snap=true;
+                }
+                23 => {
+                    s.ship=Ship::new(s.station.center()+Vector3::new(500.0,0.0,0.0),0.0);
+                    s.ship.look_at(s.station.center());
+                    snap=true;
+                }
+                24 => {
+                    if s.ship.bumped || (s.ship.position-s.station.center()-Vector3::new(500.0,0.0,0.0)).length()>0.01 {
+                        return Err("Barrera invisible al costado de estacion".into());
+                    }
+                    capture=Some("station-debug-side.png".into());
+                }
+                27 => {
+                    if s.ship.bumped || s.station.push_out(s.ship.position,s.ship.position,station_ship_radius(s,&ship_model)).is_some() {
+                        return Err("Recuperacion de colision inestable".into());
+                    }
+                    capture=Some("station-debug-recovery.png".into());
+                }
                 15 => {
                     s.focus = Some(Destination::Station);
                     s.orbit.distance = s.station.length * 2.0;
                     s.orbit.pitch = 0.3;
                     s.orbit.yaw = 1.1;
                 }
-                25 => capture = Some("station-exterior.png".into()),
+                18 => capture = Some("station-exterior.png".into()),
                 35 => {
                     s.view = View::Ship;
                     s.ship.position = s.station.approach() + Vector3::new(0.0, 0.0, 80.0);
@@ -846,7 +893,13 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 if leaving.is_none() && !entering_station {
                     let before = s.ship.position;
                     s.ship.update(dt, &input, &s.ships.flight, &s.system);
+                    if s.ship.bumped {
+                        let body=s.system.planets.iter().find(|p| p.push_out(s.ship.position,s.ships.flight.radius+0.1).is_some())
+                            .map(|p| p.config.name.as_str()).unwrap_or("Sol");
+                        debug_last=format!("controlador: {body}");
+                    }
                     if let Some(out) = s.station.push_out(before, s.ship.position, station_ship_radius(s, &ship_model)) {
+                        debug_last=format!("estacion: celdas/marco, desplazamiento {:.2}",(out-s.ship.position).length());
                         s.ship.position = out;
                         s.ship.speed = 0.0;
                         s.ship.bumped = true;
@@ -933,13 +986,15 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 let sun_clearance = s.system.sun.radius + margin;
                 if chase.length() < sun_clearance {
                     chase = chase.normalized() * sun_clearance;
+                    debug_camera="Sol";
                 }
                 for planet in &s.system.planets {
                     if let Some(out) = planet.push_out(chase, margin) {
+                        debug_camera="planeta";
                         chase = out;
                     }
                 }
-                if let Some(out) = s.station.push_out(chase, chase, margin) { chase = out; }
+                if let Some(out) = s.station.push_out(chase, chase, margin) { chase = out; debug_camera="estacion: celdas/marco"; }
                 let jitter = if shake > 0.0 {
                     let t = rl.get_time() as f32 * 60.0;
                     Vector3::new(t.sin(), (t * 1.3).cos(), 0.0) * shake * 0.6
@@ -1067,6 +1122,9 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 None if s.ships.ships[s.ship_index].model.is_empty() => crate::graphics::ship_placeholder::draw(&mut d3, sp.position, Vector3::new(sp.pitch.to_degrees(), sp.yaw.to_degrees(), sp.bank.to_degrees()), ship_len),
                 None => d3.draw_sphere(sp.position, ship_len * 0.3, Color::new(220, 220, 230, 255)),
             }
+            if s.collision_debug {
+                crate::graphics::station_debug::draw(&mut d3,&s.station,sp.position,station_ship_radius(s,&ship_model));
+            }
             if sp.speed > 1.0 {
                 // Compact supplemental exhaust; the GLB's own engine effects remain.
                 let k = (sp.speed / s.ships.flight.boost_speed).min(1.0);
@@ -1173,6 +1231,9 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         let help = if s.view == View::Ship { HELP_SHIP } else { HELP_OVERVIEW };
         d.draw_text(help, 16, height - 48, 15, Color::new(150, 156, 185, 255));
         d.draw_fps(width - 96, 14);
+        if s.collision_debug {
+            crate::graphics::station_debug::hud(&mut d,&s.station,s.ship.position,station_ship_radius(s,&ship_model),&debug_last,debug_camera);
+        }
         if fade > 0.0 {
             d.draw_rectangle(0, 0, width, height, Color::new(0, 0, 0, (fade * 255.0) as u8));
         }

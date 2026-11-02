@@ -1,4 +1,5 @@
 //! Fixed point of interest, deliberately separate from planets and orbital simulation.
+use super::station_collision::CollisionHull;
 use crate::ships::{FlightConfig, FlightInput, Ship};
 use raylib::prelude::{Matrix, Vector3};
 use serde::Deserialize;
@@ -12,10 +13,12 @@ pub struct Station {
     pub position: [f32; 3],
     pub rotation_degrees: [f32; 3],
     pub length: f32,
-    /// Conservative exterior envelope; traversing the detailed arms is not implemented.
+    /// Conservative launch envelope; actual movement uses the generated surface hull.
     pub collision_radius: f32,
     pub dock: Dock,
     pub lod_distance: f32,
+    #[serde(skip)]
+    pub hull: CollisionHull,
 }
 /// Position is a fraction of the fitted model length, in centered GLB axes.
 /// Dimensions are world units; the complementary room occupies the lower ring wall.
@@ -63,8 +66,30 @@ pub fn chase_position(position: Vector3, forward: Vector3, ship_length: f32) -> 
 
 impl Station {
     pub fn load(root: &Path) -> Result<Self, Box<dyn std::error::Error>> {
-        let s: Self =
+        let mut s: Self =
             serde_json::from_str(&std::fs::read_to_string(root.join("config/station.json"))?)?;
+        s.hull = serde_json::from_str(&std::fs::read_to_string(
+            root.join(&s.model).with_extension("collision.json"),
+        )?)?;
+        if s.hull.source != s.model
+            || s.hull.rows.is_empty()
+            || s.hull.cell <= 0.0
+            || s.hull.reference_length <= 0.0
+        {
+            return Err("Colisión derivada de estación inválida".into());
+        }
+        s.hull.bounds = s.hull.boxes().fold(
+            [
+                Vector3::one() * f32::INFINITY,
+                Vector3::one() * f32::NEG_INFINITY,
+            ],
+            |[lo, hi], (a, b)| {
+                [
+                    Vector3::new(lo.x.min(a.x), lo.y.min(a.y), lo.z.min(a.z)),
+                    Vector3::new(hi.x.max(b.x), hi.y.max(b.y), hi.z.max(b.z)),
+                ]
+            },
+        );
         if !s
             .position
             .iter()
@@ -246,19 +271,26 @@ impl Station {
         };
         input.throttle = input.throttle.min((speed / top).max(0.00001));
     }
-    /// Front access point beyond the complete sphere, including the arriving ship.
-    /// The narrow docking corridor is not required to reach this interaction.
+    /// Front access point beyond the fitted surface bounds and exterior hatch.
+    /// Includes the complete arriving ship rather than just its centre.
     pub fn entry_anchor(&self, ship_radius: f32) -> Vector3 {
         let door = self.exit_position();
-        let rel = door - self.center();
         let forward = self.exit_forward();
-        let projection = rel.dot(forward);
-        let radius = self.collision_radius + ship_radius.max(0.0) + 0.02;
-        let distance = (-projection
-            + (projection * projection + radius * radius - rel.dot(rel))
-                .max(0.0)
-                .sqrt())
-        .max(0.0);
+        let projection = (door - self.center()).dot(forward);
+        let [lo, hi] = self.hull.bounds;
+        let surface = (0..8)
+            .map(|k| {
+                let p = Vector3::new(
+                    if k & 1 == 0 { lo.x } else { hi.x },
+                    if k & 2 == 0 { lo.y } else { hi.y },
+                    if k & 4 == 0 { lo.z } else { hi.z },
+                );
+                (self.collision_point(p) - self.center()).dot(forward)
+            })
+            .fold(f32::NEG_INFINITY, f32::max)
+            .max(projection + 9.0);
+        let distance =
+            (surface + ship_radius.max(0.0) * 3.0_f32.sqrt() + 0.02 - projection).max(0.0);
         door + forward * distance
     }
     pub fn in_reach(&self, point: Vector3, ship_radius: f32) -> bool {
@@ -267,10 +299,9 @@ impl Station {
         let at_door =
             self.in_dock_lane(point, ship_radius) && rel.length() <= self.dock.interaction_radius;
         let outside = rel.dot(self.exit_forward()) >= 0.0
-            && (point - self.center()).length() >= self.collision_radius + ship_radius
             && (point - self.entry_anchor(ship_radius)).length()
                 <= self.dock.interaction_radius.min(self.dock.width * 2.0);
-        at_door || outside
+        (at_door || outside) && self.push_out(point, point, ship_radius).is_none()
     }
     /// Bounded access lane through the conservative envelope, aligned to the real hatch.
     pub fn in_dock_lane(&self, point: Vector3, margin: f32) -> bool {
@@ -279,57 +310,93 @@ impl Station {
             && rel.dot(self.exit_right()).abs() <= (self.dock.width * 0.5 - margin).max(0.0)
             && rel.dot(self.exit_up()).abs() <= (self.dock.height * 0.5 - margin).max(0.0)
     }
-    /// Swept exterior collision, including turbo and vertical flight; also usable by cameras.
+    /// Match the exact fit/centering used by the loaded visual model.
+    pub fn align_collision(&mut self, fit: Matrix) {
+        let c = self.hull.raw_center;
+        self.hull.offset_fraction =
+            Vector3::new(c[0], c[1], c[2]).transform_with(fit) / self.length;
+    }
+    pub fn collision_point(&self, local: Vector3) -> Vector3 {
+        let p = local * (self.length / self.hull.reference_length)
+            + self.hull.offset_fraction * self.length;
+        self.center() + p.transform_with(self.rotation())
+    }
+    pub fn collision_local(&self, world: Vector3) -> Vector3 {
+        let d = world - self.center();
+        let local = Vector3::new(
+            d.dot(self.rotated([1.0, 0.0, 0.0])),
+            d.dot(self.rotated([0.0, 1.0, 0.0])),
+            d.dot(self.rotated([0.0, 0.0, 1.0])),
+        );
+        (local - self.hull.offset_fraction * self.length)
+            / (self.length / self.hull.reference_length)
+    }
+    /// Swept collision against occupied GLB surface cells, never the old sphere.
     pub fn push_out(&self, start: Vector3, end: Vector3, margin: f32) -> Option<Vector3> {
-        if self.in_dock_lane(end, margin) {
-            // A segment is safe if both ends lie in the convex lane, or if it
-            // enters that lane through its outer mouth rather than a side wall.
-            let movement = end - start;
-            let rel = start - self.center();
-            let a = movement.dot(movement);
-            let b = rel.dot(movement);
-            let c = rel.dot(rel) - (self.collision_radius + margin).powi(2);
-            let disc = b * b - a * c;
-            let entry = if a > 1e-8 && disc >= 0.0 {
-                Some(start + movement * ((-b - disc.sqrt()) / a))
+        let scale = self.length / self.hull.reference_length;
+        let body = self
+            .hull
+            .push_out(
+                self.collision_local(start),
+                self.collision_local(end),
+                margin / scale,
+            )
+            .map(|out| self.collision_point(out));
+        // Physical frame extension drawn by graphics/station_dock.rs, in door axes.
+        let (w, h) = (self.dock.width * 0.5, self.dock.height * 0.5);
+        let frame = CollisionHull {
+            extra: vec![
+                (
+                    Vector3::new(-w - 1.0, -h - 1.0, 0.0),
+                    Vector3::new(-w, h + 1.0, 9.0),
+                ),
+                (
+                    Vector3::new(w, -h - 1.0, 0.0),
+                    Vector3::new(w + 1.0, h + 1.0, 9.0),
+                ),
+                (Vector3::new(-w, h, 0.0), Vector3::new(w, h + 1.0, 9.0)),
+                (Vector3::new(-w, -h - 1.0, 0.0), Vector3::new(w, -h, 9.0)),
+            ],
+            ..Default::default()
+        };
+        let local = |p: Vector3| {
+            let d = p - self.exit_position();
+            Vector3::new(
+                d.dot(self.exit_right()),
+                d.dot(self.exit_up()),
+                d.dot(self.exit_forward()),
+            )
+        };
+        let world = |p: Vector3| {
+            self.exit_position()
+                + self.exit_right() * p.x
+                + self.exit_up() * p.y
+                + self.exit_forward() * p.z
+        };
+        let hatch = frame.push_out(local(start), local(end), margin).map(world);
+        let contact = match (body, hatch) {
+            (Some(a), Some(b)) => Some(if (a - start).length() < (b - start).length() {
+                a
             } else {
-                None
-            };
-            if self.in_dock_lane(start, margin)
-                || c >= 0.0 && entry.is_some_and(|p| self.in_dock_lane(p, margin))
-            {
-                return None;
+                b
+            }),
+            (a, b) => a.or(b),
+        };
+        contact.map(|mut p| {
+            for _ in 0..8 {
+                if let Some(out) = self.hull.push_out(
+                    self.collision_local(p),
+                    self.collision_local(p),
+                    margin / scale,
+                ) {
+                    p = self.collision_point(out);
+                } else if let Some(out) = frame.push_out(local(p), local(p), margin) {
+                    p = world(out);
+                } else {
+                    return p;
+                }
             }
-        }
-        if self.in_dock_lane(start, margin) {
-            // Leaving the lane sideways inside the envelope is blocked at its edge.
-            if (start - self.center()).length() < self.collision_radius + margin {
-                return Some(start);
-            }
-        }
-        let radius = self.collision_radius + margin;
-        let rel = start - self.center();
-        if rel.length() < radius {
-            let n = if rel.length() > 0.001 {
-                rel.normalized()
-            } else {
-                Vector3::up()
-            };
-            return Some(self.center() + n * (radius + 0.01));
-        }
-        let movement = end - start;
-        let a = movement.dot(movement);
-        let b = rel.dot(movement);
-        let c = rel.dot(rel) - radius * radius;
-        let disc = b * b - a * c;
-        if a <= 1e-8 || b >= 0.0 || disc < 0.0 {
-            return None;
-        }
-        let t = (-b - disc.sqrt()) / a;
-        if !(0.0..=1.0).contains(&t) {
-            return None;
-        }
-        let hit = start + movement * t;
-        Some(hit + (hit - self.center()).normalized() * 0.01)
+            start
+        })
     }
 }
