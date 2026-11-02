@@ -1,0 +1,49 @@
+{
+  "checks": [
+    "WASD and Shift move the grounded FPS player",
+    "Mouse changes camera orientation through real input",
+    "E raycast opens the mine menu",
+    "Mine menu releases the native cursor",
+    "Modal menu blocks movement and mouse look",
+    "Cancel closes the menu; held E does not reopen it",
+    "Cancel restores native cursor capture",
+    "Start displays pending confirmation and reserves a return pose",
+    "Pending confirmation returns to exploration",
+    "Escape releases cursor during exploration",
+    "Escape recaptures cursor during exploration",
+    "Sprinting collides with the actual house",
+    "Sprinting collides with the actual oak trunk",
+    "Mine entrance remains targetable after exploration",
+    "Existing crafting table supports an occluded/ranged inspection ray"
+  ],
+  "frames": 136,
+  "limitations": [
+    "No human keyboard/mouse playtest; injected input and scene fixtures exercise the runtime.",
+    "No mining, underground scene, timer or solar integration."
+  ],
+  "method": "Hidden OpenGL window; real PlayerInput, automation events, UI loop, native cursor and renderer",
+  "model": {
+    "bounds_max": [
+      32.0,
+      9.0,
+      26.0
+    ],
+    "bounds_min": [
+      -32.0,
+      -2.0,
+      -34.0
+    ],
+    "draw_batches": 32,
+    "material_colors_match": true,
+    "original_primitives": 383,
+    "source_materials": 32,
+    "triangles": 39176
+  },
+  "pixel_materials": {
+    "alpha_mask_materials": 4,
+    "color_space": "sRGB textures decoded before daylight lighting",
+    "double_sided_materials": 32,
+    "point_filtered_textures": 27
+  },
+  "status": "passed"
+}

@@ -1,0 +1,1127 @@
+{
+  "checks": [
+    "Held native left mouse advances mining, cracks and pickaxe swing",
+    "Mouse release removes all progress and cracks",
+    "Diamond disappears, removes collider and updates HUD exactly once",
+    "Nine diamonds can be collected without triggering victory",
+    "All five common minerals produce feedback without awarding diamonds",
+    "Both passages emit a physical-clearance unlock event",
+    "Player walks through the genuinely cleared gate",
+    "Opening exit menu cancels mining immediately",
+    "A UI click held after recapture cannot strike a block behind the menu",
+    "R restores every visual, collider, target and session counter without restarting the app",
+    "Development exit returns normally to the Overworld"
+  ],
+  "events": [
+    {
+      "block": "ORE_DIAMOND_11",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_11",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_11",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_11",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_11",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_11",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_11",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_11",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_11",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_11",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_11",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_11",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_11",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_11",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_11",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_11",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_11",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_11",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_11",
+      "material": "diamond",
+      "type": "block_destroyed"
+    },
+    {
+      "block": "ORE_DIAMOND_11",
+      "total": 1,
+      "type": "diamond_collected"
+    },
+    {
+      "block": "ORE_REDSTONE_60",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_COAL_03",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_COAL_03",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_COAL_03",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_COAL_03",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_COAL_03",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_COAL_03",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_COAL_03",
+      "material": "coal",
+      "type": "block_destroyed"
+    },
+    {
+      "block": "ORE_COAL_03",
+      "material": "coal",
+      "type": "common_ore_collected"
+    },
+    {
+      "block": "ORE_IRON_07",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_IRON_07",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_IRON_07",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_IRON_07",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_IRON_07",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_IRON_07",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_IRON_07",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_IRON_07",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_IRON_07",
+      "material": "iron",
+      "type": "block_destroyed"
+    },
+    {
+      "block": "ORE_IRON_07",
+      "material": "iron",
+      "type": "common_ore_collected"
+    },
+    {
+      "block": "ORE_LAPIS_01",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_LAPIS_01",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_LAPIS_01",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_LAPIS_01",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_LAPIS_01",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_LAPIS_01",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_LAPIS_01",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_LAPIS_01",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_LAPIS_01",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_LAPIS_01",
+      "material": "lapis",
+      "type": "block_destroyed"
+    },
+    {
+      "block": "ORE_LAPIS_01",
+      "material": "lapis",
+      "type": "common_ore_collected"
+    },
+    {
+      "block": "ORE_REDSTONE_10",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_REDSTONE_10",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_REDSTONE_10",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_REDSTONE_10",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_REDSTONE_10",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_REDSTONE_10",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_REDSTONE_10",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_REDSTONE_10",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_REDSTONE_10",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_REDSTONE_10",
+      "material": "redstone",
+      "type": "block_destroyed"
+    },
+    {
+      "block": "ORE_REDSTONE_10",
+      "material": "redstone",
+      "type": "common_ore_collected"
+    },
+    {
+      "block": "ORE_GOLD_09",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_GOLD_09",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_GOLD_09",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_GOLD_09",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_GOLD_09",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_GOLD_09",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_GOLD_09",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_GOLD_09",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_GOLD_09",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_GOLD_09",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_GOLD_09",
+      "material": "gold",
+      "type": "block_destroyed"
+    },
+    {
+      "block": "ORE_GOLD_09",
+      "material": "gold",
+      "type": "common_ore_collected"
+    },
+    {
+      "block": "ORE_DIAMOND_01",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_01",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_01",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_01",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_01",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_01",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_01",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_01",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_01",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_01",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_01",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_01",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_01",
+      "material": "diamond",
+      "type": "block_destroyed"
+    },
+    {
+      "block": "ORE_DIAMOND_01",
+      "total": 2,
+      "type": "diamond_collected"
+    },
+    {
+      "block": "ORE_DIAMOND_02",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_02",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_02",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_02",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_02",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_02",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_02",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_02",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_02",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_02",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_02",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_02",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_02",
+      "material": "diamond",
+      "type": "block_destroyed"
+    },
+    {
+      "block": "ORE_DIAMOND_02",
+      "total": 3,
+      "type": "diamond_collected"
+    },
+    {
+      "block": "ORE_DIAMOND_03",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_03",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_03",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_03",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_03",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_03",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_03",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_03",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_03",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_03",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_03",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_03",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_03",
+      "material": "diamond",
+      "type": "block_destroyed"
+    },
+    {
+      "block": "ORE_DIAMOND_03",
+      "total": 4,
+      "type": "diamond_collected"
+    },
+    {
+      "block": "ORE_DIAMOND_04",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_04",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_04",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_04",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_04",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_04",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_04",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_04",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_04",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_04",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_04",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_04",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_04",
+      "material": "diamond",
+      "type": "block_destroyed"
+    },
+    {
+      "block": "ORE_DIAMOND_04",
+      "total": 5,
+      "type": "diamond_collected"
+    },
+    {
+      "block": "ORE_DIAMOND_05",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_05",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_05",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_05",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_05",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_05",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_05",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_05",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_05",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_05",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_05",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_05",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_05",
+      "material": "diamond",
+      "type": "block_destroyed"
+    },
+    {
+      "block": "ORE_DIAMOND_05",
+      "total": 6,
+      "type": "diamond_collected"
+    },
+    {
+      "block": "ORE_DIAMOND_08",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_08",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_08",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_08",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_08",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_08",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_08",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_08",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_08",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_08",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_08",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_08",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_08",
+      "material": "diamond",
+      "type": "block_destroyed"
+    },
+    {
+      "block": "ORE_DIAMOND_08",
+      "total": 7,
+      "type": "diamond_collected"
+    },
+    {
+      "block": "ORE_DIAMOND_09",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_09",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_09",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_09",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_09",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_09",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_09",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_09",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_09",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_09",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_09",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_09",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_09",
+      "material": "diamond",
+      "type": "block_destroyed"
+    },
+    {
+      "block": "ORE_DIAMOND_09",
+      "total": 8,
+      "type": "diamond_collected"
+    },
+    {
+      "block": "ORE_DIAMOND_10",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_10",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_10",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_10",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_10",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_10",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_10",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_10",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_10",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_10",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_10",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_10",
+      "type": "impact"
+    },
+    {
+      "block": "ORE_DIAMOND_10",
+      "material": "diamond",
+      "type": "block_destroyed"
+    },
+    {
+      "block": "ORE_DIAMOND_10",
+      "total": 9,
+      "type": "diamond_collected"
+    },
+    {
+      "block": "BREAK_B_gate_32_0",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_B_gate_32_0",
+      "type": "impact"
+    },
+    {
+      "block": "BREAK_B_gate_32_0",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_B_gate_32_0",
+      "type": "impact"
+    },
+    {
+      "block": "BREAK_B_gate_32_0",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_B_gate_32_0",
+      "material": "stone",
+      "type": "block_destroyed"
+    },
+    {
+      "block": "BREAK_B_gate_32_1",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_B_gate_32_1",
+      "type": "impact"
+    },
+    {
+      "block": "BREAK_B_gate_32_1",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_B_gate_32_1",
+      "type": "impact"
+    },
+    {
+      "block": "BREAK_B_gate_32_1",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_B_gate_32_1",
+      "material": "stone",
+      "type": "block_destroyed"
+    },
+    {
+      "gate": "B_gate",
+      "type": "passage_unlocked"
+    },
+    {
+      "block": "BREAK_B_gate_32_2",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_B_gate_32_2",
+      "type": "impact"
+    },
+    {
+      "block": "BREAK_B_gate_32_2",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_B_gate_32_2",
+      "type": "impact"
+    },
+    {
+      "block": "BREAK_B_gate_32_2",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_B_gate_32_2",
+      "material": "stone",
+      "type": "block_destroyed"
+    },
+    {
+      "block": "BREAK_B_gate_33_0",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_B_gate_33_0",
+      "type": "impact"
+    },
+    {
+      "block": "BREAK_B_gate_33_0",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_B_gate_33_0",
+      "type": "impact"
+    },
+    {
+      "block": "BREAK_B_gate_33_0",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_B_gate_33_0",
+      "material": "stone",
+      "type": "block_destroyed"
+    },
+    {
+      "block": "BREAK_B_gate_33_1",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_B_gate_33_1",
+      "type": "impact"
+    },
+    {
+      "block": "BREAK_B_gate_33_1",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_B_gate_33_1",
+      "type": "impact"
+    },
+    {
+      "block": "BREAK_B_gate_33_1",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_B_gate_33_1",
+      "material": "stone",
+      "type": "block_destroyed"
+    },
+    {
+      "block": "BREAK_B_gate_33_2",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_B_gate_33_2",
+      "type": "impact"
+    },
+    {
+      "block": "BREAK_B_gate_33_2",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_B_gate_33_2",
+      "type": "impact"
+    },
+    {
+      "block": "BREAK_B_gate_33_2",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_B_gate_33_2",
+      "material": "stone",
+      "type": "block_destroyed"
+    },
+    {
+      "block": "BREAK_C_gate_50_0",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_C_gate_50_0",
+      "type": "impact"
+    },
+    {
+      "block": "BREAK_C_gate_50_0",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_C_gate_50_0",
+      "type": "impact"
+    },
+    {
+      "block": "BREAK_C_gate_50_0",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_C_gate_50_0",
+      "material": "stone",
+      "type": "block_destroyed"
+    },
+    {
+      "block": "BREAK_C_gate_50_1",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_C_gate_50_1",
+      "type": "impact"
+    },
+    {
+      "block": "BREAK_C_gate_50_1",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_C_gate_50_1",
+      "type": "impact"
+    },
+    {
+      "block": "BREAK_C_gate_50_1",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_C_gate_50_1",
+      "material": "stone",
+      "type": "block_destroyed"
+    },
+    {
+      "gate": "C_gate",
+      "type": "passage_unlocked"
+    },
+    {
+      "block": "BREAK_C_gate_50_2",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_C_gate_50_2",
+      "type": "impact"
+    },
+    {
+      "block": "BREAK_C_gate_50_2",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_C_gate_50_2",
+      "type": "impact"
+    },
+    {
+      "block": "BREAK_C_gate_50_2",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_C_gate_50_2",
+      "material": "stone",
+      "type": "block_destroyed"
+    },
+    {
+      "block": "BREAK_C_gate_51_0",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_C_gate_51_0",
+      "type": "impact"
+    },
+    {
+      "block": "BREAK_C_gate_51_0",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_C_gate_51_0",
+      "type": "impact"
+    },
+    {
+      "block": "BREAK_C_gate_51_0",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_C_gate_51_0",
+      "material": "stone",
+      "type": "block_destroyed"
+    },
+    {
+      "block": "BREAK_C_gate_51_1",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_C_gate_51_1",
+      "type": "impact"
+    },
+    {
+      "block": "BREAK_C_gate_51_1",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_C_gate_51_1",
+      "type": "impact"
+    },
+    {
+      "block": "BREAK_C_gate_51_1",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_C_gate_51_1",
+      "material": "stone",
+      "type": "block_destroyed"
+    },
+    {
+      "block": "BREAK_C_gate_51_2",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_C_gate_51_2",
+      "type": "impact"
+    },
+    {
+      "block": "BREAK_C_gate_51_2",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_C_gate_51_2",
+      "type": "impact"
+    },
+    {
+      "block": "BREAK_C_gate_51_2",
+      "type": "swing_started"
+    },
+    {
+      "block": "BREAK_C_gate_51_2",
+      "material": "stone",
+      "type": "block_destroyed"
+    },
+    {
+      "block": "ORE_DIAMOND_12",
+      "type": "swing_started"
+    },
+    {
+      "block": "ORE_DIAMOND_12",
+      "type": "impact"
+    },
+    {
+      "type": "session_reset"
+    }
+  ],
+  "extractable_blocks": 86,
+  "frames": 2053,
+  "manual_hardware_playtest": false,
+  "model": {
+    "bounds_max": [
+      26.0,
+      6.0,
+      3.0
+    ],
+    "bounds_min": [
+      -23.0,
+      -0.07999999821186066,
+      -59.0
+    ],
+    "draw_batches": 100,
+    "material_colors_match": true,
+    "original_primitives": 128,
+    "source_materials": 20,
+    "triangles": 20840
+  },
+  "restored_colliders": 395,
+  "restored_diamonds": 14,
+  "status": "passed"
+}

@@ -21,6 +21,8 @@ struct Batch {
     mesh: Mesh,
     material: usize,
     background: bool,
+    group: Option<String>,
+    visible: bool,
 }
 #[derive(Default)]
 struct CpuBatch {
@@ -61,6 +63,15 @@ pub struct StaticModel {
     model: Model,
     shader: Shader,
     pub audit: ModelAudit,
+    surfaces: Option<Vec<Surface>>,
+    underground: bool,
+}
+
+struct Surface {
+    alpha_cutoff: f32,
+    textured: i32,
+    double_sided: bool,
+    emission: Vector3,
 }
 
 pub(crate) fn glb_document(path: &Path) -> Result<Value, Box<dyn std::error::Error>> {
@@ -119,6 +130,33 @@ impl StaticModel {
         path: &Path,
         flat_ground_material: Option<&str>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
+        Self::load_style(rl, thread, path, flat_ground_material, false, false)
+    }
+    /// Same GLB loader and geometry batching; opt-in pixel textures and daylight.
+    /// Existing South Park callers retain their original shader and render state.
+    pub fn load_overworld(
+        rl: &mut RaylibHandle,
+        thread: &RaylibThread,
+        path: &Path,
+    ) -> Result<Self, Box<dyn std::error::Error>> {
+        Self::load_style(rl, thread, path, None, true, false)
+    }
+    /// Pixel materials, underground lighting and separate future interactive props.
+    pub fn load_mine(
+        rl: &mut RaylibHandle,
+        thread: &RaylibThread,
+        path: &Path,
+    ) -> Result<Self, Box<dyn std::error::Error>> {
+        Self::load_style(rl, thread, path, None, true, true)
+    }
+    fn load_style(
+        rl: &mut RaylibHandle,
+        thread: &RaylibThread,
+        path: &Path,
+        flat_ground_material: Option<&str>,
+        overworld: bool,
+        underground: bool,
+    ) -> Result<Self, Box<dyn std::error::Error>> {
         let gltf = glb_document(path)?;
         let source_materials = gltf["materials"]
             .as_array()
@@ -151,15 +189,86 @@ impl StaticModel {
             }
         }
         let bounds = model.get_model_bounding_box();
-        let mut shader = winter_shader(rl, thread);
+        let mut surfaces = overworld.then(|| {
+            vec![Surface {
+                alpha_cutoff: -1.0,
+                textured: 0,
+                double_sided: false,
+                emission: Vector3::zero(),
+            }]
+        });
+        if let Some(surfaces) = &mut surfaces {
+            for (i, source) in source_materials.iter().enumerate() {
+                let textured = source["pbrMetallicRoughness"]
+                    .get("baseColorTexture")
+                    .is_some();
+                let texture = model.materials()[i + 1].maps()[0].texture;
+                if textured && (texture.id == 0 || texture.width != 16 || texture.height != 16) {
+                    return Err(
+                        format!("Missing Minecraft pixel texture: {}", source["name"]).into(),
+                    );
+                }
+                unsafe {
+                    // Texture is owned by Model; do not manufacture another owner.
+                    ffi::SetTextureFilter(texture, ffi::TextureFilter::TEXTURE_FILTER_POINT as i32);
+                    ffi::SetTextureWrap(texture, ffi::TextureWrap::TEXTURE_WRAP_REPEAT as i32);
+                }
+                surfaces.push(Surface {
+                    alpha_cutoff: if source["alphaMode"] == "MASK" {
+                        source["alphaCutoff"].as_f64().unwrap_or(0.5) as f32
+                    } else {
+                        -1.0
+                    },
+                    textured: i32::from(textured),
+                    double_sided: source["doubleSided"].as_bool().unwrap_or(false),
+                    emission: Vector3::new(
+                        source["emissiveFactor"][0].as_f64().unwrap_or(0.0) as f32,
+                        source["emissiveFactor"][1].as_f64().unwrap_or(0.0) as f32,
+                        source["emissiveFactor"][2].as_f64().unwrap_or(0.0) as f32,
+                    ),
+                });
+            }
+        }
+        let mut shader = if overworld {
+            rl.load_shader_from_memory(
+                thread,
+                Some(include_str!("shaders/winter.vs")),
+                Some(if underground {
+                    include_str!("shaders/mine.fs")
+                } else {
+                    include_str!("shaders/overworld.fs")
+                }),
+            )
+        } else {
+            winter_shader(rl, thread)
+        };
         if !shader.is_shader_valid() || shader.get_shader_location("cameraPosition") < 0 {
-            return Err("Winter lighting shader failed to compile".into());
+            return Err("Scene lighting shader failed to compile".into());
+        }
+        if overworld
+            && ["alphaCutoff", "textureIsSrgb"]
+                .iter()
+                .any(|name| shader.get_shader_location(name) < 0)
+        {
+            return Err("Overworld texture/alpha shader uniforms missing".into());
         }
         for material in model.materials_mut() {
             // WeakShader is a non-owning handle; StaticModel owns the Shader.
             *material.shader_mut() = unsafe { WeakShader::from_raw(*shader.as_ref()) };
         }
-        let mut cpu: BTreeMap<usize, Vec<CpuBatch>> = BTreeMap::new();
+        let primitive_groups: Vec<Option<String>> = gltf["meshes"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .flat_map(|mesh| {
+                let name = mesh["name"].as_str().unwrap_or("");
+                let group = (underground
+                    && (name.starts_with("ORE_") || name.starts_with("BREAK_")))
+                .then(|| name.to_owned());
+                std::iter::repeat_n(group, mesh["primitives"].as_array().map_or(0, Vec::len))
+            })
+            .collect();
+        let mut cpu: BTreeMap<(usize, Option<String>), Vec<CpuBatch>> = BTreeMap::new();
         let mut triangles = 0;
         for (i, mesh) in model.meshes().iter().enumerate() {
             // SAFETY: valid loaded Model has one meshMaterial entry per mesh.
@@ -192,7 +301,9 @@ impl StaticModel {
                 if index >= raw.vertexCount as usize {
                     return Err("Invalid GLB triangle index".into());
                 }
-                let groups = cpu.entry(material).or_default();
+                let groups = cpu
+                    .entry((material, primitive_groups[i].clone()))
+                    .or_default();
                 if groups
                     .last()
                     .is_none_or(|b| b.positions.len() >= 60_000 * 3)
@@ -210,15 +321,17 @@ impl StaticModel {
             }
         }
         let mut batches = Vec::new();
-        for (material, groups) in cpu {
-            for group in groups {
+        for ((material, group), groups) in cpu {
+            for cpu_batch in groups {
                 batches.push(Batch {
-                    mesh: group.upload()?,
+                    mesh: cpu_batch.upload()?,
                     material,
                     background: material > 0
                         && flat_ground_material.is_some_and(|name| {
                             source_materials[material - 1]["name"].as_str() == Some(name)
                         }),
+                    group: group.clone(),
+                    visible: true,
                 });
             }
         }
@@ -240,10 +353,22 @@ impl StaticModel {
             model,
             shader,
             audit,
+            surfaces,
+            underground,
         })
     }
     pub fn draw(&mut self, draw: &mut RaylibMode3D<RaylibDrawHandle>, camera_position: Vector3) {
         self.draw_at(draw, camera_position, Vector3::zero(), 0.0);
+    }
+    pub fn pixel_material_audit(&self) -> Option<serde_json::Value> {
+        self.surfaces.as_ref().map(|surfaces| {
+            serde_json::json!({
+                "point_filtered_textures": surfaces.iter().filter(|s| s.textured == 1).count(),
+                "alpha_mask_materials": surfaces.iter().filter(|s| s.alpha_cutoff >= 0.0).count(),
+                "double_sided_materials": surfaces.iter().filter(|s| s.double_sided).count(),
+                "color_space": if self.underground { "sRGB textures decoded before point-light shading" } else { "sRGB textures decoded before daylight lighting" },
+            })
+        })
     }
     pub fn draw_at(
         &mut self,
@@ -253,6 +378,69 @@ impl StaticModel {
         yaw: f32,
     ) {
         self.draw_pose(draw, camera_position, position, yaw, 0.0, Vector3::one());
+    }
+    pub fn independent_groups(&self) -> Vec<&str> {
+        let mut groups: Vec<_> = self
+            .batches
+            .iter()
+            .filter_map(|b| b.group.as_deref())
+            .collect();
+        groups.sort_unstable();
+        groups.dedup();
+        groups
+    }
+    /// Future prop visibility hook. No mining or collision change is triggered here.
+    pub fn set_group_visible(&mut self, id: &str, visible: bool) -> bool {
+        let mut found = false;
+        for batch in &mut self.batches {
+            if batch.group.as_deref() == Some(id) {
+                batch.visible = visible;
+                found = true;
+            }
+        }
+        found
+    }
+    pub fn group_visible(&self, id: &str) -> Option<bool> {
+        self.batches
+            .iter()
+            .find(|b| b.group.as_deref() == Some(id))
+            .map(|b| b.visible)
+    }
+    pub fn set_mine_lights(
+        &mut self,
+        positions: &[Vector3],
+        colors: &[Vector3],
+        radii: &[f32],
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        if !self.underground
+            || positions.is_empty()
+            || positions.len() > 48
+            || positions.len() != colors.len()
+            || positions.len() != radii.len()
+            || radii.iter().any(|r| !r.is_finite() || *r <= 0.0)
+        {
+            return Err("Invalid mine lighting rig".into());
+        }
+        for name in [
+            "lightCount",
+            "lightPosition[0]",
+            "lightColor[0]",
+            "lightRadius[0]",
+            "emission",
+        ] {
+            if self.shader.get_shader_location(name) < 0 {
+                return Err(format!("Missing mine uniform: {name}").into());
+            }
+        }
+        let loc = self.shader.get_shader_location("lightCount");
+        self.shader.set_shader_value(loc, positions.len() as i32);
+        let loc = self.shader.get_shader_location("lightPosition[0]");
+        self.shader.set_shader_value_v(loc, positions);
+        let loc = self.shader.get_shader_location("lightColor[0]");
+        self.shader.set_shader_value_v(loc, colors);
+        let loc = self.shader.get_shader_location("lightRadius[0]");
+        self.shader.set_shader_value_v(loc, radii);
+        Ok(())
     }
     /// Controlled prop animation; model buffers/materials stay resident.
     pub fn draw_pose(
@@ -273,6 +461,25 @@ impl StaticModel {
         let location = self.shader.get_shader_location("cameraPosition");
         self.shader.set_shader_value(location, camera_position);
         for batch in &self.batches {
+            if !batch.visible {
+                continue;
+            }
+            if let Some(surfaces) = &self.surfaces {
+                let surface = &surfaces[batch.material];
+                let location = self.shader.get_shader_location("alphaCutoff");
+                self.shader.set_shader_value(location, surface.alpha_cutoff);
+                let location = self.shader.get_shader_location("textureIsSrgb");
+                self.shader.set_shader_value(location, surface.textured);
+                if self.underground {
+                    let location = self.shader.get_shader_location("emission");
+                    self.shader.set_shader_value(location, surface.emission);
+                }
+                if surface.double_sided {
+                    unsafe {
+                        ffi::rlDisableBackfaceCulling();
+                    }
+                }
+            }
             // A known flat ground is a visual background. Drawing it first
             // without depth writes prevents distant roads 12 mm above it from
             // fighting the terrain's depth, without changing any asset vertices.
@@ -286,6 +493,15 @@ impl StaticModel {
                 self.model.materials()[batch.material].clone(),
                 transform,
             );
+            if self
+                .surfaces
+                .as_ref()
+                .is_some_and(|s| s[batch.material].double_sided)
+            {
+                unsafe {
+                    ffi::rlEnableBackfaceCulling();
+                }
+            }
             if batch.background {
                 unsafe {
                     ffi::rlEnableDepthMask();

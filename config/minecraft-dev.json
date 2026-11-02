@@ -1,0 +1,12 @@
+{
+  "player": {
+    "walk_speed": 4.5,
+    "run_speed": 8.0,
+    "mouse_sensitivity": 0.002,
+    "pitch_limit_degrees": 85.0,
+    "radius": 0.35,
+    "body_height": 1.8,
+    "fov_degrees": 65.0
+  },
+  "interaction_distance": 4.5
+}

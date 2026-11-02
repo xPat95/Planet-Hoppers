@@ -1,0 +1,22 @@
+[
+  {
+    "command": "rustfmt --edition 2021 --config skip_children=true src/scenes/minecraft_rush.rs",
+    "exit_code": 0,
+    "log": "C:\\Users\\pablo\\AppData\\Local\\Temp\\phase5_rustfmt_--edition.log"
+  },
+  {
+    "command": "cargo check",
+    "exit_code": 0,
+    "log": "C:\\Users\\pablo\\AppData\\Local\\Temp\\phase5_cargo_check.log"
+  },
+  {
+    "command": "cargo build",
+    "exit_code": 0,
+    "log": "C:\\Users\\pablo\\AppData\\Local\\Temp\\phase5_cargo_build.log"
+  },
+  {
+    "command": "cargo test",
+    "exit_code": 0,
+    "log": "C:\\Users\\pablo\\AppData\\Local\\Temp\\phase5_cargo_test.log"
+  }
+]

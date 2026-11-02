@@ -1,0 +1,46 @@
+[
+  {
+    "name": "rush",
+    "command": "target/debug/minecraft.exe --smoke-rush",
+    "exit_code": 0,
+    "log": "C:\\Users\\pablo\\AppData\\Local\\Temp\\phase5_runtime_rush.log"
+  },
+  {
+    "name": "mining",
+    "command": "target/debug/minecraft.exe --mine --smoke-mining --capture-dir C:\\Users\\pablo\\AppData\\Local\\Temp\\phase5-legacy-mining",
+    "exit_code": 0,
+    "log": "C:\\Users\\pablo\\AppData\\Local\\Temp\\phase5_runtime_mining.log"
+  },
+  {
+    "name": "surface",
+    "command": "target/debug/minecraft.exe --smoke --capture-dir C:\\Users\\pablo\\AppData\\Local\\Temp\\phase5-legacy-surface",
+    "exit_code": 0,
+    "log": "C:\\Users\\pablo\\AppData\\Local\\Temp\\phase5_runtime_surface.log"
+  },
+  {
+    "name": "southpark",
+    "command": "target/debug/southpark.exe --smoke --mute",
+    "exit_code": 0,
+    "log": "C:\\Users\\pablo\\AppData\\Local\\Temp\\phase5_runtime_southpark.log"
+  },
+  {
+    "name": "kenny",
+    "command": "target/debug/southpark.exe --smoke-kenny --mute",
+    "exit_code": 0,
+    "log": "C:\\Users\\pablo\\AppData\\Local\\Temp\\phase5_runtime_kenny.log"
+  },
+  {
+    "name": "threats",
+    "command": "target/debug/southpark.exe --smoke-threats --mute",
+    "exit_code": 0,
+    "log": "C:\\Users\\pablo\\AppData\\Local\\Temp\\phase5_runtime_threats.log"
+  },
+  {
+    "command": "target/debug/southpark.exe --smoke-world --mute",
+    "exit_code": 0
+  },
+  {
+    "command": "target/debug/southpark.exe --smoke-entry --mute",
+    "exit_code": 0
+  }
+]

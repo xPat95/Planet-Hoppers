@@ -1,0 +1,39 @@
+{
+  "initial_seconds": 150,
+  "routes": [
+    {
+      "diamonds": [
+        "ORE_DIAMOND_01",
+        "ORE_DIAMOND_03",
+        "ORE_DIAMOND_06",
+        "ORE_DIAMOND_07",
+        "ORE_DIAMOND_10",
+        "ORE_DIAMOND_11",
+        "ORE_DIAMOND_12",
+        "ORE_DIAMOND_15"
+      ],
+      "method": "Real FPS swept collisions and mining, fixed 20 Hz; instant orientation, known safe routes; no manual playtest.",
+      "remaining": 64.89480590820312,
+      "seconds_used": 85.10519409179688,
+      "strategy": "nearest safe ore",
+      "walked_metres": 282.706787109375
+    },
+    {
+      "diamonds": [
+        "ORE_DIAMOND_10",
+        "ORE_DIAMOND_11",
+        "ORE_DIAMOND_12",
+        "ORE_DIAMOND_15",
+        "ORE_DIAMOND_14",
+        "ORE_DIAMOND_13",
+        "ORE_DIAMOND_08",
+        "ORE_DIAMOND_04"
+      ],
+      "method": "Real FPS swept collisions and mining, fixed 20 Hz; instant orientation, known safe routes; no manual playtest.",
+      "remaining": 65.89486694335938,
+      "seconds_used": 84.10513305664062,
+      "strategy": "new sectors first",
+      "walked_metres": 278.7069091796875
+    }
+  ]
+}

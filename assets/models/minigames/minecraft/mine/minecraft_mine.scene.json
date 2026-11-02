@@ -1,0 +1,9879 @@
+{
+  "schema_version": 1,
+  "id": "minecraft.diamond-rush.mine",
+  "blend": "minecraft_mine.blend",
+  "visual_asset": "minecraft_mine.glb",
+  "coordinates": {
+    "units": "meters",
+    "up": "Z",
+    "gltf_up": "Y",
+    "to_gltf": "(x,y,z) -> (x,z,-y)"
+  },
+  "spawn": {
+    "position": [
+      0,
+      0,
+      1.7
+    ],
+    "forward": [
+      0,
+      1,
+      0
+    ],
+    "eye_height": 1.7
+  },
+  "colliders": [
+    {
+      "name": "Mine_floor",
+      "shape": "plane",
+      "role": "walkable",
+      "category": "floor",
+      "min": [
+        -26,
+        -7
+      ],
+      "max": [
+        28,
+        62
+      ],
+      "z": 0
+    },
+    {
+      "name": "BREAK_B_gate_32_0",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "breakable",
+      "min": [
+        -9,
+        32,
+        0
+      ],
+      "max": [
+        -8,
+        33,
+        1
+      ]
+    },
+    {
+      "name": "BREAK_B_gate_32_1",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "breakable",
+      "min": [
+        -9,
+        32,
+        1
+      ],
+      "max": [
+        -8,
+        33,
+        2
+      ]
+    },
+    {
+      "name": "BREAK_B_gate_32_2",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "breakable",
+      "min": [
+        -9,
+        32,
+        2
+      ],
+      "max": [
+        -8,
+        33,
+        3
+      ]
+    },
+    {
+      "name": "BREAK_B_gate_33_0",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "breakable",
+      "min": [
+        -9,
+        33,
+        0
+      ],
+      "max": [
+        -8,
+        34,
+        1
+      ]
+    },
+    {
+      "name": "BREAK_B_gate_33_1",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "breakable",
+      "min": [
+        -9,
+        33,
+        1
+      ],
+      "max": [
+        -8,
+        34,
+        2
+      ]
+    },
+    {
+      "name": "BREAK_B_gate_33_2",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "breakable",
+      "min": [
+        -9,
+        33,
+        2
+      ],
+      "max": [
+        -8,
+        34,
+        3
+      ]
+    },
+    {
+      "name": "BREAK_C_gate_50_0",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "breakable",
+      "min": [
+        -10,
+        50,
+        0
+      ],
+      "max": [
+        -9,
+        51,
+        1
+      ]
+    },
+    {
+      "name": "BREAK_C_gate_50_1",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "breakable",
+      "min": [
+        -10,
+        50,
+        1
+      ],
+      "max": [
+        -9,
+        51,
+        2
+      ]
+    },
+    {
+      "name": "BREAK_C_gate_50_2",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "breakable",
+      "min": [
+        -10,
+        50,
+        2
+      ],
+      "max": [
+        -9,
+        51,
+        3
+      ]
+    },
+    {
+      "name": "BREAK_C_gate_51_0",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "breakable",
+      "min": [
+        -10,
+        51,
+        0
+      ],
+      "max": [
+        -9,
+        52,
+        1
+      ]
+    },
+    {
+      "name": "BREAK_C_gate_51_1",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "breakable",
+      "min": [
+        -10,
+        51,
+        1
+      ],
+      "max": [
+        -9,
+        52,
+        2
+      ]
+    },
+    {
+      "name": "BREAK_C_gate_51_2",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "breakable",
+      "min": [
+        -10,
+        51,
+        2
+      ],
+      "max": [
+        -9,
+        52,
+        3
+      ]
+    },
+    {
+      "name": "ORE_DIAMOND_01",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "diamond",
+      "min": [
+        -4,
+        21,
+        1
+      ],
+      "max": [
+        -3,
+        22,
+        2
+      ]
+    },
+    {
+      "name": "ORE_DIAMOND_02",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "diamond",
+      "min": [
+        -20,
+        16,
+        1
+      ],
+      "max": [
+        -19,
+        17,
+        2
+      ]
+    },
+    {
+      "name": "ORE_DIAMOND_03",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "diamond",
+      "min": [
+        -6,
+        30,
+        1
+      ],
+      "max": [
+        -5,
+        31,
+        2
+      ]
+    },
+    {
+      "name": "ORE_DIAMOND_04",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "diamond",
+      "min": [
+        4,
+        38,
+        1
+      ],
+      "max": [
+        5,
+        39,
+        2
+      ]
+    },
+    {
+      "name": "ORE_DIAMOND_05",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "diamond",
+      "min": [
+        22,
+        28,
+        1
+      ],
+      "max": [
+        23,
+        29,
+        2
+      ]
+    },
+    {
+      "name": "ORE_DIAMOND_06",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "diamond",
+      "min": [
+        -22,
+        31,
+        1
+      ],
+      "max": [
+        -21,
+        32,
+        2
+      ]
+    },
+    {
+      "name": "ORE_DIAMOND_07",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "diamond",
+      "min": [
+        -17,
+        37,
+        1
+      ],
+      "max": [
+        -16,
+        38,
+        2
+      ]
+    },
+    {
+      "name": "ORE_DIAMOND_08",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "diamond",
+      "min": [
+        -7,
+        47,
+        1
+      ],
+      "max": [
+        -6,
+        48,
+        2
+      ]
+    },
+    {
+      "name": "ORE_DIAMOND_09",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "diamond",
+      "min": [
+        -3,
+        58,
+        1
+      ],
+      "max": [
+        -2,
+        59,
+        2
+      ]
+    },
+    {
+      "name": "ORE_DIAMOND_10",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "diamond",
+      "min": [
+        6,
+        55,
+        1
+      ],
+      "max": [
+        7,
+        56,
+        2
+      ]
+    },
+    {
+      "name": "ORE_DIAMOND_11",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "diamond",
+      "min": [
+        24,
+        48,
+        1
+      ],
+      "max": [
+        25,
+        49,
+        2
+      ]
+    },
+    {
+      "name": "ORE_DIAMOND_12",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "diamond",
+      "min": [
+        20,
+        57,
+        1
+      ],
+      "max": [
+        21,
+        58,
+        2
+      ]
+    },
+    {
+      "name": "ORE_DIAMOND_13",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "diamond",
+      "min": [
+        -23,
+        49,
+        1
+      ],
+      "max": [
+        -22,
+        50,
+        2
+      ]
+    },
+    {
+      "name": "ORE_DIAMOND_14",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "diamond",
+      "min": [
+        -18,
+        55,
+        1
+      ],
+      "max": [
+        -17,
+        56,
+        2
+      ]
+    },
+    {
+      "name": "Wall_000",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -26,
+        -7,
+        0
+      ],
+      "max": [
+        28,
+        -3,
+        8
+      ]
+    },
+    {
+      "name": "Wall_001",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -26,
+        -3,
+        0
+      ],
+      "max": [
+        -4,
+        12,
+        8
+      ]
+    },
+    {
+      "name": "Wall_002",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        5,
+        -3,
+        0
+      ],
+      "max": [
+        28,
+        15,
+        8
+      ]
+    },
+    {
+      "name": "Wall_003",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -4,
+        6,
+        0
+      ],
+      "max": [
+        -2,
+        12,
+        8
+      ]
+    },
+    {
+      "name": "Wall_004",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        2,
+        6,
+        0
+      ],
+      "max": [
+        5,
+        12,
+        8
+      ]
+    },
+    {
+      "name": "Wall_005",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -26,
+        12,
+        0
+      ],
+      "max": [
+        -5,
+        13,
+        8
+      ]
+    },
+    {
+      "name": "Wall_006",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -26,
+        13,
+        0
+      ],
+      "max": [
+        -19,
+        16,
+        8
+      ]
+    },
+    {
+      "name": "Wall_007",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -12,
+        13,
+        0
+      ],
+      "max": [
+        -5,
+        15,
+        8
+      ]
+    },
+    {
+      "name": "Wall_008",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        19,
+        15,
+        0
+      ],
+      "max": [
+        28,
+        26,
+        8
+      ]
+    },
+    {
+      "name": "Wall_009",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -26,
+        16,
+        0
+      ],
+      "max": [
+        -20,
+        29,
+        8
+      ]
+    },
+    {
+      "name": "Wall_010",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -20,
+        17,
+        0
+      ],
+      "max": [
+        -19,
+        29,
+        8
+      ]
+    },
+    {
+      "name": "Wall_011",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -12,
+        18,
+        0
+      ],
+      "max": [
+        -5,
+        30,
+        8
+      ]
+    },
+    {
+      "name": "Wall_012",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        5,
+        18,
+        0
+      ],
+      "max": [
+        16,
+        26,
+        8
+      ]
+    },
+    {
+      "name": "Wall_013",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -19,
+        20,
+        0
+      ],
+      "max": [
+        -12,
+        29,
+        8
+      ]
+    },
+    {
+      "name": "Wall_014",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -5,
+        21,
+        0
+      ],
+      "max": [
+        -4,
+        28,
+        8
+      ]
+    },
+    {
+      "name": "Wall_015",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -3,
+        21,
+        0
+      ],
+      "max": [
+        -2,
+        28,
+        8
+      ]
+    },
+    {
+      "name": "Wall_016",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        2,
+        21,
+        0
+      ],
+      "max": [
+        5,
+        28,
+        8
+      ]
+    },
+    {
+      "name": "Wall_017",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -4,
+        22,
+        0
+      ],
+      "max": [
+        -3,
+        28,
+        8
+      ]
+    },
+    {
+      "name": "Wall_018",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        5,
+        26,
+        0
+      ],
+      "max": [
+        13,
+        28,
+        8
+      ]
+    },
+    {
+      "name": "Wall_019",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        22,
+        26,
+        0
+      ],
+      "max": [
+        28,
+        28,
+        8
+      ]
+    },
+    {
+      "name": "Wall_020",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        6,
+        28,
+        0
+      ],
+      "max": [
+        13,
+        30,
+        8
+      ]
+    },
+    {
+      "name": "Wall_021",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        23,
+        28,
+        0
+      ],
+      "max": [
+        28,
+        46,
+        8
+      ]
+    },
+    {
+      "name": "Wall_022",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -26,
+        29,
+        0
+      ],
+      "max": [
+        -21,
+        31,
+        8
+      ]
+    },
+    {
+      "name": "Wall_023",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -13,
+        29,
+        0
+      ],
+      "max": [
+        -12,
+        32,
+        8
+      ]
+    },
+    {
+      "name": "Wall_024",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        22,
+        29,
+        0
+      ],
+      "max": [
+        23,
+        46,
+        8
+      ]
+    },
+    {
+      "name": "Wall_025",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -12,
+        30,
+        0
+      ],
+      "max": [
+        -6,
+        32,
+        8
+      ]
+    },
+    {
+      "name": "Wall_026",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -26,
+        31,
+        0
+      ],
+      "max": [
+        -22,
+        49,
+        8
+      ]
+    },
+    {
+      "name": "Wall_027",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -6,
+        31,
+        0
+      ],
+      "max": [
+        -5,
+        32,
+        8
+      ]
+    },
+    {
+      "name": "Wall_028",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -22,
+        32,
+        0
+      ],
+      "max": [
+        -21,
+        47,
+        8
+      ]
+    },
+    {
+      "name": "Wall_029",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -13,
+        34,
+        0
+      ],
+      "max": [
+        -5,
+        46,
+        8
+      ]
+    },
+    {
+      "name": "Wall_030",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        6,
+        34,
+        0
+      ],
+      "max": [
+        13,
+        50,
+        8
+      ]
+    },
+    {
+      "name": "Wall_031",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        13,
+        35,
+        0
+      ],
+      "max": [
+        16,
+        46,
+        8
+      ]
+    },
+    {
+      "name": "Wall_032",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        20,
+        35,
+        0
+      ],
+      "max": [
+        22,
+        46,
+        8
+      ]
+    },
+    {
+      "name": "Wall_033",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -21,
+        37,
+        0
+      ],
+      "max": [
+        -17,
+        47,
+        8
+      ]
+    },
+    {
+      "name": "Wall_034",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -16,
+        37,
+        0
+      ],
+      "max": [
+        -13,
+        47,
+        8
+      ]
+    },
+    {
+      "name": "Wall_035",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -17,
+        38,
+        0
+      ],
+      "max": [
+        -16,
+        47,
+        8
+      ]
+    },
+    {
+      "name": "Wall_036",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -5,
+        38,
+        0
+      ],
+      "max": [
+        -2,
+        46,
+        8
+      ]
+    },
+    {
+      "name": "Wall_037",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        2,
+        38,
+        0
+      ],
+      "max": [
+        4,
+        46,
+        8
+      ]
+    },
+    {
+      "name": "Wall_038",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        5,
+        38,
+        0
+      ],
+      "max": [
+        6,
+        46,
+        8
+      ]
+    },
+    {
+      "name": "Wall_039",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        4,
+        39,
+        0
+      ],
+      "max": [
+        5,
+        46,
+        8
+      ]
+    },
+    {
+      "name": "Wall_040",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -13,
+        46,
+        0
+      ],
+      "max": [
+        -6,
+        47,
+        8
+      ]
+    },
+    {
+      "name": "Wall_041",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        24,
+        46,
+        0
+      ],
+      "max": [
+        28,
+        48,
+        8
+      ]
+    },
+    {
+      "name": "Wall_042",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -14,
+        47,
+        0
+      ],
+      "max": [
+        -7,
+        50,
+        8
+      ]
+    },
+    {
+      "name": "Wall_043",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -7,
+        48,
+        0
+      ],
+      "max": [
+        -6,
+        50,
+        8
+      ]
+    },
+    {
+      "name": "Wall_044",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        25,
+        48,
+        0
+      ],
+      "max": [
+        28,
+        62,
+        8
+      ]
+    },
+    {
+      "name": "Wall_045",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -26,
+        49,
+        0
+      ],
+      "max": [
+        -23,
+        62,
+        8
+      ]
+    },
+    {
+      "name": "Wall_046",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        24,
+        49,
+        0
+      ],
+      "max": [
+        25,
+        62,
+        8
+      ]
+    },
+    {
+      "name": "Wall_047",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -23,
+        50,
+        0
+      ],
+      "max": [
+        -22,
+        62,
+        8
+      ]
+    },
+    {
+      "name": "Wall_048",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -14,
+        52,
+        0
+      ],
+      "max": [
+        -6,
+        62,
+        8
+      ]
+    },
+    {
+      "name": "Wall_049",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        6,
+        53,
+        0
+      ],
+      "max": [
+        13,
+        55,
+        8
+      ]
+    },
+    {
+      "name": "Wall_050",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -22,
+        55,
+        0
+      ],
+      "max": [
+        -18,
+        62,
+        8
+      ]
+    },
+    {
+      "name": "Wall_051",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -17,
+        55,
+        0
+      ],
+      "max": [
+        -14,
+        62,
+        8
+      ]
+    },
+    {
+      "name": "Wall_052",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        7,
+        55,
+        0
+      ],
+      "max": [
+        13,
+        62,
+        8
+      ]
+    },
+    {
+      "name": "Wall_053",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -18,
+        56,
+        0
+      ],
+      "max": [
+        -17,
+        62,
+        8
+      ]
+    },
+    {
+      "name": "Wall_054",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        6,
+        56,
+        0
+      ],
+      "max": [
+        7,
+        62,
+        8
+      ]
+    },
+    {
+      "name": "Wall_055",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        13,
+        57,
+        0
+      ],
+      "max": [
+        20,
+        62,
+        8
+      ]
+    },
+    {
+      "name": "Wall_056",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        21,
+        57,
+        0
+      ],
+      "max": [
+        24,
+        62,
+        8
+      ]
+    },
+    {
+      "name": "Wall_057",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -6,
+        58,
+        0
+      ],
+      "max": [
+        -3,
+        62,
+        8
+      ]
+    },
+    {
+      "name": "Wall_058",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -2,
+        58,
+        0
+      ],
+      "max": [
+        6,
+        62,
+        8
+      ]
+    },
+    {
+      "name": "Wall_059",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        20,
+        58,
+        0
+      ],
+      "max": [
+        21,
+        62,
+        8
+      ]
+    },
+    {
+      "name": "Wall_060",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -3,
+        59,
+        0
+      ],
+      "max": [
+        -2,
+        62,
+        8
+      ]
+    },
+    {
+      "name": "Ore_column_lower_00",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -4,
+        21,
+        0
+      ],
+      "max": [
+        -3,
+        22,
+        1
+      ]
+    },
+    {
+      "name": "Ore_column_upper_00",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -4,
+        21,
+        2
+      ],
+      "max": [
+        -3,
+        22,
+        8
+      ]
+    },
+    {
+      "name": "Ore_column_lower_01",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -20,
+        16,
+        0
+      ],
+      "max": [
+        -19,
+        17,
+        1
+      ]
+    },
+    {
+      "name": "Ore_column_upper_01",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -20,
+        16,
+        2
+      ],
+      "max": [
+        -19,
+        17,
+        8
+      ]
+    },
+    {
+      "name": "Ore_column_lower_02",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -6,
+        30,
+        0
+      ],
+      "max": [
+        -5,
+        31,
+        1
+      ]
+    },
+    {
+      "name": "Ore_column_upper_02",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -6,
+        30,
+        2
+      ],
+      "max": [
+        -5,
+        31,
+        8
+      ]
+    },
+    {
+      "name": "Ore_column_lower_03",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        4,
+        38,
+        0
+      ],
+      "max": [
+        5,
+        39,
+        1
+      ]
+    },
+    {
+      "name": "Ore_column_upper_03",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        4,
+        38,
+        2
+      ],
+      "max": [
+        5,
+        39,
+        8
+      ]
+    },
+    {
+      "name": "Ore_column_lower_04",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        22,
+        28,
+        0
+      ],
+      "max": [
+        23,
+        29,
+        1
+      ]
+    },
+    {
+      "name": "Ore_column_upper_04",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        22,
+        28,
+        2
+      ],
+      "max": [
+        23,
+        29,
+        8
+      ]
+    },
+    {
+      "name": "Ore_column_lower_05",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -22,
+        31,
+        0
+      ],
+      "max": [
+        -21,
+        32,
+        1
+      ]
+    },
+    {
+      "name": "Ore_column_upper_05",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -22,
+        31,
+        2
+      ],
+      "max": [
+        -21,
+        32,
+        8
+      ]
+    },
+    {
+      "name": "Ore_column_lower_06",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -17,
+        37,
+        0
+      ],
+      "max": [
+        -16,
+        38,
+        1
+      ]
+    },
+    {
+      "name": "Ore_column_upper_06",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -17,
+        37,
+        2
+      ],
+      "max": [
+        -16,
+        38,
+        8
+      ]
+    },
+    {
+      "name": "Ore_column_lower_07",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -7,
+        47,
+        0
+      ],
+      "max": [
+        -6,
+        48,
+        1
+      ]
+    },
+    {
+      "name": "Ore_column_upper_07",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -7,
+        47,
+        2
+      ],
+      "max": [
+        -6,
+        48,
+        8
+      ]
+    },
+    {
+      "name": "Ore_column_lower_08",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -3,
+        58,
+        0
+      ],
+      "max": [
+        -2,
+        59,
+        1
+      ]
+    },
+    {
+      "name": "Ore_column_upper_08",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -3,
+        58,
+        2
+      ],
+      "max": [
+        -2,
+        59,
+        8
+      ]
+    },
+    {
+      "name": "Ore_column_lower_09",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        6,
+        55,
+        0
+      ],
+      "max": [
+        7,
+        56,
+        1
+      ]
+    },
+    {
+      "name": "Ore_column_upper_09",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        6,
+        55,
+        2
+      ],
+      "max": [
+        7,
+        56,
+        8
+      ]
+    },
+    {
+      "name": "Ore_column_lower_10",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        24,
+        48,
+        0
+      ],
+      "max": [
+        25,
+        49,
+        1
+      ]
+    },
+    {
+      "name": "Ore_column_upper_10",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        24,
+        48,
+        2
+      ],
+      "max": [
+        25,
+        49,
+        8
+      ]
+    },
+    {
+      "name": "Ore_column_lower_11",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        20,
+        57,
+        0
+      ],
+      "max": [
+        21,
+        58,
+        1
+      ]
+    },
+    {
+      "name": "Ore_column_upper_11",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        20,
+        57,
+        2
+      ],
+      "max": [
+        21,
+        58,
+        8
+      ]
+    },
+    {
+      "name": "Ore_column_lower_12",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -23,
+        49,
+        0
+      ],
+      "max": [
+        -22,
+        50,
+        1
+      ]
+    },
+    {
+      "name": "Ore_column_upper_12",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -23,
+        49,
+        2
+      ],
+      "max": [
+        -22,
+        50,
+        8
+      ]
+    },
+    {
+      "name": "Ore_column_lower_13",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -18,
+        55,
+        0
+      ],
+      "max": [
+        -17,
+        56,
+        1
+      ]
+    },
+    {
+      "name": "Ore_column_upper_13",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "wall",
+      "min": [
+        -18,
+        55,
+        2
+      ],
+      "max": [
+        -17,
+        56,
+        8
+      ]
+    },
+    {
+      "name": "Ceiling_4_000",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "ceiling",
+      "min": [
+        -4,
+        -3,
+        4
+      ],
+      "max": [
+        5,
+        6,
+        5
+      ]
+    },
+    {
+      "name": "Ceiling_4_001",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "ceiling",
+      "min": [
+        -5,
+        12,
+        4
+      ],
+      "max": [
+        5,
+        21,
+        5
+      ]
+    },
+    {
+      "name": "Ceiling_4_002",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "ceiling",
+      "min": [
+        -2,
+        21,
+        4
+      ],
+      "max": [
+        2,
+        28,
+        5
+      ]
+    },
+    {
+      "name": "Ceiling_4_003",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "ceiling",
+      "min": [
+        13,
+        26,
+        4
+      ],
+      "max": [
+        22,
+        35,
+        5
+      ]
+    },
+    {
+      "name": "Ceiling_4_004",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "ceiling",
+      "min": [
+        -21,
+        29,
+        4
+      ],
+      "max": [
+        -13,
+        37,
+        5
+      ]
+    },
+    {
+      "name": "Ceiling_4_005",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "ceiling",
+      "min": [
+        6,
+        30,
+        4
+      ],
+      "max": [
+        13,
+        34,
+        5
+      ]
+    },
+    {
+      "name": "Ceiling_4_006",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "ceiling",
+      "min": [
+        16,
+        35,
+        4
+      ],
+      "max": [
+        20,
+        46,
+        5
+      ]
+    },
+    {
+      "name": "Ceiling_4_007",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "ceiling",
+      "min": [
+        -2,
+        38,
+        4
+      ],
+      "max": [
+        2,
+        46,
+        5
+      ]
+    },
+    {
+      "name": "Ceiling_4_008",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "ceiling",
+      "min": [
+        -22,
+        47,
+        4
+      ],
+      "max": [
+        -14,
+        55,
+        5
+      ]
+    },
+    {
+      "name": "Ceiling_3_000",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "ceiling",
+      "min": [
+        -2,
+        6,
+        3
+      ],
+      "max": [
+        2,
+        12,
+        4
+      ]
+    },
+    {
+      "name": "Ceiling_3_001",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "ceiling",
+      "min": [
+        -19,
+        13,
+        3
+      ],
+      "max": [
+        -12,
+        20,
+        4
+      ]
+    },
+    {
+      "name": "Ceiling_3_002",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "ceiling",
+      "min": [
+        -12,
+        15,
+        3
+      ],
+      "max": [
+        -5,
+        18,
+        4
+      ]
+    },
+    {
+      "name": "Ceiling_3_003",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "ceiling",
+      "min": [
+        5,
+        15,
+        3
+      ],
+      "max": [
+        19,
+        18,
+        4
+      ]
+    },
+    {
+      "name": "Ceiling_3_004",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "ceiling",
+      "min": [
+        16,
+        18,
+        3
+      ],
+      "max": [
+        19,
+        26,
+        4
+      ]
+    },
+    {
+      "name": "Ceiling_3_005",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "ceiling",
+      "min": [
+        -13,
+        32,
+        3
+      ],
+      "max": [
+        -5,
+        34,
+        4
+      ]
+    },
+    {
+      "name": "Ceiling_3_006",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "ceiling",
+      "min": [
+        -14,
+        50,
+        3
+      ],
+      "max": [
+        -6,
+        52,
+        4
+      ]
+    },
+    {
+      "name": "Ceiling_3_007",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "ceiling",
+      "min": [
+        6,
+        50,
+        3
+      ],
+      "max": [
+        13,
+        53,
+        4
+      ]
+    },
+    {
+      "name": "Ceiling_5_000",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "ceiling",
+      "min": [
+        -5,
+        28,
+        5
+      ],
+      "max": [
+        6,
+        38,
+        6
+      ]
+    },
+    {
+      "name": "Ceiling_5_001",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "ceiling",
+      "min": [
+        13,
+        46,
+        5
+      ],
+      "max": [
+        24,
+        57,
+        6
+      ]
+    },
+    {
+      "name": "Ceiling_6_000",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "ceiling",
+      "min": [
+        -6,
+        46,
+        6
+      ],
+      "max": [
+        6,
+        58,
+        7
+      ]
+    },
+    {
+      "name": "Support_0_-1.9",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "support",
+      "min": [
+        -1.9,
+        7,
+        0
+      ],
+      "max": [
+        -1.65,
+        7.35,
+        2.8
+      ]
+    },
+    {
+      "name": "Support_0_1.65",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "support",
+      "min": [
+        1.65,
+        7,
+        0
+      ],
+      "max": [
+        1.9,
+        7.35,
+        2.8
+      ]
+    },
+    {
+      "name": "Support_beam_0",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "support",
+      "min": [
+        -1.9,
+        7,
+        2.8
+      ],
+      "max": [
+        1.9,
+        7.35,
+        3
+      ]
+    },
+    {
+      "name": "Support_1_-1.9",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "support",
+      "min": [
+        -1.9,
+        11,
+        0
+      ],
+      "max": [
+        -1.65,
+        11.35,
+        2.8
+      ]
+    },
+    {
+      "name": "Support_1_1.65",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "support",
+      "min": [
+        1.65,
+        11,
+        0
+      ],
+      "max": [
+        1.9,
+        11.35,
+        2.8
+      ]
+    },
+    {
+      "name": "Support_beam_1",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "support",
+      "min": [
+        -1.9,
+        11,
+        2.8
+      ],
+      "max": [
+        1.9,
+        11.35,
+        3
+      ]
+    },
+    {
+      "name": "Support_2_-1.9",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "support",
+      "min": [
+        -1.9,
+        23,
+        0
+      ],
+      "max": [
+        -1.65,
+        23.35,
+        2.8
+      ]
+    },
+    {
+      "name": "Support_2_1.65",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "support",
+      "min": [
+        1.65,
+        23,
+        0
+      ],
+      "max": [
+        1.9,
+        23.35,
+        2.8
+      ]
+    },
+    {
+      "name": "Support_beam_2",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "support",
+      "min": [
+        -1.9,
+        23,
+        2.8
+      ],
+      "max": [
+        1.9,
+        23.35,
+        3
+      ]
+    },
+    {
+      "name": "Support_3_-1.9",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "support",
+      "min": [
+        -1.9,
+        27,
+        0
+      ],
+      "max": [
+        -1.65,
+        27.35,
+        2.8
+      ]
+    },
+    {
+      "name": "Support_3_1.65",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "support",
+      "min": [
+        1.65,
+        27,
+        0
+      ],
+      "max": [
+        1.9,
+        27.35,
+        2.8
+      ]
+    },
+    {
+      "name": "Support_beam_3",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "support",
+      "min": [
+        -1.9,
+        27,
+        2.8
+      ],
+      "max": [
+        1.9,
+        27.35,
+        3
+      ]
+    },
+    {
+      "name": "Support_4_16.1",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "support",
+      "min": [
+        16.1,
+        38,
+        0
+      ],
+      "max": [
+        16.35,
+        38.35,
+        2.8
+      ]
+    },
+    {
+      "name": "Support_4_19.65",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "support",
+      "min": [
+        19.65,
+        38,
+        0
+      ],
+      "max": [
+        19.9,
+        38.35,
+        2.8
+      ]
+    },
+    {
+      "name": "Support_beam_4",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "support",
+      "min": [
+        16.1,
+        38,
+        2.8
+      ],
+      "max": [
+        19.9,
+        38.35,
+        3
+      ]
+    },
+    {
+      "name": "Support_5_16.1",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "support",
+      "min": [
+        16.1,
+        43,
+        0
+      ],
+      "max": [
+        16.35,
+        43.35,
+        2.8
+      ]
+    },
+    {
+      "name": "Support_5_19.65",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "support",
+      "min": [
+        19.65,
+        43,
+        0
+      ],
+      "max": [
+        19.9,
+        43.35,
+        2.8
+      ]
+    },
+    {
+      "name": "Support_beam_5",
+      "shape": "aabb",
+      "role": "solid",
+      "category": "support",
+      "min": [
+        16.1,
+        43,
+        2.8
+      ],
+      "max": [
+        19.9,
+        43.35,
+        3
+      ]
+    }
+  ],
+  "roads": [
+    {
+      "name": "A_entry_junction",
+      "points": [
+        [
+          0,
+          4,
+          0
+        ],
+        [
+          0,
+          16,
+          0
+        ]
+      ]
+    },
+    {
+      "name": "A_supply_branch",
+      "points": [
+        [
+          0,
+          16.5,
+          0
+        ],
+        [
+          -15.5,
+          16.5,
+          0
+        ]
+      ]
+    },
+    {
+      "name": "A_B_main",
+      "points": [
+        [
+          0,
+          16,
+          0
+        ],
+        [
+          0,
+          33,
+          0
+        ]
+      ]
+    },
+    {
+      "name": "A_B_east_loop",
+      "points": [
+        [
+          0,
+          16.5,
+          0
+        ],
+        [
+          17.5,
+          16.5,
+          0
+        ],
+        [
+          17.5,
+          30.5,
+          0
+        ]
+      ]
+    },
+    {
+      "name": "B_east_link",
+      "points": [
+        [
+          0,
+          32,
+          0
+        ],
+        [
+          17.5,
+          32,
+          0
+        ]
+      ]
+    },
+    {
+      "name": "B_hidden_branch",
+      "points": [
+        [
+          0,
+          33,
+          0
+        ],
+        [
+          -17,
+          33,
+          0
+        ]
+      ]
+    },
+    {
+      "name": "B_C_main",
+      "points": [
+        [
+          0,
+          33,
+          0
+        ],
+        [
+          0,
+          48,
+          0
+        ]
+      ]
+    },
+    {
+      "name": "B_C_east",
+      "points": [
+        [
+          18,
+          30,
+          0
+        ],
+        [
+          18,
+          47,
+          0
+        ]
+      ]
+    },
+    {
+      "name": "C_return_link",
+      "points": [
+        [
+          3.5,
+          51.5,
+          0
+        ],
+        [
+          18,
+          51.5,
+          0
+        ]
+      ]
+    },
+    {
+      "name": "C_hidden_branch",
+      "points": [
+        [
+          -5,
+          51,
+          0
+        ],
+        [
+          -18,
+          51,
+          0
+        ]
+      ]
+    }
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "id": "A_entry",
+        "sector": "A",
+        "rect": [
+          -4,
+          -3,
+          5,
+          6
+        ],
+        "height": 4,
+        "center": [
+          0.5,
+          1.5,
+          0
+        ]
+      },
+      {
+        "id": "A_junction",
+        "sector": "A",
+        "rect": [
+          -5,
+          12,
+          5,
+          21
+        ],
+        "height": 4,
+        "center": [
+          0.0,
+          16.5,
+          0
+        ]
+      },
+      {
+        "id": "A_supply",
+        "sector": "A",
+        "rect": [
+          -19,
+          13,
+          -12,
+          20
+        ],
+        "height": 3,
+        "center": [
+          -15.5,
+          16.5,
+          0
+        ]
+      },
+      {
+        "id": "B_hub",
+        "sector": "B",
+        "rect": [
+          -5,
+          28,
+          6,
+          38
+        ],
+        "height": 5,
+        "center": [
+          0.5,
+          33.0,
+          0
+        ]
+      },
+      {
+        "id": "B_east",
+        "sector": "B",
+        "rect": [
+          13,
+          26,
+          22,
+          35
+        ],
+        "height": 4,
+        "center": [
+          17.5,
+          30.5,
+          0
+        ]
+      },
+      {
+        "id": "B_secret",
+        "sector": "B",
+        "rect": [
+          -21,
+          29,
+          -13,
+          37
+        ],
+        "height": 4,
+        "center": [
+          -17.0,
+          33.0,
+          0
+        ]
+      },
+      {
+        "id": "C_lava",
+        "sector": "C",
+        "rect": [
+          -6,
+          46,
+          6,
+          58
+        ],
+        "height": 6,
+        "center": [
+          0.0,
+          52.0,
+          0
+        ]
+      },
+      {
+        "id": "C_vault",
+        "sector": "C",
+        "rect": [
+          13,
+          46,
+          24,
+          57
+        ],
+        "height": 5,
+        "center": [
+          18.5,
+          51.5,
+          0
+        ]
+      },
+      {
+        "id": "C_secret",
+        "sector": "C",
+        "rect": [
+          -22,
+          47,
+          -14,
+          55
+        ],
+        "height": 4,
+        "center": [
+          -18.0,
+          51.0,
+          0
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "id": "A_entry_junction",
+        "a": "A_entry",
+        "b": "A_junction",
+        "rects": [
+          [
+            -2,
+            6,
+            2,
+            12
+          ]
+        ],
+        "points": [
+          [
+            0,
+            4,
+            0
+          ],
+          [
+            0,
+            16,
+            0
+          ]
+        ],
+        "height": 3,
+        "requires_break": []
+      },
+      {
+        "id": "A_supply_branch",
+        "a": "A_junction",
+        "b": "A_supply",
+        "rects": [
+          [
+            -12,
+            15,
+            -5,
+            18
+          ]
+        ],
+        "points": [
+          [
+            0,
+            16.5,
+            0
+          ],
+          [
+            -15.5,
+            16.5,
+            0
+          ]
+        ],
+        "height": 3,
+        "requires_break": []
+      },
+      {
+        "id": "A_B_main",
+        "a": "A_junction",
+        "b": "B_hub",
+        "rects": [
+          [
+            -2,
+            21,
+            2,
+            28
+          ]
+        ],
+        "points": [
+          [
+            0,
+            16,
+            0
+          ],
+          [
+            0,
+            33,
+            0
+          ]
+        ],
+        "height": 4,
+        "requires_break": []
+      },
+      {
+        "id": "A_B_east_loop",
+        "a": "A_junction",
+        "b": "B_east",
+        "rects": [
+          [
+            5,
+            15,
+            19,
+            18
+          ],
+          [
+            16,
+            16,
+            19,
+            26
+          ]
+        ],
+        "points": [
+          [
+            0,
+            16.5,
+            0
+          ],
+          [
+            17.5,
+            16.5,
+            0
+          ],
+          [
+            17.5,
+            30.5,
+            0
+          ]
+        ],
+        "height": 3,
+        "requires_break": []
+      },
+      {
+        "id": "B_east_link",
+        "a": "B_hub",
+        "b": "B_east",
+        "rects": [
+          [
+            6,
+            30,
+            13,
+            34
+          ]
+        ],
+        "points": [
+          [
+            0,
+            32,
+            0
+          ],
+          [
+            17.5,
+            32,
+            0
+          ]
+        ],
+        "height": 4,
+        "requires_break": []
+      },
+      {
+        "id": "B_hidden_branch",
+        "a": "B_hub",
+        "b": "B_secret",
+        "rects": [
+          [
+            -13,
+            32,
+            -5,
+            34
+          ]
+        ],
+        "points": [
+          [
+            0,
+            33,
+            0
+          ],
+          [
+            -17,
+            33,
+            0
+          ]
+        ],
+        "height": 3,
+        "requires_break": [
+          "BREAK_B_gate_32_0",
+          "BREAK_B_gate_32_1",
+          "BREAK_B_gate_32_2",
+          "BREAK_B_gate_33_0",
+          "BREAK_B_gate_33_1",
+          "BREAK_B_gate_33_2"
+        ]
+      },
+      {
+        "id": "B_C_main",
+        "a": "B_hub",
+        "b": "C_lava",
+        "rects": [
+          [
+            -2,
+            38,
+            2,
+            46
+          ]
+        ],
+        "points": [
+          [
+            0,
+            33,
+            0
+          ],
+          [
+            0,
+            48,
+            0
+          ]
+        ],
+        "height": 4,
+        "requires_break": []
+      },
+      {
+        "id": "B_C_east",
+        "a": "B_east",
+        "b": "C_vault",
+        "rects": [
+          [
+            16,
+            35,
+            20,
+            46
+          ]
+        ],
+        "points": [
+          [
+            18,
+            30,
+            0
+          ],
+          [
+            18,
+            47,
+            0
+          ]
+        ],
+        "height": 4,
+        "requires_break": []
+      },
+      {
+        "id": "C_return_link",
+        "a": "C_lava",
+        "b": "C_vault",
+        "rects": [
+          [
+            6,
+            50,
+            13,
+            53
+          ]
+        ],
+        "points": [
+          [
+            3.5,
+            51.5,
+            0
+          ],
+          [
+            18,
+            51.5,
+            0
+          ]
+        ],
+        "height": 3,
+        "requires_break": []
+      },
+      {
+        "id": "C_hidden_branch",
+        "a": "C_lava",
+        "b": "C_secret",
+        "rects": [
+          [
+            -14,
+            50,
+            -6,
+            52
+          ]
+        ],
+        "points": [
+          [
+            -5,
+            51,
+            0
+          ],
+          [
+            -18,
+            51,
+            0
+          ]
+        ],
+        "height": 3,
+        "requires_break": [
+          "BREAK_C_gate_50_0",
+          "BREAK_C_gate_50_1",
+          "BREAK_C_gate_50_2",
+          "BREAK_C_gate_51_0",
+          "BREAK_C_gate_51_1",
+          "BREAK_C_gate_51_2"
+        ]
+      }
+    ]
+  },
+  "interactive_blocks": [
+    {
+      "id": "BREAK_B_gate_32_0",
+      "object": "BREAK_B_gate_32_0",
+      "collider_id": "BREAK_B_gate_32_0",
+      "kind": "breakable",
+      "room": "B_secret",
+      "sector": "B",
+      "min": [
+        -9,
+        32,
+        0
+      ],
+      "max": [
+        -8,
+        33,
+        1
+      ],
+      "initial_visible": true,
+      "initial_solid": true,
+      "reset": {
+        "visible": true,
+        "solid": true
+      },
+      "gate": "B_gate"
+    },
+    {
+      "id": "BREAK_B_gate_32_1",
+      "object": "BREAK_B_gate_32_1",
+      "collider_id": "BREAK_B_gate_32_1",
+      "kind": "breakable",
+      "room": "B_secret",
+      "sector": "B",
+      "min": [
+        -9,
+        32,
+        1
+      ],
+      "max": [
+        -8,
+        33,
+        2
+      ],
+      "initial_visible": true,
+      "initial_solid": true,
+      "reset": {
+        "visible": true,
+        "solid": true
+      },
+      "gate": "B_gate"
+    },
+    {
+      "id": "BREAK_B_gate_32_2",
+      "object": "BREAK_B_gate_32_2",
+      "collider_id": "BREAK_B_gate_32_2",
+      "kind": "breakable",
+      "room": "B_secret",
+      "sector": "B",
+      "min": [
+        -9,
+        32,
+        2
+      ],
+      "max": [
+        -8,
+        33,
+        3
+      ],
+      "initial_visible": true,
+      "initial_solid": true,
+      "reset": {
+        "visible": true,
+        "solid": true
+      },
+      "gate": "B_gate"
+    },
+    {
+      "id": "BREAK_B_gate_33_0",
+      "object": "BREAK_B_gate_33_0",
+      "collider_id": "BREAK_B_gate_33_0",
+      "kind": "breakable",
+      "room": "B_secret",
+      "sector": "B",
+      "min": [
+        -9,
+        33,
+        0
+      ],
+      "max": [
+        -8,
+        34,
+        1
+      ],
+      "initial_visible": true,
+      "initial_solid": true,
+      "reset": {
+        "visible": true,
+        "solid": true
+      },
+      "gate": "B_gate"
+    },
+    {
+      "id": "BREAK_B_gate_33_1",
+      "object": "BREAK_B_gate_33_1",
+      "collider_id": "BREAK_B_gate_33_1",
+      "kind": "breakable",
+      "room": "B_secret",
+      "sector": "B",
+      "min": [
+        -9,
+        33,
+        1
+      ],
+      "max": [
+        -8,
+        34,
+        2
+      ],
+      "initial_visible": true,
+      "initial_solid": true,
+      "reset": {
+        "visible": true,
+        "solid": true
+      },
+      "gate": "B_gate"
+    },
+    {
+      "id": "BREAK_B_gate_33_2",
+      "object": "BREAK_B_gate_33_2",
+      "collider_id": "BREAK_B_gate_33_2",
+      "kind": "breakable",
+      "room": "B_secret",
+      "sector": "B",
+      "min": [
+        -9,
+        33,
+        2
+      ],
+      "max": [
+        -8,
+        34,
+        3
+      ],
+      "initial_visible": true,
+      "initial_solid": true,
+      "reset": {
+        "visible": true,
+        "solid": true
+      },
+      "gate": "B_gate"
+    },
+    {
+      "id": "BREAK_C_gate_50_0",
+      "object": "BREAK_C_gate_50_0",
+      "collider_id": "BREAK_C_gate_50_0",
+      "kind": "breakable",
+      "room": "C_secret",
+      "sector": "C",
+      "min": [
+        -10,
+        50,
+        0
+      ],
+      "max": [
+        -9,
+        51,
+        1
+      ],
+      "initial_visible": true,
+      "initial_solid": true,
+      "reset": {
+        "visible": true,
+        "solid": true
+      },
+      "gate": "C_gate"
+    },
+    {
+      "id": "BREAK_C_gate_50_1",
+      "object": "BREAK_C_gate_50_1",
+      "collider_id": "BREAK_C_gate_50_1",
+      "kind": "breakable",
+      "room": "C_secret",
+      "sector": "C",
+      "min": [
+        -10,
+        50,
+        1
+      ],
+      "max": [
+        -9,
+        51,
+        2
+      ],
+      "initial_visible": true,
+      "initial_solid": true,
+      "reset": {
+        "visible": true,
+        "solid": true
+      },
+      "gate": "C_gate"
+    },
+    {
+      "id": "BREAK_C_gate_50_2",
+      "object": "BREAK_C_gate_50_2",
+      "collider_id": "BREAK_C_gate_50_2",
+      "kind": "breakable",
+      "room": "C_secret",
+      "sector": "C",
+      "min": [
+        -10,
+        50,
+        2
+      ],
+      "max": [
+        -9,
+        51,
+        3
+      ],
+      "initial_visible": true,
+      "initial_solid": true,
+      "reset": {
+        "visible": true,
+        "solid": true
+      },
+      "gate": "C_gate"
+    },
+    {
+      "id": "BREAK_C_gate_51_0",
+      "object": "BREAK_C_gate_51_0",
+      "collider_id": "BREAK_C_gate_51_0",
+      "kind": "breakable",
+      "room": "C_secret",
+      "sector": "C",
+      "min": [
+        -10,
+        51,
+        0
+      ],
+      "max": [
+        -9,
+        52,
+        1
+      ],
+      "initial_visible": true,
+      "initial_solid": true,
+      "reset": {
+        "visible": true,
+        "solid": true
+      },
+      "gate": "C_gate"
+    },
+    {
+      "id": "BREAK_C_gate_51_1",
+      "object": "BREAK_C_gate_51_1",
+      "collider_id": "BREAK_C_gate_51_1",
+      "kind": "breakable",
+      "room": "C_secret",
+      "sector": "C",
+      "min": [
+        -10,
+        51,
+        1
+      ],
+      "max": [
+        -9,
+        52,
+        2
+      ],
+      "initial_visible": true,
+      "initial_solid": true,
+      "reset": {
+        "visible": true,
+        "solid": true
+      },
+      "gate": "C_gate"
+    },
+    {
+      "id": "BREAK_C_gate_51_2",
+      "object": "BREAK_C_gate_51_2",
+      "collider_id": "BREAK_C_gate_51_2",
+      "kind": "breakable",
+      "room": "C_secret",
+      "sector": "C",
+      "min": [
+        -10,
+        51,
+        2
+      ],
+      "max": [
+        -9,
+        52,
+        3
+      ],
+      "initial_visible": true,
+      "initial_solid": true,
+      "reset": {
+        "visible": true,
+        "solid": true
+      },
+      "gate": "C_gate"
+    },
+    {
+      "id": "ORE_DIAMOND_01",
+      "object": "ORE_DIAMOND_01",
+      "collider_id": "ORE_DIAMOND_01",
+      "kind": "diamond",
+      "room": "A_junction",
+      "sector": "A",
+      "min": [
+        -4,
+        21,
+        1
+      ],
+      "max": [
+        -3,
+        22,
+        2
+      ],
+      "initial_visible": true,
+      "initial_solid": true,
+      "reset": {
+        "visible": true,
+        "solid": true
+      },
+      "gate": null,
+      "approach": [
+        -3.5,
+        20.5,
+        0
+      ]
+    },
+    {
+      "id": "ORE_DIAMOND_02",
+      "object": "ORE_DIAMOND_02",
+      "collider_id": "ORE_DIAMOND_02",
+      "kind": "diamond",
+      "room": "A_supply",
+      "sector": "A",
+      "min": [
+        -20,
+        16,
+        1
+      ],
+      "max": [
+        -19,
+        17,
+        2
+      ],
+      "initial_visible": true,
+      "initial_solid": true,
+      "reset": {
+        "visible": true,
+        "solid": true
+      },
+      "gate": null,
+      "approach": [
+        -18.5,
+        16.5,
+        0
+      ]
+    },
+    {
+      "id": "ORE_DIAMOND_03",
+      "object": "ORE_DIAMOND_03",
+      "collider_id": "ORE_DIAMOND_03",
+      "kind": "diamond",
+      "room": "B_hub",
+      "sector": "B",
+      "min": [
+        -6,
+        30,
+        1
+      ],
+      "max": [
+        -5,
+        31,
+        2
+      ],
+      "initial_visible": true,
+      "initial_solid": true,
+      "reset": {
+        "visible": true,
+        "solid": true
+      },
+      "gate": null,
+      "approach": [
+        -4.5,
+        30.5,
+        0
+      ]
+    },
+    {
+      "id": "ORE_DIAMOND_04",
+      "object": "ORE_DIAMOND_04",
+      "collider_id": "ORE_DIAMOND_04",
+      "kind": "diamond",
+      "room": "B_hub",
+      "sector": "B",
+      "min": [
+        4,
+        38,
+        1
+      ],
+      "max": [
+        5,
+        39,
+        2
+      ],
+      "initial_visible": true,
+      "initial_solid": true,
+      "reset": {
+        "visible": true,
+        "solid": true
+      },
+      "gate": null,
+      "approach": [
+        4.5,
+        37.5,
+        0
+      ]
+    },
+    {
+      "id": "ORE_DIAMOND_05",
+      "object": "ORE_DIAMOND_05",
+      "collider_id": "ORE_DIAMOND_05",
+      "kind": "diamond",
+      "room": "B_east",
+      "sector": "B",
+      "min": [
+        22,
+        28,
+        1
+      ],
+      "max": [
+        23,
+        29,
+        2
+      ],
+      "initial_visible": true,
+      "initial_solid": true,
+      "reset": {
+        "visible": true,
+        "solid": true
+      },
+      "gate": null,
+      "approach": [
+        21.5,
+        28.5,
+        0
+      ]
+    },
+    {
+      "id": "ORE_DIAMOND_06",
+      "object": "ORE_DIAMOND_06",
+      "collider_id": "ORE_DIAMOND_06",
+      "kind": "diamond",
+      "room": "B_secret",
+      "sector": "B",
+      "min": [
+        -22,
+        31,
+        1
+      ],
+      "max": [
+        -21,
+        32,
+        2
+      ],
+      "initial_visible": true,
+      "initial_solid": true,
+      "reset": {
+        "visible": true,
+        "solid": true
+      },
+      "gate": null,
+      "approach": [
+        -20.5,
+        31.5,
+        0
+      ]
+    },
+    {
+      "id": "ORE_DIAMOND_07",
+      "object": "ORE_DIAMOND_07",
+      "collider_id": "ORE_DIAMOND_07",
+      "kind": "diamond",
+      "room": "B_secret",
+      "sector": "B",
+      "min": [
+        -17,
+        37,
+        1
+      ],
+      "max": [
+        -16,
+        38,
+        2
+      ],
+      "initial_visible": true,
+      "initial_solid": true,
+      "reset": {
+        "visible": true,
+        "solid": true
+      },
+      "gate": null,
+      "approach": [
+        -16.5,
+        36.5,
+        0
+      ]
+    },
+    {
+      "id": "ORE_DIAMOND_08",
+      "object": "ORE_DIAMOND_08",
+      "collider_id": "ORE_DIAMOND_08",
+      "kind": "diamond",
+      "room": "C_lava",
+      "sector": "C",
+      "min": [
+        -7,
+        47,
+        1
+      ],
+      "max": [
+        -6,
+        48,
+        2
+      ],
+      "initial_visible": true,
+      "initial_solid": true,
+      "reset": {
+        "visible": true,
+        "solid": true
+      },
+      "gate": null,
+      "approach": [
+        -5.5,
+        47.5,
+        0
+      ]
+    },
+    {
+      "id": "ORE_DIAMOND_09",
+      "object": "ORE_DIAMOND_09",
+      "collider_id": "ORE_DIAMOND_09",
+      "kind": "diamond",
+      "room": "C_lava",
+      "sector": "C",
+      "min": [
+        -3,
+        58,
+        1
+      ],
+      "max": [
+        -2,
+        59,
+        2
+      ],
+      "initial_visible": true,
+      "initial_solid": true,
+      "reset": {
+        "visible": true,
+        "solid": true
+      },
+      "gate": null,
+      "approach": [
+        -2.5,
+        57.5,
+        0
+      ]
+    },
+    {
+      "id": "ORE_DIAMOND_10",
+      "object": "ORE_DIAMOND_10",
+      "collider_id": "ORE_DIAMOND_10",
+      "kind": "diamond",
+      "room": "C_lava",
+      "sector": "C",
+      "min": [
+        6,
+        55,
+        1
+      ],
+      "max": [
+        7,
+        56,
+        2
+      ],
+      "initial_visible": true,
+      "initial_solid": true,
+      "reset": {
+        "visible": true,
+        "solid": true
+      },
+      "gate": null,
+      "approach": [
+        5.5,
+        55.5,
+        0
+      ]
+    },
+    {
+      "id": "ORE_DIAMOND_11",
+      "object": "ORE_DIAMOND_11",
+      "collider_id": "ORE_DIAMOND_11",
+      "kind": "diamond",
+      "room": "C_vault",
+      "sector": "C",
+      "min": [
+        24,
+        48,
+        1
+      ],
+      "max": [
+        25,
+        49,
+        2
+      ],
+      "initial_visible": true,
+      "initial_solid": true,
+      "reset": {
+        "visible": true,
+        "solid": true
+      },
+      "gate": null,
+      "approach": [
+        23.5,
+        48.5,
+        0
+      ]
+    },
+    {
+      "id": "ORE_DIAMOND_12",
+      "object": "ORE_DIAMOND_12",
+      "collider_id": "ORE_DIAMOND_12",
+      "kind": "diamond",
+      "room": "C_vault",
+      "sector": "C",
+      "min": [
+        20,
+        57,
+        1
+      ],
+      "max": [
+        21,
+        58,
+        2
+      ],
+      "initial_visible": true,
+      "initial_solid": true,
+      "reset": {
+        "visible": true,
+        "solid": true
+      },
+      "gate": null,
+      "approach": [
+        20.5,
+        56.5,
+        0
+      ]
+    },
+    {
+      "id": "ORE_DIAMOND_13",
+      "object": "ORE_DIAMOND_13",
+      "collider_id": "ORE_DIAMOND_13",
+      "kind": "diamond",
+      "room": "C_secret",
+      "sector": "C",
+      "min": [
+        -23,
+        49,
+        1
+      ],
+      "max": [
+        -22,
+        50,
+        2
+      ],
+      "initial_visible": true,
+      "initial_solid": true,
+      "reset": {
+        "visible": true,
+        "solid": true
+      },
+      "gate": null,
+      "approach": [
+        -21.5,
+        49.5,
+        0
+      ]
+    },
+    {
+      "id": "ORE_DIAMOND_14",
+      "object": "ORE_DIAMOND_14",
+      "collider_id": "ORE_DIAMOND_14",
+      "kind": "diamond",
+      "room": "C_secret",
+      "sector": "C",
+      "min": [
+        -18,
+        55,
+        1
+      ],
+      "max": [
+        -17,
+        56,
+        2
+      ],
+      "initial_visible": true,
+      "initial_solid": true,
+      "reset": {
+        "visible": true,
+        "solid": true
+      },
+      "gate": null,
+      "approach": [
+        -17.5,
+        54.5,
+        0
+      ]
+    }
+  ],
+  "lava_regions": [
+    {
+      "id": "Lava_West",
+      "min": [
+        -4,
+        50,
+        -0.1
+      ],
+      "max": [
+        -1,
+        55,
+        0.5
+      ],
+      "damage_enabled": false,
+      "animation": {
+        "source": "lava_still.png",
+        "frames": 20,
+        "active": false
+      }
+    },
+    {
+      "id": "Lava_Vault",
+      "min": [
+        19,
+        49,
+        -0.1
+      ],
+      "max": [
+        22,
+        52,
+        0.5
+      ],
+      "damage_enabled": false,
+      "animation": {
+        "source": "lava_still.png",
+        "frames": 20,
+        "active": false
+      }
+    }
+  ],
+  "lights": [
+    {
+      "id": "Torch_00",
+      "position": [
+        0,
+        -2,
+        2.8
+      ],
+      "color": [
+        1,
+        0.66,
+        0.32
+      ],
+      "radius": 9
+    },
+    {
+      "id": "Torch_01",
+      "position": [
+        3.5,
+        3.5,
+        2.7
+      ],
+      "color": [
+        1,
+        0.66,
+        0.32
+      ],
+      "radius": 9
+    },
+    {
+      "id": "Torch_02",
+      "position": [
+        -1.6,
+        9,
+        2.5
+      ],
+      "color": [
+        1,
+        0.66,
+        0.32
+      ],
+      "radius": 9
+    },
+    {
+      "id": "Torch_03",
+      "position": [
+        3.5,
+        17,
+        2.8
+      ],
+      "color": [
+        1,
+        0.66,
+        0.32
+      ],
+      "radius": 9
+    },
+    {
+      "id": "Torch_04",
+      "position": [
+        -16,
+        14,
+        2.4
+      ],
+      "color": [
+        1,
+        0.66,
+        0.32
+      ],
+      "radius": 9
+    },
+    {
+      "id": "Torch_05",
+      "position": [
+        17,
+        17,
+        2.5
+      ],
+      "color": [
+        1,
+        0.66,
+        0.32
+      ],
+      "radius": 9
+    },
+    {
+      "id": "Torch_06",
+      "position": [
+        1.5,
+        24,
+        2.7
+      ],
+      "color": [
+        1,
+        0.66,
+        0.32
+      ],
+      "radius": 9
+    },
+    {
+      "id": "Torch_07",
+      "position": [
+        -3.5,
+        29,
+        3
+      ],
+      "color": [
+        1,
+        0.66,
+        0.32
+      ],
+      "radius": 8
+    },
+    {
+      "id": "Torch_08",
+      "position": [
+        4.5,
+        36,
+        3
+      ],
+      "color": [
+        1,
+        0.66,
+        0.32
+      ],
+      "radius": 8
+    },
+    {
+      "id": "Torch_09",
+      "position": [
+        -11,
+        33,
+        2.5
+      ],
+      "color": [
+        1,
+        0.66,
+        0.32
+      ],
+      "radius": 8
+    },
+    {
+      "id": "Torch_10",
+      "position": [
+        14.5,
+        28,
+        2.7
+      ],
+      "color": [
+        1,
+        0.66,
+        0.32
+      ],
+      "radius": 8
+    },
+    {
+      "id": "Torch_11",
+      "position": [
+        20.5,
+        33,
+        2.7
+      ],
+      "color": [
+        1,
+        0.66,
+        0.32
+      ],
+      "radius": 8
+    },
+    {
+      "id": "Torch_12",
+      "position": [
+        17,
+        40,
+        2.7
+      ],
+      "color": [
+        1,
+        0.66,
+        0.32
+      ],
+      "radius": 8
+    },
+    {
+      "id": "Torch_13",
+      "position": [
+        -18,
+        30,
+        2.7
+      ],
+      "color": [
+        1,
+        0.66,
+        0.32
+      ],
+      "radius": 8
+    },
+    {
+      "id": "Torch_14",
+      "position": [
+        -4.5,
+        47.5,
+        3
+      ],
+      "color": [
+        1,
+        0.66,
+        0.32
+      ],
+      "radius": 8
+    },
+    {
+      "id": "Torch_15",
+      "position": [
+        4.5,
+        56,
+        3
+      ],
+      "color": [
+        1,
+        0.66,
+        0.32
+      ],
+      "radius": 8
+    },
+    {
+      "id": "Torch_16",
+      "position": [
+        11,
+        51,
+        2.5
+      ],
+      "color": [
+        1,
+        0.66,
+        0.32
+      ],
+      "radius": 8
+    },
+    {
+      "id": "Torch_17",
+      "position": [
+        14.5,
+        47,
+        3
+      ],
+      "color": [
+        1,
+        0.66,
+        0.32
+      ],
+      "radius": 8
+    },
+    {
+      "id": "Torch_18",
+      "position": [
+        22.5,
+        55,
+        3
+      ],
+      "color": [
+        1,
+        0.66,
+        0.32
+      ],
+      "radius": 8
+    },
+    {
+      "id": "Torch_19",
+      "position": [
+        -19,
+        48,
+        2.7
+      ],
+      "color": [
+        1,
+        0.66,
+        0.32
+      ],
+      "radius": 8
+    },
+    {
+      "id": "Lava_West",
+      "position": [
+        -2.5,
+        52.5,
+        0.7
+      ],
+      "color": [
+        1,
+        0.22,
+        0.035
+      ],
+      "radius": 10
+    },
+    {
+      "id": "Lava_Vault",
+      "position": [
+        20.5,
+        50.5,
+        0.7
+      ],
+      "color": [
+        1,
+        0.22,
+        0.035
+      ],
+      "radius": 10
+    }
+  ],
+  "floor_cells": [
+    {
+      "x": -22,
+      "y": 47,
+      "ceiling": 4
+    },
+    {
+      "x": -22,
+      "y": 48,
+      "ceiling": 4
+    },
+    {
+      "x": -22,
+      "y": 49,
+      "ceiling": 4
+    },
+    {
+      "x": -22,
+      "y": 50,
+      "ceiling": 4
+    },
+    {
+      "x": -22,
+      "y": 51,
+      "ceiling": 4
+    },
+    {
+      "x": -22,
+      "y": 52,
+      "ceiling": 4
+    },
+    {
+      "x": -22,
+      "y": 53,
+      "ceiling": 4
+    },
+    {
+      "x": -22,
+      "y": 54,
+      "ceiling": 4
+    },
+    {
+      "x": -21,
+      "y": 29,
+      "ceiling": 4
+    },
+    {
+      "x": -21,
+      "y": 30,
+      "ceiling": 4
+    },
+    {
+      "x": -21,
+      "y": 31,
+      "ceiling": 4
+    },
+    {
+      "x": -21,
+      "y": 32,
+      "ceiling": 4
+    },
+    {
+      "x": -21,
+      "y": 33,
+      "ceiling": 4
+    },
+    {
+      "x": -21,
+      "y": 34,
+      "ceiling": 4
+    },
+    {
+      "x": -21,
+      "y": 35,
+      "ceiling": 4
+    },
+    {
+      "x": -21,
+      "y": 36,
+      "ceiling": 4
+    },
+    {
+      "x": -21,
+      "y": 47,
+      "ceiling": 4
+    },
+    {
+      "x": -21,
+      "y": 48,
+      "ceiling": 4
+    },
+    {
+      "x": -21,
+      "y": 49,
+      "ceiling": 4
+    },
+    {
+      "x": -21,
+      "y": 50,
+      "ceiling": 4
+    },
+    {
+      "x": -21,
+      "y": 51,
+      "ceiling": 4
+    },
+    {
+      "x": -21,
+      "y": 52,
+      "ceiling": 4
+    },
+    {
+      "x": -21,
+      "y": 53,
+      "ceiling": 4
+    },
+    {
+      "x": -21,
+      "y": 54,
+      "ceiling": 4
+    },
+    {
+      "x": -20,
+      "y": 29,
+      "ceiling": 4
+    },
+    {
+      "x": -20,
+      "y": 30,
+      "ceiling": 4
+    },
+    {
+      "x": -20,
+      "y": 31,
+      "ceiling": 4
+    },
+    {
+      "x": -20,
+      "y": 32,
+      "ceiling": 4
+    },
+    {
+      "x": -20,
+      "y": 33,
+      "ceiling": 4
+    },
+    {
+      "x": -20,
+      "y": 34,
+      "ceiling": 4
+    },
+    {
+      "x": -20,
+      "y": 35,
+      "ceiling": 4
+    },
+    {
+      "x": -20,
+      "y": 36,
+      "ceiling": 4
+    },
+    {
+      "x": -20,
+      "y": 47,
+      "ceiling": 4
+    },
+    {
+      "x": -20,
+      "y": 48,
+      "ceiling": 4
+    },
+    {
+      "x": -20,
+      "y": 49,
+      "ceiling": 4
+    },
+    {
+      "x": -20,
+      "y": 50,
+      "ceiling": 4
+    },
+    {
+      "x": -20,
+      "y": 51,
+      "ceiling": 4
+    },
+    {
+      "x": -20,
+      "y": 52,
+      "ceiling": 4
+    },
+    {
+      "x": -20,
+      "y": 53,
+      "ceiling": 4
+    },
+    {
+      "x": -20,
+      "y": 54,
+      "ceiling": 4
+    },
+    {
+      "x": -19,
+      "y": 13,
+      "ceiling": 3
+    },
+    {
+      "x": -19,
+      "y": 14,
+      "ceiling": 3
+    },
+    {
+      "x": -19,
+      "y": 15,
+      "ceiling": 3
+    },
+    {
+      "x": -19,
+      "y": 16,
+      "ceiling": 3
+    },
+    {
+      "x": -19,
+      "y": 17,
+      "ceiling": 3
+    },
+    {
+      "x": -19,
+      "y": 18,
+      "ceiling": 3
+    },
+    {
+      "x": -19,
+      "y": 19,
+      "ceiling": 3
+    },
+    {
+      "x": -19,
+      "y": 29,
+      "ceiling": 4
+    },
+    {
+      "x": -19,
+      "y": 30,
+      "ceiling": 4
+    },
+    {
+      "x": -19,
+      "y": 31,
+      "ceiling": 4
+    },
+    {
+      "x": -19,
+      "y": 32,
+      "ceiling": 4
+    },
+    {
+      "x": -19,
+      "y": 33,
+      "ceiling": 4
+    },
+    {
+      "x": -19,
+      "y": 34,
+      "ceiling": 4
+    },
+    {
+      "x": -19,
+      "y": 35,
+      "ceiling": 4
+    },
+    {
+      "x": -19,
+      "y": 36,
+      "ceiling": 4
+    },
+    {
+      "x": -19,
+      "y": 47,
+      "ceiling": 4
+    },
+    {
+      "x": -19,
+      "y": 48,
+      "ceiling": 4
+    },
+    {
+      "x": -19,
+      "y": 49,
+      "ceiling": 4
+    },
+    {
+      "x": -19,
+      "y": 50,
+      "ceiling": 4
+    },
+    {
+      "x": -19,
+      "y": 51,
+      "ceiling": 4
+    },
+    {
+      "x": -19,
+      "y": 52,
+      "ceiling": 4
+    },
+    {
+      "x": -19,
+      "y": 53,
+      "ceiling": 4
+    },
+    {
+      "x": -19,
+      "y": 54,
+      "ceiling": 4
+    },
+    {
+      "x": -18,
+      "y": 13,
+      "ceiling": 3
+    },
+    {
+      "x": -18,
+      "y": 14,
+      "ceiling": 3
+    },
+    {
+      "x": -18,
+      "y": 15,
+      "ceiling": 3
+    },
+    {
+      "x": -18,
+      "y": 16,
+      "ceiling": 3
+    },
+    {
+      "x": -18,
+      "y": 17,
+      "ceiling": 3
+    },
+    {
+      "x": -18,
+      "y": 18,
+      "ceiling": 3
+    },
+    {
+      "x": -18,
+      "y": 19,
+      "ceiling": 3
+    },
+    {
+      "x": -18,
+      "y": 29,
+      "ceiling": 4
+    },
+    {
+      "x": -18,
+      "y": 30,
+      "ceiling": 4
+    },
+    {
+      "x": -18,
+      "y": 31,
+      "ceiling": 4
+    },
+    {
+      "x": -18,
+      "y": 32,
+      "ceiling": 4
+    },
+    {
+      "x": -18,
+      "y": 33,
+      "ceiling": 4
+    },
+    {
+      "x": -18,
+      "y": 34,
+      "ceiling": 4
+    },
+    {
+      "x": -18,
+      "y": 35,
+      "ceiling": 4
+    },
+    {
+      "x": -18,
+      "y": 36,
+      "ceiling": 4
+    },
+    {
+      "x": -18,
+      "y": 47,
+      "ceiling": 4
+    },
+    {
+      "x": -18,
+      "y": 48,
+      "ceiling": 4
+    },
+    {
+      "x": -18,
+      "y": 49,
+      "ceiling": 4
+    },
+    {
+      "x": -18,
+      "y": 50,
+      "ceiling": 4
+    },
+    {
+      "x": -18,
+      "y": 51,
+      "ceiling": 4
+    },
+    {
+      "x": -18,
+      "y": 52,
+      "ceiling": 4
+    },
+    {
+      "x": -18,
+      "y": 53,
+      "ceiling": 4
+    },
+    {
+      "x": -18,
+      "y": 54,
+      "ceiling": 4
+    },
+    {
+      "x": -17,
+      "y": 13,
+      "ceiling": 3
+    },
+    {
+      "x": -17,
+      "y": 14,
+      "ceiling": 3
+    },
+    {
+      "x": -17,
+      "y": 15,
+      "ceiling": 3
+    },
+    {
+      "x": -17,
+      "y": 16,
+      "ceiling": 3
+    },
+    {
+      "x": -17,
+      "y": 17,
+      "ceiling": 3
+    },
+    {
+      "x": -17,
+      "y": 18,
+      "ceiling": 3
+    },
+    {
+      "x": -17,
+      "y": 19,
+      "ceiling": 3
+    },
+    {
+      "x": -17,
+      "y": 29,
+      "ceiling": 4
+    },
+    {
+      "x": -17,
+      "y": 30,
+      "ceiling": 4
+    },
+    {
+      "x": -17,
+      "y": 31,
+      "ceiling": 4
+    },
+    {
+      "x": -17,
+      "y": 32,
+      "ceiling": 4
+    },
+    {
+      "x": -17,
+      "y": 33,
+      "ceiling": 4
+    },
+    {
+      "x": -17,
+      "y": 34,
+      "ceiling": 4
+    },
+    {
+      "x": -17,
+      "y": 35,
+      "ceiling": 4
+    },
+    {
+      "x": -17,
+      "y": 36,
+      "ceiling": 4
+    },
+    {
+      "x": -17,
+      "y": 47,
+      "ceiling": 4
+    },
+    {
+      "x": -17,
+      "y": 48,
+      "ceiling": 4
+    },
+    {
+      "x": -17,
+      "y": 49,
+      "ceiling": 4
+    },
+    {
+      "x": -17,
+      "y": 50,
+      "ceiling": 4
+    },
+    {
+      "x": -17,
+      "y": 51,
+      "ceiling": 4
+    },
+    {
+      "x": -17,
+      "y": 52,
+      "ceiling": 4
+    },
+    {
+      "x": -17,
+      "y": 53,
+      "ceiling": 4
+    },
+    {
+      "x": -17,
+      "y": 54,
+      "ceiling": 4
+    },
+    {
+      "x": -16,
+      "y": 13,
+      "ceiling": 3
+    },
+    {
+      "x": -16,
+      "y": 14,
+      "ceiling": 3
+    },
+    {
+      "x": -16,
+      "y": 15,
+      "ceiling": 3
+    },
+    {
+      "x": -16,
+      "y": 16,
+      "ceiling": 3
+    },
+    {
+      "x": -16,
+      "y": 17,
+      "ceiling": 3
+    },
+    {
+      "x": -16,
+      "y": 18,
+      "ceiling": 3
+    },
+    {
+      "x": -16,
+      "y": 19,
+      "ceiling": 3
+    },
+    {
+      "x": -16,
+      "y": 29,
+      "ceiling": 4
+    },
+    {
+      "x": -16,
+      "y": 30,
+      "ceiling": 4
+    },
+    {
+      "x": -16,
+      "y": 31,
+      "ceiling": 4
+    },
+    {
+      "x": -16,
+      "y": 32,
+      "ceiling": 4
+    },
+    {
+      "x": -16,
+      "y": 33,
+      "ceiling": 4
+    },
+    {
+      "x": -16,
+      "y": 34,
+      "ceiling": 4
+    },
+    {
+      "x": -16,
+      "y": 35,
+      "ceiling": 4
+    },
+    {
+      "x": -16,
+      "y": 36,
+      "ceiling": 4
+    },
+    {
+      "x": -16,
+      "y": 47,
+      "ceiling": 4
+    },
+    {
+      "x": -16,
+      "y": 48,
+      "ceiling": 4
+    },
+    {
+      "x": -16,
+      "y": 49,
+      "ceiling": 4
+    },
+    {
+      "x": -16,
+      "y": 50,
+      "ceiling": 4
+    },
+    {
+      "x": -16,
+      "y": 51,
+      "ceiling": 4
+    },
+    {
+      "x": -16,
+      "y": 52,
+      "ceiling": 4
+    },
+    {
+      "x": -16,
+      "y": 53,
+      "ceiling": 4
+    },
+    {
+      "x": -16,
+      "y": 54,
+      "ceiling": 4
+    },
+    {
+      "x": -15,
+      "y": 13,
+      "ceiling": 3
+    },
+    {
+      "x": -15,
+      "y": 14,
+      "ceiling": 3
+    },
+    {
+      "x": -15,
+      "y": 15,
+      "ceiling": 3
+    },
+    {
+      "x": -15,
+      "y": 16,
+      "ceiling": 3
+    },
+    {
+      "x": -15,
+      "y": 17,
+      "ceiling": 3
+    },
+    {
+      "x": -15,
+      "y": 18,
+      "ceiling": 3
+    },
+    {
+      "x": -15,
+      "y": 19,
+      "ceiling": 3
+    },
+    {
+      "x": -15,
+      "y": 29,
+      "ceiling": 4
+    },
+    {
+      "x": -15,
+      "y": 30,
+      "ceiling": 4
+    },
+    {
+      "x": -15,
+      "y": 31,
+      "ceiling": 4
+    },
+    {
+      "x": -15,
+      "y": 32,
+      "ceiling": 4
+    },
+    {
+      "x": -15,
+      "y": 33,
+      "ceiling": 4
+    },
+    {
+      "x": -15,
+      "y": 34,
+      "ceiling": 4
+    },
+    {
+      "x": -15,
+      "y": 35,
+      "ceiling": 4
+    },
+    {
+      "x": -15,
+      "y": 36,
+      "ceiling": 4
+    },
+    {
+      "x": -15,
+      "y": 47,
+      "ceiling": 4
+    },
+    {
+      "x": -15,
+      "y": 48,
+      "ceiling": 4
+    },
+    {
+      "x": -15,
+      "y": 49,
+      "ceiling": 4
+    },
+    {
+      "x": -15,
+      "y": 50,
+      "ceiling": 4
+    },
+    {
+      "x": -15,
+      "y": 51,
+      "ceiling": 4
+    },
+    {
+      "x": -15,
+      "y": 52,
+      "ceiling": 4
+    },
+    {
+      "x": -15,
+      "y": 53,
+      "ceiling": 4
+    },
+    {
+      "x": -15,
+      "y": 54,
+      "ceiling": 4
+    },
+    {
+      "x": -14,
+      "y": 13,
+      "ceiling": 3
+    },
+    {
+      "x": -14,
+      "y": 14,
+      "ceiling": 3
+    },
+    {
+      "x": -14,
+      "y": 15,
+      "ceiling": 3
+    },
+    {
+      "x": -14,
+      "y": 16,
+      "ceiling": 3
+    },
+    {
+      "x": -14,
+      "y": 17,
+      "ceiling": 3
+    },
+    {
+      "x": -14,
+      "y": 18,
+      "ceiling": 3
+    },
+    {
+      "x": -14,
+      "y": 19,
+      "ceiling": 3
+    },
+    {
+      "x": -14,
+      "y": 29,
+      "ceiling": 4
+    },
+    {
+      "x": -14,
+      "y": 30,
+      "ceiling": 4
+    },
+    {
+      "x": -14,
+      "y": 31,
+      "ceiling": 4
+    },
+    {
+      "x": -14,
+      "y": 32,
+      "ceiling": 4
+    },
+    {
+      "x": -14,
+      "y": 33,
+      "ceiling": 4
+    },
+    {
+      "x": -14,
+      "y": 34,
+      "ceiling": 4
+    },
+    {
+      "x": -14,
+      "y": 35,
+      "ceiling": 4
+    },
+    {
+      "x": -14,
+      "y": 36,
+      "ceiling": 4
+    },
+    {
+      "x": -14,
+      "y": 50,
+      "ceiling": 3
+    },
+    {
+      "x": -14,
+      "y": 51,
+      "ceiling": 3
+    },
+    {
+      "x": -13,
+      "y": 13,
+      "ceiling": 3
+    },
+    {
+      "x": -13,
+      "y": 14,
+      "ceiling": 3
+    },
+    {
+      "x": -13,
+      "y": 15,
+      "ceiling": 3
+    },
+    {
+      "x": -13,
+      "y": 16,
+      "ceiling": 3
+    },
+    {
+      "x": -13,
+      "y": 17,
+      "ceiling": 3
+    },
+    {
+      "x": -13,
+      "y": 18,
+      "ceiling": 3
+    },
+    {
+      "x": -13,
+      "y": 19,
+      "ceiling": 3
+    },
+    {
+      "x": -13,
+      "y": 32,
+      "ceiling": 3
+    },
+    {
+      "x": -13,
+      "y": 33,
+      "ceiling": 3
+    },
+    {
+      "x": -13,
+      "y": 50,
+      "ceiling": 3
+    },
+    {
+      "x": -13,
+      "y": 51,
+      "ceiling": 3
+    },
+    {
+      "x": -12,
+      "y": 15,
+      "ceiling": 3
+    },
+    {
+      "x": -12,
+      "y": 16,
+      "ceiling": 3
+    },
+    {
+      "x": -12,
+      "y": 17,
+      "ceiling": 3
+    },
+    {
+      "x": -12,
+      "y": 32,
+      "ceiling": 3
+    },
+    {
+      "x": -12,
+      "y": 33,
+      "ceiling": 3
+    },
+    {
+      "x": -12,
+      "y": 50,
+      "ceiling": 3
+    },
+    {
+      "x": -12,
+      "y": 51,
+      "ceiling": 3
+    },
+    {
+      "x": -11,
+      "y": 15,
+      "ceiling": 3
+    },
+    {
+      "x": -11,
+      "y": 16,
+      "ceiling": 3
+    },
+    {
+      "x": -11,
+      "y": 17,
+      "ceiling": 3
+    },
+    {
+      "x": -11,
+      "y": 32,
+      "ceiling": 3
+    },
+    {
+      "x": -11,
+      "y": 33,
+      "ceiling": 3
+    },
+    {
+      "x": -11,
+      "y": 50,
+      "ceiling": 3
+    },
+    {
+      "x": -11,
+      "y": 51,
+      "ceiling": 3
+    },
+    {
+      "x": -10,
+      "y": 15,
+      "ceiling": 3
+    },
+    {
+      "x": -10,
+      "y": 16,
+      "ceiling": 3
+    },
+    {
+      "x": -10,
+      "y": 17,
+      "ceiling": 3
+    },
+    {
+      "x": -10,
+      "y": 32,
+      "ceiling": 3
+    },
+    {
+      "x": -10,
+      "y": 33,
+      "ceiling": 3
+    },
+    {
+      "x": -10,
+      "y": 50,
+      "ceiling": 3
+    },
+    {
+      "x": -10,
+      "y": 51,
+      "ceiling": 3
+    },
+    {
+      "x": -9,
+      "y": 15,
+      "ceiling": 3
+    },
+    {
+      "x": -9,
+      "y": 16,
+      "ceiling": 3
+    },
+    {
+      "x": -9,
+      "y": 17,
+      "ceiling": 3
+    },
+    {
+      "x": -9,
+      "y": 32,
+      "ceiling": 3
+    },
+    {
+      "x": -9,
+      "y": 33,
+      "ceiling": 3
+    },
+    {
+      "x": -9,
+      "y": 50,
+      "ceiling": 3
+    },
+    {
+      "x": -9,
+      "y": 51,
+      "ceiling": 3
+    },
+    {
+      "x": -8,
+      "y": 15,
+      "ceiling": 3
+    },
+    {
+      "x": -8,
+      "y": 16,
+      "ceiling": 3
+    },
+    {
+      "x": -8,
+      "y": 17,
+      "ceiling": 3
+    },
+    {
+      "x": -8,
+      "y": 32,
+      "ceiling": 3
+    },
+    {
+      "x": -8,
+      "y": 33,
+      "ceiling": 3
+    },
+    {
+      "x": -8,
+      "y": 50,
+      "ceiling": 3
+    },
+    {
+      "x": -8,
+      "y": 51,
+      "ceiling": 3
+    },
+    {
+      "x": -7,
+      "y": 15,
+      "ceiling": 3
+    },
+    {
+      "x": -7,
+      "y": 16,
+      "ceiling": 3
+    },
+    {
+      "x": -7,
+      "y": 17,
+      "ceiling": 3
+    },
+    {
+      "x": -7,
+      "y": 32,
+      "ceiling": 3
+    },
+    {
+      "x": -7,
+      "y": 33,
+      "ceiling": 3
+    },
+    {
+      "x": -7,
+      "y": 50,
+      "ceiling": 3
+    },
+    {
+      "x": -7,
+      "y": 51,
+      "ceiling": 3
+    },
+    {
+      "x": -6,
+      "y": 15,
+      "ceiling": 3
+    },
+    {
+      "x": -6,
+      "y": 16,
+      "ceiling": 3
+    },
+    {
+      "x": -6,
+      "y": 17,
+      "ceiling": 3
+    },
+    {
+      "x": -6,
+      "y": 32,
+      "ceiling": 3
+    },
+    {
+      "x": -6,
+      "y": 33,
+      "ceiling": 3
+    },
+    {
+      "x": -6,
+      "y": 46,
+      "ceiling": 6
+    },
+    {
+      "x": -6,
+      "y": 47,
+      "ceiling": 6
+    },
+    {
+      "x": -6,
+      "y": 48,
+      "ceiling": 6
+    },
+    {
+      "x": -6,
+      "y": 49,
+      "ceiling": 6
+    },
+    {
+      "x": -6,
+      "y": 50,
+      "ceiling": 6
+    },
+    {
+      "x": -6,
+      "y": 51,
+      "ceiling": 6
+    },
+    {
+      "x": -6,
+      "y": 52,
+      "ceiling": 6
+    },
+    {
+      "x": -6,
+      "y": 53,
+      "ceiling": 6
+    },
+    {
+      "x": -6,
+      "y": 54,
+      "ceiling": 6
+    },
+    {
+      "x": -6,
+      "y": 55,
+      "ceiling": 6
+    },
+    {
+      "x": -6,
+      "y": 56,
+      "ceiling": 6
+    },
+    {
+      "x": -6,
+      "y": 57,
+      "ceiling": 6
+    },
+    {
+      "x": -5,
+      "y": 12,
+      "ceiling": 4
+    },
+    {
+      "x": -5,
+      "y": 13,
+      "ceiling": 4
+    },
+    {
+      "x": -5,
+      "y": 14,
+      "ceiling": 4
+    },
+    {
+      "x": -5,
+      "y": 15,
+      "ceiling": 4
+    },
+    {
+      "x": -5,
+      "y": 16,
+      "ceiling": 4
+    },
+    {
+      "x": -5,
+      "y": 17,
+      "ceiling": 4
+    },
+    {
+      "x": -5,
+      "y": 18,
+      "ceiling": 4
+    },
+    {
+      "x": -5,
+      "y": 19,
+      "ceiling": 4
+    },
+    {
+      "x": -5,
+      "y": 20,
+      "ceiling": 4
+    },
+    {
+      "x": -5,
+      "y": 28,
+      "ceiling": 5
+    },
+    {
+      "x": -5,
+      "y": 29,
+      "ceiling": 5
+    },
+    {
+      "x": -5,
+      "y": 30,
+      "ceiling": 5
+    },
+    {
+      "x": -5,
+      "y": 31,
+      "ceiling": 5
+    },
+    {
+      "x": -5,
+      "y": 32,
+      "ceiling": 5
+    },
+    {
+      "x": -5,
+      "y": 33,
+      "ceiling": 5
+    },
+    {
+      "x": -5,
+      "y": 34,
+      "ceiling": 5
+    },
+    {
+      "x": -5,
+      "y": 35,
+      "ceiling": 5
+    },
+    {
+      "x": -5,
+      "y": 36,
+      "ceiling": 5
+    },
+    {
+      "x": -5,
+      "y": 37,
+      "ceiling": 5
+    },
+    {
+      "x": -5,
+      "y": 46,
+      "ceiling": 6
+    },
+    {
+      "x": -5,
+      "y": 47,
+      "ceiling": 6
+    },
+    {
+      "x": -5,
+      "y": 48,
+      "ceiling": 6
+    },
+    {
+      "x": -5,
+      "y": 49,
+      "ceiling": 6
+    },
+    {
+      "x": -5,
+      "y": 50,
+      "ceiling": 6
+    },
+    {
+      "x": -5,
+      "y": 51,
+      "ceiling": 6
+    },
+    {
+      "x": -5,
+      "y": 52,
+      "ceiling": 6
+    },
+    {
+      "x": -5,
+      "y": 53,
+      "ceiling": 6
+    },
+    {
+      "x": -5,
+      "y": 54,
+      "ceiling": 6
+    },
+    {
+      "x": -5,
+      "y": 55,
+      "ceiling": 6
+    },
+    {
+      "x": -5,
+      "y": 56,
+      "ceiling": 6
+    },
+    {
+      "x": -5,
+      "y": 57,
+      "ceiling": 6
+    },
+    {
+      "x": -4,
+      "y": -3,
+      "ceiling": 4
+    },
+    {
+      "x": -4,
+      "y": -2,
+      "ceiling": 4
+    },
+    {
+      "x": -4,
+      "y": -1,
+      "ceiling": 4
+    },
+    {
+      "x": -4,
+      "y": 0,
+      "ceiling": 4
+    },
+    {
+      "x": -4,
+      "y": 1,
+      "ceiling": 4
+    },
+    {
+      "x": -4,
+      "y": 2,
+      "ceiling": 4
+    },
+    {
+      "x": -4,
+      "y": 3,
+      "ceiling": 4
+    },
+    {
+      "x": -4,
+      "y": 4,
+      "ceiling": 4
+    },
+    {
+      "x": -4,
+      "y": 5,
+      "ceiling": 4
+    },
+    {
+      "x": -4,
+      "y": 12,
+      "ceiling": 4
+    },
+    {
+      "x": -4,
+      "y": 13,
+      "ceiling": 4
+    },
+    {
+      "x": -4,
+      "y": 14,
+      "ceiling": 4
+    },
+    {
+      "x": -4,
+      "y": 15,
+      "ceiling": 4
+    },
+    {
+      "x": -4,
+      "y": 16,
+      "ceiling": 4
+    },
+    {
+      "x": -4,
+      "y": 17,
+      "ceiling": 4
+    },
+    {
+      "x": -4,
+      "y": 18,
+      "ceiling": 4
+    },
+    {
+      "x": -4,
+      "y": 19,
+      "ceiling": 4
+    },
+    {
+      "x": -4,
+      "y": 20,
+      "ceiling": 4
+    },
+    {
+      "x": -4,
+      "y": 28,
+      "ceiling": 5
+    },
+    {
+      "x": -4,
+      "y": 29,
+      "ceiling": 5
+    },
+    {
+      "x": -4,
+      "y": 30,
+      "ceiling": 5
+    },
+    {
+      "x": -4,
+      "y": 31,
+      "ceiling": 5
+    },
+    {
+      "x": -4,
+      "y": 32,
+      "ceiling": 5
+    },
+    {
+      "x": -4,
+      "y": 33,
+      "ceiling": 5
+    },
+    {
+      "x": -4,
+      "y": 34,
+      "ceiling": 5
+    },
+    {
+      "x": -4,
+      "y": 35,
+      "ceiling": 5
+    },
+    {
+      "x": -4,
+      "y": 36,
+      "ceiling": 5
+    },
+    {
+      "x": -4,
+      "y": 37,
+      "ceiling": 5
+    },
+    {
+      "x": -4,
+      "y": 46,
+      "ceiling": 6
+    },
+    {
+      "x": -4,
+      "y": 47,
+      "ceiling": 6
+    },
+    {
+      "x": -4,
+      "y": 48,
+      "ceiling": 6
+    },
+    {
+      "x": -4,
+      "y": 49,
+      "ceiling": 6
+    },
+    {
+      "x": -4,
+      "y": 50,
+      "ceiling": 6
+    },
+    {
+      "x": -4,
+      "y": 51,
+      "ceiling": 6
+    },
+    {
+      "x": -4,
+      "y": 52,
+      "ceiling": 6
+    },
+    {
+      "x": -4,
+      "y": 53,
+      "ceiling": 6
+    },
+    {
+      "x": -4,
+      "y": 54,
+      "ceiling": 6
+    },
+    {
+      "x": -4,
+      "y": 55,
+      "ceiling": 6
+    },
+    {
+      "x": -4,
+      "y": 56,
+      "ceiling": 6
+    },
+    {
+      "x": -4,
+      "y": 57,
+      "ceiling": 6
+    },
+    {
+      "x": -3,
+      "y": -3,
+      "ceiling": 4
+    },
+    {
+      "x": -3,
+      "y": -2,
+      "ceiling": 4
+    },
+    {
+      "x": -3,
+      "y": -1,
+      "ceiling": 4
+    },
+    {
+      "x": -3,
+      "y": 0,
+      "ceiling": 4
+    },
+    {
+      "x": -3,
+      "y": 1,
+      "ceiling": 4
+    },
+    {
+      "x": -3,
+      "y": 2,
+      "ceiling": 4
+    },
+    {
+      "x": -3,
+      "y": 3,
+      "ceiling": 4
+    },
+    {
+      "x": -3,
+      "y": 4,
+      "ceiling": 4
+    },
+    {
+      "x": -3,
+      "y": 5,
+      "ceiling": 4
+    },
+    {
+      "x": -3,
+      "y": 12,
+      "ceiling": 4
+    },
+    {
+      "x": -3,
+      "y": 13,
+      "ceiling": 4
+    },
+    {
+      "x": -3,
+      "y": 14,
+      "ceiling": 4
+    },
+    {
+      "x": -3,
+      "y": 15,
+      "ceiling": 4
+    },
+    {
+      "x": -3,
+      "y": 16,
+      "ceiling": 4
+    },
+    {
+      "x": -3,
+      "y": 17,
+      "ceiling": 4
+    },
+    {
+      "x": -3,
+      "y": 18,
+      "ceiling": 4
+    },
+    {
+      "x": -3,
+      "y": 19,
+      "ceiling": 4
+    },
+    {
+      "x": -3,
+      "y": 20,
+      "ceiling": 4
+    },
+    {
+      "x": -3,
+      "y": 28,
+      "ceiling": 5
+    },
+    {
+      "x": -3,
+      "y": 29,
+      "ceiling": 5
+    },
+    {
+      "x": -3,
+      "y": 30,
+      "ceiling": 5
+    },
+    {
+      "x": -3,
+      "y": 31,
+      "ceiling": 5
+    },
+    {
+      "x": -3,
+      "y": 32,
+      "ceiling": 5
+    },
+    {
+      "x": -3,
+      "y": 33,
+      "ceiling": 5
+    },
+    {
+      "x": -3,
+      "y": 34,
+      "ceiling": 5
+    },
+    {
+      "x": -3,
+      "y": 35,
+      "ceiling": 5
+    },
+    {
+      "x": -3,
+      "y": 36,
+      "ceiling": 5
+    },
+    {
+      "x": -3,
+      "y": 37,
+      "ceiling": 5
+    },
+    {
+      "x": -3,
+      "y": 46,
+      "ceiling": 6
+    },
+    {
+      "x": -3,
+      "y": 47,
+      "ceiling": 6
+    },
+    {
+      "x": -3,
+      "y": 48,
+      "ceiling": 6
+    },
+    {
+      "x": -3,
+      "y": 49,
+      "ceiling": 6
+    },
+    {
+      "x": -3,
+      "y": 50,
+      "ceiling": 6
+    },
+    {
+      "x": -3,
+      "y": 51,
+      "ceiling": 6
+    },
+    {
+      "x": -3,
+      "y": 52,
+      "ceiling": 6
+    },
+    {
+      "x": -3,
+      "y": 53,
+      "ceiling": 6
+    },
+    {
+      "x": -3,
+      "y": 54,
+      "ceiling": 6
+    },
+    {
+      "x": -3,
+      "y": 55,
+      "ceiling": 6
+    },
+    {
+      "x": -3,
+      "y": 56,
+      "ceiling": 6
+    },
+    {
+      "x": -3,
+      "y": 57,
+      "ceiling": 6
+    },
+    {
+      "x": -2,
+      "y": -3,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": -2,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": -1,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": 0,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": 1,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": 2,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": 3,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": 4,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": 5,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": 6,
+      "ceiling": 3
+    },
+    {
+      "x": -2,
+      "y": 7,
+      "ceiling": 3
+    },
+    {
+      "x": -2,
+      "y": 8,
+      "ceiling": 3
+    },
+    {
+      "x": -2,
+      "y": 9,
+      "ceiling": 3
+    },
+    {
+      "x": -2,
+      "y": 10,
+      "ceiling": 3
+    },
+    {
+      "x": -2,
+      "y": 11,
+      "ceiling": 3
+    },
+    {
+      "x": -2,
+      "y": 12,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": 13,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": 14,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": 15,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": 16,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": 17,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": 18,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": 19,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": 20,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": 21,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": 22,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": 23,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": 24,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": 25,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": 26,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": 27,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": 28,
+      "ceiling": 5
+    },
+    {
+      "x": -2,
+      "y": 29,
+      "ceiling": 5
+    },
+    {
+      "x": -2,
+      "y": 30,
+      "ceiling": 5
+    },
+    {
+      "x": -2,
+      "y": 31,
+      "ceiling": 5
+    },
+    {
+      "x": -2,
+      "y": 32,
+      "ceiling": 5
+    },
+    {
+      "x": -2,
+      "y": 33,
+      "ceiling": 5
+    },
+    {
+      "x": -2,
+      "y": 34,
+      "ceiling": 5
+    },
+    {
+      "x": -2,
+      "y": 35,
+      "ceiling": 5
+    },
+    {
+      "x": -2,
+      "y": 36,
+      "ceiling": 5
+    },
+    {
+      "x": -2,
+      "y": 37,
+      "ceiling": 5
+    },
+    {
+      "x": -2,
+      "y": 38,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": 39,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": 40,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": 41,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": 42,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": 43,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": 44,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": 45,
+      "ceiling": 4
+    },
+    {
+      "x": -2,
+      "y": 46,
+      "ceiling": 6
+    },
+    {
+      "x": -2,
+      "y": 47,
+      "ceiling": 6
+    },
+    {
+      "x": -2,
+      "y": 48,
+      "ceiling": 6
+    },
+    {
+      "x": -2,
+      "y": 49,
+      "ceiling": 6
+    },
+    {
+      "x": -2,
+      "y": 50,
+      "ceiling": 6
+    },
+    {
+      "x": -2,
+      "y": 51,
+      "ceiling": 6
+    },
+    {
+      "x": -2,
+      "y": 52,
+      "ceiling": 6
+    },
+    {
+      "x": -2,
+      "y": 53,
+      "ceiling": 6
+    },
+    {
+      "x": -2,
+      "y": 54,
+      "ceiling": 6
+    },
+    {
+      "x": -2,
+      "y": 55,
+      "ceiling": 6
+    },
+    {
+      "x": -2,
+      "y": 56,
+      "ceiling": 6
+    },
+    {
+      "x": -2,
+      "y": 57,
+      "ceiling": 6
+    },
+    {
+      "x": -1,
+      "y": -3,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": -2,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": -1,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": 0,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": 1,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": 2,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": 3,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": 4,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": 5,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": 6,
+      "ceiling": 3
+    },
+    {
+      "x": -1,
+      "y": 7,
+      "ceiling": 3
+    },
+    {
+      "x": -1,
+      "y": 8,
+      "ceiling": 3
+    },
+    {
+      "x": -1,
+      "y": 9,
+      "ceiling": 3
+    },
+    {
+      "x": -1,
+      "y": 10,
+      "ceiling": 3
+    },
+    {
+      "x": -1,
+      "y": 11,
+      "ceiling": 3
+    },
+    {
+      "x": -1,
+      "y": 12,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": 13,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": 14,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": 15,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": 16,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": 17,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": 18,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": 19,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": 20,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": 21,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": 22,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": 23,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": 24,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": 25,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": 26,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": 27,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": 28,
+      "ceiling": 5
+    },
+    {
+      "x": -1,
+      "y": 29,
+      "ceiling": 5
+    },
+    {
+      "x": -1,
+      "y": 30,
+      "ceiling": 5
+    },
+    {
+      "x": -1,
+      "y": 31,
+      "ceiling": 5
+    },
+    {
+      "x": -1,
+      "y": 32,
+      "ceiling": 5
+    },
+    {
+      "x": -1,
+      "y": 33,
+      "ceiling": 5
+    },
+    {
+      "x": -1,
+      "y": 34,
+      "ceiling": 5
+    },
+    {
+      "x": -1,
+      "y": 35,
+      "ceiling": 5
+    },
+    {
+      "x": -1,
+      "y": 36,
+      "ceiling": 5
+    },
+    {
+      "x": -1,
+      "y": 37,
+      "ceiling": 5
+    },
+    {
+      "x": -1,
+      "y": 38,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": 39,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": 40,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": 41,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": 42,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": 43,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": 44,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": 45,
+      "ceiling": 4
+    },
+    {
+      "x": -1,
+      "y": 46,
+      "ceiling": 6
+    },
+    {
+      "x": -1,
+      "y": 47,
+      "ceiling": 6
+    },
+    {
+      "x": -1,
+      "y": 48,
+      "ceiling": 6
+    },
+    {
+      "x": -1,
+      "y": 49,
+      "ceiling": 6
+    },
+    {
+      "x": -1,
+      "y": 50,
+      "ceiling": 6
+    },
+    {
+      "x": -1,
+      "y": 51,
+      "ceiling": 6
+    },
+    {
+      "x": -1,
+      "y": 52,
+      "ceiling": 6
+    },
+    {
+      "x": -1,
+      "y": 53,
+      "ceiling": 6
+    },
+    {
+      "x": -1,
+      "y": 54,
+      "ceiling": 6
+    },
+    {
+      "x": -1,
+      "y": 55,
+      "ceiling": 6
+    },
+    {
+      "x": -1,
+      "y": 56,
+      "ceiling": 6
+    },
+    {
+      "x": -1,
+      "y": 57,
+      "ceiling": 6
+    },
+    {
+      "x": 0,
+      "y": -3,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": -2,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": -1,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": 1,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": 2,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": 3,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": 4,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": 5,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": 6,
+      "ceiling": 3
+    },
+    {
+      "x": 0,
+      "y": 7,
+      "ceiling": 3
+    },
+    {
+      "x": 0,
+      "y": 8,
+      "ceiling": 3
+    },
+    {
+      "x": 0,
+      "y": 9,
+      "ceiling": 3
+    },
+    {
+      "x": 0,
+      "y": 10,
+      "ceiling": 3
+    },
+    {
+      "x": 0,
+      "y": 11,
+      "ceiling": 3
+    },
+    {
+      "x": 0,
+      "y": 12,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": 13,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": 14,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": 15,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": 16,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": 17,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": 18,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": 19,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": 20,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": 21,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": 22,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": 23,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": 24,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": 25,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": 26,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": 27,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": 28,
+      "ceiling": 5
+    },
+    {
+      "x": 0,
+      "y": 29,
+      "ceiling": 5
+    },
+    {
+      "x": 0,
+      "y": 30,
+      "ceiling": 5
+    },
+    {
+      "x": 0,
+      "y": 31,
+      "ceiling": 5
+    },
+    {
+      "x": 0,
+      "y": 32,
+      "ceiling": 5
+    },
+    {
+      "x": 0,
+      "y": 33,
+      "ceiling": 5
+    },
+    {
+      "x": 0,
+      "y": 34,
+      "ceiling": 5
+    },
+    {
+      "x": 0,
+      "y": 35,
+      "ceiling": 5
+    },
+    {
+      "x": 0,
+      "y": 36,
+      "ceiling": 5
+    },
+    {
+      "x": 0,
+      "y": 37,
+      "ceiling": 5
+    },
+    {
+      "x": 0,
+      "y": 38,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": 39,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": 40,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": 41,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": 42,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": 43,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": 44,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": 45,
+      "ceiling": 4
+    },
+    {
+      "x": 0,
+      "y": 46,
+      "ceiling": 6
+    },
+    {
+      "x": 0,
+      "y": 47,
+      "ceiling": 6
+    },
+    {
+      "x": 0,
+      "y": 48,
+      "ceiling": 6
+    },
+    {
+      "x": 0,
+      "y": 49,
+      "ceiling": 6
+    },
+    {
+      "x": 0,
+      "y": 50,
+      "ceiling": 6
+    },
+    {
+      "x": 0,
+      "y": 51,
+      "ceiling": 6
+    },
+    {
+      "x": 0,
+      "y": 52,
+      "ceiling": 6
+    },
+    {
+      "x": 0,
+      "y": 53,
+      "ceiling": 6
+    },
+    {
+      "x": 0,
+      "y": 54,
+      "ceiling": 6
+    },
+    {
+      "x": 0,
+      "y": 55,
+      "ceiling": 6
+    },
+    {
+      "x": 0,
+      "y": 56,
+      "ceiling": 6
+    },
+    {
+      "x": 0,
+      "y": 57,
+      "ceiling": 6
+    },
+    {
+      "x": 1,
+      "y": -3,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": -2,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": -1,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": 0,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": 1,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": 2,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": 3,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": 4,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": 5,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": 6,
+      "ceiling": 3
+    },
+    {
+      "x": 1,
+      "y": 7,
+      "ceiling": 3
+    },
+    {
+      "x": 1,
+      "y": 8,
+      "ceiling": 3
+    },
+    {
+      "x": 1,
+      "y": 9,
+      "ceiling": 3
+    },
+    {
+      "x": 1,
+      "y": 10,
+      "ceiling": 3
+    },
+    {
+      "x": 1,
+      "y": 11,
+      "ceiling": 3
+    },
+    {
+      "x": 1,
+      "y": 12,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": 13,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": 14,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": 15,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": 16,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": 17,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": 18,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": 19,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": 20,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": 21,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": 22,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": 23,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": 24,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": 25,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": 26,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": 27,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": 28,
+      "ceiling": 5
+    },
+    {
+      "x": 1,
+      "y": 29,
+      "ceiling": 5
+    },
+    {
+      "x": 1,
+      "y": 30,
+      "ceiling": 5
+    },
+    {
+      "x": 1,
+      "y": 31,
+      "ceiling": 5
+    },
+    {
+      "x": 1,
+      "y": 32,
+      "ceiling": 5
+    },
+    {
+      "x": 1,
+      "y": 33,
+      "ceiling": 5
+    },
+    {
+      "x": 1,
+      "y": 34,
+      "ceiling": 5
+    },
+    {
+      "x": 1,
+      "y": 35,
+      "ceiling": 5
+    },
+    {
+      "x": 1,
+      "y": 36,
+      "ceiling": 5
+    },
+    {
+      "x": 1,
+      "y": 37,
+      "ceiling": 5
+    },
+    {
+      "x": 1,
+      "y": 38,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": 39,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": 40,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": 41,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": 42,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": 43,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": 44,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": 45,
+      "ceiling": 4
+    },
+    {
+      "x": 1,
+      "y": 46,
+      "ceiling": 6
+    },
+    {
+      "x": 1,
+      "y": 47,
+      "ceiling": 6
+    },
+    {
+      "x": 1,
+      "y": 48,
+      "ceiling": 6
+    },
+    {
+      "x": 1,
+      "y": 49,
+      "ceiling": 6
+    },
+    {
+      "x": 1,
+      "y": 50,
+      "ceiling": 6
+    },
+    {
+      "x": 1,
+      "y": 51,
+      "ceiling": 6
+    },
+    {
+      "x": 1,
+      "y": 52,
+      "ceiling": 6
+    },
+    {
+      "x": 1,
+      "y": 53,
+      "ceiling": 6
+    },
+    {
+      "x": 1,
+      "y": 54,
+      "ceiling": 6
+    },
+    {
+      "x": 1,
+      "y": 55,
+      "ceiling": 6
+    },
+    {
+      "x": 1,
+      "y": 56,
+      "ceiling": 6
+    },
+    {
+      "x": 1,
+      "y": 57,
+      "ceiling": 6
+    },
+    {
+      "x": 2,
+      "y": -3,
+      "ceiling": 4
+    },
+    {
+      "x": 2,
+      "y": -2,
+      "ceiling": 4
+    },
+    {
+      "x": 2,
+      "y": -1,
+      "ceiling": 4
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "ceiling": 4
+    },
+    {
+      "x": 2,
+      "y": 1,
+      "ceiling": 4
+    },
+    {
+      "x": 2,
+      "y": 2,
+      "ceiling": 4
+    },
+    {
+      "x": 2,
+      "y": 3,
+      "ceiling": 4
+    },
+    {
+      "x": 2,
+      "y": 4,
+      "ceiling": 4
+    },
+    {
+      "x": 2,
+      "y": 5,
+      "ceiling": 4
+    },
+    {
+      "x": 2,
+      "y": 12,
+      "ceiling": 4
+    },
+    {
+      "x": 2,
+      "y": 13,
+      "ceiling": 4
+    },
+    {
+      "x": 2,
+      "y": 14,
+      "ceiling": 4
+    },
+    {
+      "x": 2,
+      "y": 15,
+      "ceiling": 4
+    },
+    {
+      "x": 2,
+      "y": 16,
+      "ceiling": 4
+    },
+    {
+      "x": 2,
+      "y": 17,
+      "ceiling": 4
+    },
+    {
+      "x": 2,
+      "y": 18,
+      "ceiling": 4
+    },
+    {
+      "x": 2,
+      "y": 19,
+      "ceiling": 4
+    },
+    {
+      "x": 2,
+      "y": 20,
+      "ceiling": 4
+    },
+    {
+      "x": 2,
+      "y": 28,
+      "ceiling": 5
+    },
+    {
+      "x": 2,
+      "y": 29,
+      "ceiling": 5
+    },
+    {
+      "x": 2,
+      "y": 30,
+      "ceiling": 5
+    },
+    {
+      "x": 2,
+      "y": 31,
+      "ceiling": 5
+    },
+    {
+      "x": 2,
+      "y": 32,
+      "ceiling": 5
+    },
+    {
+      "x": 2,
+      "y": 33,
+      "ceiling": 5
+    },
+    {
+      "x": 2,
+      "y": 34,
+      "ceiling": 5
+    },
+    {
+      "x": 2,
+      "y": 35,
+      "ceiling": 5
+    },
+    {
+      "x": 2,
+      "y": 36,
+      "ceiling": 5
+    },
+    {
+      "x": 2,
+      "y": 37,
+      "ceiling": 5
+    },
+    {
+      "x": 2,
+      "y": 46,
+      "ceiling": 6
+    },
+    {
+      "x": 2,
+      "y": 47,
+      "ceiling": 6
+    },
+    {
+      "x": 2,
+      "y": 48,
+      "ceiling": 6
+    },
+    {
+      "x": 2,
+      "y": 49,
+      "ceiling": 6
+    },
+    {
+      "x": 2,
+      "y": 50,
+      "ceiling": 6
+    },
+    {
+      "x": 2,
+      "y": 51,
+      "ceiling": 6
+    },
+    {
+      "x": 2,
+      "y": 52,
+      "ceiling": 6
+    },
+    {
+      "x": 2,
+      "y": 53,
+      "ceiling": 6
+    },
+    {
+      "x": 2,
+      "y": 54,
+      "ceiling": 6
+    },
+    {
+      "x": 2,
+      "y": 55,
+      "ceiling": 6
+    },
+    {
+      "x": 2,
+      "y": 56,
+      "ceiling": 6
+    },
+    {
+      "x": 2,
+      "y": 57,
+      "ceiling": 6
+    },
+    {
+      "x": 3,
+      "y": -3,
+      "ceiling": 4
+    },
+    {
+      "x": 3,
+      "y": -2,
+      "ceiling": 4
+    },
+    {
+      "x": 3,
+      "y": -1,
+      "ceiling": 4
+    },
+    {
+      "x": 3,
+      "y": 0,
+      "ceiling": 4
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "ceiling": 4
+    },
+    {
+      "x": 3,
+      "y": 2,
+      "ceiling": 4
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "ceiling": 4
+    },
+    {
+      "x": 3,
+      "y": 4,
+      "ceiling": 4
+    },
+    {
+      "x": 3,
+      "y": 5,
+      "ceiling": 4
+    },
+    {
+      "x": 3,
+      "y": 12,
+      "ceiling": 4
+    },
+    {
+      "x": 3,
+      "y": 13,
+      "ceiling": 4
+    },
+    {
+      "x": 3,
+      "y": 14,
+      "ceiling": 4
+    },
+    {
+      "x": 3,
+      "y": 15,
+      "ceiling": 4
+    },
+    {
+      "x": 3,
+      "y": 16,
+      "ceiling": 4
+    },
+    {
+      "x": 3,
+      "y": 17,
+      "ceiling": 4
+    },
+    {
+      "x": 3,
+      "y": 18,
+      "ceiling": 4
+    },
+    {
+      "x": 3,
+      "y": 19,
+      "ceiling": 4
+    },
+    {
+      "x": 3,
+      "y": 20,
+      "ceiling": 4
+    },
+    {
+      "x": 3,
+      "y": 28,
+      "ceiling": 5
+    },
+    {
+      "x": 3,
+      "y": 29,
+      "ceiling": 5
+    },
+    {
+      "x": 3,
+      "y": 30,
+      "ceiling": 5
+    },
+    {
+      "x": 3,
+      "y": 31,
+      "ceiling": 5
+    },
+    {
+      "x": 3,
+      "y": 32,
+      "ceiling": 5
+    },
+    {
+      "x": 3,
+      "y": 33,
+      "ceiling": 5
+    },
+    {
+      "x": 3,
+      "y": 34,
+      "ceiling": 5
+    },
+    {
+      "x": 3,
+      "y": 35,
+      "ceiling": 5
+    },
+    {
+      "x": 3,
+      "y": 36,
+      "ceiling": 5
+    },
+    {
+      "x": 3,
+      "y": 37,
+      "ceiling": 5
+    },
+    {
+      "x": 3,
+      "y": 46,
+      "ceiling": 6
+    },
+    {
+      "x": 3,
+      "y": 47,
+      "ceiling": 6
+    },
+    {
+      "x": 3,
+      "y": 48,
+      "ceiling": 6
+    },
+    {
+      "x": 3,
+      "y": 49,
+      "ceiling": 6
+    },
+    {
+      "x": 3,
+      "y": 50,
+      "ceiling": 6
+    },
+    {
+      "x": 3,
+      "y": 51,
+      "ceiling": 6
+    },
+    {
+      "x": 3,
+      "y": 52,
+      "ceiling": 6
+    },
+    {
+      "x": 3,
+      "y": 53,
+      "ceiling": 6
+    },
+    {
+      "x": 3,
+      "y": 54,
+      "ceiling": 6
+    },
+    {
+      "x": 3,
+      "y": 55,
+      "ceiling": 6
+    },
+    {
+      "x": 3,
+      "y": 56,
+      "ceiling": 6
+    },
+    {
+      "x": 3,
+      "y": 57,
+      "ceiling": 6
+    },
+    {
+      "x": 4,
+      "y": -3,
+      "ceiling": 4
+    },
+    {
+      "x": 4,
+      "y": -2,
+      "ceiling": 4
+    },
+    {
+      "x": 4,
+      "y": -1,
+      "ceiling": 4
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "ceiling": 4
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "ceiling": 4
+    },
+    {
+      "x": 4,
+      "y": 2,
+      "ceiling": 4
+    },
+    {
+      "x": 4,
+      "y": 3,
+      "ceiling": 4
+    },
+    {
+      "x": 4,
+      "y": 4,
+      "ceiling": 4
+    },
+    {
+      "x": 4,
+      "y": 5,
+      "ceiling": 4
+    },
+    {
+      "x": 4,
+      "y": 12,
+      "ceiling": 4
+    },
+    {
+      "x": 4,
+      "y": 13,
+      "ceiling": 4
+    },
+    {
+      "x": 4,
+      "y": 14,
+      "ceiling": 4
+    },
+    {
+      "x": 4,
+      "y": 15,
+      "ceiling": 4
+    },
+    {
+      "x": 4,
+      "y": 16,
+      "ceiling": 4
+    },
+    {
+      "x": 4,
+      "y": 17,
+      "ceiling": 4
+    },
+    {
+      "x": 4,
+      "y": 18,
+      "ceiling": 4
+    },
+    {
+      "x": 4,
+      "y": 19,
+      "ceiling": 4
+    },
+    {
+      "x": 4,
+      "y": 20,
+      "ceiling": 4
+    },
+    {
+      "x": 4,
+      "y": 28,
+      "ceiling": 5
+    },
+    {
+      "x": 4,
+      "y": 29,
+      "ceiling": 5
+    },
+    {
+      "x": 4,
+      "y": 30,
+      "ceiling": 5
+    },
+    {
+      "x": 4,
+      "y": 31,
+      "ceiling": 5
+    },
+    {
+      "x": 4,
+      "y": 32,
+      "ceiling": 5
+    },
+    {
+      "x": 4,
+      "y": 33,
+      "ceiling": 5
+    },
+    {
+      "x": 4,
+      "y": 34,
+      "ceiling": 5
+    },
+    {
+      "x": 4,
+      "y": 35,
+      "ceiling": 5
+    },
+    {
+      "x": 4,
+      "y": 36,
+      "ceiling": 5
+    },
+    {
+      "x": 4,
+      "y": 37,
+      "ceiling": 5
+    },
+    {
+      "x": 4,
+      "y": 46,
+      "ceiling": 6
+    },
+    {
+      "x": 4,
+      "y": 47,
+      "ceiling": 6
+    },
+    {
+      "x": 4,
+      "y": 48,
+      "ceiling": 6
+    },
+    {
+      "x": 4,
+      "y": 49,
+      "ceiling": 6
+    },
+    {
+      "x": 4,
+      "y": 50,
+      "ceiling": 6
+    },
+    {
+      "x": 4,
+      "y": 51,
+      "ceiling": 6
+    },
+    {
+      "x": 4,
+      "y": 52,
+      "ceiling": 6
+    },
+    {
+      "x": 4,
+      "y": 53,
+      "ceiling": 6
+    },
+    {
+      "x": 4,
+      "y": 54,
+      "ceiling": 6
+    },
+    {
+      "x": 4,
+      "y": 55,
+      "ceiling": 6
+    },
+    {
+      "x": 4,
+      "y": 56,
+      "ceiling": 6
+    },
+    {
+      "x": 4,
+      "y": 57,
+      "ceiling": 6
+    },
+    {
+      "x": 5,
+      "y": 15,
+      "ceiling": 3
+    },
+    {
+      "x": 5,
+      "y": 16,
+      "ceiling": 3
+    },
+    {
+      "x": 5,
+      "y": 17,
+      "ceiling": 3
+    },
+    {
+      "x": 5,
+      "y": 28,
+      "ceiling": 5
+    },
+    {
+      "x": 5,
+      "y": 29,
+      "ceiling": 5
+    },
+    {
+      "x": 5,
+      "y": 30,
+      "ceiling": 5
+    },
+    {
+      "x": 5,
+      "y": 31,
+      "ceiling": 5
+    },
+    {
+      "x": 5,
+      "y": 32,
+      "ceiling": 5
+    },
+    {
+      "x": 5,
+      "y": 33,
+      "ceiling": 5
+    },
+    {
+      "x": 5,
+      "y": 34,
+      "ceiling": 5
+    },
+    {
+      "x": 5,
+      "y": 35,
+      "ceiling": 5
+    },
+    {
+      "x": 5,
+      "y": 36,
+      "ceiling": 5
+    },
+    {
+      "x": 5,
+      "y": 37,
+      "ceiling": 5
+    },
+    {
+      "x": 5,
+      "y": 46,
+      "ceiling": 6
+    },
+    {
+      "x": 5,
+      "y": 47,
+      "ceiling": 6
+    },
+    {
+      "x": 5,
+      "y": 48,
+      "ceiling": 6
+    },
+    {
+      "x": 5,
+      "y": 49,
+      "ceiling": 6
+    },
+    {
+      "x": 5,
+      "y": 50,
+      "ceiling": 6
+    },
+    {
+      "x": 5,
+      "y": 51,
+      "ceiling": 6
+    },
+    {
+      "x": 5,
+      "y": 52,
+      "ceiling": 6
+    },
+    {
+      "x": 5,
+      "y": 53,
+      "ceiling": 6
+    },
+    {
+      "x": 5,
+      "y": 54,
+      "ceiling": 6
+    },
+    {
+      "x": 5,
+      "y": 55,
+      "ceiling": 6
+    },
+    {
+      "x": 5,
+      "y": 56,
+      "ceiling": 6
+    },
+    {
+      "x": 5,
+      "y": 57,
+      "ceiling": 6
+    },
+    {
+      "x": 6,
+      "y": 15,
+      "ceiling": 3
+    },
+    {
+      "x": 6,
+      "y": 16,
+      "ceiling": 3
+    },
+    {
+      "x": 6,
+      "y": 17,
+      "ceiling": 3
+    },
+    {
+      "x": 6,
+      "y": 30,
+      "ceiling": 4
+    },
+    {
+      "x": 6,
+      "y": 31,
+      "ceiling": 4
+    },
+    {
+      "x": 6,
+      "y": 32,
+      "ceiling": 4
+    },
+    {
+      "x": 6,
+      "y": 33,
+      "ceiling": 4
+    },
+    {
+      "x": 6,
+      "y": 50,
+      "ceiling": 3
+    },
+    {
+      "x": 6,
+      "y": 51,
+      "ceiling": 3
+    },
+    {
+      "x": 6,
+      "y": 52,
+      "ceiling": 3
+    },
+    {
+      "x": 7,
+      "y": 15,
+      "ceiling": 3
+    },
+    {
+      "x": 7,
+      "y": 16,
+      "ceiling": 3
+    },
+    {
+      "x": 7,
+      "y": 17,
+      "ceiling": 3
+    },
+    {
+      "x": 7,
+      "y": 30,
+      "ceiling": 4
+    },
+    {
+      "x": 7,
+      "y": 31,
+      "ceiling": 4
+    },
+    {
+      "x": 7,
+      "y": 32,
+      "ceiling": 4
+    },
+    {
+      "x": 7,
+      "y": 33,
+      "ceiling": 4
+    },
+    {
+      "x": 7,
+      "y": 50,
+      "ceiling": 3
+    },
+    {
+      "x": 7,
+      "y": 51,
+      "ceiling": 3
+    },
+    {
+      "x": 7,
+      "y": 52,
+      "ceiling": 3
+    },
+    {
+      "x": 8,
+      "y": 15,
+      "ceiling": 3
+    },
+    {
+      "x": 8,
+      "y": 16,
+      "ceiling": 3
+    },
+    {
+      "x": 8,
+      "y": 17,
+      "ceiling": 3
+    },
+    {
+      "x": 8,
+      "y": 30,
+      "ceiling": 4
+    },
+    {
+      "x": 8,
+      "y": 31,
+      "ceiling": 4
+    },
+    {
+      "x": 8,
+      "y": 32,
+      "ceiling": 4
+    },
+    {
+      "x": 8,
+      "y": 33,
+      "ceiling": 4
+    },
+    {
+      "x": 8,
+      "y": 50,
+      "ceiling": 3
+    },
+    {
+      "x": 8,
+      "y": 51,
+      "ceiling": 3
+    },
+    {
+      "x": 8,
+      "y": 52,
+      "ceiling": 3
+    },
+    {
+      "x": 9,
+      "y": 15,
+      "ceiling": 3
+    },
+    {
+      "x": 9,
+      "y": 16,
+      "ceiling": 3
+    },
+    {
+      "x": 9,
+      "y": 17,
+      "ceiling": 3
+    },
+    {
+      "x": 9,
+      "y": 30,
+      "ceiling": 4
+    },
+    {
+      "x": 9,
+      "y": 31,
+      "ceiling": 4
+    },
+    {
+      "x": 9,
+      "y": 32,
+      "ceiling": 4
+    },
+    {
+      "x": 9,
+      "y": 33,
+      "ceiling": 4
+    },
+    {
+      "x": 9,
+      "y": 50,
+      "ceiling": 3
+    },
+    {
+      "x": 9,
+      "y": 51,
+      "ceiling": 3
+    },
+    {
+      "x": 9,
+      "y": 52,
+      "ceiling": 3
+    },
+    {
+      "x": 10,
+      "y": 15,
+      "ceiling": 3
+    },
+    {
+      "x": 10,
+      "y": 16,
+      "ceiling": 3
+    },
+    {
+      "x": 10,
+      "y": 17,
+      "ceiling": 3
+    },
+    {
+      "x": 10,
+      "y": 30,
+      "ceiling": 4
+    },
+    {
+      "x": 10,
+      "y": 31,
+      "ceiling": 4
+    },
+    {
+      "x": 10,
+      "y": 32,
+      "ceiling": 4
+    },
+    {
+      "x": 10,
+      "y": 33,
+      "ceiling": 4
+    },
+    {
+      "x": 10,
+      "y": 50,
+      "ceiling": 3
+    },
+    {
+      "x": 10,
+      "y": 51,
+      "ceiling": 3
+    },
+    {
+      "x": 10,
+      "y": 52,
+      "ceiling": 3
+    },
+    {
+      "x": 11,
+      "y": 15,
+      "ceiling": 3
+    },
+    {
+      "x": 11,
+      "y": 16,
+      "ceiling": 3
+    },
+    {
+      "x": 11,
+      "y": 17,
+      "ceiling": 3
+    },
+    {
+      "x": 11,
+      "y": 30,
+      "ceiling": 4
+    },
+    {
+      "x": 11,
+      "y": 31,
+      "ceiling": 4
+    },
+    {
+      "x": 11,
+      "y": 32,
+      "ceiling": 4
+    },
+    {
+      "x": 11,
+      "y": 33,
+      "ceiling": 4
+    },
+    {
+      "x": 11,
+      "y": 50,
+      "ceiling": 3
+    },
+    {
+      "x": 11,
+      "y": 51,
+      "ceiling": 3
+    },
+    {
+      "x": 11,
+      "y": 52,
+      "ceiling": 3
+    },
+    {
+      "x": 12,
+      "y": 15,
+      "ceiling": 3
+    },
+    {
+      "x": 12,
+      "y": 16,
+      "ceiling": 3
+    },
+    {
+      "x": 12,
+      "y": 17,
+      "ceiling": 3
+    },
+    {
+      "x": 12,
+      "y": 30,
+      "ceiling": 4
+    },
+    {
+      "x": 12,
+      "y": 31,
+      "ceiling": 4
+    },
+    {
+      "x": 12,
+      "y": 32,
+      "ceiling": 4
+    },
+    {
+      "x": 12,
+      "y": 33,
+      "ceiling": 4
+    },
+    {
+      "x": 12,
+      "y": 50,
+      "ceiling": 3
+    },
+    {
+      "x": 12,
+      "y": 51,
+      "ceiling": 3
+    },
+    {
+      "x": 12,
+      "y": 52,
+      "ceiling": 3
+    },
+    {
+      "x": 13,
+      "y": 15,
+      "ceiling": 3
+    },
+    {
+      "x": 13,
+      "y": 16,
+      "ceiling": 3
+    },
+    {
+      "x": 13,
+      "y": 17,
+      "ceiling": 3
+    },
+    {
+      "x": 13,
+      "y": 26,
+      "ceiling": 4
+    },
+    {
+      "x": 13,
+      "y": 27,
+      "ceiling": 4
+    },
+    {
+      "x": 13,
+      "y": 28,
+      "ceiling": 4
+    },
+    {
+      "x": 13,
+      "y": 29,
+      "ceiling": 4
+    },
+    {
+      "x": 13,
+      "y": 30,
+      "ceiling": 4
+    },
+    {
+      "x": 13,
+      "y": 31,
+      "ceiling": 4
+    },
+    {
+      "x": 13,
+      "y": 32,
+      "ceiling": 4
+    },
+    {
+      "x": 13,
+      "y": 33,
+      "ceiling": 4
+    },
+    {
+      "x": 13,
+      "y": 34,
+      "ceiling": 4
+    },
+    {
+      "x": 13,
+      "y": 46,
+      "ceiling": 5
+    },
+    {
+      "x": 13,
+      "y": 47,
+      "ceiling": 5
+    },
+    {
+      "x": 13,
+      "y": 48,
+      "ceiling": 5
+    },
+    {
+      "x": 13,
+      "y": 49,
+      "ceiling": 5
+    },
+    {
+      "x": 13,
+      "y": 50,
+      "ceiling": 5
+    },
+    {
+      "x": 13,
+      "y": 51,
+      "ceiling": 5
+    },
+    {
+      "x": 13,
+      "y": 52,
+      "ceiling": 5
+    },
+    {
+      "x": 13,
+      "y": 53,
+      "ceiling": 5
+    },
+    {
+      "x": 13,
+      "y": 54,
+      "ceiling": 5
+    },
+    {
+      "x": 13,
+      "y": 55,
+      "ceiling": 5
+    },
+    {
+      "x": 13,
+      "y": 56,
+      "ceiling": 5
+    },
+    {
+      "x": 14,
+      "y": 15,
+      "ceiling": 3
+    },
+    {
+      "x": 14,
+      "y": 16,
+      "ceiling": 3
+    },
+    {
+      "x": 14,
+      "y": 17,
+      "ceiling": 3
+    },
+    {
+      "x": 14,
+      "y": 26,
+      "ceiling": 4
+    },
+    {
+      "x": 14,
+      "y": 27,
+      "ceiling": 4
+    },
+    {
+      "x": 14,
+      "y": 28,
+      "ceiling": 4
+    },
+    {
+      "x": 14,
+      "y": 29,
+      "ceiling": 4
+    },
+    {
+      "x": 14,
+      "y": 30,
+      "ceiling": 4
+    },
+    {
+      "x": 14,
+      "y": 31,
+      "ceiling": 4
+    },
+    {
+      "x": 14,
+      "y": 32,
+      "ceiling": 4
+    },
+    {
+      "x": 14,
+      "y": 33,
+      "ceiling": 4
+    },
+    {
+      "x": 14,
+      "y": 34,
+      "ceiling": 4
+    },
+    {
+      "x": 14,
+      "y": 46,
+      "ceiling": 5
+    },
+    {
+      "x": 14,
+      "y": 47,
+      "ceiling": 5
+    },
+    {
+      "x": 14,
+      "y": 48,
+      "ceiling": 5
+    },
+    {
+      "x": 14,
+      "y": 49,
+      "ceiling": 5
+    },
+    {
+      "x": 14,
+      "y": 50,
+      "ceiling": 5
+    },
+    {
+      "x": 14,
+      "y": 51,
+      "ceiling": 5
+    },
+    {
+      "x": 14,
+      "y": 52,
+      "ceiling": 5
+    },
+    {
+      "x": 14,
+      "y": 53,
+      "ceiling": 5
+    },
+    {
+      "x": 14,
+      "y": 54,
+      "ceiling": 5
+    },
+    {
+      "x": 14,
+      "y": 55,
+      "ceiling": 5
+    },
+    {
+      "x": 14,
+      "y": 56,
+      "ceiling": 5
+    },
+    {
+      "x": 15,
+      "y": 15,
+      "ceiling": 3
+    },
+    {
+      "x": 15,
+      "y": 16,
+      "ceiling": 3
+    },
+    {
+      "x": 15,
+      "y": 17,
+      "ceiling": 3
+    },
+    {
+      "x": 15,
+      "y": 26,
+      "ceiling": 4
+    },
+    {
+      "x": 15,
+      "y": 27,
+      "ceiling": 4
+    },
+    {
+      "x": 15,
+      "y": 28,
+      "ceiling": 4
+    },
+    {
+      "x": 15,
+      "y": 29,
+      "ceiling": 4
+    },
+    {
+      "x": 15,
+      "y": 30,
+      "ceiling": 4
+    },
+    {
+      "x": 15,
+      "y": 31,
+      "ceiling": 4
+    },
+    {
+      "x": 15,
+      "y": 32,
+      "ceiling": 4
+    },
+    {
+      "x": 15,
+      "y": 33,
+      "ceiling": 4
+    },
+    {
+      "x": 15,
+      "y": 34,
+      "ceiling": 4
+    },
+    {
+      "x": 15,
+      "y": 46,
+      "ceiling": 5
+    },
+    {
+      "x": 15,
+      "y": 47,
+      "ceiling": 5
+    },
+    {
+      "x": 15,
+      "y": 48,
+      "ceiling": 5
+    },
+    {
+      "x": 15,
+      "y": 49,
+      "ceiling": 5
+    },
+    {
+      "x": 15,
+      "y": 50,
+      "ceiling": 5
+    },
+    {
+      "x": 15,
+      "y": 51,
+      "ceiling": 5
+    },
+    {
+      "x": 15,
+      "y": 52,
+      "ceiling": 5
+    },
+    {
+      "x": 15,
+      "y": 53,
+      "ceiling": 5
+    },
+    {
+      "x": 15,
+      "y": 54,
+      "ceiling": 5
+    },
+    {
+      "x": 15,
+      "y": 55,
+      "ceiling": 5
+    },
+    {
+      "x": 15,
+      "y": 56,
+      "ceiling": 5
+    },
+    {
+      "x": 16,
+      "y": 15,
+      "ceiling": 3
+    },
+    {
+      "x": 16,
+      "y": 16,
+      "ceiling": 3
+    },
+    {
+      "x": 16,
+      "y": 17,
+      "ceiling": 3
+    },
+    {
+      "x": 16,
+      "y": 18,
+      "ceiling": 3
+    },
+    {
+      "x": 16,
+      "y": 19,
+      "ceiling": 3
+    },
+    {
+      "x": 16,
+      "y": 20,
+      "ceiling": 3
+    },
+    {
+      "x": 16,
+      "y": 21,
+      "ceiling": 3
+    },
+    {
+      "x": 16,
+      "y": 22,
+      "ceiling": 3
+    },
+    {
+      "x": 16,
+      "y": 23,
+      "ceiling": 3
+    },
+    {
+      "x": 16,
+      "y": 24,
+      "ceiling": 3
+    },
+    {
+      "x": 16,
+      "y": 25,
+      "ceiling": 3
+    },
+    {
+      "x": 16,
+      "y": 26,
+      "ceiling": 4
+    },
+    {
+      "x": 16,
+      "y": 27,
+      "ceiling": 4
+    },
+    {
+      "x": 16,
+      "y": 28,
+      "ceiling": 4
+    },
+    {
+      "x": 16,
+      "y": 29,
+      "ceiling": 4
+    },
+    {
+      "x": 16,
+      "y": 30,
+      "ceiling": 4
+    },
+    {
+      "x": 16,
+      "y": 31,
+      "ceiling": 4
+    },
+    {
+      "x": 16,
+      "y": 32,
+      "ceiling": 4
+    },
+    {
+      "x": 16,
+      "y": 33,
+      "ceiling": 4
+    },
+    {
+      "x": 16,
+      "y": 34,
+      "ceiling": 4
+    },
+    {
+      "x": 16,
+      "y": 35,
+      "ceiling": 4
+    },
+    {
+      "x": 16,
+      "y": 36,
+      "ceiling": 4
+    },
+    {
+      "x": 16,
+      "y": 37,
+      "ceiling": 4
+    },
+    {
+      "x": 16,
+      "y": 38,
+      "ceiling": 4
+    },
+    {
+      "x": 16,
+      "y": 39,
+      "ceiling": 4
+    },
+    {
+      "x": 16,
+      "y": 40,
+      "ceiling": 4
+    },
+    {
+      "x": 16,
+      "y": 41,
+      "ceiling": 4
+    },
+    {
+      "x": 16,
+      "y": 42,
+      "ceiling": 4
+    },
+    {
+      "x": 16,
+      "y": 43,
+      "ceiling": 4
+    },
+    {
+      "x": 16,
+      "y": 44,
+      "ceiling": 4
+    },
+    {
+      "x": 16,
+      "y": 45,
+      "ceiling": 4
+    },
+    {
+      "x": 16,
+      "y": 46,
+      "ceiling": 5
+    },
+    {
+      "x": 16,
+      "y": 47,
+      "ceiling": 5
+    },
+    {
+      "x": 16,
+      "y": 48,
+      "ceiling": 5
+    },
+    {
+      "x": 16,
+      "y": 49,
+      "ceiling": 5
+    },
+    {
+      "x": 16,
+      "y": 50,
+      "ceiling": 5
+    },
+    {
+      "x": 16,
+      "y": 51,
+      "ceiling": 5
+    },
+    {
+      "x": 16,
+      "y": 52,
+      "ceiling": 5
+    },
+    {
+      "x": 16,
+      "y": 53,
+      "ceiling": 5
+    },
+    {
+      "x": 16,
+      "y": 54,
+      "ceiling": 5
+    },
+    {
+      "x": 16,
+      "y": 55,
+      "ceiling": 5
+    },
+    {
+      "x": 16,
+      "y": 56,
+      "ceiling": 5
+    },
+    {
+      "x": 17,
+      "y": 15,
+      "ceiling": 3
+    },
+    {
+      "x": 17,
+      "y": 16,
+      "ceiling": 3
+    },
+    {
+      "x": 17,
+      "y": 17,
+      "ceiling": 3
+    },
+    {
+      "x": 17,
+      "y": 18,
+      "ceiling": 3
+    },
+    {
+      "x": 17,
+      "y": 19,
+      "ceiling": 3
+    },
+    {
+      "x": 17,
+      "y": 20,
+      "ceiling": 3
+    },
+    {
+      "x": 17,
+      "y": 21,
+      "ceiling": 3
+    },
+    {
+      "x": 17,
+      "y": 22,
+      "ceiling": 3
+    },
+    {
+      "x": 17,
+      "y": 23,
+      "ceiling": 3
+    },
+    {
+      "x": 17,
+      "y": 24,
+      "ceiling": 3
+    },
+    {
+      "x": 17,
+      "y": 25,
+      "ceiling": 3
+    },
+    {
+      "x": 17,
+      "y": 26,
+      "ceiling": 4
+    },
+    {
+      "x": 17,
+      "y": 27,
+      "ceiling": 4
+    },
+    {
+      "x": 17,
+      "y": 28,
+      "ceiling": 4
+    },
+    {
+      "x": 17,
+      "y": 29,
+      "ceiling": 4
+    },
+    {
+      "x": 17,
+      "y": 30,
+      "ceiling": 4
+    },
+    {
+      "x": 17,
+      "y": 31,
+      "ceiling": 4
+    },
+    {
+      "x": 17,
+      "y": 32,
+      "ceiling": 4
+    },
+    {
+      "x": 17,
+      "y": 33,
+      "ceiling": 4
+    },
+    {
+      "x": 17,
+      "y": 34,
+      "ceiling": 4
+    },
+    {
+      "x": 17,
+      "y": 35,
+      "ceiling": 4
+    },
+    {
+      "x": 17,
+      "y": 36,
+      "ceiling": 4
+    },
+    {
+      "x": 17,
+      "y": 37,
+      "ceiling": 4
+    },
+    {
+      "x": 17,
+      "y": 38,
+      "ceiling": 4
+    },
+    {
+      "x": 17,
+      "y": 39,
+      "ceiling": 4
+    },
+    {
+      "x": 17,
+      "y": 40,
+      "ceiling": 4
+    },
+    {
+      "x": 17,
+      "y": 41,
+      "ceiling": 4
+    },
+    {
+      "x": 17,
+      "y": 42,
+      "ceiling": 4
+    },
+    {
+      "x": 17,
+      "y": 43,
+      "ceiling": 4
+    },
+    {
+      "x": 17,
+      "y": 44,
+      "ceiling": 4
+    },
+    {
+      "x": 17,
+      "y": 45,
+      "ceiling": 4
+    },
+    {
+      "x": 17,
+      "y": 46,
+      "ceiling": 5
+    },
+    {
+      "x": 17,
+      "y": 47,
+      "ceiling": 5
+    },
+    {
+      "x": 17,
+      "y": 48,
+      "ceiling": 5
+    },
+    {
+      "x": 17,
+      "y": 49,
+      "ceiling": 5
+    },
+    {
+      "x": 17,
+      "y": 50,
+      "ceiling": 5
+    },
+    {
+      "x": 17,
+      "y": 51,
+      "ceiling": 5
+    },
+    {
+      "x": 17,
+      "y": 52,
+      "ceiling": 5
+    },
+    {
+      "x": 17,
+      "y": 53,
+      "ceiling": 5
+    },
+    {
+      "x": 17,
+      "y": 54,
+      "ceiling": 5
+    },
+    {
+      "x": 17,
+      "y": 55,
+      "ceiling": 5
+    },
+    {
+      "x": 17,
+      "y": 56,
+      "ceiling": 5
+    },
+    {
+      "x": 18,
+      "y": 15,
+      "ceiling": 3
+    },
+    {
+      "x": 18,
+      "y": 16,
+      "ceiling": 3
+    },
+    {
+      "x": 18,
+      "y": 17,
+      "ceiling": 3
+    },
+    {
+      "x": 18,
+      "y": 18,
+      "ceiling": 3
+    },
+    {
+      "x": 18,
+      "y": 19,
+      "ceiling": 3
+    },
+    {
+      "x": 18,
+      "y": 20,
+      "ceiling": 3
+    },
+    {
+      "x": 18,
+      "y": 21,
+      "ceiling": 3
+    },
+    {
+      "x": 18,
+      "y": 22,
+      "ceiling": 3
+    },
+    {
+      "x": 18,
+      "y": 23,
+      "ceiling": 3
+    },
+    {
+      "x": 18,
+      "y": 24,
+      "ceiling": 3
+    },
+    {
+      "x": 18,
+      "y": 25,
+      "ceiling": 3
+    },
+    {
+      "x": 18,
+      "y": 26,
+      "ceiling": 4
+    },
+    {
+      "x": 18,
+      "y": 27,
+      "ceiling": 4
+    },
+    {
+      "x": 18,
+      "y": 28,
+      "ceiling": 4
+    },
+    {
+      "x": 18,
+      "y": 29,
+      "ceiling": 4
+    },
+    {
+      "x": 18,
+      "y": 30,
+      "ceiling": 4
+    },
+    {
+      "x": 18,
+      "y": 31,
+      "ceiling": 4
+    },
+    {
+      "x": 18,
+      "y": 32,
+      "ceiling": 4
+    },
+    {
+      "x": 18,
+      "y": 33,
+      "ceiling": 4
+    },
+    {
+      "x": 18,
+      "y": 34,
+      "ceiling": 4
+    },
+    {
+      "x": 18,
+      "y": 35,
+      "ceiling": 4
+    },
+    {
+      "x": 18,
+      "y": 36,
+      "ceiling": 4
+    },
+    {
+      "x": 18,
+      "y": 37,
+      "ceiling": 4
+    },
+    {
+      "x": 18,
+      "y": 38,
+      "ceiling": 4
+    },
+    {
+      "x": 18,
+      "y": 39,
+      "ceiling": 4
+    },
+    {
+      "x": 18,
+      "y": 40,
+      "ceiling": 4
+    },
+    {
+      "x": 18,
+      "y": 41,
+      "ceiling": 4
+    },
+    {
+      "x": 18,
+      "y": 42,
+      "ceiling": 4
+    },
+    {
+      "x": 18,
+      "y": 43,
+      "ceiling": 4
+    },
+    {
+      "x": 18,
+      "y": 44,
+      "ceiling": 4
+    },
+    {
+      "x": 18,
+      "y": 45,
+      "ceiling": 4
+    },
+    {
+      "x": 18,
+      "y": 46,
+      "ceiling": 5
+    },
+    {
+      "x": 18,
+      "y": 47,
+      "ceiling": 5
+    },
+    {
+      "x": 18,
+      "y": 48,
+      "ceiling": 5
+    },
+    {
+      "x": 18,
+      "y": 49,
+      "ceiling": 5
+    },
+    {
+      "x": 18,
+      "y": 50,
+      "ceiling": 5
+    },
+    {
+      "x": 18,
+      "y": 51,
+      "ceiling": 5
+    },
+    {
+      "x": 18,
+      "y": 52,
+      "ceiling": 5
+    },
+    {
+      "x": 18,
+      "y": 53,
+      "ceiling": 5
+    },
+    {
+      "x": 18,
+      "y": 54,
+      "ceiling": 5
+    },
+    {
+      "x": 18,
+      "y": 55,
+      "ceiling": 5
+    },
+    {
+      "x": 18,
+      "y": 56,
+      "ceiling": 5
+    },
+    {
+      "x": 19,
+      "y": 26,
+      "ceiling": 4
+    },
+    {
+      "x": 19,
+      "y": 27,
+      "ceiling": 4
+    },
+    {
+      "x": 19,
+      "y": 28,
+      "ceiling": 4
+    },
+    {
+      "x": 19,
+      "y": 29,
+      "ceiling": 4
+    },
+    {
+      "x": 19,
+      "y": 30,
+      "ceiling": 4
+    },
+    {
+      "x": 19,
+      "y": 31,
+      "ceiling": 4
+    },
+    {
+      "x": 19,
+      "y": 32,
+      "ceiling": 4
+    },
+    {
+      "x": 19,
+      "y": 33,
+      "ceiling": 4
+    },
+    {
+      "x": 19,
+      "y": 34,
+      "ceiling": 4
+    },
+    {
+      "x": 19,
+      "y": 35,
+      "ceiling": 4
+    },
+    {
+      "x": 19,
+      "y": 36,
+      "ceiling": 4
+    },
+    {
+      "x": 19,
+      "y": 37,
+      "ceiling": 4
+    },
+    {
+      "x": 19,
+      "y": 38,
+      "ceiling": 4
+    },
+    {
+      "x": 19,
+      "y": 39,
+      "ceiling": 4
+    },
+    {
+      "x": 19,
+      "y": 40,
+      "ceiling": 4
+    },
+    {
+      "x": 19,
+      "y": 41,
+      "ceiling": 4
+    },
+    {
+      "x": 19,
+      "y": 42,
+      "ceiling": 4
+    },
+    {
+      "x": 19,
+      "y": 43,
+      "ceiling": 4
+    },
+    {
+      "x": 19,
+      "y": 44,
+      "ceiling": 4
+    },
+    {
+      "x": 19,
+      "y": 45,
+      "ceiling": 4
+    },
+    {
+      "x": 19,
+      "y": 46,
+      "ceiling": 5
+    },
+    {
+      "x": 19,
+      "y": 47,
+      "ceiling": 5
+    },
+    {
+      "x": 19,
+      "y": 48,
+      "ceiling": 5
+    },
+    {
+      "x": 19,
+      "y": 49,
+      "ceiling": 5
+    },
+    {
+      "x": 19,
+      "y": 50,
+      "ceiling": 5
+    },
+    {
+      "x": 19,
+      "y": 51,
+      "ceiling": 5
+    },
+    {
+      "x": 19,
+      "y": 52,
+      "ceiling": 5
+    },
+    {
+      "x": 19,
+      "y": 53,
+      "ceiling": 5
+    },
+    {
+      "x": 19,
+      "y": 54,
+      "ceiling": 5
+    },
+    {
+      "x": 19,
+      "y": 55,
+      "ceiling": 5
+    },
+    {
+      "x": 19,
+      "y": 56,
+      "ceiling": 5
+    },
+    {
+      "x": 20,
+      "y": 26,
+      "ceiling": 4
+    },
+    {
+      "x": 20,
+      "y": 27,
+      "ceiling": 4
+    },
+    {
+      "x": 20,
+      "y": 28,
+      "ceiling": 4
+    },
+    {
+      "x": 20,
+      "y": 29,
+      "ceiling": 4
+    },
+    {
+      "x": 20,
+      "y": 30,
+      "ceiling": 4
+    },
+    {
+      "x": 20,
+      "y": 31,
+      "ceiling": 4
+    },
+    {
+      "x": 20,
+      "y": 32,
+      "ceiling": 4
+    },
+    {
+      "x": 20,
+      "y": 33,
+      "ceiling": 4
+    },
+    {
+      "x": 20,
+      "y": 34,
+      "ceiling": 4
+    },
+    {
+      "x": 20,
+      "y": 46,
+      "ceiling": 5
+    },
+    {
+      "x": 20,
+      "y": 47,
+      "ceiling": 5
+    },
+    {
+      "x": 20,
+      "y": 48,
+      "ceiling": 5
+    },
+    {
+      "x": 20,
+      "y": 49,
+      "ceiling": 5
+    },
+    {
+      "x": 20,
+      "y": 50,
+      "ceiling": 5
+    },
+    {
+      "x": 20,
+      "y": 51,
+      "ceiling": 5
+    },
+    {
+      "x": 20,
+      "y": 52,
+      "ceiling": 5
+    },
+    {
+      "x": 20,
+      "y": 53,
+      "ceiling": 5
+    },
+    {
+      "x": 20,
+      "y": 54,
+      "ceiling": 5
+    },
+    {
+      "x": 20,
+      "y": 55,
+      "ceiling": 5
+    },
+    {
+      "x": 20,
+      "y": 56,
+      "ceiling": 5
+    },
+    {
+      "x": 21,
+      "y": 26,
+      "ceiling": 4
+    },
+    {
+      "x": 21,
+      "y": 27,
+      "ceiling": 4
+    },
+    {
+      "x": 21,
+      "y": 28,
+      "ceiling": 4
+    },
+    {
+      "x": 21,
+      "y": 29,
+      "ceiling": 4
+    },
+    {
+      "x": 21,
+      "y": 30,
+      "ceiling": 4
+    },
+    {
+      "x": 21,
+      "y": 31,
+      "ceiling": 4
+    },
+    {
+      "x": 21,
+      "y": 32,
+      "ceiling": 4
+    },
+    {
+      "x": 21,
+      "y": 33,
+      "ceiling": 4
+    },
+    {
+      "x": 21,
+      "y": 34,
+      "ceiling": 4
+    },
+    {
+      "x": 21,
+      "y": 46,
+      "ceiling": 5
+    },
+    {
+      "x": 21,
+      "y": 47,
+      "ceiling": 5
+    },
+    {
+      "x": 21,
+      "y": 48,
+      "ceiling": 5
+    },
+    {
+      "x": 21,
+      "y": 49,
+      "ceiling": 5
+    },
+    {
+      "x": 21,
+      "y": 50,
+      "ceiling": 5
+    },
+    {
+      "x": 21,
+      "y": 51,
+      "ceiling": 5
+    },
+    {
+      "x": 21,
+      "y": 52,
+      "ceiling": 5
+    },
+    {
+      "x": 21,
+      "y": 53,
+      "ceiling": 5
+    },
+    {
+      "x": 21,
+      "y": 54,
+      "ceiling": 5
+    },
+    {
+      "x": 21,
+      "y": 55,
+      "ceiling": 5
+    },
+    {
+      "x": 21,
+      "y": 56,
+      "ceiling": 5
+    },
+    {
+      "x": 22,
+      "y": 46,
+      "ceiling": 5
+    },
+    {
+      "x": 22,
+      "y": 47,
+      "ceiling": 5
+    },
+    {
+      "x": 22,
+      "y": 48,
+      "ceiling": 5
+    },
+    {
+      "x": 22,
+      "y": 49,
+      "ceiling": 5
+    },
+    {
+      "x": 22,
+      "y": 50,
+      "ceiling": 5
+    },
+    {
+      "x": 22,
+      "y": 51,
+      "ceiling": 5
+    },
+    {
+      "x": 22,
+      "y": 52,
+      "ceiling": 5
+    },
+    {
+      "x": 22,
+      "y": 53,
+      "ceiling": 5
+    },
+    {
+      "x": 22,
+      "y": 54,
+      "ceiling": 5
+    },
+    {
+      "x": 22,
+      "y": 55,
+      "ceiling": 5
+    },
+    {
+      "x": 22,
+      "y": 56,
+      "ceiling": 5
+    },
+    {
+      "x": 23,
+      "y": 46,
+      "ceiling": 5
+    },
+    {
+      "x": 23,
+      "y": 47,
+      "ceiling": 5
+    },
+    {
+      "x": 23,
+      "y": 48,
+      "ceiling": 5
+    },
+    {
+      "x": 23,
+      "y": 49,
+      "ceiling": 5
+    },
+    {
+      "x": 23,
+      "y": 50,
+      "ceiling": 5
+    },
+    {
+      "x": 23,
+      "y": 51,
+      "ceiling": 5
+    },
+    {
+      "x": 23,
+      "y": 52,
+      "ceiling": 5
+    },
+    {
+      "x": 23,
+      "y": 53,
+      "ceiling": 5
+    },
+    {
+      "x": 23,
+      "y": 54,
+      "ceiling": 5
+    },
+    {
+      "x": 23,
+      "y": 55,
+      "ceiling": 5
+    },
+    {
+      "x": 23,
+      "y": 56,
+      "ceiling": 5
+    }
+  ],
+  "exit": {
+    "id": "Mine_Exit",
+    "min": [
+      -1.5,
+      -3,
+      0
+    ],
+    "max": [
+      1.5,
+      -2.5,
+      2.8
+    ],
+    "forward": [
+      0,
+      -1,
+      0
+    ],
+    "surface_manifest": "../minecraft_village.scene.json",
+    "surface_position": [
+      8.5,
+      23,
+      1.7
+    ],
+    "surface_forward": [
+      0,
+      -1,
+      0
+    ],
+    "transition_implemented": false
+  },
+  "texture_sources": [
+    {
+      "file": "assets/textures/minigames/Minecraft/stone.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "b5e10adc72442bfb257ce7ba0b9bbe36475a0c8cdfec89b80dc9517203ff3e9f",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/cobblestone.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "bcda95fdf5afa91747657aa198fc0b69ebf44141de30a718075f74045e9a5def",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/granite.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "9bde1239e00c17b0d2842a941cda606c395039f59ec351ec8866a27e77ee7f8b",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/diorite.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "5f44c6743cd72c00a074e6c43cc9c46b9cf54a82c0cf87c5eb675a7207cff648",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/andesite.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "7c7960dd3dd2084233907c1529dcbea0b8a2195fadaa608027f395b6f430fbd7",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/gravel.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "bc1558fa64b238fabca4cc957e61c232337d410495784b106676bf73e52e16e0",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/coal_ore.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "a24553e4cb9cfe70aae48fdb19d8205736135551301dc9c16ecca842d8dd3ae3",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/iron_ore.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "72fb64f5a1c7ef0c356b1510b84174576d8cca5ae1de3bb9fa41e3dd1a7a2719",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/gold_ore.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "5253e5a8ea32739a5c8cb1d844f0e46c8c85641f77c3d07dcc03645e2914dd1f",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/redstone_ore.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "742b6a5bad43ec8875f3861ee713ca32a57a1a257c7fefecf981c0355615248f",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/lapis_ore.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "f85afc08c133c664a39f1526da82b4627960d1d460982185b1a6e1d4eebda312",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/diamond_ore.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "2ef421308b678d2225aef41affc087ae512a81213a24a98cf456dbe231884122",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/oak_planks.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "65665943ef9c8bcf63fc67d2083ed0c50243f724106d0e4bb1abea5d921b16d3",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/oak_log.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "61735859c9c9ea82601191a77c6f256d93619cbaf7cad998a3ed5762877a34e6",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/oak_log_top.png",
+      "size": [
+        16,
+        16
+      ],
+      "sha256": "a520800a833ea0c6214481245ab40397aa0c08b4ffc909046dac266386f9fc01",
+      "tint": null,
+      "alpha": "OPAQUE"
+    },
+    {
+      "file": "assets/textures/minigames/Minecraft/lava_still.png",
+      "size": [
+        16,
+        320
+      ],
+      "sha256": "9d28ac5d4ac1a9965552e5c8b5e1229a38a5f7216c0250b35d2400dee1f1b8be",
+      "frame": 0,
+      "frame_count": 20,
+      "note": "First top frame packed in memory, no external derivative texture"
+    }
+  ],
+  "decorative_ores": {
+    "coal_ore": 14,
+    "iron_ore": 14,
+    "gold_ore": 10,
+    "redstone_ore": 12,
+    "lapis_ore": 10
+  },
+  "counts": {
+    "chambers": 9,
+    "tunnels": 10,
+    "diamonds": 14,
+    "breakables": 12,
+    "lava_regions": 2
+  },
+  "notes": [
+    "Flat walkable floor Z=0; sector depth is thematic, no vertical descent.",
+    "No extraction, removal, collection, timer, damage or challenge transitions.",
+    "Two gated chambers require future removal of all six blocks per gate.",
+    "Lava has a solid development floor; sensor metadata is separate from solids."
+  ]
+}

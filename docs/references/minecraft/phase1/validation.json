@@ -1,0 +1,65 @@
+{
+  "status": "passed",
+  "checks": [
+    "Original planet, ship, South Park, Rust sources and source textures: SHA-256 unchanged (170 files)",
+    "Blend reopened: 5 buildings, 16 oaks; metre scale, flat normals, packed 16x16 images, Closest interpolation and per-face UV/materials",
+    "2136 road samples clear for a radius .35 / height 1.8 actor, including lateral bands",
+    "Spawn connects to all five house approaches, farm, mine interaction and tunnel transition by independent flood fill",
+    "Destination visual floor agrees with Z=0 plane within .02 m; decorative tunnel rails allowed up to .11 m",
+    "All 5 houses in overview frame with unobstructed visibility rays",
+    "GLB self-contained; 27 embedded images, complete used material palette, NEAREST samplers, MASK cutouts, no cameras/lights/proxies",
+    "GLB reimport: all meshes and triangles preserved, UVs present, orientation and bounds within .001 m",
+    "Five PNG review captures present"
+  ],
+  "blender": "5.4.0 Alpha",
+  "mesh_objects": 98,
+  "triangles": 39176,
+  "materials": 32,
+  "images": 27,
+  "colliders": 83,
+  "collider_categories": {
+    "building": 5,
+    "hill_boundary": 46,
+    "decoration": 10,
+    "mine_frame": 2,
+    "mine_wall": 2,
+    "mine_ceiling": 1,
+    "mine_end": 1,
+    "tree_trunk": 16
+  },
+  "bounds_blender": [
+    [
+      -32.0,
+      -26.0,
+      -2.0
+    ],
+    [
+      32.0,
+      34.0,
+      9.0
+    ]
+  ],
+  "original_libraries": {
+    "assets/models/planets/minecraft/minecraft_planet_textured_v02.blend": {
+      "objects": 150,
+      "materials": 12
+    },
+    "assets/models/ships/minecraft/end_ship.blend": {
+      "objects": 14,
+      "materials": 12
+    }
+  },
+  "visible_houses": [
+    "House_Small_West",
+    "House_Small_East",
+    "House_Medium_West",
+    "House_Medium_East",
+    "Village_Hall"
+  ],
+  "road_samples": 2136,
+  "reachable_grid_cells": 9213,
+  "limitations": [
+    "Geometric validation only; FPS/controller not integrated or tested.",
+    "Raylib runtime rendering and alpha-discard/point-filter setup pending phase 2."
+  ]
+}

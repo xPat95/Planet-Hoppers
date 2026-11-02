@@ -1,0 +1,78 @@
+{
+  "audio": {
+    "loaded": {
+      "assets/audio/music/Minecraft/Minecraft.mp3": 860.3950805664062,
+      "assets/audio/sfx/Minecraft/block_break.wav": 0.5235000252723694,
+      "assets/audio/sfx/Minecraft/danger.mp3": 5.381229400634766,
+      "assets/audio/sfx/Minecraft/diamond_collect.wav": 1.7763333320617676,
+      "assets/audio/sfx/Minecraft/footsteps.mp3": 7.584000110626221,
+      "assets/audio/sfx/Minecraft/game_over.mp3": 3.082458257675171,
+      "assets/audio/sfx/Minecraft/pickaxe_hit.mp3": 0.8881666660308838,
+      "assets/audio/sfx/Minecraft/success.mp3": 3.4079999923706055,
+      "assets/audio/sfx/Minecraft/victory.mp3": 3.503999948501587
+    },
+    "music_transitions": [
+      "surface",
+      "mine",
+      "paused",
+      "mine",
+      "mine-low",
+      "victory",
+      "mine",
+      "mine-low",
+      "defeat",
+      "mine",
+      "paused",
+      "surface"
+    ],
+    "plays": {
+      "block_break": 8,
+      "danger": 2,
+      "diamond_collect": 8,
+      "footsteps": 2,
+      "game_over": 1,
+      "pickaxe_hit": 48,
+      "success": 1,
+      "victory": 1
+    },
+    "warnings": []
+  },
+  "checks": [
+    "E opens invitation without starting a timer",
+    "Loaded scene starts at 02:30 after resources are ready",
+    "Exit with insufficient diamonds gives feedback and keeps gameplay active",
+    "Lava removes ten seconds and teleports to safe ground once",
+    "Real pause menu freezes countdown",
+    "Eight actual mined diamonds require a physical return, not automatic victory",
+    "Low-time threshold activates visual and one-shot alert",
+    "E at actual exit with time and diamonds produces victory and releases cursor",
+    "Victory retry restores timer, every block, collision state and HUD",
+    "Timeout ends gameplay, clamps clock and opens defeat screen",
+    "Defeat retry starts a fresh attempt without reopening application",
+    "Return restores surface FPS in the same graphics context",
+    "One looping Minecraft music stream survives all scene changes and retries",
+    "All nine exact audio resources decode successfully",
+    "Success, victory and defeat sounds each fire once in their attempt",
+    "Movement, mining, collection and warning cues play through the real audio device"
+  ],
+  "method": "Real hidden OpenGL/audio; native events and explicit pose/time presets. No manual hardware playtest.",
+  "model": {
+    "bounds_max": [
+      52.0,
+      9.0,
+      3.0
+    ],
+    "bounds_min": [
+      -45.0,
+      -0.07999999821186066,
+      -84.0
+    ],
+    "draw_batches": 102,
+    "material_colors_match": true,
+    "original_primitives": 145,
+    "source_materials": 20,
+    "triangles": 40184
+  },
+  "music_starts": 1,
+  "status": "passed"
+}

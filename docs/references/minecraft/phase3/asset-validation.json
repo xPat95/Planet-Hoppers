@@ -1,0 +1,90 @@
+{
+  "status": "passed",
+  "checks": [
+    "All 224 protected sources unchanged",
+    "Blend reopened; cubic shell, metre scale, packed square images and block-scale Closest UVs",
+    "10 tunnels / 9 chambers; three sectors, exit return paths and safe diamond access checked while treating lava as forbidden",
+    "14 diamonds and 12 breakable blocks remain separate meshes; colliders have no overlapping static wall volumes",
+    "Every floor cell raycast has solid visual ground; decorative rails/lava limited to 0.11 m",
+    "GLB reimport preserves meshes, triangles, material palette, UVs, independent nodes, axes and bounds"
+  ],
+  "intact": {
+    "diamonds": [
+      "ORE_DIAMOND_01",
+      "ORE_DIAMOND_02",
+      "ORE_DIAMOND_03",
+      "ORE_DIAMOND_04",
+      "ORE_DIAMOND_05",
+      "ORE_DIAMOND_08",
+      "ORE_DIAMOND_09",
+      "ORE_DIAMOND_10",
+      "ORE_DIAMOND_11",
+      "ORE_DIAMOND_12"
+    ],
+    "rooms": [
+      "A_entry",
+      "A_junction",
+      "A_supply",
+      "B_hub",
+      "B_east",
+      "C_lava",
+      "C_vault"
+    ],
+    "reached_cells": 916
+  },
+  "with_future_gates_open": {
+    "diamonds": [
+      "ORE_DIAMOND_01",
+      "ORE_DIAMOND_02",
+      "ORE_DIAMOND_03",
+      "ORE_DIAMOND_04",
+      "ORE_DIAMOND_05",
+      "ORE_DIAMOND_06",
+      "ORE_DIAMOND_07",
+      "ORE_DIAMOND_08",
+      "ORE_DIAMOND_09",
+      "ORE_DIAMOND_10",
+      "ORE_DIAMOND_11",
+      "ORE_DIAMOND_12",
+      "ORE_DIAMOND_13",
+      "ORE_DIAMOND_14"
+    ],
+    "rooms": [
+      "A_entry",
+      "A_junction",
+      "A_supply",
+      "B_hub",
+      "B_east",
+      "B_secret",
+      "C_lava",
+      "C_vault",
+      "C_secret"
+    ],
+    "reached_cells": 1064
+  },
+  "counts": {
+    "chambers": 9,
+    "tunnels": 10,
+    "diamonds": 14,
+    "breakables": 12,
+    "lava_regions": 2
+  },
+  "visual_meshes": 44,
+  "triangles": 19704,
+  "materials": 20,
+  "images": 16,
+  "solid_colliders": 153,
+  "lights": 22,
+  "bounds_blender": [
+    [
+      -23.0,
+      -3.0,
+      -0.07999999821186066
+    ],
+    [
+      25.0,
+      59.0,
+      6.0
+    ]
+  ]
+}
