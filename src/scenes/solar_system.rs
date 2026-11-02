@@ -2,6 +2,7 @@
 //! (vuelo y choques) con la representación de `graphics::space`, y coordina las visitas: "Explorar planeta" cierra
 //! esta ventana, abre el minijuego y al terminar vuelve al mismo sistema solar, con la nave junto al planeta.
 use super::minigame_host::{self, MinigameVisits};
+use crate::gameplay::station::Station;
 use crate::minigames::common::host::{MinigameCompletion, MinigameExit, MinigameResult};
 use crate::graphics::resources::save_frame;
 use crate::graphics::space::{draw_sun_glow, Fit, Sky, SpaceModel, SpaceShader, SunShader, SKY_BACKGROUND};
@@ -11,9 +12,9 @@ use crate::solar_system::{hex_color, Planet, SolarSystem, SolarSystemConfig};
 use raylib::{ffi, prelude::*};
 use std::path::{Path, PathBuf};
 
-const HELP_SHIP: &str = "W/S: acelerar / frenar | Mouse o A/D: girar | Shift: turbo | Tab: objetivo | Espacio: piloto automático\n\
+const HELP_SHIP: &str = "W/S: acelerar / frenar | Mouse o A/D: girar | Espacio: subir | Shift: turbo | Tab: objetivo | B: piloto automático\n\
                          E: explorar planeta | C: vista general | N: otra nave | O: órbitas | Esc: soltar el mouse | Ctrl+Q: salir";
-const HELP_OVERVIEW: &str = "Arrastrar: girar cámara | Rueda: acercar | Tab: seguir planeta | Espacio: pausa | Arriba/Abajo: velocidad del tiempo\n\
+const HELP_OVERVIEW: &str = "Arrastrar: girar cámara | Rueda: acercar | Tab: seguir objetivo | P: pausa | Arriba/Abajo: velocidad del tiempo\n\
                              C: volver a la nave | O: órbitas | F12: captura | Ctrl+Q: salir";
 
 /// El plano cercano conserva el detalle de las naves; el lejano se calcula con el sistema.
@@ -31,6 +32,31 @@ const FADE: f32 = 0.6;
 enum View {
     Ship,
     Overview,
+}
+
+#[derive(Clone, Copy, PartialEq)]
+enum Destination {
+    Planet(usize),
+    Station,
+}
+impl Destination {
+    fn next(current: Option<Self>, count: usize) -> Option<Self> {
+        match current {
+            None => Some(Self::Planet(0)),
+            Some(Self::Planet(i)) if i + 1 < count => Some(Self::Planet(i + 1)),
+            Some(Self::Planet(_)) => Some(Self::Station),
+            Some(Self::Station) => None,
+        }
+    }
+    fn position(self, s: &Session) -> Vector3 {
+        match self { Self::Planet(i) => s.system.planets[i].position(), Self::Station => s.station.center() }
+    }
+    fn radius(self, s: &Session) -> f32 {
+        match self { Self::Planet(i) => s.system.planets[i].config.radius, Self::Station => s.station.collision_radius }
+    }
+    fn name(self, s: &Session) -> &str {
+        match self { Self::Planet(i) => &s.system.planets[i].config.name, Self::Station => &s.station.name }
+    }
 }
 
 /// Cámara de la vista general: gira alrededor del Sol o del planeta que se sigue.
@@ -54,20 +80,22 @@ impl OrbitCamera {
 /// Lo que se conserva entre ventanas: al volver de un minijuego todo sigue donde estaba.
 struct Session {
     system: SolarSystem,
+    station: Station,
     ships: ShipsConfig,
     ship_index: usize,
     ship: Ship,
     view: View,
     orbit: OrbitCamera,
-    focus: Option<usize>,
+    focus: Option<Destination>,
     paused: bool,
     time_scale: f32,
-    target: Option<usize>,
+    target: Option<Destination>,
     show_orbits: bool,
     minigames: MinigameVisits,
     last_completion: Option<MinigameCompletion>,
     return_smoke: bool,
     launch_smoke: bool,
+    station_smoke: bool,
     game: Option<GameState>,
     returning_from: Option<usize>,
     /// Prueba de ida y vuelta a un minijuego (--smoke-visit): cuántas visitas van.
@@ -79,6 +107,26 @@ struct Marker {
     at: Vector2,
     radius: Option<f32>,
     angle: f32,
+}
+
+/// Project a fixed POI, falling back to a direction marker inside the HUD margins.
+fn rl_screen_marker(point: Vector3, camera: Camera3D, width: i32, height: i32) -> (Vector2, bool) {
+    let forward = (camera.target - camera.position).normalized();
+    let right = forward.cross(camera.up).normalized();
+    let up = right.cross(forward);
+    let rel = point - camera.position;
+    let depth = rel.dot(forward);
+    let scale = height as f32 * 0.5 / (camera.fovy.to_radians() * 0.5).tan();
+    let center = Vector2::new(width as f32 * 0.5, height as f32 * 0.5);
+    let direction = Vector2::new(rel.dot(right), -rel.dot(up));
+    let projected = center + direction * (scale / depth.max(0.001));
+    if depth > 0.0 && projected.x > 30.0 && projected.x < width as f32 - 30.0
+        && projected.y > 100.0 && projected.y < height as f32 - 100.0 {
+        (projected, true)
+    } else {
+        let dir = if direction.length() > 0.001 { direction.normalized() } else { Vector2::new(0.0, 1.0) };
+        (center + dir * (width.min(height) as f32 * 0.35), false)
+    }
 }
 
 enum Exit {
@@ -128,12 +176,14 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
     let mut visit_smoke = false;
     let mut return_smoke = false;
     let mut launch_smoke = false;
+    let mut station_smoke = false;
     let mut overview = false;
     let mut args = args;
     while let Some(arg) = args.next() {
         match arg.as_str() {
             "--smoke" => smoke = true,
             "--smoke-launch" => { smoke = true; launch_smoke = true; }
+            "--smoke-station" => { smoke = true; station_smoke = true; }
             "--smoke-returns" => { smoke = true; visit_smoke = true; return_smoke = true; }
             "--smoke-visit" => {
                 smoke = true;
@@ -148,6 +198,7 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
                 println!("--smoke: recorrido automático sin ventana visible; guarda capturas en target/solarsystem/");
                 println!("--smoke-visit: ida y vuelta a South Park (con su prueba de entrada) y captura al volver");
                 println!("--smoke-returns: victoria, derrota, pausa/reinicio/abandono y cuatro visitas a South Park");
+                println!("--smoke-station: estación fija, aproximación y controles de ascenso/piloto");
                 return Ok(game);
             }
             _ => return Err(format!("Opción desconocida: {arg}").into()),
@@ -166,6 +217,7 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
     let mut ship = Ship::new(system.departure_position(), 0.0);
     ship.look_at(first);
     let mut session = Session {
+        station: Station::load(&root)?,
         ship_index: ships.ships.iter().position(|s| s.id == ships.active_ship).unwrap_or(0),
         ships,
         system,
@@ -175,12 +227,13 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
         focus: None,
         paused: false,
         time_scale: 1.0,
-        target: Some(0),
+        target: Some(Destination::Planet(0)),
         show_orbits: true,
         minigames: MinigameVisits::default(),
         last_completion: None,
         return_smoke,
         launch_smoke,
+        station_smoke,
         game,
         returning_from: None,
         visit_smoke: visit_smoke.then_some(0),
@@ -214,7 +267,7 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
                     return Err("La visita alteró la nave o las órbitas del anfitrión".into());
                 }
                 session.view = View::Ship;
-                session.target = Some(i);
+                session.target = Some(Destination::Planet(i));
                 session.ship.carried_by = None;
                 if let Some(n) = &mut session.visit_smoke {
                     *n += 1;
@@ -298,6 +351,13 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
     *sun.materials_mut()[0].shader_mut() = unsafe { WeakShader::from_raw(*sun_shader.shader.as_ref()) };
     let placeholder = rl.load_model_from_mesh(&thread, unsafe { Mesh::gen_mesh_sphere(&thread, 1.0, 24, 32).make_weak() })?;
     let planets = load_planet_models(&mut rl, &thread, root, &shader, &mut s.system);
+    let station_near = SpaceModel::load(&mut rl, &thread, &root.join(&s.station.model), &shader,
+        s.station.rotation_degrees, Fit::Length(s.station.length))?;
+    let station_far = SpaceModel::load(&mut rl, &thread, &root.join(&s.station.model_far), &shader,
+        s.station.rotation_degrees, Fit::Same(station_near.fit, station_near.half_extents))?;
+    if station_near.half_extents.length() > s.station.collision_radius {
+        return Err("La envolvente de seguridad no contiene la estación".into());
+    }
     let mut ship_model = load_ship_model(&mut rl, &thread, root, &shader, s);
     let sky = Sky::new();
     let outer = outer_orbit(&s.system);
@@ -336,13 +396,70 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         }
         let dt = if smoke { 1.0 / 60.0 } else { rl.get_frame_time().min(0.1) };
         // Sin teclado durante las pruebas ni mientras se sale hacia un minijuego
-        let accepts_input = !smoke && leaving.is_none();
+        let accepts_input = (!smoke || s.station_smoke) && leaving.is_none();
         let pressed = |rl: &RaylibHandle, k: KeyboardKey| accepts_input && rl.is_key_pressed(k);
         let down = |rl: &RaylibHandle, k: KeyboardKey| accepts_input && rl.is_key_down(k);
 
         // --- Recorrido automático de prueba (--smoke) -------------------------------------------------------
         let mut capture: Option<String> = None;
-        if let Some(visits) = s.visit_smoke {
+        if s.station_smoke {
+            // Native key events exercise the same input path as ordinary flight.
+            for key in [KeyboardKey::KEY_SPACE, KeyboardKey::KEY_B, KeyboardKey::KEY_E, KeyboardKey::KEY_TAB] {
+                unsafe { ffi::PlayAutomationEvent(ffi::AutomationEvent { frame: 0, type_: 1, params: [key as i32,0,0,0] }); }
+            }
+            let held = match frame {
+                36 => Some(KeyboardKey::KEY_TAB),
+                40..=49 => Some(KeyboardKey::KEY_SPACE),
+                51..=69 => Some(KeyboardKey::KEY_B),
+                80 => Some(KeyboardKey::KEY_E),
+                _ => None,
+            };
+            if let Some(key) = held {
+                unsafe { ffi::PlayAutomationEvent(ffi::AutomationEvent { frame: 0, type_: 2, params: [key as i32,0,0,0] }); }
+            }
+            match frame {
+                0 => { s.view = View::Overview; s.focus = None; }
+                10 => capture = Some("station-overview.png".into()),
+                15 => {
+                    s.focus = Some(Destination::Station);
+                    s.orbit.distance = s.station.length * 2.0;
+                    s.orbit.pitch = 0.3;
+                    s.orbit.yaw = 1.1;
+                }
+                25 => capture = Some("station-exterior.png".into()),
+                35 => {
+                    s.view = View::Ship;
+                    s.ship.position = s.station.approach() + Vector3::new(0.0, 0.0, 80.0);
+                    s.ship.speed = 0.0;
+                    s.ship.carried_by = None;
+                    s.ship.yaw = 0.5;
+                    s.ship.pitch = 0.0;
+                    s.target = Some(Destination::Planet(s.system.planets.len()-1));
+                    snap = true;
+                }
+                50 => {
+                    if s.ship.position.y <= s.station.center().y + 15.0 || s.ship.pitch != 0.0
+                        || s.ship.yaw != 0.5 || s.target != Some(Destination::Station) {
+                        return Err("Espacio no produjo ascenso vertical independiente".into());
+                    }
+                }
+                70 => {
+                    if s.ship.forward().dot((s.station.approach()-s.ship.position).normalized()) < 0.98 {
+                        return Err("B no activó el piloto automático".into());
+                    }
+                    capture = Some("station-approach.png".into());
+                }
+                85 => {
+                    if notice.is_none() || !s.station.in_reach(s.ship.position) { return Err("Falta interacción de proximidad con la estación".into()); }
+                    capture = Some("station-contact.png".into());
+                }
+                90 => {
+                    println!("STATION_SMOKE_PASS fixed={:?} length={} ascend=Space autopilot=B proximity=true", s.station.position, s.station.length);
+                    return Ok(Exit::Quit);
+                }
+                _ => {}
+            }
+        } else if let Some(visits) = s.visit_smoke {
             // Ida: estacionar junto a South Park y explorar. Vuelta: capturar la nave junto al planeta y salir
             let total = if s.return_smoke { 4 } else { 1 };
             match (visits, frame) {
@@ -397,7 +514,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 10 => capture = Some("overview.png".into()),
                 f if (20..20 + n * 15).contains(&f) => {
                     let i = ((f - 20) / 15) as usize;
-                    s.focus = Some(i);
+                    s.focus = Some(Destination::Planet(i));
                     s.orbit.distance = s.system.planets[i].config.radius * 3.4;
                     s.orbit.pitch = 0.35;
                     // Desde el lado del Sol (el iluminado), un poco de costado
@@ -496,7 +613,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         let mut in_reach = None;
         match s.view {
             View::Overview => {
-                if pressed(&rl, KeyboardKey::KEY_SPACE) {
+                if pressed(&rl, KeyboardKey::KEY_P) {
                     s.paused = !s.paused;
                 }
                 if pressed(&rl, KeyboardKey::KEY_UP) {
@@ -506,13 +623,9 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                     s.time_scale = (s.time_scale / 2.0).max(0.125);
                 }
                 if pressed(&rl, KeyboardKey::KEY_TAB) {
-                    s.focus = match s.focus {
-                        None => Some(0),
-                        Some(i) if i + 1 < s.system.planets.len() => Some(i + 1),
-                        Some(_) => None,
-                    };
+                    s.focus = Destination::next(s.focus, s.system.planets.len());
                     s.orbit.distance = match s.focus {
-                        Some(i) => s.system.planets[i].config.radius * 5.0,
+                        Some(destination) => destination.radius(s) * 5.0,
                         None => OVERVIEW * outer,
                     };
                 }
@@ -523,7 +636,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 }
                 let wheel = if smoke { 0.0 } else { rl.get_mouse_wheel_move() };
                 if wheel != 0.0 {
-                    let nearest = s.focus.map_or(s.system.sun.radius, |i| s.system.planets[i].config.radius) * 1.6;
+                    let nearest = s.focus.map_or(s.system.sun.radius, |destination| destination.radius(s)) * 1.6;
                     s.orbit.distance = (s.orbit.distance * (1.0 - wheel * 0.1)).clamp(nearest, outer * MAX_ZOOM_OUT);
                 }
                 if !s.paused {
@@ -540,11 +653,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                     }
                 }
                 if pressed(&rl, KeyboardKey::KEY_TAB) {
-                    s.target = match s.target {
-                        None => Some(0),
-                        Some(i) if i + 1 < s.system.planets.len() => Some(i + 1),
-                        Some(_) => None,
-                    };
+                    s.target = Destination::next(s.target, s.system.planets.len());
                 }
                 let axis = |neg: bool, pos: bool| (pos as i32 - neg as i32) as f32;
                 let key = |k| down(&rl, k);
@@ -558,10 +667,14 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                     (0.0, 0.0)
                 };
                 // Piloto automático: apunta adonde va a estar el objetivo cuando la nave llegue
-                let aim_at = s.target.filter(|_| key(KeyboardKey::KEY_SPACE)).map(|i| {
-                    s.ship.autopilot_aim(i, &s.ships.flight, &s.system)
+                let aim_at = s.target.filter(|_| key(KeyboardKey::KEY_B)).map(|destination| {
+                    match destination {
+                        Destination::Planet(i) => s.ship.autopilot_aim(i, &s.ships.flight, &s.system),
+                        Destination::Station => s.ship.autopilot_to(s.station.approach(), &s.ships.flight, &s.system),
+                    }
                 });
                 let input = FlightInput {
+                    ascend: key(KeyboardKey::KEY_SPACE),
                     throttle: axis(
                         key(KeyboardKey::KEY_S) || key(KeyboardKey::KEY_DOWN),
                         key(KeyboardKey::KEY_W) || key(KeyboardKey::KEY_UP),
@@ -576,7 +689,13 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 };
                 s.system.update(dt);
                 if leaving.is_none() {
+                    let before = s.ship.position;
                     s.ship.update(dt, &input, &s.ships.flight, &s.system);
+                    if let Some(out) = s.station.push_out(before, s.ship.position, s.ships.flight.radius) {
+                        s.ship.position = out;
+                        s.ship.speed = 0.0;
+                        s.ship.bumped = true;
+                    }
                 } else {
                     s.ship.resolve_collisions(&s.ships.flight, &s.system);
                 }
@@ -609,6 +728,9 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                         }
                     }
                 }
+                if s.station.in_reach(s.ship.position) && explore && in_reach.is_none() {
+                    notice = Some(("Ciudadela: acceso al hangar próximamente".into(), 3.0));
+                }
             }
         }
         if let Some((_, t)) = &mut notice {
@@ -634,7 +756,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         previous_ship_position = s.ship.position;
         let camera = match s.view {
             View::Overview => {
-                let target = s.focus.map_or(s.system.center(), |i| s.system.planets[i].position());
+                let target = s.focus.map_or(s.system.center(), |destination| destination.position(s));
                 let aspect = rl.get_screen_width() as f32 / rl.get_screen_height().max(1) as f32;
                 s.orbit.camera(target, aspect)
             }
@@ -658,6 +780,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                         chase = out;
                     }
                 }
+                if let Some(out) = s.station.push_out(chase, chase, margin) { chase = out; }
                 let jitter = if shake > 0.0 {
                     let t = rl.get_time() as f32 * 60.0;
                     Vector3::new(t.sin(), (t * 1.3).cos(), 0.0) * shake * 0.6
@@ -735,6 +858,13 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 }
             }
             d3.draw_model_ex(&sun, center, Vector3::up(), s.system.sun_spin_angle.to_degrees(), Vector3::one() * s.system.sun.radius, Color::WHITE);
+            let station_pos = s.station.center();
+            let station_model = if (camera.position - station_pos).length() > s.station.lod_distance {
+                &station_far
+            } else { &station_near };
+            if (station_pos - camera.position).dot(forward) > -s.station.collision_radius {
+                station_model.draw(&mut d3, &mut shader, Matrix::translate(station_pos.x, station_pos.y, station_pos.z));
+            }
             for (p, (near, far)) in s.system.planets.iter().zip(&planets) {
                 let pos = p.position();
                 let to = pos - camera.position;
@@ -770,10 +900,25 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         // --- Interfaz ------------------------------------------------------------------------------------------
         let white = Color::new(230, 232, 245, 255);
         let dim = Color::new(160, 168, 200, 255);
+        // Distinct cyan diamond instead of a planetary ring. Off-screen target remains locatable.
+        let station_pos = s.station.center();
+        let station_at = rl_screen_marker(station_pos, camera, width, height);
+        let station_selected = if s.view == View::Ship { s.target } else { s.focus } == Some(Destination::Station);
+        if station_at.1 || station_selected {
+            let at = station_at.0;
+            let c = Color::new(109, 222, 239, 255);
+            for (a, b) in [(Vector2::new(0.0,-10.0), Vector2::new(10.0,0.0)),
+                (Vector2::new(10.0,0.0), Vector2::new(0.0,10.0)),
+                (Vector2::new(0.0,10.0), Vector2::new(-10.0,0.0)),
+                (Vector2::new(-10.0,0.0), Vector2::new(0.0,-10.0))] { d.draw_line_v(at+a, at+b, c); }
+            let label = format!("{}  {:.0}", s.station.name, (station_pos - s.ship.position).length());
+            let label_x = (at.x as i32 - d.measure_text(&label,16)/2).clamp(8, (width-d.measure_text(&label,16)-8).max(8));
+            d.draw_text(&label, label_x, at.y as i32 + 16, 16, c);
+        }
         if s.view == View::Ship {
             for (i, (p, m)) in s.system.planets.iter().zip(&markers).enumerate() {
                 let at = m.at;
-                let is_target = s.target == Some(i);
+                let is_target = s.target == Some(Destination::Planet(i));
                 let c = if is_target { Color::new(255, 214, 90, 255) } else { Color::new(150, 170, 220, 170) };
                 let distance = ((p.position() - s.ship.position).length() - p.config.radius).max(0.0);
                 let label = format!("{}  {:.0}", p.config.name, distance);
@@ -806,7 +951,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             let boosting = s.ship.speed > s.ships.flight.cruise_speed + 1.0;
             d.draw_text(ship_name, 16, 14, 22, white);
             d.draw_text(&format!("Velocidad {:.0}{}", s.ship.speed, if boosting { "  TURBO" } else { "" }), 16, 42, 18, dim);
-            let target = s.target.map_or("ninguno".to_string(), |i| s.system.planets[i].config.name.clone());
+            let target = s.target.map_or("ninguno", |destination| destination.name(s));
             d.draw_text(&format!("Objetivo: {target}"), 16, 64, 18, dim);
             if let Some(i) = s.ship.carried_by {
                 d.draw_text(&format!("Acompañando la órbita de {}", s.system.planets[i].config.name), 16, 86, 18, dim);
@@ -825,8 +970,12 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 let sw = d.measure_text(sub, 16);
                 d.draw_text(sub, (w / 2.0) as i32 - sw / 2, (h - 110.0) as i32, 16, dim);
             }
+            if s.station.in_reach(s.ship.position) {
+                let text = "[E] Ciudadela / Hangar: acceso próximamente";
+                d.draw_text(text, (width - d.measure_text(text, 20)) / 2, height - 112, 20, Color::new(109,222,239,255));
+            }
         } else {
-            let focus = s.focus.map_or("Sol", |i| s.system.planets[i].config.name.as_str());
+            let focus = s.focus.map_or("Sol", |destination| destination.name(s));
             let status = format!("Vista general   Tiempo x{}{}   Siguiendo: {focus}", s.time_scale, if s.paused { "  (pausa)" } else { "" });
             d.draw_text(&status, 16, 14, 20, white);
             for (p, m) in s.system.planets.iter().zip(&markers) {

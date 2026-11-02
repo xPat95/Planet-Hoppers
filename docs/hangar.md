@@ -45,16 +45,21 @@ Al confirmar una selección inicial se devuelve `SelectionTransition::StartAdven
 
 El acceso directo de desarrollo mantiene N para recorrer todos los modelos. En una aventura, N únicamente recorre las naves desbloqueadas; al comienzo solo está disponible la elegida. No se añaden controles de estación ni un sistema de progreso.
 
-## Hangar provisional y estación de Norman
+## Hangar circular inspirado en la estación
 
 `graphics::hangar` contiene únicamente la presentación:
 
-- `HangarStyle` centraliza tamaño de exhibición (6 unidades), plataforma (radio 4,5), giro (10°/s), y transformación del futuro modelo de estación.
-- `HangarCamera` encuadra la esfera que contiene la nave en cualquier ángulo de giro, considerando las áreas ocupadas por encabezado, pie y flechas. Conserva FOV de 42°.
-- `Hangar` carga materiales/texturas mediante `SpaceModel` y utiliza la iluminación existente con una luz local y ambiente de 0,55. No cambia ningún shader solar o espacial.
-- El fondo provisional consiste en suelo, dos paredes y unas tiras luminosas. La plataforma y la nave giran juntas; la cámara permanece estable.
+- `HangarStyle` centraliza tamaño de exhibición (6 unidades), plataforma (radio 4,5), giro (10°/s), posición de la luz local, ambiente (0,55), estilo del interior y transformación de un eventual modelo interior.
+- `HangarCamera` conserva el encuadre de la esfera que contiene la nave en cualquier ángulo de giro, considerando encabezado, pie y flechas. Dirección, distancia mínima (11), margen (1,08) y FOV (42°) quedan configurables por separado.
+- `graphics::hangar_interior` construye solamente el entorno visual. `InteriorStyle` centraliza radio (12), altura (6,8), 60 segmentos, cinco accesos radiales y paleta de grafito, titanio azulado, plata, cian y hielo.
+- La referencia es el anillo del Presidium y los cinco acoplamientos del [modelo aprobado de la Ciudadela](../assets/models/environment/spaceStation/README.md), especialmente [Ciudadela_Anillo.png](references/spaceStation/Ciudadela_Anillo.png). Se traducen sus placas segmentadas, bandas concéntricas, nervios y pequeñas ventanas a una sala circular. Los accesos usan marcos sucesivos y guías de suelo para sugerir profundidad hacia los brazos.
+- El lado cercano se presenta como un corte arquitectónico: omite pared y franja de techo frente a la cámara para que nunca oculten la nave. El suelo circular permanece completo. La parte superior es una corona abierta; no se pretende construir una estación visitable.
+- El entorno usa primitivas batched de raylib con colores de caras preajustados y pequeñas franjas luminosas sin iluminación dinámica adicional, bloom, texturas nuevas ni sombras. La nave conserva sus materiales/texturas y el shader existente con luz local. La plataforma tiene tapa de grafito y un borde cian discreto; sus marcas y la nave siguen girando juntas.
+- Las pequeñas ventanas superiores repiten las bandas habitadas del exterior aprobado: luz hielo y algunos acentos ámbar sobre el titanio frío. La estación real ya aparece fija sobre el sistema solar; su [posición, aproximación y controles](solar-system.md#estación-espacial-fija) se configuran por separado del visor. La interacción exterior todavía no abre el selector.
 
-Para integrar el GLB definitivo de Norman se configura `HangarStyle.station_model`, junto con `station_length`, `station_position` y `station_rotation`. El adaptador `draw_backdrop` sustituye el interior provisional por ese recurso; la selección, los desbloqueos, la cámara y las transiciones no dependen de la geometría de las paredes. El ajuste de posición debe alinearse con la plataforma tras inspeccionar el modelo definitivo.
+Para integrar un GLB interior definitivo se configura `HangarStyle.station_model`, junto con `station_length`, `station_position` y `station_rotation`. El adaptador `draw_backdrop` sustituye el entorno procedural por ese recurso; conserva plataforma, nave, selección, desbloqueos, cámara y transiciones. El GLB exterior aprobado no se carga como habitación: contiene el conjunto completo y no define un espacio interior preparado para exhibición. No se modifica su fuente Blender ni sus exportaciones.
+
+Se puede expandir o reemplazar únicamente `InteriorStyle::draw` para incorporar pasarelas, techos o módulos interiores completos. Ambos modos del selector comparten este mismo entorno. Quedan pendientes el modelo interior final, materiales PBR específicos si se desean, sombras de contacto y una medición sostenida de rendimiento en el hardware objetivo; no se necesitan para el flujo actual.
 
 La escala de exhibición es una transformación local del visor. El vuelo sigue utilizando los largos originales de 4–5 unidades, su radio de colisión y las velocidades existentes. No se modifican mallas de Blender, planetas, órbitas, skybox ni shaders del Sol.
 
@@ -82,3 +87,5 @@ Capturas e informe de selección: `target/front-end/`. Capturas de arranque: `ta
 Validación completada: compilación de todos los binarios y 116 pruebas aprobadas. Se ejecutó el flujo completo de menú y arranque con cada una de las seis identidades. También pasó el flujo desde el menú con Calaca y las cuatro visitas a South Park (victoria, derrota y dos abandonos), manteniendo Calaca como nave activa e inicial y una sola desbloqueada. Se revisaron capturas de las seis exhibiciones y se corrigió el encuadre del Barco del End para que el pie de interfaz no lo tape.
 
 La validación automatizada no sustituye una sesión manual con teclado/mouse físicos, una evaluación sostenida de FPS ni la revisión del futuro modelo de estación. Persiste el aviso conocido de raylib sobre los índices del planeta de Star Wars; no se modificó su cargador ni ese recurso.
+
+Verificación del rediseño circular: `cargo build --locked --bins` y la suite completa de `cargo test --locked` pasaron. Se ejecutó `planet-hoppers --smoke --ship minecraft`: menú, Controles, regreso, seis exhibiciones, ambas flechas, cancelación, nueva selección y arranque del sistema solar con Minecraft; los tres informes `SELECTION_SMOKE_PASS`, `LAUNCH_SMOKE_PASS` y `FRONT_END_SMOKE_PASS` resultaron correctos. Se revisaron las capturas de las seis naves, incluida Calaca provisional, comprobando encuadre y legibilidad de UI. Evidencia: `target/front-end/hangar-<id>.png`, `target/front-end/selection-validation.json` y `target/hangar-redesign-smoke.log`. No se hizo una medición sostenida de FPS ni una partida manual en esta revisión.
