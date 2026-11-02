@@ -13,6 +13,9 @@ use crate::{
 use raylib::{ffi, prelude::*};
 use std::{collections::BTreeSet, path::PathBuf};
 
+#[path = "front_end_ui.rs"]
+mod ui;
+
 type Error = Box<dyn std::error::Error>;
 const INK: Color = Color::new(221, 234, 244, 255);
 const MUTED: Color = Color::new(133, 157, 179, 255);
@@ -240,7 +243,7 @@ fn draw_menu_button(
     slanted(d, x, y, w, h, |_| cobalt);
     slanted(d, x + 3.0, y + 3.0, w - 6.0, h - 6.0, |t| chrome(t, if hovered { 0.18 } else { 0.0 }));
     // Mismo tamaño en los tres botones: el más grande que deja entrar "CONTROLES" (la palabra más larga)
-    let fit = font.measure_text("CONTROLES", 100.0, 1.0).x / 100.0;
+    let fit = font.measure_text("CONTROLES", 100.0, 1.0).x.max(font.measure_text(label, 100.0, 1.0).x) / 100.0;
     let size = (h * 0.66).min((w - 30.0) / fit).max(12.0);
     let text = font.measure_text(label, size, 1.0);
     let at = Vector2::new(
@@ -296,54 +299,6 @@ fn launch_button(w: i32, h: i32) -> Rectangle {
     Rectangle::new(w as f32 * 0.5 - 170.0, h as f32 - 92.0, 340.0, 52.0)
 }
 
-fn button(
-    d: &mut RaylibDrawHandle,
-    rect: Rectangle,
-    label: &str,
-    mouse: Vector2,
-    enabled: bool,
-    primary: bool,
-) {
-    let hovered = enabled && rect.check_collision_point_rec(mouse);
-    let fill = if !enabled {
-        Color::new(26, 35, 46, 255)
-    } else if primary {
-        if hovered {
-            Color::new(94, 204, 225, 255)
-        } else {
-            Color::new(65, 165, 190, 255)
-        }
-    } else if hovered {
-        Color::new(38, 65, 85, 245)
-    } else {
-        Color::new(20, 37, 53, 235)
-    };
-    d.draw_rectangle_rec(rect, fill);
-    d.draw_rectangle_lines_ex(
-        rect,
-        1.0,
-        if hovered || primary {
-            CYAN
-        } else {
-            Color::new(47, 74, 95, 255)
-        },
-    );
-    let size = 20;
-    d.draw_text(
-        label,
-        (rect.x + (rect.width - d.measure_text(label, size) as f32) * 0.5) as i32,
-        (rect.y + (rect.height - size as f32) * 0.5) as i32,
-        size,
-        if primary && enabled {
-            Color::new(4, 21, 30, 255)
-        } else if enabled {
-            INK
-        } else {
-            MUTED
-        },
-    );
-}
-
 fn view(
     mut screen: Screen,
     mode: SelectionMode,
@@ -395,6 +350,8 @@ fn view(
     )?;
     // Fuente nítida al achicarla (se carga grande y se escala según el botón)
     unsafe { ffi::SetTextureFilter(menu_font.texture, ffi::TextureFilter::TEXTURE_FILTER_BILINEAR as i32) };
+    let secondary_title = ui::load_font(&root.join("assets/fonts/Bungee-Regular.ttf"))?;
+    let body_font = ui::load_font(&root.join("assets/fonts/TitilliumWeb-Bold.ttf"))?;
     let mut hangar = Hangar::load(&mut rl, &thread, &root, HangarStyle::default())?;
     let captures = root.join("target/front-end");
     if smoke_goal.is_some() {
@@ -421,6 +378,10 @@ fn view(
                 1 => rl.set_window_size(1920, 1080),
                 2 | 4 => rl.set_window_size(1280, 800),
                 3 => rl.set_window_size(1024, 1024),
+                6 | 30 if !embedded => rl.set_window_size(960, 640),
+                7 | 31 if !embedded => rl.set_window_size(1920, 1080),
+                9 | 32 if !embedded => rl.set_window_size(1024, 1024),
+                8 | 10 | 33 if !embedded => rl.set_window_size(1280, 800),
                 _ => {}
             }
         }
@@ -551,9 +512,11 @@ fn view(
         if screen==Screen::Hangar && hangar_view>0 {camera=hangar.inspection_camera(hangar_view==2);}
         let sky_frame = sky.project(&rl, camera);
         let menu_time = rl.get_time() as f32;
+        let left_active = rl.is_key_down(KeyboardKey::KEY_LEFT);
+        let right_active = rl.is_key_down(KeyboardKey::KEY_RIGHT);
         let mut d = rl.begin_drawing(&thread);
         d.clear_background(SKY_BACKGROUND);
-        if screen == Screen::Main {
+        if matches!(screen, Screen::Main | Screen::Controls) {
             galaxy.draw(&mut d, w, h, menu_time);
         }
         if screen == Screen::Hangar {
@@ -596,77 +559,27 @@ fn view(
                 }
             }
             Screen::Controls => {
-                d.draw_text("CONTROLES", 70, 75, 44, INK);
-                d.draw_text("VUELO ESPACIAL", 74, 150, 18, CYAN);
-                for (i, (keys, action)) in [
-                    ("W / S", "Acelerar / frenar"),
-                    ("Mouse / A / D / R / F", "Orientar la nave"),
-                    ("Shift", "Turbo"),
-                    ("Tab / B", "Elegir objetivo / piloto automático"),
-                    ("Espacio", "Subir (ascenso vertical)"),
-                    ("E / Enter", "Explorar planeta / entrar a estación"),
-                    ("C / O", "Vista general / órbitas"),
-                    ("Esc", "Soltar o recapturar mouse en el espacio"),
-                    (
-                        "South Park: Esc / P",
-                        "Pausa, reinicio y regreso al sistema solar",
-                    ),
-                    ("Ctrl + Q", "Salir del juego"),
-                ]
-                .iter()
-                .enumerate()
-                {
-                    d.draw_text(keys, 74, 194 + i as i32 * 34, 19, INK);
-                    d.draw_text(action, 360, 194 + i as i32 * 34, 18, MUTED);
-                }
-                button(&mut d, back_button(w), "Volver", mouse, true, false);
+                ui::controls(&mut d, &secondary_title, &body_font, w, h);
+                ui::action(&mut d, &secondary_title, back_button(w), "VOLVER", mouse, true);
             }
             Screen::Hangar => {
                 {
                     let mut d3 = d.begin_mode3D(camera);
                     hangar.draw(&mut d3, camera);
                 }
-                d.draw_rectangle(0, 0, w, HANGAR_HEADER as i32, Color::new(4, 12, 21, 220));
-                d.draw_text(
-                    if mode == SelectionMode::Initial {
-                        "CIUDADELA / TU PRIMERA NAVE"
-                    } else {
-                        "CIUDADELA / HANGAR DEL PRESIDIUM"
-                    },
-                    36,
-                    28,
-                    18,
-                    CYAN,
-                );
+                ui::hangar_shade(&mut d, w, h);
                 let choice = &catalog.choices[selection.index];
-                d.draw_text(&choice.name, 36, 65, 38, INK);
                 let model = catalog.model(choice, &ships);
                 let provisional = format!("NAVE PROVISIONAL / {}", choice.name);
-                d.draw_text(
-                    if hangar.placeholder {
-                        &provisional
-                    } else {
-                        &model.name
-                    },
-                    38,
-                    116,
-                    17,
-                    if hangar.placeholder {
-                        Color::new(255, 178, 88, 255)
-                    } else {
-                        MUTED
-                    },
+                ui::hangar_title(
+                    &mut d, &secondary_title, &body_font, &choice.name,
+                    if hangar.placeholder { &provisional } else { &model.name },
+                    if mode == SelectionMode::Initial { "CIUDADELA / TU PRIMERA NAVE" }
+                    else { "CIUDADELA / HANGAR DEL PRESIDIUM" }, w,
                 );
-                button(&mut d, back_button(w), "Volver", mouse, true, false);
-                button(&mut d, arrow(w, h, false), "<", mouse, true, false);
-                button(&mut d, arrow(w, h, true), ">", mouse, true, false);
-                d.draw_rectangle(
-                    0,
-                    h - HANGAR_FOOTER as i32,
-                    w,
-                    HANGAR_FOOTER as i32,
-                    Color::new(4, 12, 21, 238),
-                );
+                ui::action(&mut d, &secondary_title, back_button(w), "VOLVER", mouse, true);
+                ui::arrow(&mut d, arrow(w, h, false), false, mouse, left_active);
+                ui::arrow(&mut d, arrow(w, h, true), true, mouse, right_active);
                 let status = if mode == SelectionMode::Initial {
                     "Elige libremente tu nave inicial"
                 } else if mode == SelectionMode::Docked {
@@ -676,41 +589,18 @@ fn view(
                 } else {
                     "Nave bloqueada"
                 };
-                d.draw_text(
-                    status,
-                    (w - d.measure_text(status, 20)) / 2,
-                    h - 137,
-                    20,
-                    INK,
-                );
+                ui::centered(&mut d, &body_font, status, w, h as f32 - 123.0, 18.0, INK);
                 let enabled = selection.can_confirm(&catalog, game.as_ref());
-                button(
-                    &mut d,
-                    launch_button(w, h),
-                    if !enabled {
-                        "Bloqueada"
-                    } else if mode == SelectionMode::Initial {
-                        "Despegar"
-                    } else if mode == SelectionMode::Docked {
-                        "Despegar con esta nave"
-                    } else {
-                        "Activar nave"
-                    },
-                    mouse,
-                    enabled,
-                    true,
+                ui::action(
+                    &mut d, &secondary_title, launch_button(w, h),
+                    if !enabled { "BLOQUEADA" }
+                    else if mode == SelectionMode::Initial { "DESPEGAR" }
+                    else if mode == SelectionMode::Docked { "DESPEGAR CON ESTA NAVE" }
+                    else { "ACTIVAR NAVE" }, mouse, enabled,
                 );
-                let count = format!(
-                    "{:02}/06  Flechas: elegir  Enter: despegar  V: vista  Esc: volver",
-                    selection.index + 1
-                );
-                d.draw_text(
-                    &count,
-                    (w - d.measure_text(&count, 16)) / 2,
-                    h - 26,
-                    16,
-                    MUTED,
-                );
+                let count = format!("{:02} / {:02}", selection.index + 1, catalog.choices.len());
+                ui::text(&mut d, &secondary_title, &count, 38.0, h as f32 - 34.0, 18.0, CYAN);
+                ui::centered(&mut d, &body_font, "FLECHAS / elegir     ENTER / despegar     V / vista     ESC / volver", w, h as f32 - 26.0, 16.0, INK);
             }
         }
         if smoke_goal.is_some() {
@@ -732,6 +622,8 @@ fn view(
                     controls_seen = screen == Screen::Controls;
                     Some("controls.png".into())
                 }
+                6 | 7 | 9 if !embedded => Some(format!("controls-{w}x{h}.png")),
+                30 | 31 | 32 if !embedded => Some(format!("hangar-{w}x{h}.png")),
                 26 if !embedded => Some("hangar-complete.png".into()),
                 27 if !embedded => Some("hangar-exit.png".into()),
                 24 | 34 | 46 | 58 | 70 | 82 if screen == Screen::Hangar => {
