@@ -107,6 +107,7 @@ pub struct Hangar {
     center: Vector3,
     half_extents: Vector3,
     angle: f32,
+    exhibit_yaw_offset: f32,
 }
 impl Hangar {
     pub fn load(
@@ -143,6 +144,7 @@ impl Hangar {
             center: Vector3::zero(),
             half_extents: Vector3::one() * 3.0,
             angle: 0.0,
+            exhibit_yaw_offset: 0.0,
         })
     }
     pub fn exhibit(
@@ -177,6 +179,7 @@ impl Hangar {
             self.center.y = self.style.platform_top + 0.225 * self.style.display_length / 4.0;
         }
         self.angle = 0.0;
+        self.exhibit_yaw_offset = super::ship_presentation::hangar_start_yaw(ship, self.camera.position);
     }
     pub fn update(&mut self, dt: f32) {
         self.angle = (self.angle + dt * self.style.rotation_degrees_per_second).rem_euclid(360.0);
@@ -220,7 +223,8 @@ impl Hangar {
         self.environment_shader.begin_frame(self.style.light_position, camera.position, 0.50);
         self.station.draw(d, &mut self.environment_shader, Matrix::identity());
         self.draw_platform(d);
-        let world = Matrix::rotate_y(self.angle.to_radians())
+        let exhibit_angle = self.angle + self.exhibit_yaw_offset;
+        let world = Matrix::rotate_y(exhibit_angle.to_radians())
             * Matrix::translate(self.center.x, self.center.y, self.center.z);
         if let Some(ship) = &self.ship {
             ship.draw(d, &mut self.shader, world);
@@ -228,7 +232,7 @@ impl Hangar {
             super::ship_placeholder::draw(
                 d,
                 self.center,
-                Vector3::new(0.0, self.angle, 0.0),
+                Vector3::new(0.0, exhibit_angle, 0.0),
                 self.style.display_length,
             );
         }

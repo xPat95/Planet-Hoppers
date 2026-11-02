@@ -1,0 +1,8 @@
+cargo :     Checking planet-hoppers v0.1.0 (C:\Documentos\Pat\uvg\6to Semestre\Graficas\proyecto final\Planet-Hoppers)
+En línea: 4 Carácter: 1
++ cargo check --locked *> target/hangar-polish-check.log
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (    Checking pl...Planet-Hoppers):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+    Finished `dev` profile [optimized + debuginfo] target(s) in 0.91s

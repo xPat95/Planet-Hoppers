@@ -140,6 +140,7 @@ fn bounds(station_half: Vector3, model: &ShipModel, collision: f32) -> Departure
         },
         ship_collision_radius: collision,
         ship_length: model.length,
+        camera_length: model.camera_length(),
         camera_radius: 1.0,
     }
 }
@@ -165,7 +166,7 @@ fn verify(station: &Station, b: DepartureBounds) {
         .push_out(p.camera_position, p.camera_position, b.camera_radius)
         .is_none());
     assert!(
-        (chase_position(p.ship.position, f, b.ship_length) - p.camera_position).length() < 0.001
+        (chase_position(p.ship.position, f, b.camera_length) - p.camera_position).length() < 0.001
     );
     let model_rotation = Matrix::rotate_x(p.ship.pitch) * Matrix::rotate_y(p.ship.yaw);
     let rendered_nose = Vector3::new(0.0, 0.0, -1.0)
@@ -226,6 +227,32 @@ fn all_six_real_ship_bounds_launch_beyond_visual_and_collision_hulls() {
             b.ship_half_extents.length()
         );
         verify(&station, b);
+    }
+}
+
+#[test]
+fn entry_is_reachable_before_collision_for_all_six_ship_envelopes() {
+    let (mut station, ships, models, half) = setup();
+    for rotation in [[0.0, -90.0, 0.0], [22.0, 37.0, 13.0], [0.0, 0.0, 90.0]] {
+        station.rotation_degrees = rotation;
+        for model in &models {
+            let b = bounds(half, model, ships.flight.radius);
+            let radius = b.ship_half_extents.length().max(b.ship_collision_radius);
+            let anchor = station.entry_anchor(radius);
+            // Off-axis manual approach, outside the narrow corridor, is also usable.
+            let near = anchor + station.exit_right() * 25.0 + station.exit_forward() * 10.0;
+            let far = near + station.exit_forward() * 200.0;
+            assert!((near - station.center()).length() > station.collision_radius + radius);
+            assert!(station.push_out(far, near, radius).is_none());
+            assert!(station.in_reach(near, radius));
+            assert!(!station.in_reach(far, radius));
+            assert!(!station.in_reach(station.center(), radius));
+            assert!(!station.in_reach(station.center() - station.exit_forward() * 1000.0, radius));
+            // The hull remains solid away from its existing corridor.
+            assert!(station.push_out(near, station.center(), radius).is_some());
+            let plan = station.departure(b).unwrap();
+            assert!(!station.in_reach(plan.ship.position, radius));
+        }
     }
 }
 
@@ -300,13 +327,17 @@ fn legacy_dock_lane_does_not_disguise_an_unsafe_launch_and_return_still_works() 
     let old = station.dock_target();
     assert!((old - station.center()).length() < station.collision_radius);
     assert!(station.push_out(old, old, ships.flight.radius).is_none());
-    assert!(station.in_reach(old));
-    assert!(!station.in_reach(station.approach()));
+    assert!(station.in_reach(old, ships.flight.radius));
+    assert!(station.in_reach(
+        station.entry_anchor(ships.flight.radius),
+        ships.flight.radius
+    ));
+    assert!(!station.in_reach(station.approach(), ships.flight.radius));
     for model in models {
         let plan = station
             .departure(bounds(half, &model, ships.flight.radius))
             .unwrap();
-        assert!(!station.in_reach(plan.ship.position));
+        assert!(!station.in_reach(plan.ship.position, plan.ship_radius));
         assert!(station
             .push_out(station.approach(), old, ships.flight.radius)
             .is_none());

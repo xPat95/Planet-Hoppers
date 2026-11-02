@@ -1,0 +1,30 @@
+{
+  "branch": "main",
+  "check": "PASS",
+  "build": "PASS",
+  "tests_passed": 33,
+  "cargo_fmt_check": "FAIL, also fails on clean baseline",
+  "baseline_format_files": [
+    "\\\\?\\C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\src\\audio.rs",
+    "\\\\?\\C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\src\\graphics\\hangar.rs",
+    "\\\\?\\C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\src\\graphics\\mod.rs",
+    "\\\\?\\C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\src\\graphics\\space.rs",
+    "\\\\?\\C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\src\\lib.rs",
+    "\\\\?\\C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\src\\minigames\\southpark\\session.rs",
+    "\\\\?\\C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\src\\scenes\\front_end.rs",
+    "\\\\?\\C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\src\\scenes\\mod.rs",
+    "\\\\?\\C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\src\\scenes\\session_smoke.rs",
+    "\\\\?\\C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\src\\scenes\\session_ui.rs",
+    "\\\\?\\C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\src\\scenes\\solar_system.rs",
+    "\\\\?\\C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\src\\scenes\\southpark_dev.rs",
+    "\\\\?\\C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\src\\scenes\\southpark_entry.rs",
+    "\\\\?\\C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\src\\ships\\mod.rs",
+    "\\\\?\\C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\src\\solarSystem\\mod.rs",
+    "\\\\?\\C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\tests\\ships.rs",
+    "\\\\?\\C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\tests\\solar_system.rs"
+  ],
+  "additional_format_files": [],
+  "platform_function_unchanged": true,
+  "hangar_camera_unchanged": true,
+  "protected_assets_config_planets_minigames_menu_unchanged": true
+}

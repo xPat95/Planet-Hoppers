@@ -42,6 +42,7 @@ pub struct DepartureBounds {
     pub ship_half_extents: Vector3,
     pub ship_collision_radius: f32,
     pub ship_length: f32,
+    pub camera_length: f32,
     pub camera_radius: f32,
 }
 
@@ -57,7 +58,7 @@ pub struct Departure {
 
 /// Shared with the flight view so launch clearance cannot drift from its camera.
 pub fn chase_position(position: Vector3, forward: Vector3, ship_length: f32) -> Vector3 {
-    position - forward * ship_length * 3.0 + Vector3::up() * ship_length * 0.9
+    position - forward * ship_length * 2.76 + Vector3::up() * ship_length * 0.9
 }
 
 impl Station {
@@ -140,6 +141,7 @@ impl Station {
             || ![
                 bounds.ship_collision_radius,
                 bounds.ship_length,
+                bounds.camera_length,
                 bounds.camera_radius,
             ]
             .iter()
@@ -168,7 +170,7 @@ impl Station {
             .ship_half_extents
             .length()
             .max(bounds.ship_collision_radius);
-        let camera_offset = chase_position(Vector3::zero(), forward, bounds.ship_length);
+        let camera_offset = chase_position(Vector3::zero(), forward, bounds.camera_length);
         let rear = ship_radius.max(-camera_offset.dot(forward) + bounds.camera_radius);
         let safety_margin = self
             .dock
@@ -244,12 +246,31 @@ impl Station {
         };
         input.throttle = input.throttle.min((speed / top).max(0.00001));
     }
-    pub fn in_reach(&self, point: Vector3) -> bool {
+    /// Front access point beyond the complete sphere, including the arriving ship.
+    /// The narrow docking corridor is not required to reach this interaction.
+    pub fn entry_anchor(&self, ship_radius: f32) -> Vector3 {
+        let door = self.exit_position();
+        let rel = door - self.center();
+        let forward = self.exit_forward();
+        let projection = rel.dot(forward);
+        let radius = self.collision_radius + ship_radius.max(0.0) + 0.02;
+        let distance = (-projection
+            + (projection * projection + radius * radius - rel.dot(rel))
+                .max(0.0)
+                .sqrt())
+        .max(0.0);
+        door + forward * distance
+    }
+    pub fn in_reach(&self, point: Vector3, ship_radius: f32) -> bool {
         let rel = point - self.exit_position();
-        rel.dot(self.exit_forward()) >= 0.0
-            && rel.length() <= self.dock.interaction_radius
-            && rel.dot(self.exit_right()).abs() < self.dock.width * 0.5
-            && rel.dot(self.exit_up()).abs() < self.dock.height * 0.5
+        // Preserve access at the real door for players already in its open lane.
+        let at_door =
+            self.in_dock_lane(point, ship_radius) && rel.length() <= self.dock.interaction_radius;
+        let outside = rel.dot(self.exit_forward()) >= 0.0
+            && (point - self.center()).length() >= self.collision_radius + ship_radius
+            && (point - self.entry_anchor(ship_radius)).length()
+                <= self.dock.interaction_radius.min(self.dock.width * 2.0);
+        at_door || outside
     }
     /// Bounded access lane through the conservative envelope, aligned to the real hatch.
     pub fn in_dock_lane(&self, point: Vector3, margin: f32) -> bool {

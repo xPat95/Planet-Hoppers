@@ -27,8 +27,11 @@ fn station_is_fixed_above_every_orbit_and_sun_with_a_safe_entry_anchor() {
             assert!((p.position() - initial).length() > station.collision_radius + p.config.radius);
         }
     }
-    assert!(station.in_reach(station.dock_target()));
-    assert!(!station.in_reach(station.approach()));
+    assert!(station.in_reach(
+        station.entry_anchor(ships.flight.radius),
+        ships.flight.radius
+    ));
+    assert!(!station.in_reach(station.approach(), ships.flight.radius));
     assert!(station
         .push_out(station.approach(), station.approach(), ships.flight.radius)
         .is_none());
@@ -93,7 +96,7 @@ fn shared_autopilot_reaches_the_station_safely_in_normal_and_turbo_flight() {
     for boost in [false, true] {
         let mut ship = Ship::new(system.departure_position(), 0.0);
         for _ in 0..12000 {
-            if station.in_reach(ship.position) {
+            if station.in_reach(ship.position, ships.flight.radius) {
                 break;
             }
             let aim_at = Some(ship.autopilot_to(
@@ -117,7 +120,7 @@ fn shared_autopilot_reaches_the_station_safely_in_normal_and_turbo_flight() {
             assert!(ship.position.length() >= system.sun.radius + ships.flight.radius);
         }
         assert!(
-            station.in_reach(ship.position),
+            station.in_reach(ship.position, ships.flight.radius),
             "no llegó con turbo={boost}"
         );
     }
@@ -141,7 +144,10 @@ fn docking_waypoint_follows_translation_rotation_and_fitted_scale() {
         let offset = station.dock_target() - station.exit_position();
         assert!((offset.length() - station.dock.departure_clearance).abs() < 0.001);
         assert!(offset.normalized().dot(station.exit_forward()) > 0.999);
-        assert!(station.in_reach(station.dock_target()));
+        assert!(station.in_reach(
+            station.entry_anchor(ships.flight.radius),
+            ships.flight.radius
+        ));
         assert!(station
             .push_out(
                 station.dock_target(),
@@ -149,10 +155,15 @@ fn docking_waypoint_follows_translation_rotation_and_fitted_scale() {
                 ships.flight.radius
             )
             .is_none());
-        assert!(!station.in_reach(station.exit_position() - station.exit_forward() * 2.0));
-        assert!(
-            !station.in_reach(station.dock_target() + station.exit_right() * station.dock.width)
-        );
+        assert!(!station.in_reach(
+            station.exit_position() - station.exit_forward() * 2.0,
+            ships.flight.radius
+        ));
+        assert!(!station.in_reach(
+            station.entry_anchor(ships.flight.radius)
+                + station.exit_right() * station.dock.width * 3.0,
+            ships.flight.radius
+        ));
     }
 }
 

@@ -1,0 +1,50 @@
+[
+  {
+    "ship": "halloween",
+    "exit_code": 0,
+    "passed": true
+  },
+  {
+    "ship": "starwars",
+    "exit_code": 0,
+    "passed": true
+  },
+  {
+    "ship": "smilingfriends",
+    "exit_code": 0,
+    "passed": true
+  },
+  {
+    "ship": "minecraft",
+    "exit_code": 0,
+    "passed": true
+  },
+  {
+    "ship": "regularshow",
+    "exit_code": 0,
+    "passed": true
+  },
+  {
+    "ship": "southpark",
+    "exit_code": 0,
+    "passed": true
+  },
+  {
+    "mode": "docking",
+    "ship": "smilingfriends",
+    "exit_code": 0,
+    "passed": true
+  },
+  {
+    "mode": "docking",
+    "ship": "starwars",
+    "exit_code": 0,
+    "passed": true
+  },
+  {
+    "mode": "docking",
+    "ship": "minecraft",
+    "exit_code": 0,
+    "passed": true
+  }
+]

@@ -373,6 +373,11 @@ fn load_ship_model(
         .ok()
 }
 
+fn station_ship_radius(s: &Session, model: &Option<SpaceModel>) -> f32 {
+    model.as_ref().map_or(s.ships.ships[s.ship_index].length * 0.5 * 3.0_f32.sqrt(),
+        |m| m.half_extents.length()).max(s.ships.flight.radius)
+}
+
 /// Una ventana del sistema solar, hasta salir del juego o ir a un minijuego.
 fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::error::Error>> {
     let (mut rl, thread) = raylib::init()
@@ -418,6 +423,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             ship_half_extents: half,
             ship_collision_radius: s.ships.flight.radius,
             ship_length: length,
+            camera_length: s.ships.ships[s.ship_index].camera_length(),
             camera_radius,
         })?;
         s.ship = plan.ship.clone();
@@ -449,7 +455,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
     if s.view == View::Ship && !smoke {
         rl.disable_cursor();
     }
-    let mut chase = chase_position(s.ship.position, s.ship.forward(), s.ships.ships[s.ship_index].length);
+    let mut chase = chase_position(s.ship.position, s.ship.forward(), s.ships.ships[s.ship_index].camera_length());
     let mut previous_ship_position = s.ship.position;
     let mut snap = true;
     let mut fade = if smoke { 0.0 } else { 1.0_f32 }; // 1 = negro; baja al entrar
@@ -508,8 +514,15 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 snap=true;
             }
             if frame>30 {
-                if s.station.in_reach(s.ship.position) || entering_station {
-                    if !entering_station {capture=Some(format!("dock-approach-{cycles}.png"));}
+                if s.station.in_reach(s.ship.position, station_ship_radius(s, &ship_model)) || entering_station {
+                    if !entering_station {
+                        let radius=station_ship_radius(s,&ship_model);
+                        if (s.ship.position-s.station.center()).length()<=s.station.collision_radius+radius || s.ship.bumped {
+                            return Err("La interacción no es accesible fuera del colisionador".into());
+                        }
+                        println!("ENTRY_OUTSIDE ship={} radius={} centre_distance={}",s.ships.ships[s.ship_index].id,radius,(s.ship.position-s.station.center()).length());
+                        capture=Some(format!("dock-approach-{cycles}.png"));
+                    }
                     keys.push(KeyboardKey::KEY_E);
                 } else {
                     keys.push(KeyboardKey::KEY_W); keys.push(KeyboardKey::KEY_B);
@@ -563,9 +576,9 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                     }
                     capture = Some("station-approach.png".into());
                 }
-                75 => {s.ship.position=s.station.dock_target();s.ship.speed=0.0;}
+                75 => {s.ship.position=s.station.entry_anchor(station_ship_radius(s, &ship_model));s.ship.speed=0.0;}
                 85 => {
-                    if !s.station.in_reach(s.ship.position) { return Err("Falta proximidad con la estación".into()); }
+                    if !s.station.in_reach(s.ship.position, station_ship_radius(s, &ship_model)) { return Err("Falta proximidad con la estación".into()); }
                     capture = Some("station-contact.png".into());
                 }
                 90 => {
@@ -833,7 +846,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 if leaving.is_none() && !entering_station {
                     let before = s.ship.position;
                     s.ship.update(dt, &input, &s.ships.flight, &s.system);
-                    if let Some(out) = s.station.push_out(before, s.ship.position, s.ships.flight.radius) {
+                    if let Some(out) = s.station.push_out(before, s.ship.position, station_ship_radius(s, &ship_model)) {
                         s.ship.position = out;
                         s.ship.speed = 0.0;
                         s.ship.bumped = true;
@@ -870,7 +883,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                         }
                     }
                 }
-                if station_reentry_delay<=0.0 && s.station.in_reach(s.ship.position) && explore && in_reach.is_none() {
+                if station_reentry_delay<=0.0 && s.station.in_reach(s.ship.position, station_ship_radius(s, &ship_model)) && explore && in_reach.is_none() {
                     interaction_armed=false;
                     entering_station=true;
                     s.ship.speed=0.0;
@@ -909,7 +922,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             View::Ship => {
                 // Cámara de persecución: detrás y un poco arriba, siguiendo con suavidad
                 let fwd = s.ship.forward();
-                let wanted = chase_position(s.ship.position, fwd, ship_len);
+                let wanted = chase_position(s.ship.position, fwd, s.ships.ships[s.ship_index].camera_length());
                 if snap {
                     chase = wanted;
                 } else {
@@ -1055,11 +1068,12 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 None => d3.draw_sphere(sp.position, ship_len * 0.3, Color::new(220, 220, 230, 255)),
             }
             if sp.speed > 1.0 {
-                // Fuego del motor: más largo con más velocidad
+                // Compact supplemental exhaust; the GLB's own engine effects remain.
                 let k = (sp.speed / s.ships.flight.boost_speed).min(1.0);
-                for (i, a) in [(0.0, 150u8), (0.35, 90u8), (0.7, 40u8)] {
-                    let at = sp.position - fwd * ship_len * (0.55 + i * (0.3 + k));
-                    d3.draw_sphere(at, ship_len * (0.12 - i * 0.05) * (0.6 + k), Color::new(140, 210, 255, a));
+                let rear = ship_model.as_ref().map_or(ship_len * 0.5, |m| m.half_extents.z);
+                for (offset, radius, alpha) in crate::graphics::ship_presentation::exhaust_spheres(ship_len, rear, k) {
+                    let at = sp.position - fwd * offset;
+                    d3.draw_sphere(at, radius, Color::new(140, 210, 255, alpha));
                 }
             }
         }
@@ -1136,7 +1150,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 let sw = d.measure_text(sub, 16);
                 d.draw_text(sub, (w / 2.0) as i32 - sw / 2, (h - 110.0) as i32, 16, dim);
             }
-            if station_reentry_delay<=0.0 && s.station.in_reach(s.ship.position) {
+            if station_reentry_delay<=0.0 && s.station.in_reach(s.ship.position, station_ship_radius(s, &ship_model)) {
                 let text = "[E] Entrar a la estación espacial";
                 d.draw_text(text, (width - d.measure_text(text, 20)) / 2, height - 112, 20, Color::new(109,222,239,255));
             }

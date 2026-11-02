@@ -23,6 +23,18 @@ pub struct ShipModel {
     pub model_rotation_degrees: [f32; 3],
 }
 
+impl ShipModel {
+    /// Flight framing only: the slender N-1 needs a little more screen space.
+    /// Model fitting, hangar scale and physical dimensions stay unchanged.
+    pub fn camera_length(&self) -> f32 {
+        if self.model.contains("/starwars/") {
+            self.length * 0.90
+        } else {
+            self.length
+        }
+    }
+}
+
 #[derive(Debug, Clone, Deserialize)]
 pub struct FlightConfig {
     /// Velocidad normal y con turbo (unidades por segundo).

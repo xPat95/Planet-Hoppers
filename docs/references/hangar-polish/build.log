@@ -1,0 +1,8 @@
+cargo :    Compiling planet-hoppers v0.1.0 (C:\Documentos\Pat\uvg\6to Semestre\Graficas\proyecto final\Planet-Hoppers)
+En línea: 6 Carácter: 1
++ cargo build --locked *> target/hangar-polish-build.log
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (   Compiling pl...Planet-Hoppers):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+    Finished `dev` profile [optimized + debuginfo] target(s) in 7.02s

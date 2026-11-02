@@ -1,0 +1,11 @@
+SELECTION_SMOKE_PASS {"back_to_menu":true,"controls":true,"physical_input_verified":false,"previews":["halloween","minecraft","regularshow","smilingfriends","southpark","starwars"],"selected":"southpark","status":"PASS"}
+WARNING: MODEL: [C:\Documentos\Pat\uvg\6to Semestre\Graficas\proyecto final\Planet-Hoppers\assets/models/planets/starwars/exports/starwars_death_star_planet_near.glb] Indices data converted from u32 to u16, possible loss of data
+WARNING: MODEL: [C:\Documentos\Pat\uvg\6to Semestre\Graficas\proyecto final\Planet-Hoppers\assets/models/planets/starwars/exports/starwars_death_star_planet_near.glb] Indices data converted from u32 to u16, possible loss of data
+WARNING: MODEL: [C:\Documentos\Pat\uvg\6to Semestre\Graficas\proyecto final\Planet-Hoppers\assets/models/environment/spaceStation/exports/citadel_space_station_near.glb] Indices data converted from u32 to u16, possible loss of data
+WARNING: MODEL: [C:\Documentos\Pat\uvg\6to Semestre\Graficas\proyecto final\Planet-Hoppers\assets/models/environment/spaceStation/exports/citadel_space_station_near.glb] Indices data converted from u32 to u16, possible loss of data
+WARNING: MODEL: [C:\Documentos\Pat\uvg\6to Semestre\Graficas\proyecto final\Planet-Hoppers\assets/models/environment/spaceStation/exports/citadel_space_station_near.glb] Indices data converted from u32 to u16, possible loss of data
+WARNING: MODEL: [C:\Documentos\Pat\uvg\6to Semestre\Graficas\proyecto final\Planet-Hoppers\assets/models/environment/spaceStation/exports/citadel_space_station_near.glb] Indices data converted from u32 to u16, possible loss of data
+WARNING: MODEL: [C:\Documentos\Pat\uvg\6to Semestre\Graficas\proyecto final\Planet-Hoppers\assets/models/environment/spaceStation/exports/citadel_space_station_near.glb] Indices data converted from u32 to u16, possible loss of data
+DEPARTURE_SAFE {"camera":[-0.000059593148762360215,6035.60009765625,897.0],"distance_from_dock":201.03997802734375,"forward":[-1.5099580252808664e-7,0.0,1.0],"hull_support":860.0,"position":[-0.00006126014341134578,6032.0,908.0399780273438],"safety_margin":36.0,"ship":"southpark","ship_radius":2.914809226989746,"visual_half":[1.6478866338729858,1.3343846797943115,2.0]}
+LAUNCH_SMOKE_PASS ship=southpark
+FRONT_END_SMOKE_PASS active=southpark initial=southpark unlocked=1

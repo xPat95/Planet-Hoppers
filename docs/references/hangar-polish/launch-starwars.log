@@ -1,0 +1,11 @@
+SELECTION_SMOKE_PASS {"back_to_menu":true,"controls":true,"physical_input_verified":false,"previews":["halloween","minecraft","regularshow","smilingfriends","southpark","starwars"],"selected":"starwars","status":"PASS"}
+WARNING: MODEL: [C:\Documentos\Pat\uvg\6to Semestre\Graficas\proyecto final\Planet-Hoppers\assets/models/planets/starwars/exports/starwars_death_star_planet_near.glb] Indices data converted from u32 to u16, possible loss of data
+WARNING: MODEL: [C:\Documentos\Pat\uvg\6to Semestre\Graficas\proyecto final\Planet-Hoppers\assets/models/planets/starwars/exports/starwars_death_star_planet_near.glb] Indices data converted from u32 to u16, possible loss of data
+WARNING: MODEL: [C:\Documentos\Pat\uvg\6to Semestre\Graficas\proyecto final\Planet-Hoppers\assets/models/environment/spaceStation/exports/citadel_space_station_near.glb] Indices data converted from u32 to u16, possible loss of data
+WARNING: MODEL: [C:\Documentos\Pat\uvg\6to Semestre\Graficas\proyecto final\Planet-Hoppers\assets/models/environment/spaceStation/exports/citadel_space_station_near.glb] Indices data converted from u32 to u16, possible loss of data
+WARNING: MODEL: [C:\Documentos\Pat\uvg\6to Semestre\Graficas\proyecto final\Planet-Hoppers\assets/models/environment/spaceStation/exports/citadel_space_station_near.glb] Indices data converted from u32 to u16, possible loss of data
+WARNING: MODEL: [C:\Documentos\Pat\uvg\6to Semestre\Graficas\proyecto final\Planet-Hoppers\assets/models/environment/spaceStation/exports/citadel_space_station_near.glb] Indices data converted from u32 to u16, possible loss of data
+WARNING: MODEL: [C:\Documentos\Pat\uvg\6to Semestre\Graficas\proyecto final\Planet-Hoppers\assets/models/environment/spaceStation/exports/citadel_space_station_near.glb] Indices data converted from u32 to u16, possible loss of data
+DEPARTURE_SAFE {"camera":[-0.00005959315240033902,6036.0498046875,897.0],"distance_from_dock":202.41998291015625,"forward":[-1.5099580252808664e-7,0.0,1.0],"hull_support":860.0,"position":[-0.00006146851956145838,6032.0,909.4199829101562],"safety_margin":36.0,"ship":"starwars","ship_radius":2.8648698329925537,"visual_half":[1.3666325807571411,0.29965800046920776,2.5]}
+LAUNCH_SMOKE_PASS ship=starwars
+FRONT_END_SMOKE_PASS active=starwars initial=starwars unlocked=1
