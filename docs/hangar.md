@@ -1,5 +1,9 @@
 # Menú principal y selección de naves
 
+> Presentación actual: cámara de la vista general aprobada, iluminación de Cycles horneada y nebulosa original en la salida. [Comparación Blender/juego, capturas y verificaciones](references/hangar/presentation/README.md). No se rediseñó el modelo ni se modificaron plataforma, naves o mecánicas.
+
+> Estado actual — Fase 2: el selector usa `citadel_hangar_reconstructed.glb`, exportado del Blender aprobado. [Integración, capturas reales, ajuste de cámara por clipping y verificación funcional](references/hangar/integration/README.md). Las descripciones de implementaciones anteriores que siguen abajo son históricas.
+
 > Actualización visual: el entorno procedural descrito históricamente abajo fue sustituido por `citadel_hangar_interior.glb`, construido en Blender desde la referencia aprobada. La plataforma circular de radio 4.5 y el giro de 10°/s están restaurados. [Informe actual con renders, capturas reales y validaciones](references/hangar/README.md).
 
 ## Entrada normal y acceso de desarrollo

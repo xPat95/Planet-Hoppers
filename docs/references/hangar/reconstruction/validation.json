@@ -1,0 +1,210 @@
+{
+  "reopened": true,
+  "source_unchanged": true,
+  "external_libraries": [],
+  "missing_external_images": [],
+  "source_material_property_mismatches": [],
+  "platform_clearance_surface_intersections": [],
+  "platform_clearance_interior_vertices": [],
+  "clearance_volume": {
+    "radius": 4.8,
+    "height": 6.9
+  },
+  "game_camera_center_ray_unobstructed": true,
+  "game_camera_vertical_fov": 42.00000053005865,
+  "game_camera_eye": [
+    8.204826354980469,
+    -12.76306438446045,
+    6.629474639892578
+  ],
+  "game_camera_target": [
+    0.0,
+    0.0,
+    1.1595896482467651
+  ],
+  "reused_mesh_provenance_errors": [],
+  "original_mesh_object_names": [
+    "CI 1 | Casco facetado continuo",
+    "CI 1 | Costillas estructurales",
+    "CI 1 | Escudo de raiz +1",
+    "CI 1 | Escudo de raiz -1",
+    "CI 1 | Placas y rejillas exteriores",
+    "CI | Anillo estructural octogonal",
+    "CI | Aros nervios y cinco acoplamientos",
+    "CI | Ciudad interior y Torre del Consejo",
+    "CI | Luces del Presidium",
+    "CI | Segmentos de blindaje del Presidium"
+  ],
+  "architecture_objects": 241,
+  "architecture_faces": 61962,
+  "render_evidence": {
+    "01-original-general.png": {
+      "bytes": 1899246,
+      "resolution": [
+        1440,
+        960
+      ],
+      "png_signature": true
+    },
+    "02-original-presidium.png": {
+      "bytes": 1727379,
+      "resolution": [
+        1440,
+        960
+      ],
+      "png_signature": true
+    },
+    "03-original-districts.png": {
+      "bytes": 2285491,
+      "resolution": [
+        1440,
+        960
+      ],
+      "png_signature": true
+    },
+    "04-game-camera.png": {
+      "bytes": 1381054,
+      "resolution": [
+        1280,
+        800
+      ],
+      "png_signature": true
+    },
+    "05-interior-general.png": {
+      "bytes": 1425150,
+      "resolution": [
+        1280,
+        800
+      ],
+      "png_signature": true
+    },
+    "06-lateral.png": {
+      "bytes": 1354487,
+      "resolution": [
+        1280,
+        800
+      ],
+      "png_signature": true
+    },
+    "07-roof.png": {
+      "bytes": 1431039,
+      "resolution": [
+        1280,
+        800
+      ],
+      "png_signature": true
+    },
+    "08-exit.png": {
+      "bytes": 1439873,
+      "resolution": [
+        1280,
+        800
+      ],
+      "png_signature": true
+    },
+    "09-architecture.png": {
+      "bytes": 1329445,
+      "resolution": [
+        1280,
+        800
+      ],
+      "png_signature": true
+    }
+  },
+  "reference_only_objects": [
+    "NO EXPORTAR | Plataforma base Rust",
+    "NO EXPORTAR | Plataforma borde Rust",
+    "NO EXPORTAR | Plataforma tapa Rust",
+    "NO EXPORTAR | Nave CASCO MANDO | Auricular beskar -1",
+    "NO EXPORTAR | Nave CASCO MANDO | Auricular beskar 1",
+    "NO EXPORTAR | Nave CASCO MANDO | Borde y cresta central",
+    "NO EXPORTAR | Nave CASCO MANDO | Carrilleras angulares",
+    "NO EXPORTAR | Nave CASCO MANDO | Casco envolvente",
+    "NO EXPORTAR | Nave CASCO MANDO | Cupula beskar",
+    "NO EXPORTAR | Nave CASCO MANDO | Rejillas laterales",
+    "NO EXPORTAR | Nave CASCO MANDO | Visor negro en T",
+    "NO EXPORTAR | Nave Din_Djarin_ROOT",
+    "NO EXPORTAR | Nave GROGU POD | Aro de cierre",
+    "NO EXPORTAR | Nave GROGU POD | Asiento interior",
+    "NO EXPORTAR | Nave GROGU POD | Base metalica de subcabina",
+    "NO EXPORTAR | Nave GROGU POD | Cristal de subcabina",
+    "NO EXPORTAR | Nave GROGU | Cuello de lana doblado",
+    "NO EXPORTAR | Nave GROGU | Ojos negros y boca",
+    "NO EXPORTAR | Nave GROGU | Orejas largas e interior rosado",
+    "NO EXPORTAR | Nave GROGU | Parpados arrugas y pliegues",
+    "NO EXPORTAR | Nave GROGU | Pelo fino de la coronilla",
+    "NO EXPORTAR | Nave GROGU | Piel cabeza nariz y manos",
+    "NO EXPORTAR | Nave GROGU | Tunica marron",
+    "NO EXPORTAR | Nave Grogu_Pod_ROOT",
+    "NO EXPORTAR | Nave Grogu_ROOT",
+    "NO EXPORTAR | Nave Mandalorian_N1_ROOT",
+    "NO EXPORTAR | Nave MANDO | Bandolera de cuero",
+    "NO EXPORTAR | Nave MANDO | Capa recogida",
+    "NO EXPORTAR | Nave MANDO | Cartucheras y herrajes",
+    "NO EXPORTAR | Nave MANDO | Coraza hombreras y brazales beskar",
+    "NO EXPORTAR | Nave MANDO | Guantes y botas",
+    "NO EXPORTAR | Nave MANDO | Traje de Din Djarin",
+    "NO EXPORTAR | Nave Mando_Canopy_ROOT",
+    "NO EXPORTAR | Nave MOD MOTOR babor | Anillos y largueros",
+    "NO EXPORTAR | Nave MOD MOTOR babor | Aro ionico azul",
+    "NO EXPORTAR | Nave MOD MOTOR babor | Nucleo mecanico",
+    "NO EXPORTAR | Nave MOD MOTOR babor | Paneles abiertos y aguja",
+    "NO EXPORTAR | Nave MOD MOTOR babor | Tobera posterior",
+    "NO EXPORTAR | Nave MOD MOTOR babor | Tuberias y cableado",
+    "NO EXPORTAR | Nave MOD MOTOR babor | Turbina frontal",
+    "NO EXPORTAR | Nave MOD MOTOR estribor | Anillos y largueros",
+    "NO EXPORTAR | Nave MOD MOTOR estribor | Aro ionico azul",
+    "NO EXPORTAR | Nave MOD MOTOR estribor | Nucleo mecanico",
+    "NO EXPORTAR | Nave MOD MOTOR estribor | Paneles abiertos y aguja",
+    "NO EXPORTAR | Nave MOD MOTOR estribor | Tobera posterior",
+    "NO EXPORTAR | Nave MOD MOTOR estribor | Tuberias y cableado",
+    "NO EXPORTAR | Nave MOD MOTOR estribor | Turbina frontal",
+    "NO EXPORTAR | Nave MOD | Acelerador central inferior",
+    "NO EXPORTAR | Nave MOD | Conductos y cableado",
+    "NO EXPORTAR | Nave MOD | Desgaste y soldaduras",
+    "NO EXPORTAR | Nave MOD | Espina posterior sin carenado",
+    "NO EXPORTAR | Nave MOD | Parches y pintura restante",
+    "NO EXPORTAR | Nave MOD | Rejilla lateral -1 0",
+    "NO EXPORTAR | Nave MOD | Rejilla lateral -1 1",
+    "NO EXPORTAR | Nave MOD | Rejilla lateral -1 2",
+    "NO EXPORTAR | Nave MOD | Rejilla lateral -1 3",
+    "NO EXPORTAR | Nave MOD | Rejilla lateral -1 4",
+    "NO EXPORTAR | Nave MOD | Rejilla lateral -1 5",
+    "NO EXPORTAR | Nave MOD | Rejilla lateral -1 6",
+    "NO EXPORTAR | Nave MOD | Rejilla lateral -1 7",
+    "NO EXPORTAR | Nave MOD | Rejilla lateral -1 8",
+    "NO EXPORTAR | Nave MOD | Rejilla lateral 1 0",
+    "NO EXPORTAR | Nave MOD | Rejilla lateral 1 1",
+    "NO EXPORTAR | Nave MOD | Rejilla lateral 1 2",
+    "NO EXPORTAR | Nave MOD | Rejilla lateral 1 3",
+    "NO EXPORTAR | Nave MOD | Rejilla lateral 1 4",
+    "NO EXPORTAR | Nave MOD | Rejilla lateral 1 5",
+    "NO EXPORTAR | Nave MOD | Rejilla lateral 1 6",
+    "NO EXPORTAR | Nave MOD | Rejilla lateral 1 7",
+    "NO EXPORTAR | Nave MOD | Rejilla lateral 1 8",
+    "NO EXPORTAR | Nave N1 | Ala babor",
+    "NO EXPORTAR | Nave N1 | Ala estribor",
+    "NO EXPORTAR | Nave N1 | Arcos metalicos de cabina",
+    "NO EXPORTAR | Nave N1 | Asiento del piloto",
+    "NO EXPORTAR | Nave N1 | Banera interior de cabina",
+    "NO EXPORTAR | Nave N1 | Botones y mandos",
+    "NO EXPORTAR | Nave N1 | Canones y rejillas",
+    "NO EXPORTAR | Nave N1 | Consola de instrumentos",
+    "NO EXPORTAR | Nave N1 | Consola lateral -1",
+    "NO EXPORTAR | Nave N1 | Consola lateral 1",
+    "NO EXPORTAR | Nave N1 | Cristal transparente de cabina",
+    "NO EXPORTAR | Nave N1 | Fuselaje amarillo y proa cromada",
+    "NO EXPORTAR | Nave N1 | Juntas del casco",
+    "NO EXPORTAR | Nave N1 | Lineas del ala babor",
+    "NO EXPORTAR | Nave N1 | Lineas del ala estribor",
+    "NO EXPORTAR | Nave N1 | Marco amarillo de cabina",
+    "NO EXPORTAR | Nave N1 | Pantalla principal",
+    "NO EXPORTAR | Nave N1 | Respaldo y reposacabezas",
+    "NO EXPORTAR | Nave N1 | Terminales y remaches",
+    "NO EXPORTAR | Reserva radio 4.8 altura 6.9"
+  ],
+  "lighting_limit": "Area lights, procedural world, Cycles shadows and AgX are presentation only, not a verified raylib result.",
+  "export_limit": "NO EXPORTAR/custom property is organizational metadata. A future GLB export must explicitly select architecture collections.",
+  "visual_review_limit": "Artistic acceptance belongs to user. Visual inspection is not a watertight/collision proof of every architectural joint.",
+  "technical_pass": true
+}

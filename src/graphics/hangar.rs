@@ -1,6 +1,7 @@
 //! Exhibition only: no ownership or selection rules. Replace the backdrop independently.
 pub use super::hangar_interior::InteriorStyle;
 use super::space::{Fit, SpaceModel, SpaceShader};
+use super::hangar_backdrop::HangarBackdrop;
 use crate::ships::ShipModel;
 use raylib::prelude::*;
 use std::path::Path;
@@ -27,7 +28,7 @@ impl Default for HangarStyle {
             light_position: Vector3::new(-4.0, 9.0, 5.0),
             ambient: 0.55,
             station_model:
-                "assets/models/environment/spaceStation/exports/citadel_hangar_phase1.glb".into(),
+                "assets/models/environment/spaceStation/exports/citadel_hangar_reconstructed.glb".into(),
         }
     }
 }
@@ -35,16 +36,18 @@ impl Default for HangarStyle {
 pub struct HangarCamera {
     pub fov: f32,
     pub framing_margin: f32,
-    pub direction: Vector3,
-    pub minimum_distance: f32,
+    pub position: Vector3,
+    pub target: Vector3,
 }
 impl Default for HangarCamera {
     fn default() -> Self {
         Self {
-            fov: 42.0,
+            fov: 70.0,
             framing_margin: 1.08,
-            direction: Vector3::new(0.9, 0.6, 1.4),
-            minimum_distance: 11.0,
+            // Slight dolly toward the platform; keep the surrounding architecture.
+            position: Vector3::new(10.8, 7.2, 12.6),
+            // Keep the exhibit prominent and the composition stable between ships.
+            target: Vector3::new(0.0, 4.8, -5.5),
         }
     }
 }
@@ -56,22 +59,38 @@ impl HangarCamera {
         viewport: Vector2,
         insets: Vector2,
     ) -> Camera3D {
-        // Frame the bounding sphere inside the actual space left by the HUD and arrows.
+        // Keep the approved architectural viewpoint fixed; fit each rotating ship
+        // inside the actual HUD region by changing only the vertical field of view.
         let aspect = viewport.x / viewport.y.max(1.0);
-        let usable_height =
-            ((viewport.y - insets.x - insets.y) / viewport.y.max(1.0)).clamp(0.2, 1.0);
-        let usable_width = ((viewport.x - 180.0) / viewport.x.max(1.0)).clamp(0.2, 1.0);
-        let tangent = (self.fov.to_radians() * 0.5).tan();
-        let half_angle = (tangent * usable_height)
-            .atan()
-            .min((tangent * aspect * usable_width).atan());
-        let distance = (half_extents.length() / half_angle.sin() * self.framing_margin)
-            .max(self.minimum_distance);
+        let top = (1.0 - 2.0 * insets.x / viewport.y.max(1.0)).max(0.1);
+        let bottom = (1.0 - 2.0 * insets.y / viewport.y.max(1.0)).max(0.1);
+        let side = (1.0 - 180.0 / viewport.x.max(1.0)).max(0.1);
+        let target = self.target;
+        let forward = (target - self.position).normalized();
+        let right = forward.cross(Vector3::up()).normalized();
+        let up = right.cross(forward).normalized();
+        // A cylinder bounds every yaw angle without treating a thin ship as a
+        // tall sphere. Include the historical platform's 4.7-unit base as well.
+        let radius = half_extents.x.hypot(half_extents.z).max(4.7) * self.framing_margin;
+        let mut tangent = (self.fov.to_radians() * 0.5).tan();
+        for step in 0..16 {
+            let a = step as f32 * std::f32::consts::TAU / 16.0;
+            for y in [-half_extents.y, half_extents.y] {
+                let point = center + Vector3::new(radius * a.cos(), y * self.framing_margin, radius * a.sin());
+                let delta = point - self.position;
+                let depth = delta.dot(forward).max(0.1);
+                let vertical = delta.dot(up) / depth;
+                let horizontal = delta.dot(right) / depth;
+                tangent = tangent.max(if vertical >= 0.0 { vertical / top } else { -vertical / bottom })
+                    .max(horizontal.abs() / (side * aspect));
+            }
+        }
+        let fov = (2.0 * tangent.atan()).to_degrees();
         Camera3D::perspective(
-            center + self.direction.normalized() * distance,
-            center,
+            self.position,
+            target,
             Vector3::up(),
-            self.fov,
+            fov,
         )
     }
 }
@@ -81,6 +100,7 @@ pub struct Hangar {
     pub camera: HangarCamera,
     shader: SpaceShader,
     environment_shader: SpaceShader,
+    backdrop: HangarBackdrop,
     ship: Option<SpaceModel>,
     station: SpaceModel,
     pub placeholder: bool,
@@ -99,21 +119,24 @@ impl Hangar {
         style.interior.configure(&dock);
         let shader = SpaceShader::load(rl, thread)?;
         let environment_shader = SpaceShader::load_hangar(rl, thread)?;
+        let backdrop = HangarBackdrop::load(rl, thread, root)?;
         // Preserve the architectural origin and metres; automatic model fitting would
         // recenter the deck and separate it from the historical platform.
-        let station = SpaceModel::load(
+        let mut station = SpaceModel::load(
             rl,
             thread,
             &root.join(&style.station_model),
             &environment_shader,
             [0.0; 3],
-            Fit::Same(Matrix::identity(), Vector3::new(18.7, 16.7, 32.0)),
+            Fit::Same(Matrix::identity(), Vector3::new(26.626122, 25.748001, 29.763777)),
         )?;
+        station.filter_albedo(TextureFilter::TEXTURE_FILTER_BILINEAR);
         Ok(Self {
             style,
             camera: HangarCamera::default(),
             shader,
             environment_shader,
+            backdrop,
             ship: None,
             station,
             placeholder: true,
@@ -166,22 +189,25 @@ impl Hangar {
         self.camera
             .camera(self.center, self.half_extents, viewport, insets)
     }
-    /// Inspection viewpoints stay inside the configured walls and below the roof.
+    pub fn draw_backdrop(&mut self, d: &mut impl RaylibDraw, camera: Camera3D, viewport: Vector2) {
+        self.backdrop.draw(d, camera, viewport);
+    }
+    /// Approved Blender review views, converted from Z-up to game Y-up.
+    /// These auxiliary views do not change the ship selection camera.
     pub fn inspection_camera(&self, exit: bool) -> Camera3D {
-        let room = &self.style.interior;
         if exit {
             Camera3D::perspective(
-                Vector3::new(0.0, room.exit_height * 0.5, room.depth * 0.14),
-                Vector3::new(0.0, room.exit_height * 0.5, -room.depth * 0.5),
+                Vector3::new(0.0, 5.0, 2.0),
+                Vector3::new(0.0, 9.0, -20.0),
                 Vector3::up(),
-                60.0,
+                67.0,
             )
         } else {
             Camera3D::perspective(
-                Vector3::new(room.width * 0.33, room.height * 0.625, room.depth * 0.41),
-                Vector3::new(0.0, room.height * 0.31, -room.depth * 0.18),
+                Vector3::new(12.0, 8.0, 14.0),
+                Vector3::new(0.0, 6.0, -7.0),
                 Vector3::up(),
-                65.0,
+                74.0,
             )
         }
     }
@@ -191,7 +217,7 @@ impl Hangar {
             camera.position,
             self.style.ambient,
         );
-        self.environment_shader.begin_frame(self.style.light_position, camera.position, 0.24);
+        self.environment_shader.begin_frame(self.style.light_position, camera.position, 0.50);
         self.station.draw(d, &mut self.environment_shader, Matrix::identity());
         self.draw_platform(d);
         let world = Matrix::rotate_y(self.angle.to_radians())

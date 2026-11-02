@@ -1,0 +1,231 @@
+{
+  "branch": "feature/hangar",
+  "preservation": {
+    "draw_platform": {
+      "unchanged": true,
+      "sha256": "8e0478ea4f63e26e05aef01e67a6a86138c0217a0ccf99d75b75bd4a17d8f480"
+    },
+    "exhibit": {
+      "unchanged": true,
+      "sha256": "3fc8750835831914f7b4123d0d93c12f4229231dada24d925d0dfdfe7d69b285"
+    },
+    "update": {
+      "unchanged": true,
+      "sha256": "92b7330c01367d62d7918bd5c953791936f8d697c86c919cce1906a4ba5e48d7"
+    },
+    "front_end_input_HUD_buttons_flow": {
+      "unchanged": true,
+      "only_change": "background draw branch for Screen::Hangar"
+    },
+    "src/graphics/hangar_interior.rs": {
+      "unchanged": true
+    },
+    "src/gameplay/selection.rs": {
+      "unchanged": true
+    },
+    "src/scenes/solar_system.rs": {
+      "unchanged": true
+    },
+    "config/station.json": {
+      "unchanged": true
+    },
+    "config/ships.json": {
+      "unchanged": true
+    },
+    "config/ship-selection.json": {
+      "unchanged": true
+    }
+  },
+  "approved_blend_unchanged": true,
+  "geometry": {
+    "before_objects": 241,
+    "after_objects": 241,
+    "mismatches": [],
+    "note": "Canonical triangle positions, independent of winding/UVs",
+    "coordinate_precision": 1e-05
+  },
+  "camera": {
+    "game_position": [
+      12,
+      8,
+      14
+    ],
+    "game_target": [
+      0,
+      6,
+      -7
+    ],
+    "base_fov_y": 74,
+    "audited_cases": 18,
+    "occlusions": 0,
+    "hud_errors": 0
+  },
+  "checks": {
+    "cargo check --locked": "PASS",
+    "cargo build --locked": "PASS",
+    "cargo test --locked --test hangar_asset --test ship_selection --test station --test ships --test minigame_returns": "27 PASS",
+    "git diff --check": "PASS",
+    "runtime smoke docking exit code": 0
+  },
+  "runtime_markers": [
+    "SELECTION_SMOKE_PASS {\"back_to_menu\":true,\"controls\":true,\"physical_input_verified\":false,\"previews\":[\"halloween\",\"minecraft\",\"regularshow\",\"smilingfriends\",\"southpark\",\"starwars\"],\"selected\":\"minecraft\",\"status\":\"PASS\"}",
+    "DOCK_SELECTION_SMOKE_PASS {\"back_to_menu\":false,\"controls\":false,\"physical_input_verified\":false,\"previews\":[\"minecraft\"],\"selected\":\"minecraft\",\"status\":\"PASS\"}",
+    "DOCK_SELECTION_SMOKE_PASS {\"back_to_menu\":false,\"controls\":false,\"physical_input_verified\":false,\"previews\":[\"starwars\"],\"selected\":\"starwars\",\"status\":\"PASS\"}",
+    "DOCKING_SMOKE_PASS cycles=3 same_ship=true changed_ship=true cancel=true safe_launch=true active=starwars",
+    "FRONT_END_SMOKE_PASS active=starwars initial=minecraft unlocked=2"
+  ],
+  "resources": {
+    "assets/models/environment/spaceStation/exports/citadel_hangar_reconstructed.glb": {
+      "bytes": 13712744,
+      "sha256": "45e0617afa71071785ab89d83e6dab03c9dc71c2dd80f3603980c66dc2fdd235"
+    },
+    "assets/textures/environment/hangar/approved_cycles_radiance.png": {
+      "bytes": 4972492,
+      "sha256": "a3f3a6b5c0e08dda7a0a1df6d25d6ec747937c5271b92c3e4c67d3e30ff29c4f"
+    },
+    "assets/textures/environment/hangar/approved_world.png": {
+      "bytes": 2404456,
+      "sha256": "08d37b0d2e4c8ed47df0a85370a1bddd7829639d0b8eb6e7f8e457ff2f71346b"
+    }
+  },
+  "captures": {
+    "runtime-dock-approach-0.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "61d5adb69096213374506e0eeac6b6daa4d8170e4dc1f2f20aab62f43b1f62d1"
+    },
+    "runtime-dock-approach-1.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "f74a0ca4bb4e44ea8c62d3f68c32b1a5d868070575688a4fa97fe42db39c1a26"
+    },
+    "runtime-dock-approach-2.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "289fc50f0159c30daf37a4663670d9b80263846e379355bb63815d6cce8d71bc"
+    },
+    "runtime-dock-launch-0.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "e206eccb0c3521c7925bf63a0eb519c3cccb24a435cccc3833320bab33205f69"
+    },
+    "runtime-dock-launch-1.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "65d0cf45abf0d1dac725d7bfab2b0a941e456f636b119fecb07b1a6eba6fcd7f"
+    },
+    "runtime-dock-launch-2.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "a4684905438b9ee6ff7b6db747c0cba31cdc09332ddb391924979c42c42ce8c7"
+    },
+    "runtime-dock-launch-3.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "a4684905438b9ee6ff7b6db747c0cba31cdc09332ddb391924979c42c42ce8c7"
+    },
+    "runtime-docked-entry.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "d2a6a1998bbcc43240f8b9ebae044fc2829f70abc7a71c45ae9ec9198b3012f0"
+    },
+    "runtime-docked-selected.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "7da23c0ae99de321e07c801ad3fec9ed87afe49aa15a4a399f1e33afcc5cabcb"
+    },
+    "runtime-hangar-complete.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "c922ba24e36ab0550eefeba100caf5b463b4c0a34a9ebc2680a369a7acb3b917"
+    },
+    "runtime-hangar-exit.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "e300c34bd55735ed7c8b525ce759b5e4d246fbc2aebf8801cf5e447e3894f248"
+    },
+    "runtime-hangar-halloween.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "6ef8c4fad1bb05f66da2b9fead5038d11b66282ab602dd322978400fe48b4958"
+    },
+    "runtime-hangar-minecraft.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "38ba9e5cc221f9c1393b153c8458400c3866625588eb3354264b285041e0ab7d"
+    },
+    "runtime-hangar-regularshow.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "d910f54290ca158c51ba737b368b071ec8405d37168af02a58ff1af5fde1e4a1"
+    },
+    "runtime-hangar-smilingfriends-back.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "2013440ce4ec8b91bab566a348c72e7e629d962e4a343e24d751909614751e41"
+    },
+    "runtime-hangar-smilingfriends-side.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "f67aba7cdf888116eef44350b76223d583f3e9e65e0496d1ae2850524c6666f8"
+    },
+    "runtime-hangar-smilingfriends.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "b99ec76fdf336522432a89685fd43f8dbeeeaad90f62998ac6b29b0ee04d081a"
+    },
+    "runtime-hangar-southpark.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "2c049f65ee4c9a521ad325aec961888bd4dae12b4467c61e39b3274901b9fe9f"
+    },
+    "runtime-hangar-starwars.png": {
+      "resolution": [
+        1280,
+        800
+      ],
+      "sha256": "81c573a512dd7d7ae113cd805fb896da33eb574f5ce422542f42722dc1f6dd0b"
+    }
+  },
+  "limitations": [
+    "Static architectural radiance; dynamic ships/platform retain their existing renderer.",
+    "The metallic view-dependent bounce is approximated, not a full Cycles renderer.",
+    "Physical keyboard/mouse and long-duration performance remain for human review."
+  ]
+}

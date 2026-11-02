@@ -556,7 +556,11 @@ fn view(
         if screen == Screen::Main {
             galaxy.draw(&mut d, w, h, menu_time);
         }
-        sky.draw(&mut d, &sky_frame);
+        if screen == Screen::Hangar {
+            hangar.draw_backdrop(&mut d, camera, Vector2::new(w as f32, h as f32));
+        } else {
+            sky.draw(&mut d, &sky_frame);
+        }
         if matches!(screen, Screen::Main | Screen::Controls) {
             draw_moving_stars(&mut d, w, h, menu_time);
         }

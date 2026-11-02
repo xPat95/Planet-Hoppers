@@ -1,0 +1,50 @@
+00:00.031  color_management | Using config from OCIO: "C:\Documentos\Pat\uvg\6to Semestre\Graficas\blender-5.4.0-alpha+main.16a7f36b710d-windows.amd64-release\blender-5.4.0-alpha+main.16a7f36b710d-windows.amd64-release\5.4\datafiles\colormanagement\config.ocio"
+00:00.468  blend            | Read blend: "C:\Documentos\Pat\uvg\6to Semestre\Graficas\proyecto final\Planet-Hoppers\assets\models\environment\spaceStation\citadel_hangar_reconstructed.blend"
+{
+  "reopened": true,
+  "source_unchanged": true,
+  "external_libraries": [],
+  "missing_external_images": [],
+  "source_material_property_mismatches": [],
+  "platform_clearance_surface_intersections": [],
+  "platform_clearance_interior_vertices": [],
+  "clearance_volume": {
+    "radius": 4.8,
+    "height": 6.9
+  },
+  "game_camera_center_ray_unobstructed": true,
+  "game_camera_vertical_fov": 42.00000053005865,
+  "game_camera_eye": [
+    8.204826354980469,
+    -12.76306438446045,
+    6.629474639892578
+  ],
+  "game_camera_target": [
+    0.0,
+    0.0,
+    1.1595896482467651
+  ],
+  "reused_mesh_provenance_errors": [],
+  "original_mesh_object_names": [
+    "CI 1 | Casco facetado continuo",
+    "CI 1 | Costillas estructurales",
+    "CI 1 | Escudo de raiz +1",
+    "CI 1 | Escudo de raiz -1",
+    "CI 1 | Placas y rejillas exteriores",
+    "CI | Anillo estructural octogonal",
+    "CI | Aros nervios y cinco acoplamientos",
+    "CI | Ciudad interior y Torre del Consejo",
+    "CI | Luces del Presidium",
+    "CI | Segmentos de blindaje del Presidium"
+  ],
+  "architecture_objects": 241,
+  "architecture_faces": 61962,
+  "lighting_limit": "Area lights, procedural world, Cycles shadows and AgX are presentation only, not a verified raylib result.",
+  "export_limit": "NO EXPORTAR/custom property is organizational metadata. A future GLB export must explicitly select architecture collections.",
+  "visual_review_limit": "Artistic acceptance belongs to user. Visual inspection is not a watertight/collision proof of every architectural joint.",
+  "technical_pass": true
+}
+REOPEN_VALIDATION_PASS
+Blender 5.4.0 Alpha (hash 16a7f36b710d built 2026-10-08 12:07:46)
+
+Blender quit

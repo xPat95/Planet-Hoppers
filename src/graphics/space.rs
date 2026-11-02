@@ -22,7 +22,10 @@ impl SpaceShader {
 
     /// Local architectural lighting; shared loader, no changes to flight or ship materials.
     pub fn load_hangar(rl: &mut RaylibHandle, thread: &RaylibThread) -> Result<Self, Box<dyn std::error::Error>> {
-        Self::load_fragment(rl, thread, include_str!("shaders/hangar.fs"))
+        let mut shader = Self::load_fragment(rl, thread, include_str!("shaders/hangar.fs"))?;
+        let radiance = shader.shader.get_shader_location("bakedRadiance");
+        shader.shader.set_shader_value(radiance, 1.0f32);
+        Ok(shader)
     }
 
     fn load_fragment(rl: &mut RaylibHandle, thread: &RaylibThread, fragment: &str) -> Result<Self, Box<dyn std::error::Error>> {
@@ -220,6 +223,16 @@ fn rotation(degrees: [f32; 3]) -> Matrix {
 }
 
 impl SpaceModel {
+    /// Apply filtering explicitly to architectural lightmaps; ships keep their settings.
+    pub fn filter_albedo(&mut self, filter: TextureFilter) {
+        for material in self.model.materials() {
+            let texture = material.maps()[0].texture;
+            if texture.id != 0 {
+                unsafe { ffi::SetTextureFilter(texture, filter as i32) };
+            }
+        }
+    }
+
     pub fn load(
         rl: &mut RaylibHandle,
         thread: &RaylibThread,

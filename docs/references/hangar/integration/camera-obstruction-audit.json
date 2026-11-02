@@ -1,0 +1,2202 @@
+[
+  {
+    "choice": "halloween",
+    "viewport": [
+      960,
+      640
+    ],
+    "fitted_half_blender": [
+      2.299999952316284,
+      3.0,
+      0.800000011920929
+    ],
+    "views": [
+      {
+        "maximum_distance": null,
+        "distance": 21.30620236029754,
+        "eye_blender": [
+          10.838680267333984,
+          -16.86016845703125,
+          8.363286972045898
+        ],
+        "vertical_fov": 42,
+        "center_obstructed": true,
+        "rotated_bounds_corner_obstructions": 32,
+        "hit_blender": [
+          10.20899486541748,
+          -15.880658149719238,
+          7.9434967041015625
+        ]
+      },
+      {
+        "maximum_distance": 17.0,
+        "distance": 17.0,
+        "eye_blender": [
+          8.6480712890625,
+          -13.452555656433105,
+          6.902881622314453
+        ],
+        "vertical_fov": 51.90174142861124,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 16.0,
+        "distance": 16.0,
+        "eye_blender": [
+          8.139361381530762,
+          -12.661229133605957,
+          6.563741683959961
+        ],
+        "vertical_fov": 54.88019203333112,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 15.0,
+        "distance": 15.0,
+        "eye_blender": [
+          7.630651473999023,
+          -11.869902610778809,
+          6.224601745605469
+        ],
+        "vertical_fov": 58.205954833955,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 14.0,
+        "distance": 14.0,
+        "eye_blender": [
+          7.121941089630127,
+          -11.078575134277344,
+          5.88546085357666
+        ],
+        "vertical_fov": 61.94088591619434,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 13.0,
+        "distance": 13.0,
+        "eye_blender": [
+          6.613231182098389,
+          -10.287248611450195,
+          5.546320915222168
+        ],
+        "vertical_fov": 66.16196290558354,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 12.0,
+        "distance": 12.0,
+        "eye_blender": [
+          6.104520797729492,
+          -9.495922088623047,
+          5.207180976867676
+        ],
+        "vertical_fov": 70.96621889460899,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 11.0,
+        "distance": 11.0,
+        "eye_blender": [
+          5.595810890197754,
+          -8.704594612121582,
+          4.868041038513184
+        ],
+        "vertical_fov": 76.47793727081043,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      }
+    ]
+  },
+  {
+    "choice": "halloween",
+    "viewport": [
+      1280,
+      800
+    ],
+    "fitted_half_blender": [
+      2.299999952316284,
+      3.0,
+      0.800000011920929
+    ],
+    "views": [
+      {
+        "maximum_distance": null,
+        "distance": 18.12770388565911,
+        "eye_blender": [
+          9.221746444702148,
+          -14.344939231872559,
+          7.285331726074219
+        ],
+        "vertical_fov": 42,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 17.0,
+        "distance": 17.0,
+        "eye_blender": [
+          8.6480712890625,
+          -13.452555656433105,
+          6.902881622314453
+        ],
+        "vertical_fov": 44.676186969280444,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 16.0,
+        "distance": 16.0,
+        "eye_blender": [
+          8.139361381530762,
+          -12.661229133605957,
+          6.563741683959961
+        ],
+        "vertical_fov": 47.34568087587802,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 15.0,
+        "distance": 15.0,
+        "eye_blender": [
+          7.630651473999023,
+          -11.869902610778809,
+          6.224601745605469
+        ],
+        "vertical_fov": 50.347070095453894,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 14.0,
+        "distance": 14.0,
+        "eye_blender": [
+          7.121941089630127,
+          -11.078575134277344,
+          5.88546085357666
+        ],
+        "vertical_fov": 53.74506412760702,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 13.0,
+        "distance": 13.0,
+        "eye_blender": [
+          6.613231182098389,
+          -10.287248611450195,
+          5.546320915222168
+        ],
+        "vertical_fov": 57.62214406028815,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 12.0,
+        "distance": 12.0,
+        "eye_blender": [
+          6.104520797729492,
+          -9.495922088623047,
+          5.207180976867676
+        ],
+        "vertical_fov": 62.08515585095157,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 11.0,
+        "distance": 11.0,
+        "eye_blender": [
+          5.595810890197754,
+          -8.704594612121582,
+          4.868041038513184
+        ],
+        "vertical_fov": 67.2752241914561,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      }
+    ]
+  },
+  {
+    "choice": "halloween",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "fitted_half_blender": [
+      2.299999952316284,
+      3.0,
+      0.800000011920929
+    ],
+    "views": [
+      {
+        "maximum_distance": null,
+        "distance": 15.751534708675925,
+        "eye_blender": [
+          8.012964248657227,
+          -12.464612007141113,
+          6.4794769287109375
+        ],
+        "vertical_fov": 42,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 17.0,
+        "distance": 15.751534708675925,
+        "eye_blender": [
+          8.012964248657227,
+          -12.464612007141113,
+          6.4794769287109375
+        ],
+        "vertical_fov": 42,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 16.0,
+        "distance": 15.751534708675925,
+        "eye_blender": [
+          8.012964248657227,
+          -12.464612007141113,
+          6.4794769287109375
+        ],
+        "vertical_fov": 42,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 15.0,
+        "distance": 15.0,
+        "eye_blender": [
+          7.630651473999023,
+          -11.869902610778809,
+          6.224601745605469
+        ],
+        "vertical_fov": 44.06324399851523,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 14.0,
+        "distance": 14.0,
+        "eye_blender": [
+          7.121941089630127,
+          -11.078575134277344,
+          5.88546085357666
+        ],
+        "vertical_fov": 47.14226437278203,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 13.0,
+        "distance": 13.0,
+        "eye_blender": [
+          6.613231182098389,
+          -10.287248611450195,
+          5.546320915222168
+        ],
+        "vertical_fov": 50.68010027662891,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 12.0,
+        "distance": 12.0,
+        "eye_blender": [
+          6.104520797729492,
+          -9.495922088623047,
+          5.207180976867676
+        ],
+        "vertical_fov": 54.78727379603175,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 11.0,
+        "distance": 11.0,
+        "eye_blender": [
+          5.595810890197754,
+          -8.704594612121582,
+          4.868041038513184
+        ],
+        "vertical_fov": 59.61329720662283,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      }
+    ]
+  },
+  {
+    "choice": "starwars",
+    "viewport": [
+      960,
+      640
+    ],
+    "fitted_half_blender": [
+      1.6399590969085693,
+      3.0,
+      0.3595896065235138
+    ],
+    "views": [
+      {
+        "maximum_distance": null,
+        "distance": 18.95668058635406,
+        "eye_blender": [
+          9.643454551696777,
+          -15.000929832458496,
+          7.588560104370117
+        ],
+        "vertical_fov": 42,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 17.0,
+        "distance": 17.0,
+        "eye_blender": [
+          8.6480712890625,
+          -13.452555656433105,
+          6.924971103668213
+        ],
+        "vertical_fov": 46.54895697334892,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 16.0,
+        "distance": 16.0,
+        "eye_blender": [
+          8.139361381530762,
+          -12.661229133605957,
+          6.585831165313721
+        ],
+        "vertical_fov": 49.26352725671868,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 15.0,
+        "distance": 15.0,
+        "eye_blender": [
+          7.630651473999023,
+          -11.869902610778809,
+          6.2466912269592285
+        ],
+        "vertical_fov": 52.30230619078354,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 14.0,
+        "distance": 14.0,
+        "eye_blender": [
+          7.121941089630127,
+          -11.078575134277344,
+          5.907550811767578
+        ],
+        "vertical_fov": 55.72479477023253,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 13.0,
+        "distance": 13.0,
+        "eye_blender": [
+          6.613231182098389,
+          -10.287248611450195,
+          5.568410873413086
+        ],
+        "vertical_fov": 59.60547359191463,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 12.0,
+        "distance": 12.0,
+        "eye_blender": [
+          6.104520797729492,
+          -9.495922088623047,
+          5.229270935058594
+        ],
+        "vertical_fov": 64.0387338232618,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 11.0,
+        "distance": 11.0,
+        "eye_blender": [
+          5.595810890197754,
+          -8.704594612121582,
+          4.890130519866943
+        ],
+        "vertical_fov": 69.14594824647867,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      }
+    ]
+  },
+  {
+    "choice": "starwars",
+    "viewport": [
+      1280,
+      800
+    ],
+    "fitted_half_blender": [
+      1.6399590969085693,
+      3.0,
+      0.3595896065235138
+    ],
+    "views": [
+      {
+        "maximum_distance": null,
+        "distance": 16.128688093416294,
+        "eye_blender": [
+          8.204826354980469,
+          -12.76306438446045,
+          6.629474639892578
+        ],
+        "vertical_fov": 42,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 17.0,
+        "distance": 16.128688093416294,
+        "eye_blender": [
+          8.204826354980469,
+          -12.76306438446045,
+          6.629474639892578
+        ],
+        "vertical_fov": 42,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 16.0,
+        "distance": 16.0,
+        "eye_blender": [
+          8.139361381530762,
+          -12.661229133605957,
+          6.585831165313721
+        ],
+        "vertical_fov": 42.32547532851405,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 15.0,
+        "distance": 15.0,
+        "eye_blender": [
+          7.630651473999023,
+          -11.869902610778809,
+          6.2466912269592285
+        ],
+        "vertical_fov": 45.03421911385992,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 14.0,
+        "distance": 14.0,
+        "eye_blender": [
+          7.121941089630127,
+          -11.078575134277344,
+          5.907550811767578
+        ],
+        "vertical_fov": 48.10580298482691,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 13.0,
+        "distance": 13.0,
+        "eye_blender": [
+          6.613231182098389,
+          -10.287248611450195,
+          5.568410873413086
+        ],
+        "vertical_fov": 51.61686421730061,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 12.0,
+        "distance": 12.0,
+        "eye_blender": [
+          6.104520797729492,
+          -9.495922088623047,
+          5.229270935058594
+        ],
+        "vertical_fov": 55.6669347828367,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 11.0,
+        "distance": 11.0,
+        "eye_blender": [
+          5.595810890197754,
+          -8.704594612121582,
+          4.890130519866943
+        ],
+        "vertical_fov": 60.38768993475734,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      }
+    ]
+  },
+  {
+    "choice": "starwars",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "fitted_half_blender": [
+      1.6399590969085693,
+      3.0,
+      0.3595896065235138
+    ],
+    "views": [
+      {
+        "maximum_distance": null,
+        "distance": 14.014548776353083,
+        "eye_blender": [
+          7.129342079162598,
+          -11.090087890625,
+          5.912485122680664
+        ],
+        "vertical_fov": 42,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 17.0,
+        "distance": 14.014548776353083,
+        "eye_blender": [
+          7.129342079162598,
+          -11.090087890625,
+          5.912485122680664
+        ],
+        "vertical_fov": 42,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 16.0,
+        "distance": 14.014548776353083,
+        "eye_blender": [
+          7.129342079162598,
+          -11.090087890625,
+          5.912485122680664
+        ],
+        "vertical_fov": 42,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 15.0,
+        "distance": 14.014548776353083,
+        "eye_blender": [
+          7.129342079162598,
+          -11.090087890625,
+          5.912485122680664
+        ],
+        "vertical_fov": 42,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 14.0,
+        "distance": 14.0,
+        "eye_blender": [
+          7.121941089630127,
+          -11.078575134277344,
+          5.907550811767578
+        ],
+        "vertical_fov": 42.04284749912449,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 13.0,
+        "distance": 13.0,
+        "eye_blender": [
+          6.613231182098389,
+          -10.287248611450195,
+          5.568410873413086
+        ],
+        "vertical_fov": 45.211553304900974,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 12.0,
+        "distance": 12.0,
+        "eye_blender": [
+          6.104520797729492,
+          -9.495922088623047,
+          5.229270935058594
+        ],
+        "vertical_fov": 48.89258434865972,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 11.0,
+        "distance": 11.0,
+        "eye_blender": [
+          5.595810890197754,
+          -8.704594612121582,
+          4.890130519866943
+        ],
+        "vertical_fov": 53.2206297591549,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      }
+    ]
+  },
+  {
+    "choice": "smilingfriends",
+    "viewport": [
+      960,
+      640
+    ],
+    "fitted_half_blender": [
+      3.0,
+      3.0,
+      1.1961205005645752
+    ],
+    "views": [
+      {
+        "maximum_distance": null,
+        "distance": 24.30638732511041,
+        "eye_blender": [
+          12.364904403686523,
+          -19.234296798706055,
+          10.23939037322998
+        ],
+        "vertical_fov": 42,
+        "center_obstructed": true,
+        "rotated_bounds_corner_obstructions": 32,
+        "hit_blender": [
+          10.208993911743164,
+          -15.880658149719238,
+          8.802116394042969
+        ]
+      },
+      {
+        "maximum_distance": 17.0,
+        "distance": 17.0,
+        "eye_blender": [
+          8.6480712890625,
+          -13.452555656433105,
+          7.761501789093018
+        ],
+        "vertical_fov": 58.55399985330138,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 16.0,
+        "distance": 16.0,
+        "eye_blender": [
+          8.139361381530762,
+          -12.661229133605957,
+          7.422361850738525
+        ],
+        "vertical_fov": 61.84159422968901,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 15.0,
+        "distance": 15.0,
+        "eye_blender": [
+          7.630651473999023,
+          -11.869902610778809,
+          7.083221912384033
+        ],
+        "vertical_fov": 65.50078374837975,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 14.0,
+        "distance": 14.0,
+        "eye_blender": [
+          7.121941089630127,
+          -11.078575134277344,
+          6.744081497192383
+        ],
+        "vertical_fov": 69.59545328308135,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 13.0,
+        "distance": 13.0,
+        "eye_blender": [
+          6.613231182098389,
+          -10.287248611450195,
+          6.404941558837891
+        ],
+        "vertical_fov": 74.20475383085079,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 12.0,
+        "distance": 12.0,
+        "eye_blender": [
+          6.104520797729492,
+          -9.495922088623047,
+          6.065801620483398
+        ],
+        "vertical_fov": 79.42824310641717,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 11.0,
+        "distance": 11.0,
+        "eye_blender": [
+          5.595810890197754,
+          -8.704594612121582,
+          5.726661682128906
+        ],
+        "vertical_fov": 85.39373418616312,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      }
+    ]
+  },
+  {
+    "choice": "smilingfriends",
+    "viewport": [
+      1280,
+      800
+    ],
+    "fitted_half_blender": [
+      3.0,
+      3.0,
+      1.1961205005645752
+    ],
+    "views": [
+      {
+        "maximum_distance": null,
+        "distance": 20.68031573664196,
+        "eye_blender": [
+          10.520284652709961,
+          -16.364887237548828,
+          9.009644508361816
+        ],
+        "vertical_fov": 42,
+        "center_obstructed": true,
+        "rotated_bounds_corner_obstructions": 32,
+        "hit_blender": [
+          10.20899486541748,
+          -15.880659103393555,
+          8.802118301391602
+        ]
+      },
+      {
+        "maximum_distance": 17.0,
+        "distance": 17.0,
+        "eye_blender": [
+          8.6480712890625,
+          -13.452555656433105,
+          7.761501789093018
+        ],
+        "vertical_fov": 50.662471913347865,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 16.0,
+        "distance": 16.0,
+        "eye_blender": [
+          8.139361381530762,
+          -12.661229133605957,
+          7.422361850738525
+        ],
+        "vertical_fov": 53.65434224922845,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 15.0,
+        "distance": 15.0,
+        "eye_blender": [
+          7.630651473999023,
+          -11.869902610778809,
+          7.083221912384033
+        ],
+        "vertical_fov": 57.01218155339343,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 14.0,
+        "distance": 14.0,
+        "eye_blender": [
+          7.121941089630127,
+          -11.078575134277344,
+          6.744081497192383
+        ],
+        "vertical_fov": 60.806123024029695,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 13.0,
+        "distance": 13.0,
+        "eye_blender": [
+          6.613231182098389,
+          -10.287248611450195,
+          6.404941558837891
+        ],
+        "vertical_fov": 65.12538665265238,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 12.0,
+        "distance": 12.0,
+        "eye_blender": [
+          6.104520797729492,
+          -9.495922088623047,
+          6.065801620483398
+        ],
+        "vertical_fov": 70.08549297772511,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 11.0,
+        "distance": 11.0,
+        "eye_blender": [
+          5.595810890197754,
+          -8.704594612121582,
+          5.726661682128906
+        ],
+        "vertical_fov": 75.83939554934754,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      }
+    ]
+  },
+  {
+    "choice": "smilingfriends",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "fitted_half_blender": [
+      3.0,
+      3.0,
+      1.1961205005645752
+    ],
+    "views": [
+      {
+        "maximum_distance": null,
+        "distance": 17.96955164133016,
+        "eye_blender": [
+          9.141291618347168,
+          -14.21978759765625,
+          8.090314865112305
+        ],
+        "vertical_fov": 42,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 17.0,
+        "distance": 17.0,
+        "eye_blender": [
+          8.6480712890625,
+          -13.452555656433105,
+          7.761501789093018
+        ],
+        "vertical_fov": 44.348220166370524,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 16.0,
+        "distance": 16.0,
+        "eye_blender": [
+          8.139361381530762,
+          -12.661229133605957,
+          7.422361850738525
+        ],
+        "vertical_fov": 47.059801659468576,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 15.0,
+        "distance": 15.0,
+        "eye_blender": [
+          7.630651473999023,
+          -11.869902610778809,
+          7.083221912384033
+        ],
+        "vertical_fov": 50.12170030641134,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 14.0,
+        "distance": 14.0,
+        "eye_blender": [
+          7.121941089630127,
+          -11.078575134277344,
+          6.744081497192383
+        ],
+        "vertical_fov": 53.606291814114606,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 13.0,
+        "distance": 13.0,
+        "eye_blender": [
+          6.613231182098389,
+          -10.287248611450195,
+          6.404941558837891
+        ],
+        "vertical_fov": 57.607546509312954,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 12.0,
+        "distance": 12.0,
+        "eye_blender": [
+          6.104520797729492,
+          -9.495922088623047,
+          6.065801620483398
+        ],
+        "vertical_fov": 62.24999512595777,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 11.0,
+        "distance": 11.0,
+        "eye_blender": [
+          5.595810890197754,
+          -8.704594612121582,
+          5.726661682128906
+        ],
+        "vertical_fov": 67.70289001422168,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      }
+    ]
+  },
+  {
+    "choice": "minecraft",
+    "viewport": [
+      960,
+      640
+    ],
+    "fitted_half_blender": [
+      1.293532371520996,
+      3.0,
+      2.388059616088867
+    ],
+    "views": [
+      {
+        "maximum_distance": null,
+        "distance": 22.314172502549017,
+        "eye_blender": [
+          11.351445198059082,
+          -17.65780258178711,
+          10.75568962097168
+        ],
+        "vertical_fov": 42,
+        "center_obstructed": true,
+        "rotated_bounds_corner_obstructions": 32,
+        "hit_blender": [
+          10.208995819091797,
+          -15.880658149719238,
+          9.994056701660156
+        ]
+      },
+      {
+        "maximum_distance": 17.0,
+        "distance": 17.0,
+        "eye_blender": [
+          8.6480712890625,
+          -13.452555656433105,
+          8.95344066619873
+        ],
+        "vertical_fov": 54.16000898073667,
+        "center_obstructed": true,
+        "rotated_bounds_corner_obstructions": 27,
+        "hit_blender": [
+          8.595876693725586,
+          -13.371363639831543,
+          8.918643951416016
+        ]
+      },
+      {
+        "maximum_distance": 16.0,
+        "distance": 16.0,
+        "eye_blender": [
+          8.139361381530762,
+          -12.661229133605957,
+          8.614300727844238
+        ],
+        "vertical_fov": 57.24576764576844,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 15.0,
+        "distance": 15.0,
+        "eye_blender": [
+          7.630651473999023,
+          -11.869902610778809,
+          8.275160789489746
+        ],
+        "vertical_fov": 60.68760981662709,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 14.0,
+        "distance": 14.0,
+        "eye_blender": [
+          7.121941089630127,
+          -11.078575134277344,
+          7.936020851135254
+        ],
+        "vertical_fov": 64.54817251593298,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 13.0,
+        "distance": 13.0,
+        "eye_blender": [
+          6.613231182098389,
+          -10.287248611450195,
+          7.596880912780762
+        ],
+        "vertical_fov": 68.90525443253284,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 12.0,
+        "distance": 12.0,
+        "eye_blender": [
+          6.104520797729492,
+          -9.495922088623047,
+          7.2577409744262695
+        ],
+        "vertical_fov": 73.85678582323892,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 11.0,
+        "distance": 11.0,
+        "eye_blender": [
+          5.595810890197754,
+          -8.704594612121582,
+          6.918600559234619
+        ],
+        "vertical_fov": 79.52816659385955,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      }
+    ]
+  },
+  {
+    "choice": "minecraft",
+    "viewport": [
+      1280,
+      800
+    ],
+    "fitted_half_blender": [
+      1.293532371520996,
+      3.0,
+      2.388059616088867
+    ],
+    "views": [
+      {
+        "maximum_distance": null,
+        "distance": 18.98530318727699,
+        "eye_blender": [
+          9.658015251159668,
+          -15.023580551147461,
+          9.626737594604492
+        ],
+        "vertical_fov": 42,
+        "center_obstructed": true,
+        "rotated_bounds_corner_obstructions": 22,
+        "hit_blender": [
+          8.595874786376953,
+          -13.371360778808594,
+          8.918643951416016
+        ]
+      },
+      {
+        "maximum_distance": 17.0,
+        "distance": 17.0,
+        "eye_blender": [
+          8.6480712890625,
+          -13.452555656433105,
+          8.95344066619873
+        ],
+        "vertical_fov": 46.69864000051283,
+        "center_obstructed": true,
+        "rotated_bounds_corner_obstructions": 27,
+        "hit_blender": [
+          8.595876693725586,
+          -13.371363639831543,
+          8.918643951416016
+        ]
+      },
+      {
+        "maximum_distance": 16.0,
+        "distance": 16.0,
+        "eye_blender": [
+          8.139361381530762,
+          -12.661229133605957,
+          8.614300727844238
+        ],
+        "vertical_fov": 49.47823487245038,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 15.0,
+        "distance": 15.0,
+        "eye_blender": [
+          7.630651473999023,
+          -11.869902610778809,
+          8.275160789489746
+        ],
+        "vertical_fov": 52.60152881878035,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 14.0,
+        "distance": 14.0,
+        "eye_blender": [
+          7.121941089630127,
+          -11.078575134277344,
+          7.936020851135254
+        ],
+        "vertical_fov": 56.135123495534124,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 13.0,
+        "distance": 13.0,
+        "eye_blender": [
+          6.613231182098389,
+          -10.287248611450195,
+          7.596880912780762
+        ],
+        "vertical_fov": 60.16383357171037,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 12.0,
+        "distance": 12.0,
+        "eye_blender": [
+          6.104520797729492,
+          -9.495922088623047,
+          7.2577409744262695
+        ],
+        "vertical_fov": 64.79746503788466,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 11.0,
+        "distance": 11.0,
+        "eye_blender": [
+          5.595810890197754,
+          -8.704594612121582,
+          6.918600559234619
+        ],
+        "vertical_fov": 70.18107678073851,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      }
+    ]
+  },
+  {
+    "choice": "minecraft",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "fitted_half_blender": [
+      1.293532371520996,
+      3.0,
+      2.388059616088867
+    ],
+    "views": [
+      {
+        "maximum_distance": null,
+        "distance": 16.496720378674482,
+        "eye_blender": [
+          8.392048835754395,
+          -13.054298400878906,
+          8.782758712768555
+        ],
+        "vertical_fov": 42,
+        "center_obstructed": true,
+        "rotated_bounds_corner_obstructions": 32,
+        "hit_blender": [
+          8.361166000366211,
+          -13.006258010864258,
+          8.76216983795166
+        ]
+      },
+      {
+        "maximum_distance": 17.0,
+        "distance": 16.496720378674482,
+        "eye_blender": [
+          8.392048835754395,
+          -13.054298400878906,
+          8.782758712768555
+        ],
+        "vertical_fov": 42,
+        "center_obstructed": true,
+        "rotated_bounds_corner_obstructions": 32,
+        "hit_blender": [
+          8.361166000366211,
+          -13.006258010864258,
+          8.76216983795166
+        ]
+      },
+      {
+        "maximum_distance": 16.0,
+        "distance": 16.0,
+        "eye_blender": [
+          8.139361381530762,
+          -12.661229133605957,
+          8.614300727844238
+        ],
+        "vertical_fov": 43.27906659541397,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 15.0,
+        "distance": 15.0,
+        "eye_blender": [
+          7.630651473999023,
+          -11.869902610778809,
+          8.275160789489746
+        ],
+        "vertical_fov": 46.10387907789408,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 14.0,
+        "distance": 14.0,
+        "eye_blender": [
+          7.121941089630127,
+          -11.078575134277344,
+          7.936020851135254
+        ],
+        "vertical_fov": 49.31998220168926,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 13.0,
+        "distance": 13.0,
+        "eye_blender": [
+          6.613231182098389,
+          -10.287248611450195,
+          7.596880912780762
+        ],
+        "vertical_fov": 53.01444469406091,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 12.0,
+        "distance": 12.0,
+        "eye_blender": [
+          6.104520797729492,
+          -9.495922088623047,
+          7.2577409744262695
+        ],
+        "vertical_fov": 57.30244637399127,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 11.0,
+        "distance": 11.0,
+        "eye_blender": [
+          5.595810890197754,
+          -8.704594612121582,
+          6.918600559234619
+        ],
+        "vertical_fov": 62.3399756533589,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      }
+    ]
+  },
+  {
+    "choice": "regularshow",
+    "viewport": [
+      960,
+      640
+    ],
+    "fitted_half_blender": [
+      3.0,
+      1.9004735946655273,
+      2.018994092941284
+    ],
+    "views": [
+      {
+        "maximum_distance": null,
+        "distance": 22.525792309979703,
+        "eye_blender": [
+          11.459097862243652,
+          -17.82526397705078,
+          10.458393096923828
+        ],
+        "vertical_fov": 42,
+        "center_obstructed": true,
+        "rotated_bounds_corner_obstructions": 32,
+        "hit_blender": [
+          10.20899486541748,
+          -15.880659103393555,
+          9.624990463256836
+        ]
+      },
+      {
+        "maximum_distance": 17.0,
+        "distance": 17.0,
+        "eye_blender": [
+          8.6480712890625,
+          -13.452555656433105,
+          8.584375381469727
+        ],
+        "vertical_fov": 54.631152841194094,
+        "center_obstructed": true,
+        "rotated_bounds_corner_obstructions": 32,
+        "hit_blender": [
+          8.54692268371582,
+          -13.295212745666504,
+          8.516942977905273
+        ]
+      },
+      {
+        "maximum_distance": 16.0,
+        "distance": 16.0,
+        "eye_blender": [
+          8.139361381530762,
+          -12.661229133605957,
+          8.245235443115234
+        ],
+        "vertical_fov": 57.73899424372251,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 15.0,
+        "distance": 15.0,
+        "eye_blender": [
+          7.630651473999023,
+          -11.869902610778809,
+          7.906095504760742
+        ],
+        "vertical_fov": 61.20467889541797,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 14.0,
+        "distance": 14.0,
+        "eye_blender": [
+          7.121941089630127,
+          -11.078575134277344,
+          7.566955089569092
+        ],
+        "vertical_fov": 65.09099338296495,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 13.0,
+        "distance": 13.0,
+        "eye_blender": [
+          6.613231182098389,
+          -10.287248611450195,
+          7.2278151512146
+        ],
+        "vertical_fov": 69.47589458308731,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 12.0,
+        "distance": 12.0,
+        "eye_blender": [
+          6.104520797729492,
+          -9.495922088623047,
+          6.888675212860107
+        ],
+        "vertical_fov": 74.45749087356693,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 11.0,
+        "distance": 11.0,
+        "eye_blender": [
+          5.595810890197754,
+          -8.704594612121582,
+          6.549534797668457
+        ],
+        "vertical_fov": 80.16141912014223,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      }
+    ]
+  },
+  {
+    "choice": "regularshow",
+    "viewport": [
+      1280,
+      800
+    ],
+    "fitted_half_blender": [
+      3.0,
+      1.9004735946655273,
+      2.018994092941284
+    ],
+    "views": [
+      {
+        "maximum_distance": null,
+        "distance": 19.165353162423763,
+        "eye_blender": [
+          9.749608993530273,
+          -15.166058540344238,
+          9.318733215332031
+        ],
+        "vertical_fov": 42,
+        "center_obstructed": true,
+        "rotated_bounds_corner_obstructions": 26,
+        "hit_blender": [
+          8.890077590942383,
+          -13.829009056091309,
+          8.745712280273438
+        ]
+      },
+      {
+        "maximum_distance": 17.0,
+        "distance": 17.0,
+        "eye_blender": [
+          8.6480712890625,
+          -13.452555656433105,
+          8.584375381469727
+        ],
+        "vertical_fov": 47.1218197286422,
+        "center_obstructed": true,
+        "rotated_bounds_corner_obstructions": 32,
+        "hit_blender": [
+          8.54692268371582,
+          -13.295212745666504,
+          8.516942977905273
+        ]
+      },
+      {
+        "maximum_distance": 16.0,
+        "distance": 16.0,
+        "eye_blender": [
+          8.139361381530762,
+          -12.661229133605957,
+          8.245235443115234
+        ],
+        "vertical_fov": 49.92429941966592,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 15.0,
+        "distance": 15.0,
+        "eye_blender": [
+          7.630651473999023,
+          -11.869902610778809,
+          7.906095504760742
+        ],
+        "vertical_fov": 53.07290938730835,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 14.0,
+        "distance": 14.0,
+        "eye_blender": [
+          7.121941089630127,
+          -11.078575134277344,
+          7.566955089569092
+        ],
+        "vertical_fov": 56.634638648247176,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 13.0,
+        "distance": 13.0,
+        "eye_blender": [
+          6.613231182098389,
+          -10.287248611450195,
+          7.2278151512146
+        ],
+        "vertical_fov": 60.694781307729954,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 12.0,
+        "distance": 12.0,
+        "eye_blender": [
+          6.104520797729492,
+          -9.495922088623047,
+          6.888675212860107
+        ],
+        "vertical_fov": 65.36375617315618,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 11.0,
+        "distance": 11.0,
+        "eye_blender": [
+          5.595810890197754,
+          -8.704594612121582,
+          6.549534797668457
+        ],
+        "vertical_fov": 70.78744811562451,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      }
+    ]
+  },
+  {
+    "choice": "regularshow",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "fitted_half_blender": [
+      3.0,
+      1.9004735946655273,
+      2.018994092941284
+    ],
+    "views": [
+      {
+        "maximum_distance": null,
+        "distance": 16.653169504868792,
+        "eye_blender": [
+          8.471635818481445,
+          -13.178099632263184,
+          8.466751098632812
+        ],
+        "vertical_fov": 42,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 17.0,
+        "distance": 16.653169504868792,
+        "eye_blender": [
+          8.471635818481445,
+          -13.178099632263184,
+          8.466751098632812
+        ],
+        "vertical_fov": 42,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 16.0,
+        "distance": 16.0,
+        "eye_blender": [
+          8.139361381530762,
+          -12.661229133605957,
+          8.245235443115234
+        ],
+        "vertical_fov": 43.68151328616798,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 15.0,
+        "distance": 15.0,
+        "eye_blender": [
+          7.630651473999023,
+          -11.869902610778809,
+          7.906095504760742
+        ],
+        "vertical_fov": 46.53164141281359,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 14.0,
+        "distance": 14.0,
+        "eye_blender": [
+          7.121941089630127,
+          -11.078575134277344,
+          7.566955089569092
+        ],
+        "vertical_fov": 49.77641615849396,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 13.0,
+        "distance": 13.0,
+        "eye_blender": [
+          6.613231182098389,
+          -10.287248611450195,
+          7.2278151512146
+        ],
+        "vertical_fov": 53.50363702097339,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 12.0,
+        "distance": 12.0,
+        "eye_blender": [
+          6.104520797729492,
+          -9.495922088623047,
+          6.888675212860107
+        ],
+        "vertical_fov": 57.82946589201465,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 11.0,
+        "distance": 11.0,
+        "eye_blender": [
+          5.595810890197754,
+          -8.704594612121582,
+          6.549534797668457
+        ],
+        "vertical_fov": 62.91126670558934,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      }
+    ]
+  },
+  {
+    "choice": "southpark",
+    "viewport": [
+      960,
+      640
+    ],
+    "fitted_half_blender": [
+      2.471829652786255,
+      2.999999761581421,
+      2.001577138900757
+    ],
+    "views": [
+      {
+        "maximum_distance": null,
+        "distance": 24.1089067078898,
+        "eye_blender": [
+          12.264443397521973,
+          -19.07802391052246,
+          10.977872848510742
+        ],
+        "vertical_fov": 42,
+        "center_obstructed": true,
+        "rotated_bounds_corner_obstructions": 32,
+        "hit_blender": [
+          10.208993911743164,
+          -15.880658149719238,
+          9.607573509216309
+        ]
+      },
+      {
+        "maximum_distance": 17.0,
+        "distance": 17.0,
+        "eye_blender": [
+          8.6480712890625,
+          -13.452555656433105,
+          8.5669584274292
+        ],
+        "vertical_fov": 58.12260425858504,
+        "center_obstructed": true,
+        "rotated_bounds_corner_obstructions": 32,
+        "hit_blender": [
+          8.556368827819824,
+          -13.309907913208008,
+          8.505824089050293
+        ]
+      },
+      {
+        "maximum_distance": 16.0,
+        "distance": 16.0,
+        "eye_blender": [
+          8.139361381530762,
+          -12.661229133605957,
+          8.227818489074707
+        ],
+        "vertical_fov": 61.39079118368986,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 15.0,
+        "distance": 15.0,
+        "eye_blender": [
+          7.630651473999023,
+          -11.869902610778809,
+          7.888678550720215
+        ],
+        "vertical_fov": 65.02913718183787,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 14.0,
+        "distance": 14.0,
+        "eye_blender": [
+          7.121941089630127,
+          -11.078575134277344,
+          7.5495381355285645
+        ],
+        "vertical_fov": 69.10141741608281,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 13.0,
+        "distance": 13.0,
+        "eye_blender": [
+          6.613231182098389,
+          -10.287248611450195,
+          7.210398197174072
+        ],
+        "vertical_fov": 73.6866594158764,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 12.0,
+        "distance": 12.0,
+        "eye_blender": [
+          6.104520797729492,
+          -9.495922088623047,
+          6.87125825881958
+        ],
+        "vertical_fov": 78.88425967136205,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 11.0,
+        "distance": 11.0,
+        "eye_blender": [
+          5.595810890197754,
+          -8.704594612121582,
+          6.53211784362793
+        ],
+        "vertical_fov": 84.82176601138329,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      }
+    ]
+  },
+  {
+    "choice": "southpark",
+    "viewport": [
+      1280,
+      800
+    ],
+    "fitted_half_blender": [
+      2.471829652786255,
+      2.999999761581421,
+      2.001577138900757
+    ],
+    "views": [
+      {
+        "maximum_distance": null,
+        "distance": 20.512295641291544,
+        "eye_blender": [
+          10.43481159210205,
+          -16.231929779052734,
+          9.758118629455566
+        ],
+        "vertical_fov": 42,
+        "center_obstructed": true,
+        "rotated_bounds_corner_obstructions": 32,
+        "hit_blender": [
+          10.20899486541748,
+          -15.880659103393555,
+          9.607573509216309
+        ]
+      },
+      {
+        "maximum_distance": 17.0,
+        "distance": 17.0,
+        "eye_blender": [
+          8.6480712890625,
+          -13.452555656433105,
+          8.5669584274292
+        ],
+        "vertical_fov": 50.271574245718405,
+        "center_obstructed": true,
+        "rotated_bounds_corner_obstructions": 32,
+        "hit_blender": [
+          8.556368827819824,
+          -13.309907913208008,
+          8.505824089050293
+        ]
+      },
+      {
+        "maximum_distance": 16.0,
+        "distance": 16.0,
+        "eye_blender": [
+          8.139361381530762,
+          -12.661229133605957,
+          8.227818489074707
+        ],
+        "vertical_fov": 53.242718069788104,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 15.0,
+        "distance": 15.0,
+        "eye_blender": [
+          7.630651473999023,
+          -11.869902610778809,
+          7.888678550720215
+        ],
+        "vertical_fov": 56.57768341357358,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 14.0,
+        "distance": 14.0,
+        "eye_blender": [
+          7.121941089630127,
+          -11.078575134277344,
+          7.5495381355285645
+        ],
+        "vertical_fov": 60.34626373411435,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 13.0,
+        "distance": 13.0,
+        "eye_blender": [
+          6.613231182098389,
+          -10.287248611450195,
+          7.210398197174072
+        ],
+        "vertical_fov": 64.637251126095,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 12.0,
+        "distance": 12.0,
+        "eye_blender": [
+          6.104520797729492,
+          -9.495922088623047,
+          6.87125825881958
+        ],
+        "vertical_fov": 69.56560154336917,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 11.0,
+        "distance": 11.0,
+        "eye_blender": [
+          5.595810890197754,
+          -8.704594612121582,
+          6.53211784362793
+        ],
+        "vertical_fov": 75.28346747513332,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      }
+    ]
+  },
+  {
+    "choice": "southpark",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "fitted_half_blender": [
+      2.471829652786255,
+      2.999999761581421,
+      2.001577138900757
+    ],
+    "views": [
+      {
+        "maximum_distance": null,
+        "distance": 17.823555525089493,
+        "eye_blender": [
+          9.067022323608398,
+          -14.104257583618164,
+          8.846259117126465
+        ],
+        "vertical_fov": 42,
+        "center_obstructed": true,
+        "rotated_bounds_corner_obstructions": 32,
+        "hit_blender": [
+          8.890985488891602,
+          -13.830423355102539,
+          8.728901863098145
+        ]
+      },
+      {
+        "maximum_distance": 17.0,
+        "distance": 17.0,
+        "eye_blender": [
+          8.6480712890625,
+          -13.452555656433105,
+          8.5669584274292
+        ],
+        "vertical_fov": 43.995055293193175,
+        "center_obstructed": true,
+        "rotated_bounds_corner_obstructions": 32,
+        "hit_blender": [
+          8.556368827819824,
+          -13.309907913208008,
+          8.505824089050293
+        ]
+      },
+      {
+        "maximum_distance": 16.0,
+        "distance": 16.0,
+        "eye_blender": [
+          8.139361381530762,
+          -12.661229133605957,
+          8.227818489074707
+        ],
+        "vertical_fov": 46.68583108514477,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 15.0,
+        "distance": 15.0,
+        "eye_blender": [
+          7.630651473999023,
+          -11.869902610778809,
+          7.888678550720215
+        ],
+        "vertical_fov": 49.72435008705208,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 14.0,
+        "distance": 14.0,
+        "eye_blender": [
+          7.121941089630127,
+          -11.078575134277344,
+          7.5495381355285645
+        ],
+        "vertical_fov": 53.18246645549569,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 13.0,
+        "distance": 13.0,
+        "eye_blender": [
+          6.613231182098389,
+          -10.287248611450195,
+          7.210398197174072
+        ],
+        "vertical_fov": 57.153462740460284,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 12.0,
+        "distance": 12.0,
+        "eye_blender": [
+          6.104520797729492,
+          -9.495922088623047,
+          6.87125825881958
+        ],
+        "vertical_fov": 61.760929450938164,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      },
+      {
+        "maximum_distance": 11.0,
+        "distance": 11.0,
+        "eye_blender": [
+          5.595810890197754,
+          -8.704594612121582,
+          6.53211784362793
+        ],
+        "vertical_fov": 67.17276713136313,
+        "center_obstructed": false,
+        "rotated_bounds_corner_obstructions": 0,
+        "hit_blender": null
+      }
+    ]
+  }
+]

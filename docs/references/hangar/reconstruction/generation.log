@@ -1,0 +1,114 @@
+00:00.015  color_management | Using config from OCIO: "C:\Documentos\Pat\uvg\6to Semestre\Graficas\blender-5.4.0-alpha+main.16a7f36b710d-windows.amd64-release\blender-5.4.0-alpha+main.16a7f36b710d-windows.amd64-release\5.4\datafiles\colormanagement\config.ocio"
+00:00.484  blend            | Read blend: "C:\Documentos\Pat\uvg\6to Semestre\Graficas\proyecto final\Planet-Hoppers\assets\models\environment\spaceStation\citadel_space_station.blend"
+00:00.875  cycles           | WARNING HIPEW initialization failed: Error opening HIP dynamic library
+C:\Documentos\Pat\uvg\6to Semestre\Graficas\proyecto final\Planet-Hoppers\tools\blender\spaceStation\reconstruct_hangar.py:41: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  'materials':{m.name:matinfo(m) for m in bpy.data.materials if m.use_nodes}}
+00:07.328  render           | Saved: 'C:\Documentos\Pat\uvg\6to Semestre\Graficas\proyecto final\Planet-Hoppers\docs\references\hangar\reconstruction\01-original-general.png'
+RENDERED 01-original-general.png
+00:12.375  render           | Saved: 'C:\Documentos\Pat\uvg\6to Semestre\Graficas\proyecto final\Planet-Hoppers\docs\references\hangar\reconstruction\02-original-presidium.png'
+RENDERED 02-original-presidium.png
+00:18.140  render           | Saved: 'C:\Documentos\Pat\uvg\6to Semestre\Graficas\proyecto final\Planet-Hoppers\docs\references\hangar\reconstruction\03-original-districts.png'
+RENDERED 03-original-districts.png
+08:25:23 | INFO: Data are loaded, start creating Blender stuff
+08:25:23 | INFO: Blender create Mesh node CASCO PILOTO | Auricular beskar 1.001
+08:25:23 | INFO: Blender create Mesh node CASCO PILOTO | Auricular beskar -1.001
+08:25:23 | INFO: Blender create Mesh node CASCO PILOTO | Borde y cresta central.001
+08:25:23 | INFO: Blender create Mesh node CASCO PILOTO | Carrilleras angulares.001
+08:25:23 | INFO: Blender create Mesh node CASCO PILOTO | Casco envolvente.001
+08:25:23 | INFO: Blender create Mesh node CASCO PILOTO | Cupula beskar.001
+08:25:23 | INFO: Blender create Mesh node CASCO PILOTO | Rejillas laterales.001
+08:25:23 | INFO: Blender create Mesh node CASCO PILOTO | Visor negro en T.001
+08:25:23 | INFO: Blender create Mesh node PILOTO | Bandolera de cuero.001
+08:25:23 | INFO: Blender create Mesh node PILOTO | Capa recogida.001
+08:25:23 | INFO: Blender create Mesh node PILOTO | Cartucheras y herrajes.001
+08:25:23 | INFO: Blender create Mesh node PILOTO | Coraza hombreras y brazales beskar.001
+08:25:23 | INFO: Blender create Mesh node PILOTO | Guantes y botas.001
+08:25:23 | INFO: Blender create Mesh node PILOTO | Traje de Din Djarin.001
+08:25:23 | INFO: Blender create Mesh node GROGU POD | Aro de cierre.001
+08:25:23 | INFO: Blender create Mesh node GROGU POD | Asiento interior.001
+08:25:23 | INFO: Blender create Mesh node GROGU POD | Base metalica de subcabina.001
+08:25:23 | INFO: Blender create Mesh node GROGU POD | Cristal de subcabina.001
+08:25:23 | INFO: Blender create Mesh node GROGU | Cuello de lana doblado.001
+08:25:23 | INFO: Blender create Mesh node GROGU | Ojos negros y boca.001
+08:25:23 | INFO: Blender create Mesh node GROGU | Orejas largas e interior rosado.001
+08:25:23 | INFO: Blender create Mesh node GROGU | Parpados arrugas y pliegues.001
+08:25:23 | INFO: Blender create Mesh node GROGU | Pelo fino de la coronilla.001
+08:25:23 | INFO: Blender create Mesh node GROGU | Piel cabeza nariz y manos.001
+08:25:23 | INFO: Blender create Mesh node GROGU | Tunica marron.001
+08:25:23 | INFO: Blender create Mesh node N1 | Arcos metalicos de cabina.001
+08:25:23 | INFO: Blender create Mesh node N1 | Cristal transparente de cabina.001
+08:25:23 | INFO: Blender create Mesh node MOD MOTOR babor | Anillos y largueros.001
+08:25:23 | INFO: Blender create Mesh node MOD MOTOR babor | Aro ionico azul.001
+08:25:23 | INFO: Blender create Mesh node MOD MOTOR babor | Nucleo mecanico.001
+08:25:23 | INFO: Blender create Mesh node MOD MOTOR babor | Paneles abiertos y aguja.001
+08:25:23 | INFO: Blender create Mesh node MOD MOTOR babor | Tobera posterior.001
+08:25:23 | INFO: Blender create Mesh node MOD MOTOR babor | Tuberias y cableado.001
+08:25:23 | INFO: Blender create Mesh node MOD MOTOR babor | Turbina frontal.001
+08:25:23 | INFO: Blender create Mesh node MOD MOTOR estribor | Anillos y largueros.001
+08:25:23 | INFO: Blender create Mesh node MOD MOTOR estribor | Aro ionico azul.001
+08:25:23 | INFO: Blender create Mesh node MOD MOTOR estribor | Nucleo mecanico.001
+08:25:23 | INFO: Blender create Mesh node MOD MOTOR estribor | Paneles abiertos y aguja.001
+08:25:23 | INFO: Blender create Mesh node MOD MOTOR estribor | Tobera posterior.001
+08:25:23 | INFO: Blender create Mesh node MOD MOTOR estribor | Tuberias y cableado.001
+08:25:23 | INFO: Blender create Mesh node MOD MOTOR estribor | Turbina frontal.001
+08:25:23 | INFO: Blender create Mesh node MOD | Acelerador central inferior.001
+08:25:23 | INFO: Blender create Mesh node MOD | Conductos y cableado.001
+08:25:23 | INFO: Blender create Mesh node MOD | Desgaste y soldaduras.001
+08:25:23 | INFO: Blender create Mesh node MOD | Espina posterior sin carenado.001
+08:25:23 | INFO: Blender create Mesh node MOD | Parches y pintura restante.001
+08:25:23 | INFO: Blender create Mesh node MOD | Rejilla lateral 1 0.001
+08:25:23 | INFO: Blender create Mesh node MOD | Rejilla lateral 1 1.001
+08:25:23 | INFO: Blender create Mesh node MOD | Rejilla lateral 1 2.001
+08:25:23 | INFO: Blender create Mesh node MOD | Rejilla lateral 1 3.001
+08:25:23 | INFO: Blender create Mesh node MOD | Rejilla lateral 1 4.001
+08:25:23 | INFO: Blender create Mesh node MOD | Rejilla lateral 1 5.001
+08:25:23 | INFO: Blender create Mesh node MOD | Rejilla lateral 1 6.001
+08:25:23 | INFO: Blender create Mesh node MOD | Rejilla lateral 1 7.001
+08:25:23 | INFO: Blender create Mesh node MOD | Rejilla lateral 1 8.001
+08:25:23 | INFO: Blender create Mesh node MOD | Rejilla lateral -1 0.001
+08:25:23 | INFO: Blender create Mesh node MOD | Rejilla lateral -1 1.001
+08:25:23 | INFO: Blender create Mesh node MOD | Rejilla lateral -1 2.001
+08:25:23 | INFO: Blender create Mesh node MOD | Rejilla lateral -1 3.001
+08:25:23 | INFO: Blender create Mesh node MOD | Rejilla lateral -1 4.001
+08:25:23 | INFO: Blender create Mesh node MOD | Rejilla lateral -1 5.001
+08:25:23 | INFO: Blender create Mesh node MOD | Rejilla lateral -1 6.001
+08:25:23 | INFO: Blender create Mesh node MOD | Rejilla lateral -1 7.001
+08:25:23 | INFO: Blender create Mesh node MOD | Rejilla lateral -1 8.001
+08:25:23 | INFO: Blender create Mesh node N1 | Ala babor.001
+08:25:23 | INFO: Blender create Mesh node N1 | Ala estribor.001
+08:25:23 | INFO: Blender create Mesh node N1 | Asiento del piloto.001
+08:25:23 | INFO: Blender create Mesh node N1 | Banera interior de cabina.001
+08:25:23 | INFO: Blender create Mesh node N1 | Botones y mandos.001
+08:25:23 | INFO: Blender create Mesh node N1 | Canones y rejillas.001
+08:25:23 | INFO: Blender create Mesh node N1 | Consola de instrumentos.001
+08:25:23 | INFO: Blender create Mesh node N1 | Consola lateral 1.001
+08:25:23 | INFO: Blender create Mesh node N1 | Consola lateral -1.001
+08:25:23 | INFO: Blender create Mesh node N1 | Fuselaje amarillo y proa cromada.001
+08:25:23 | INFO: Blender create Mesh node N1 | Juntas del casco.001
+08:25:23 | INFO: Blender create Mesh node N1 | Lineas del ala babor.001
+08:25:23 | INFO: Blender create Mesh node N1 | Lineas del ala estribor.001
+08:25:23 | INFO: Blender create Mesh node N1 | Marco amarillo de cabina.001
+08:25:23 | INFO: Blender create Mesh node N1 | Pantalla principal.001
+08:25:23 | INFO: Blender create Mesh node N1 | Respaldo y reposacabezas.001
+08:25:23 | INFO: Blender create Mesh node N1 | Terminales y remaches.001
+08:25:23 | INFO: glTF import finished in 0.56s
+Info: No new files have been packed
+Info: Saved as "citadel_hangar_reconstructed.blend"
+MODEL_SAVED C:\Documentos\Pat\uvg\6to Semestre\Graficas\proyecto final\Planet-Hoppers\assets\models\environment\spaceStation\citadel_hangar_reconstructed.blend
+00:26.640  render           | Saved: 'C:\Documentos\Pat\uvg\6to Semestre\Graficas\proyecto final\Planet-Hoppers\docs\references\hangar\reconstruction\04-game-camera.png'
+RENDERED 04-game-camera.png
+00:33.078  render           | Saved: 'C:\Documentos\Pat\uvg\6to Semestre\Graficas\proyecto final\Planet-Hoppers\docs\references\hangar\reconstruction\05-interior-general.png'
+RENDERED 05-interior-general.png
+00:39.687  render           | Saved: 'C:\Documentos\Pat\uvg\6to Semestre\Graficas\proyecto final\Planet-Hoppers\docs\references\hangar\reconstruction\06-lateral.png'
+RENDERED 06-lateral.png
+00:46.109  render           | Saved: 'C:\Documentos\Pat\uvg\6to Semestre\Graficas\proyecto final\Planet-Hoppers\docs\references\hangar\reconstruction\07-roof.png'
+RENDERED 07-roof.png
+00:52.359  render           | Saved: 'C:\Documentos\Pat\uvg\6to Semestre\Graficas\proyecto final\Planet-Hoppers\docs\references\hangar\reconstruction\08-exit.png'
+RENDERED 08-exit.png
+00:56.828  render           | Saved: 'C:\Documentos\Pat\uvg\6to Semestre\Graficas\proyecto final\Planet-Hoppers\docs\references\hangar\reconstruction\09-architecture.png'
+RENDERED 09-architecture.png
+Info: Saved as "citadel_hangar_reconstructed.blend"
+RECONSTRUCTION_RENDER_COMPLETE
+Blender 5.4.0 Alpha (hash 16a7f36b710d built 2026-10-08 12:07:46)
+
+Blender quit

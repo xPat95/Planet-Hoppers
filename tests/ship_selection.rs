@@ -160,11 +160,39 @@ fn exhibition_camera_fits_rotating_bounds_between_header_and_footer() {
         ] {
             let center = Vector3::new(0.0, 4.0, 0.0);
             let camera = settings.camera(center, half, viewport, Vector2::new(151.0, 156.0));
-            let angular_radius = (half.length() / (camera.position - center).length()).asin();
-            let available = ((settings.fov.to_radians() * 0.5).tan() * (viewport.y - 307.0)
-                / viewport.y)
-                .atan();
-            assert!(angular_radius < available);
+            assert_eq!(camera.position, settings.position);
+            assert_eq!(camera.target, settings.target);
+            assert!(camera.fovy >= settings.fov);
+            let forward = (camera.target - camera.position).normalized();
+            let right = forward.cross(Vector3::up()).normalized();
+            let up = right.cross(forward).normalized();
+            let tangent = (camera.fovy.to_radians() * 0.5).tan();
+            for step in 0..8 {
+                let angle = step as f32 * std::f32::consts::TAU / 8.0;
+                for sx in [-1.0, 1.0] {
+                    for sy in [-1.0, 1.0] {
+                        for sz in [-1.0, 1.0] {
+                            let (x, z) = (sx * half.x, sz * half.z);
+                            let point = center
+                                + Vector3::new(
+                                    x * angle.cos() - z * angle.sin(),
+                                    sy * half.y,
+                                    x * angle.sin() + z * angle.cos(),
+                                );
+                            let delta = point - camera.position;
+                            let depth = delta.dot(forward);
+                            assert!(depth > 0.0);
+                            let ndc_x =
+                                delta.dot(right) / (depth * tangent * viewport.x / viewport.y);
+                            let ndc_y = delta.dot(up) / (depth * tangent);
+                            let x = (ndc_x + 1.0) * viewport.x * 0.5;
+                            let y = (1.0 - ndc_y) * viewport.y * 0.5;
+                            assert!((90.0..=viewport.x - 90.0).contains(&x));
+                            assert!((151.0..=viewport.y - 156.0).contains(&y));
+                        }
+                    }
+                }
+            }
         }
     }
 }

@@ -1,0 +1,380 @@
+[
+  {
+    "ship": "halloween",
+    "viewport": [
+      960,
+      640
+    ],
+    "eye_blender": [
+      10.800000190734863,
+      -12.600000381469727,
+      7.199999809265137
+    ],
+    "target_blender": [
+      0.0,
+      5.5,
+      4.800000190734863
+    ],
+    "fov_y": 84.43863741605027,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "halloween",
+    "viewport": [
+      1280,
+      800
+    ],
+    "eye_blender": [
+      10.800000190734863,
+      -12.600000381469727,
+      7.199999809265137
+    ],
+    "target_blender": [
+      0.0,
+      5.5,
+      4.800000190734863
+    ],
+    "fov_y": 74.63875670820963,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "halloween",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "eye_blender": [
+      10.800000190734863,
+      -12.600000381469727,
+      7.199999809265137
+    ],
+    "target_blender": [
+      0.0,
+      5.5,
+      4.800000190734863
+    ],
+    "fov_y": 70.0,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "starwars",
+    "viewport": [
+      960,
+      640
+    ],
+    "eye_blender": [
+      10.800000190734863,
+      -12.600000381469727,
+      7.199999809265137
+    ],
+    "target_blender": [
+      0.0,
+      5.5,
+      4.800000190734863
+    ],
+    "fov_y": 79.46107797691579,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "starwars",
+    "viewport": [
+      1280,
+      800
+    ],
+    "eye_blender": [
+      10.800000190734863,
+      -12.600000381469727,
+      7.199999809265137
+    ],
+    "target_blender": [
+      0.0,
+      5.5,
+      4.800000190734863
+    ],
+    "fov_y": 70.0,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "starwars",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "eye_blender": [
+      10.800000190734863,
+      -12.600000381469727,
+      7.199999809265137
+    ],
+    "target_blender": [
+      0.0,
+      5.5,
+      4.800000190734863
+    ],
+    "fov_y": 70.0,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "smilingfriends",
+    "viewport": [
+      960,
+      640
+    ],
+    "eye_blender": [
+      10.800000190734863,
+      -12.600000381469727,
+      7.199999809265137
+    ],
+    "target_blender": [
+      0.0,
+      5.5,
+      4.800000190734863
+    ],
+    "fov_y": 80.15515438044396,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "smilingfriends",
+    "viewport": [
+      1280,
+      800
+    ],
+    "eye_blender": [
+      10.800000190734863,
+      -12.600000381469727,
+      7.199999809265137
+    ],
+    "target_blender": [
+      0.0,
+      5.5,
+      4.800000190734863
+    ],
+    "fov_y": 70.51465892916595,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "smilingfriends",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "eye_blender": [
+      10.800000190734863,
+      -12.600000381469727,
+      7.199999809265137
+    ],
+    "target_blender": [
+      0.0,
+      5.5,
+      4.800000190734863
+    ],
+    "fov_y": 70.0,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "minecraft",
+    "viewport": [
+      960,
+      640
+    ],
+    "eye_blender": [
+      10.800000190734863,
+      -12.600000381469727,
+      7.199999809265137
+    ],
+    "target_blender": [
+      0.0,
+      5.5,
+      4.800000190734863
+    ],
+    "fov_y": 81.13055028929685,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "minecraft",
+    "viewport": [
+      1280,
+      800
+    ],
+    "eye_blender": [
+      10.800000190734863,
+      -12.600000381469727,
+      7.199999809265137
+    ],
+    "target_blender": [
+      0.0,
+      5.5,
+      4.800000190734863
+    ],
+    "fov_y": 71.44924851343445,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "minecraft",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "eye_blender": [
+      10.800000190734863,
+      -12.600000381469727,
+      7.199999809265137
+    ],
+    "target_blender": [
+      0.0,
+      5.5,
+      4.800000190734863
+    ],
+    "fov_y": 70.0,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "regularshow",
+    "viewport": [
+      960,
+      640
+    ],
+    "eye_blender": [
+      10.800000190734863,
+      -12.600000381469727,
+      7.199999809265137
+    ],
+    "target_blender": [
+      0.0,
+      5.5,
+      4.800000190734863
+    ],
+    "fov_y": 80.8302324270035,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "regularshow",
+    "viewport": [
+      1280,
+      800
+    ],
+    "eye_blender": [
+      10.800000190734863,
+      -12.600000381469727,
+      7.199999809265137
+    ],
+    "target_blender": [
+      0.0,
+      5.5,
+      4.800000190734863
+    ],
+    "fov_y": 71.16121396327907,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "regularshow",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "eye_blender": [
+      10.800000190734863,
+      -12.600000381469727,
+      7.199999809265137
+    ],
+    "target_blender": [
+      0.0,
+      5.5,
+      4.800000190734863
+    ],
+    "fov_y": 70.0,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "southpark",
+    "viewport": [
+      960,
+      640
+    ],
+    "eye_blender": [
+      10.800000190734863,
+      -12.600000381469727,
+      7.199999809265137
+    ],
+    "target_blender": [
+      0.0,
+      5.5,
+      4.800000190734863
+    ],
+    "fov_y": 80.81602383976806,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "southpark",
+    "viewport": [
+      1280,
+      800
+    ],
+    "eye_blender": [
+      10.800000190734863,
+      -12.600000381469727,
+      7.199999809265137
+    ],
+    "target_blender": [
+      0.0,
+      5.5,
+      4.800000190734863
+    ],
+    "fov_y": 71.14759272086174,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  },
+  {
+    "ship": "southpark",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "eye_blender": [
+      10.800000190734863,
+      -12.600000381469727,
+      7.199999809265137
+    ],
+    "target_blender": [
+      0.0,
+      5.5,
+      4.800000190734863
+    ],
+    "fov_y": 70.0,
+    "center_obstructed": false,
+    "rotating_corner_obstructions": 0,
+    "hud_errors": 0
+  }
+]

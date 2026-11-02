@@ -1,0 +1,73 @@
+{
+  "source_sha256": "1791b9c614b915490c205cb1e675b62c09d80f3d0669bbbca2ef185670b29fe9",
+  "source_unchanged": true,
+  "ship_unchanged": true,
+  "architecture_objects": 241,
+  "architecture_polygons": 61474,
+  "reused_objects": 23,
+  "reused_source_polygons": 59002,
+  "platform": {
+    "center_game": [
+      0,
+      0,
+      0
+    ],
+    "radius": 4.5,
+    "base_max_radius": 4.7,
+    "top": 0.8,
+    "no_export": true
+  },
+  "clearance": {
+    "conservative_radius": 4.8,
+    "height": 6.9,
+    "surface_intersections": [],
+    "interior_vertices": [],
+    "ship_bound": "Fit::Length(6): half extents <=3, yaw radius<=sqrt(18), top<=6.8"
+  },
+  "camera": {
+    "viewport": [
+      1280,
+      800
+    ],
+    "hud": [
+      151,
+      156
+    ],
+    "eye_blender": [
+      8.204826354980469,
+      -12.76306438446045,
+      6.629474639892578
+    ],
+    "target_blender": [
+      0.0,
+      0.0,
+      1.1595896482467651
+    ],
+    "vertical_fov": 42,
+    "distance": 16.128688093416294,
+    "ship": "starwars_mandalorian",
+    "half_extents_blender": [
+      1.6399590969085693,
+      3.0,
+      0.3595896065235138
+    ]
+  },
+  "external_libraries": [],
+  "images": [],
+  "export_collections": [
+    "01 | Componentes originales reutilizados",
+    "02 | Componentes adaptados - arquitectura principal",
+    "03 | Conexiones y suelo nuevo",
+    "04 | Detalles mecanicos originales"
+  ],
+  "non_export_collections": [
+    "90 | NO EXPORTAR - plataforma y nave",
+    "91 | NO EXPORTAR - iluminacion de presentacion",
+    "92 | NO EXPORTAR - camaras"
+  ],
+  "notes": [
+    "Area lights and AgX are presentation only, not verified in raylib.",
+    "No GLB exported; future export must select architecture only.",
+    "Changed architectural dimensions need future dock review; Rust and config untouched."
+  ]
+}
