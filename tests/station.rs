@@ -27,7 +27,7 @@ fn station_is_fixed_above_every_orbit_and_sun_with_a_safe_entry_anchor() {
             assert!((p.position() - initial).length() > station.collision_radius + p.config.radius);
         }
     }
-    assert!(station.in_reach(station.departure()));
+    assert!(station.in_reach(station.dock_target()));
     assert!(!station.in_reach(station.approach()));
     assert!(station
         .push_out(station.approach(), station.approach(), ships.flight.radius)
@@ -124,7 +124,7 @@ fn shared_autopilot_reaches_the_station_safely_in_normal_and_turbo_flight() {
 }
 
 #[test]
-fn dock_and_departure_follow_translation_rotation_and_fitted_scale() {
+fn docking_waypoint_follows_translation_rotation_and_fitted_scale() {
     let (mut station, _, ships) = setup();
     for angles in [[0.0, -90.0, 0.0], [22.0, 37.0, 13.0], [0.0, 180.0, 0.0]] {
         station.rotation_degrees = angles;
@@ -138,26 +138,28 @@ fn dock_and_departure_follow_translation_rotation_and_fitted_scale() {
             .transform_with(station.rotation())
                 * station.length;
         assert!((expected - station.exit_position()).length() < 0.001);
-        let offset = station.departure() - station.exit_position();
+        let offset = station.dock_target() - station.exit_position();
         assert!((offset.length() - station.dock.departure_clearance).abs() < 0.001);
         assert!(offset.normalized().dot(station.exit_forward()) > 0.999);
-        assert!(station.in_reach(station.departure()));
+        assert!(station.in_reach(station.dock_target()));
         assert!(station
             .push_out(
-                station.departure(),
-                station.departure(),
+                station.dock_target(),
+                station.dock_target(),
                 ships.flight.radius
             )
             .is_none());
         assert!(!station.in_reach(station.exit_position() - station.exit_forward() * 2.0));
-        assert!(!station.in_reach(station.departure() + station.exit_right() * station.dock.width));
+        assert!(
+            !station.in_reach(station.dock_target() + station.exit_right() * station.dock.width)
+        );
     }
 }
 
 #[test]
 fn dock_access_carves_only_the_configured_lane_not_the_rest_of_the_hull() {
     let (station, _, ships) = setup();
-    let p = station.departure();
+    let p = station.dock_target();
     assert!(station
         .push_out(station.approach(), p, ships.flight.radius)
         .is_none());

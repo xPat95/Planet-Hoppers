@@ -1,0 +1,37 @@
+[
+  {
+    "ship": "halloween",
+    "exit_code": 0,
+    "pass": true
+  },
+  {
+    "ship": "starwars",
+    "exit_code": 0,
+    "pass": true
+  },
+  {
+    "ship": "smilingfriends",
+    "exit_code": 0,
+    "pass": true
+  },
+  {
+    "ship": "minecraft",
+    "exit_code": 0,
+    "pass": true
+  },
+  {
+    "ship": "regularshow",
+    "exit_code": 0,
+    "pass": true
+  },
+  {
+    "ship": "southpark",
+    "exit_code": 0,
+    "pass": true
+  },
+  {
+    "mode": "docking",
+    "exit_code": 0,
+    "pass": true
+  }
+]

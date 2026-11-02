@@ -29,10 +29,37 @@ pub struct Dock {
     pub room_width: f32,
     pub room_height: f32,
     pub room_depth: f32,
+    /// Minimum free margin beyond the hull/camera; also the close docking waypoint distance.
     pub departure_clearance: f32,
     pub approach_distance: f32,
     pub interaction_radius: f32,
 }
+
+/// Bounds already fitted by the same loader used for rendering, in game units.
+#[derive(Debug, Clone, Copy)]
+pub struct DepartureBounds {
+    pub station_half_extents: Vector3,
+    pub ship_half_extents: Vector3,
+    pub ship_collision_radius: f32,
+    pub ship_length: f32,
+    pub camera_radius: f32,
+}
+
+#[derive(Debug, Clone)]
+pub struct Departure {
+    pub ship: Ship,
+    pub camera_position: Vector3,
+    pub ship_radius: f32,
+    pub hull_support: f32,
+    pub safety_margin: f32,
+    pub distance_from_dock: f32,
+}
+
+/// Shared with the flight view so launch clearance cannot drift from its camera.
+pub fn chase_position(position: Vector3, forward: Vector3, ship_length: f32) -> Vector3 {
+    position - forward * ship_length * 3.0 + Vector3::up() * ship_length * 0.9
+}
+
 impl Station {
     pub fn load(root: &Path) -> Result<Self, Box<dyn std::error::Error>> {
         let s: Self =
@@ -98,8 +125,89 @@ impl Station {
     pub fn exit_right(&self) -> Vector3 {
         self.exit_forward().cross(self.exit_up()).normalized()
     }
-    pub fn departure(&self) -> Vector3 {
+    /// Close docking waypoint, inside the access corridor. Never a flight spawn.
+    pub fn dock_target(&self) -> Vector3 {
         self.exit_position() + self.exit_forward() * self.dock.departure_clearance
+    }
+
+    /// Launch beyond both the actual fitted model and the entire collision hull,
+    /// rather than relying on the narrow corridor's collision exemption.
+    pub fn departure(&self, bounds: DepartureBounds) -> Result<Departure, String> {
+        let halves = [bounds.station_half_extents, bounds.ship_half_extents];
+        if !halves
+            .iter()
+            .all(|h| [h.x, h.y, h.z].iter().all(|v| v.is_finite() && *v >= 0.0))
+            || ![
+                bounds.ship_collision_radius,
+                bounds.ship_length,
+                bounds.camera_radius,
+            ]
+            .iter()
+            .all(|v| v.is_finite() && *v > 0.0)
+        {
+            return Err("Límites de despegue inválidos".into());
+        }
+        // Use the controller's representable heading, including its pitch limit.
+        // No GLB-specific yaw corrections belong to gameplay orientation.
+        let mut ship = Ship::new(Vector3::zero(), 0.0);
+        ship.look_at(self.exit_forward());
+        let forward = ship.forward();
+        let half = bounds.station_half_extents;
+        let visual_support = self.rotated([1.0, 0.0, 0.0]).dot(forward).abs() * half.x
+            + self.rotated([0.0, 1.0, 0.0]).dot(forward).abs() * half.y
+            + self.rotated([0.0, 0.0, 1.0]).dot(forward).abs() * half.z;
+        let door_projection = (self.exit_position() - self.center()).dot(forward);
+        // Inspected exterior hatch geometry: depth 9, lateral frame up to w/2+1.9,
+        // upper frame up to h/2+0.85 (graphics/station_dock.rs).
+        let hatch_support = door_projection
+            + self.exit_forward().dot(forward).max(0.0) * 9.0
+            + self.exit_right().dot(forward).abs() * (self.dock.width * 0.5 + 1.9)
+            + self.exit_up().dot(forward).abs() * (self.dock.height * 0.5 + 0.85);
+        let hull_support = self.collision_radius.max(visual_support).max(hatch_support);
+        let ship_radius = bounds
+            .ship_half_extents
+            .length()
+            .max(bounds.ship_collision_radius);
+        let camera_offset = chase_position(Vector3::zero(), forward, bounds.ship_length);
+        let rear = ship_radius.max(-camera_offset.dot(forward) + bounds.camera_radius);
+        let safety_margin = self
+            .dock
+            .departure_clearance
+            .max(ship_radius * 2.0)
+            .max(bounds.camera_radius * 2.0);
+        let distance = (hull_support + rear + safety_margin - door_projection)
+            .max(self.dock.departure_clearance);
+        let step = ship_radius.max(bounds.camera_radius).max(1.0);
+        // Bounded outward search, with independent collision and support-plane
+        // validation of ship, camera and a forward movement segment.
+        for attempt in 0..=16 {
+            let travel = distance + attempt as f32 * step;
+            let position = self.exit_position() + forward * travel;
+            let camera_position = position + camera_offset;
+            let outside = |p: Vector3, radius: f32| {
+                let rel = p - self.center();
+                rel.length() > self.collision_radius + radius
+                    && rel.dot(forward) - radius > hull_support
+                    && self.push_out(p, p, radius).is_none()
+            };
+            let ahead = position + forward * (safety_margin + bounds.ship_length);
+            if outside(position, ship_radius)
+                && outside(camera_position, bounds.camera_radius)
+                && outside(ahead, ship_radius)
+                && self.push_out(position, ahead, ship_radius).is_none()
+            {
+                ship.position = position;
+                return Ok(Departure {
+                    ship,
+                    camera_position,
+                    ship_radius,
+                    hull_support,
+                    safety_margin,
+                    distance_from_dock: travel,
+                });
+            }
+        }
+        Err("No se encontró un despegue seguro fuera de la estación".into())
     }
     /// Aim farther outside the mouth before the final approach.
     pub fn approach(&self) -> Vector3 {
@@ -113,7 +221,7 @@ impl Station {
             && rel.dot(self.exit_right()).abs() < self.dock.width * 0.3
             && rel.dot(self.exit_up()).abs() < self.dock.height * 0.3
         {
-            self.departure()
+            self.dock_target()
         } else {
             self.approach()
         }

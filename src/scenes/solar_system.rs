@@ -2,7 +2,7 @@
 //! (vuelo y choques) con la representación de `graphics::space`, y coordina las visitas: "Explorar planeta" cierra
 //! esta ventana, abre el minijuego y al terminar vuelve al mismo sistema solar, con la nave junto al planeta.
 use super::minigame_host::{self, MinigameVisits};
-use crate::gameplay::station::Station;
+use crate::gameplay::station::{chase_position, DepartureBounds, Station};
 use crate::minigames::common::host::{MinigameCompletion, MinigameExit, MinigameResult};
 use crate::graphics::resources::save_frame;
 use crate::graphics::space::{draw_sun_glow, Fit, Sky, SpaceModel, SpaceShader, SunShader, SKY_BACKGROUND};
@@ -224,7 +224,8 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
     let system = SolarSystem::new(&config);
     let outer = outer_orbit(&system);
     let station = Station::load(&root)?;
-    let mut ship = Ship::new(station.departure(), 0.0);
+    // The actual departure is resolved after loading the fitted visual bounds.
+    let mut ship = Ship::new(station.dock_target(), 0.0);
     ship.look_at(ship.position + station.exit_forward());
     let mut session = Session {
         station,
@@ -281,7 +282,7 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
                     }
                     *n+=1;
                 }
-                session.ship=Ship::new(session.station.departure(),0.0);
+                session.ship=Ship::new(session.station.dock_target(),0.0);
                 session.ship.look_at(session.ship.position+session.station.exit_forward());
                 session.view=View::Ship;
                 session.paused=false;
@@ -403,10 +404,36 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         [0.0;3], Fit::Length(s.station.length))?;
     let station_far = SpaceModel::load(&mut rl, &thread, &root.join(&s.station.model_far), &shader,
         [0.0;3], Fit::Same(station_near.fit, station_near.half_extents))?;
-    if station_near.half_extents.length() > s.station.collision_radius {
-        return Err("La envolvente de seguridad no contiene la estación".into());
-    }
     let mut ship_model = load_ship_model(&mut rl, &thread, root, &shader, s);
+    let departing = std::mem::take(&mut s.departing);
+    let departure = if departing {
+        let length = s.ships.ships[s.ship_index].length;
+        let half = ship_model.as_ref().map_or(Vector3::one() * length * 0.5, |m| m.half_extents);
+        let aspect = rl.get_screen_width() as f32 / rl.get_screen_height().max(1) as f32;
+        let near = NEAR_PLANE as f32;
+        let camera_radius = (near * (1.0 + (30.0_f32.to_radians().tan()).powi(2)
+            * (1.0 + aspect * aspect)).sqrt()).max(near * 2.0);
+        let plan = s.station.departure(DepartureBounds {
+            station_half_extents: station_near.half_extents,
+            ship_half_extents: half,
+            ship_collision_radius: s.ships.flight.radius,
+            ship_length: length,
+            camera_radius,
+        })?;
+        s.ship = plan.ship.clone();
+        if smoke {
+            println!("DEPARTURE_SAFE {}", serde_json::json!({
+                "ship":s.ships.ships[s.ship_index].id,
+                "position":[s.ship.position.x,s.ship.position.y,s.ship.position.z],
+                "forward":[s.ship.forward().x,s.ship.forward().y,s.ship.forward().z],
+                "camera":[plan.camera_position.x,plan.camera_position.y,plan.camera_position.z],
+                "visual_half":[half.x,half.y,half.z],"ship_radius":plan.ship_radius,
+                "hull_support":plan.hull_support,"safety_margin":plan.safety_margin,
+                "distance_from_dock":plan.distance_from_dock,
+            }));
+        }
+        Some(plan)
+    } else { None };
     let sky = Sky::new();
     let outer = outer_orbit(&s.system);
     // Las pruebas siguen a South Park por identidad, aunque cambie de órbita.
@@ -422,14 +449,12 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
     if s.view == View::Ship && !smoke {
         rl.disable_cursor();
     }
-    let mut chase = s.ship.position - s.ship.forward() * 20.0;
+    let mut chase = chase_position(s.ship.position, s.ship.forward(), s.ships.ships[s.ship_index].length);
     let mut previous_ship_position = s.ship.position;
     let mut snap = true;
     let mut fade = if smoke { 0.0 } else { 1.0_f32 }; // 1 = negro; baja al entrar
     let mut leaving: Option<usize> = None;
     let mut entering_station = false;
-    let departing=std::mem::take(&mut s.departing);
-    let mut departure_reveal=if departing {2.5_f32} else {0.0};
     let mut station_reentry_delay=if departing {1.2_f32} else {0.0};
     let mut interaction_armed = false;
     let mut discard_mouse_frames = 2u8;
@@ -448,7 +473,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         }
         let dt = if smoke { 1.0 / 60.0 } else { rl.get_frame_time().min(0.1) };
         // Sin teclado durante las pruebas ni mientras se sale hacia un minijuego
-        let accepts_input = (!smoke || s.station_smoke || s.docking_smoke.is_some()) && leaving.is_none() && !entering_station;
+        let accepts_input = (!smoke || s.launch_smoke || s.station_smoke || s.docking_smoke.is_some()) && leaving.is_none() && !entering_station;
         let pressed = |rl: &RaylibHandle, k: KeyboardKey| accepts_input && rl.is_key_pressed(k);
         let down = |rl: &RaylibHandle, k: KeyboardKey| accepts_input && rl.is_key_down(k);
 
@@ -461,14 +486,15 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             let mut keys=Vec::new();
             if cycles>0 && frame<10 {keys.push(KeyboardKey::KEY_E);}
             if frame==0 {
-                if (s.ship.position-s.station.departure()).length()>0.01 || s.ship.speed!=0.0
+                if (s.ship.position-departure.as_ref().ok_or("Falta plan de despegue")?.ship.position).length()>0.01 || s.ship.speed!=0.0
                     || s.station.push_out(s.ship.position,s.ship.position,s.ships.flight.radius).is_some()
-                    || s.ship.forward().dot(s.station.exit_forward())<0.999 {
+                    || s.ship.forward().dot(departure.as_ref().unwrap().ship.forward())<0.999 {
                     return Err("Despegue fuera de la salida o con una transformación insegura".into());
                 }
                 if s.game.as_ref().unwrap().active_ship()!=s.ships.ships[s.ship_index].id {return Err("Modelo de despegue incorrecto".into());}
                 if !s.ships.ships[s.ship_index].model.is_empty() && ship_model.is_none() {return Err("Fallo al cargar el modelo de despegue".into());}
             }
+            if (2..=12).contains(&frame) { keys.push(KeyboardKey::KEY_W); }
             if frame==20 {capture=Some(format!("dock-launch-{cycles}.png"));}
             if cycles==3 && frame==25 {
                 println!("DOCKING_SMOKE_PASS cycles=3 same_ship=true changed_ship=true cancel=true safe_launch=true active={}",s.game.as_ref().unwrap().active_ship());
@@ -537,7 +563,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                     }
                     capture = Some("station-approach.png".into());
                 }
-                75 => {s.ship.position=s.station.departure();s.ship.speed=0.0;}
+                75 => {s.ship.position=s.station.dock_target();s.ship.speed=0.0;}
                 85 => {
                     if !s.station.in_reach(s.ship.position) { return Err("Falta proximidad con la estación".into()); }
                     capture = Some("station-contact.png".into());
@@ -586,6 +612,10 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 _ => {}
             }
         } else if s.launch_smoke {
+            unsafe { ffi::PlayAutomationEvent(ffi::AutomationEvent {frame:0,type_:1,params:[KeyboardKey::KEY_W as i32,0,0,0]}); }
+            if (2..=12).contains(&frame) {
+                unsafe { ffi::PlayAutomationEvent(ffi::AutomationEvent {frame:0,type_:2,params:[KeyboardKey::KEY_W as i32,0,0,0]}); }
+            }
             if let Some(game) = &s.game {
                 if s.ships.ships[s.ship_index].id != game.active_ship() { return Err("El modelo activo no coincide con la selección".into()); }
             }
@@ -879,7 +909,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             View::Ship => {
                 // Cámara de persecución: detrás y un poco arriba, siguiendo con suavidad
                 let fwd = s.ship.forward();
-                let wanted = s.ship.position - fwd * ship_len * 3.0 + Vector3::up() * ship_len * 0.9;
+                let wanted = chase_position(s.ship.position, fwd, ship_len);
                 if snap {
                     chase = wanted;
                 } else {
@@ -907,14 +937,26 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             }
         };
         snap = false;
-        let camera = if departure_reveal>0.0 && s.view==View::Ship && s.visit_smoke.is_none() && !s.station_smoke {
-            departure_reveal=(departure_reveal-dt).max(0.0);
-            let blend=departure_reveal.min(1.0);
-            let p=s.ship.position+s.station.exit_forward()*ship_len*4.0
-                + s.station.exit_right()*ship_len*1.2 + s.station.exit_up()*ship_len*0.55;
-            Camera3D::perspective(camera.position*(1.0-blend)+p*blend,
-                camera.target*(1.0-blend)+s.ship.position*blend,Vector3::up(),60.0)
-        } else {camera};
+        // Launch starts in the real chase view, behind the nose. No reverse
+        // reveal camera or interpolation through the station during takeoff.
+        if let Some(plan) = &departure {
+            if smoke && (s.launch_smoke || s.docking_smoke.is_some()) && frame < 30 {
+                if s.ship.bumped || (s.station.center()-s.ship.position).dot(s.ship.forward()) >= 0.0
+                    || (camera.position-s.ship.position).dot(s.ship.forward()) >= 0.0
+                    || s.station.push_out(camera.position,camera.position,NEAR_PLANE as f32*2.0).is_some() {
+                    return Err("Colisión u orientación incorrecta al iniciar el vuelo".into());
+                }
+                if frame==1 && (s.ship.position-plan.ship.position).length()>0.01 {
+                    return Err("El primer frame desplazó la nave sin acelerar".into());
+                }
+                if frame==0 && (camera.position-plan.camera_position).length()>0.01 {
+                    return Err("La cámara inicial necesitó una corrección de posición".into());
+                }
+                if frame==14 && (s.ship.position-plan.ship.position).dot(plan.ship.forward())<=0.0 {
+                    return Err("W no alejó la nave de la estación".into());
+                }
+            }
+        }
         let camera = side_camera.unwrap_or(camera);
         // También cubre el sistema cuando la nave se aleja más allá de la última órbita.
         let far = far_plane.max(camera.position.length() + outer * 2.0);

@@ -1,5 +1,7 @@
 # Hangar del Presidium: interior, entrada y despegue
 
+> Corrección de despegue: el punto cercano `puerta + 36` descrito abajo queda reservado a la aproximación. El vuelo comienza ahora fuera de los límites visuales y de colisión, contemplando nave y cámara, sin la antigua cámara frontal de salida. [Cálculo actual, pruebas y capturas](references/station-departure/README.md).
+
 > Actualización visual posterior: la geometría procedural se sustituyó por el módulo Blender `citadel_hangar_interior.glb`, y se restauraron plataforma circular y giro. Las descripciones originales de geometría de este documento son históricas; los contratos de entrada, estado y despegue se conservan. [Informe visual actual y capturas](references/hangar/README.md).
 
 ## Arquitectura y continuidad espacial
