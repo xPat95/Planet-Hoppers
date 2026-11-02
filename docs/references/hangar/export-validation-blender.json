@@ -1,0 +1,39 @@
+{
+  "status": "PASS",
+  "triangles": 74748,
+  "meshes": 11,
+  "max_vertices_per_primitive": 17280,
+  "materials": 11,
+  "external_dependencies": 0,
+  "textures": "Not required: original constant PBR/emissive materials",
+  "source_unchanged": true,
+  "source_sha256": "1791b9c614b915490c205cb1e675b62c09d80f3d0669bbbca2ef185670b29fe9",
+  "blender_reimport": true,
+  "blender_bounds": [
+    [
+      -18.598039627075195,
+      18.598039627075195
+    ],
+    [
+      -28.149999618530273,
+      31.399999618530273
+    ],
+    [
+      -2.0,
+      16.598039627075195
+    ]
+  ],
+  "reimport_materials": [
+    "CI | Blindaje grafito",
+    "CI | Canales",
+    "CI | Juntas oscuras",
+    "CI | Luz ambar",
+    "CI | Luz cian",
+    "CI | Luz hielo",
+    "CI | Luz marfil",
+    "CI | Marcas de panel",
+    "CI | Placas acero",
+    "CI | Placas plata",
+    "CI | Titanio azulado"
+  ]
+}

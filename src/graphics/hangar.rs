@@ -13,11 +13,8 @@ pub struct HangarStyle {
     pub interior: InteriorStyle,
     pub light_position: Vector3,
     pub ambient: f32,
-    /// Interior GLB override. The exterior station is not an interior room.
-    pub station_model: Option<String>,
-    pub station_length: f32,
-    pub station_position: Vector3,
-    pub station_rotation: [f32; 3],
+    /// Blender module authored in game units, with the platform center at the origin.
+    pub station_model: String,
 }
 impl Default for HangarStyle {
     fn default() -> Self {
@@ -29,10 +26,8 @@ impl Default for HangarStyle {
             interior: InteriorStyle::default(),
             light_position: Vector3::new(-4.0, 9.0, 5.0),
             ambient: 0.55,
-            station_model: None,
-            station_length: 22.0,
-            station_position: Vector3::new(0.0, 4.0, 0.0),
-            station_rotation: [0.0; 3],
+            station_model:
+                "assets/models/environment/spaceStation/exports/citadel_hangar_phase1.glb".into(),
         }
     }
 }
@@ -85,8 +80,9 @@ pub struct Hangar {
     pub style: HangarStyle,
     pub camera: HangarCamera,
     shader: SpaceShader,
+    environment_shader: SpaceShader,
     ship: Option<SpaceModel>,
-    station: Option<SpaceModel>,
+    station: SpaceModel,
     pub placeholder: bool,
     center: Vector3,
     half_extents: Vector3,
@@ -97,25 +93,27 @@ impl Hangar {
         rl: &mut RaylibHandle,
         thread: &RaylibThread,
         root: &Path,
-        style: HangarStyle,
+        mut style: HangarStyle,
     ) -> Result<Self, Box<dyn std::error::Error>> {
+        let dock = crate::gameplay::station::Station::load(root)?;
+        style.interior.configure(&dock);
         let shader = SpaceShader::load(rl, thread)?;
-        let station = if let Some(path) = &style.station_model {
-            Some(SpaceModel::load(
-                rl,
-                thread,
-                &root.join(path),
-                &shader,
-                style.station_rotation,
-                Fit::Length(style.station_length),
-            )?)
-        } else {
-            None
-        };
+        let environment_shader = SpaceShader::load_hangar(rl, thread)?;
+        // Preserve the architectural origin and metres; automatic model fitting would
+        // recenter the deck and separate it from the historical platform.
+        let station = SpaceModel::load(
+            rl,
+            thread,
+            &root.join(&style.station_model),
+            &environment_shader,
+            [0.0; 3],
+            Fit::Same(Matrix::identity(), Vector3::new(18.7, 16.7, 32.0)),
+        )?;
         Ok(Self {
             style,
             camera: HangarCamera::default(),
             shader,
+            environment_shader,
             ship: None,
             station,
             placeholder: true,
@@ -151,7 +149,11 @@ impl Hangar {
             .as_ref()
             .map_or(Vector3::new(2.3, 0.8, 3.0), |s| s.half_extents);
         self.center = Vector3::new(0.0, self.style.platform_top + self.half_extents.y, 0.0);
-        self.angle = 25.0;
+        if self.placeholder {
+            // The shared primitive hull is not centered on its asymmetric bounds.
+            self.center.y = self.style.platform_top + 0.225 * self.style.display_length / 4.0;
+        }
+        self.angle = 0.0;
     }
     pub fn update(&mut self, dt: f32) {
         self.angle = (self.angle + dt * self.style.rotation_degrees_per_second).rem_euclid(360.0);
@@ -164,48 +166,34 @@ impl Hangar {
         self.camera
             .camera(self.center, self.half_extents, viewport, insets)
     }
+    /// Inspection viewpoints stay inside the configured walls and below the roof.
+    pub fn inspection_camera(&self, exit: bool) -> Camera3D {
+        let room = &self.style.interior;
+        if exit {
+            Camera3D::perspective(
+                Vector3::new(0.0, room.exit_height * 0.5, room.depth * 0.14),
+                Vector3::new(0.0, room.exit_height * 0.5, -room.depth * 0.5),
+                Vector3::up(),
+                60.0,
+            )
+        } else {
+            Camera3D::perspective(
+                Vector3::new(room.width * 0.33, room.height * 0.625, room.depth * 0.41),
+                Vector3::new(0.0, room.height * 0.31, -room.depth * 0.18),
+                Vector3::up(),
+                65.0,
+            )
+        }
+    }
     pub fn draw(&mut self, d: &mut impl RaylibDraw3D, camera: Camera3D) {
         self.shader.begin_frame(
             self.style.light_position,
             camera.position,
             self.style.ambient,
         );
-        self.draw_backdrop(d, camera);
-        let base = self.style.interior.titanium;
-        d.draw_cylinder(
-            Vector3::new(0.0, 0.0, 0.0),
-            self.style.platform_radius,
-            self.style.platform_radius + 0.2,
-            self.style.platform_top,
-            64,
-            base,
-        );
-        d.draw_cylinder(
-            Vector3::new(0.0, self.style.platform_top - 0.08, 0.0),
-            self.style.platform_radius + 0.04,
-            self.style.platform_radius + 0.04,
-            0.04,
-            64,
-            self.style.interior.cyan,
-        );
-        d.draw_cylinder(
-            Vector3::new(0.0, self.style.platform_top, 0.0),
-            self.style.platform_radius - 0.15,
-            self.style.platform_radius - 0.15,
-            0.02,
-            64,
-            self.style.interior.graphite,
-        );
-        for i in 0..12 {
-            let angle = self.angle.to_radians() + i as f32 * std::f32::consts::TAU / 12.0;
-            let ray = Vector3::new(angle.cos(), 0.0, angle.sin());
-            let top = Vector3::up() * (self.style.platform_top + 0.01);
-            d.draw_line_3D(
-                top + ray * self.style.platform_radius * 0.85,
-                top + ray * self.style.platform_radius * 0.98,
-                Color::new(100, 205, 225, 255),
-            );
-        }
+        self.environment_shader.begin_frame(self.style.light_position, camera.position, 0.24);
+        self.station.draw(d, &mut self.environment_shader, Matrix::identity());
+        self.draw_platform(d);
         let world = Matrix::rotate_y(self.angle.to_radians())
             * Matrix::translate(self.center.x, self.center.y, self.center.z);
         if let Some(ship) = &self.ship {
@@ -219,12 +207,44 @@ impl Hangar {
             );
         }
     }
-    fn draw_backdrop(&mut self, d: &mut impl RaylibDraw3D, camera: Camera3D) {
-        if let Some(model) = &self.station {
-            let p = self.style.station_position;
-            model.draw(d, &mut self.shader, Matrix::translate(p.x, p.y, p.z));
-            return;
+    /// Original circular exhibition base, independent from the station architecture.
+    fn draw_platform(&self, d: &mut impl RaylibDraw3D) {
+        let radius = self.style.platform_radius;
+        let top = self.style.platform_top;
+        d.draw_cylinder(
+            Vector3::zero(),
+            radius,
+            radius + 0.2,
+            top - 0.08,
+            64,
+            self.style.interior.titanium,
+        );
+        d.draw_cylinder(
+            Vector3::new(0.0, top - 0.08, 0.0),
+            radius + 0.04,
+            radius + 0.04,
+            0.04,
+            64,
+            self.style.interior.cyan,
+        );
+        // The top ends at platform_top: the ship's minimum Y rests exactly here.
+        d.draw_cylinder(
+            Vector3::new(0.0, top - 0.04, 0.0),
+            radius - 0.15,
+            radius - 0.15,
+            0.04,
+            64,
+            self.style.interior.graphite,
+        );
+        for i in 0..12 {
+            let angle = self.angle.to_radians() + i as f32 * std::f32::consts::TAU / 12.0;
+            let ray = Vector3::new(angle.cos(), 0.0, angle.sin());
+            let at = Vector3::up() * (top + 0.01);
+            d.draw_line_3D(
+                at + ray * radius * 0.85,
+                at + ray * radius * 0.98,
+                Color::new(100, 205, 225, 255),
+            );
         }
-        self.style.interior.draw(d, camera);
     }
 }

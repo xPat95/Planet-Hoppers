@@ -1,0 +1,65 @@
+{
+  "source_sha256": "1791b9c614b915490c205cb1e675b62c09d80f3d0669bbbca2ef185670b29fe9",
+  "source_unchanged": true,
+  "meshes": 16,
+  "glb_bytes": 13598568,
+  "camera_game": {
+    "eye": [
+      8.204826354980469,
+      6.629474639892578,
+      12.76306438446045
+    ],
+    "target": [
+      0.0,
+      1.1595896482467651,
+      0.0
+    ],
+    "fov_y": 42,
+    "viewport": [
+      1280,
+      800
+    ],
+    "hud": [
+      151,
+      156
+    ]
+  },
+  "export_excludes": [
+    "platform",
+    "ship",
+    "lights",
+    "cameras"
+  ],
+  "reference_materials": [
+    "Blindaje grafito",
+    "Canales",
+    "Edificios claros",
+    "Edificios oscuros",
+    "Edificios pizarra",
+    "Juntas oscuras",
+    "Luz ambar",
+    "Luz cian",
+    "Luz hielo",
+    "Luz marfil",
+    "Luz roja baliza",
+    "Marcas de panel",
+    "Parques",
+    "Placas acero",
+    "Placas plata",
+    "Titanio azulado",
+    "Recess shadow",
+    "Oiled steel",
+    "Brushed edge",
+    "Louver interior",
+    "Low ice",
+    "Low ivory",
+    "Low amber",
+    "Status cyan"
+  ],
+  "platform_clear_radius": 4.85,
+  "aperture": {
+    "width": 20,
+    "height": 12
+  },
+  "units": "game metres, Blender Z-up to GLB Y-up"
+}

@@ -138,6 +138,9 @@ impl GameState {
 pub enum SelectionMode {
     Initial,
     Change,
+    /// Functional station fleet during the prototype: free session-only changes.
+    /// Change retains the ownership restriction for future progression integration.
+    Docked,
 }
 
 /// Explicit transition points for future initial/unlock abduction cinematics.
@@ -145,6 +148,7 @@ pub enum SelectionMode {
 pub enum SelectionTransition {
     StartAdventure(GameState),
     ChangedShip(GameState),
+    Quit,
 }
 
 pub struct ShipSelection {
@@ -163,6 +167,7 @@ impl ShipSelection {
     }
     pub fn can_confirm(&self, catalog: &ShipCatalog, game: Option<&GameState>) -> bool {
         self.mode == SelectionMode::Initial
+            || self.mode == SelectionMode::Docked && game.is_some()
             || game.is_some_and(|g| g.is_unlocked(&catalog.choices[self.index].id))
     }
     pub fn confirm(
@@ -175,8 +180,11 @@ impl ShipSelection {
             SelectionMode::Initial => Ok(SelectionTransition::StartAdventure(GameState::new_game(
                 id, catalog,
             )?)),
-            SelectionMode::Change => {
+            SelectionMode::Change | SelectionMode::Docked => {
                 let mut next = game.ok_or("No hay partida activa")?.clone();
+                if self.mode == SelectionMode::Docked {
+                    next.unlock(id, catalog)?;
+                }
                 next.activate(id)?;
                 Ok(SelectionTransition::ChangedShip(next))
             }

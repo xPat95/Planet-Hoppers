@@ -1,5 +1,18 @@
 # Herramientas de la Ciudadela
 
+## Fase 1 artística: reconstrucción desde la fuente real
+
+`rebuild_hangar_phase1.py` abre la estación aprobada, reutiliza sus materiales y genera archivos independientes `citadel_hangar_phase1.blend` y `exports/citadel_hangar_phase1.glb`. Construye la arquitectura sin exportar plataforma ni naves. `validate_hangar_phase1.py`, ejecutado con Blender, vuelve a abrir los dos `.blend`, inspecciona transformaciones/materiales y reimporta el GLB para comprobar huecos, espacio libre y límites. [Renders, capturas y alcance](../../../docs/references/hangar/phase1/README.md).
+
+```powershell
+blender -b --factory-startup --python tools/blender/spaceStation/rebuild_hangar_phase1.py
+blender -b --factory-startup --python tools/blender/spaceStation/validate_hangar_phase1.py
+```
+
+## Interior complementario del hangar
+
+`inspect_hangar_reference.py` abre la fuente aprobada y genera inspección y renders sin guardarla. `build_hangar.py` reutiliza sus materiales y construye el módulo independiente `citadel_hangar_interior.blend` y su GLB, sin incluir la plataforma de exhibición de Rust. `validate_hangar.py` verifica el GLB con Python y, ejecutado desde Blender, lo reimporta. [Evidencias y validaciones](../../../docs/references/hangar/README.md).
+
 - `crear_ciudadela.py`: reconstruye la fuente procedural aprobada desde un archivo nuevo de Blender. Escribe en `assets/models/environment/spaceStation/` y `docs/references/spaceStation/`.
 - `renderizar_ciudadela.py`: genera las cuatro vistas a partir de la fuente abierta.
 - `prepare_citadel_asset.py`: actualiza los metadatos de la copia integrada, conserva su geometria, genera GLB cercano/lejano y OBJ/MTL, y reimporta los GLB para comprobar jerarquia, cinco brazos, triangulos, limites y dependencias.

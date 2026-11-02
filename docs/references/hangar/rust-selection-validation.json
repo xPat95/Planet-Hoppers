@@ -1,0 +1,15 @@
+{
+  "back_to_menu": true,
+  "controls": true,
+  "physical_input_verified": false,
+  "previews": [
+    "halloween",
+    "minecraft",
+    "regularshow",
+    "smilingfriends",
+    "southpark",
+    "starwars"
+  ],
+  "selected": "minecraft",
+  "status": "PASS"
+}

@@ -1,0 +1,41 @@
+{
+  "status": "PASS",
+  "original_source_unchanged": true,
+  "source_sha256": "1791b9c614b915490c205cb1e675b62c09d80f3d0669bbbca2ef185670b29fe9",
+  "editable_reopened": true,
+  "glb_reimported": true,
+  "architecture_meshes": 16,
+  "materials": 15,
+  "primitives": 78,
+  "triangles": 241012,
+  "max_vertices_per_primitive": 41664,
+  "glb_bytes": 13598568,
+  "bounds_blender": [
+    [
+      -18.498823165893555,
+      18.498823165893555
+    ],
+    [
+      -28.100000381469727,
+      32.25
+    ],
+    [
+      -2.0,
+      16.498823165893555
+    ]
+  ],
+  "degenerate_faces": 0,
+  "unit_face_normals": true,
+  "platform_and_ship_clearance": true,
+  "aperture_open": true,
+  "export_excludes": [
+    "platform",
+    "ships",
+    "camera",
+    "lights",
+    "animations"
+  ],
+  "original_material_parameters_preserved": true,
+  "game_camera_fov_y": 42,
+  "external_asset_dependencies": 0
+}

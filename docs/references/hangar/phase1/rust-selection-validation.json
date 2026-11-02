@@ -1,0 +1,10 @@
+{
+  "back_to_menu": false,
+  "controls": false,
+  "physical_input_verified": false,
+  "previews": [
+    "starwars"
+  ],
+  "selected": "starwars",
+  "status": "PASS"
+}

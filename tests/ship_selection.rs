@@ -168,3 +168,25 @@ fn exhibition_camera_fits_rotating_bounds_between_header_and_footer() {
         }
     }
 }
+
+#[test]
+fn docked_fleet_changes_are_confirmed_and_preserve_the_first_ship() {
+    let (catalog, ships) = setup();
+    let game = GameState::new_game("minecraft", &catalog).unwrap();
+    let mut selector = ShipSelection::new(SelectionMode::Docked, Some(&game), &catalog);
+    assert_eq!(catalog.choices[selector.index].id, game.active_ship());
+    selector.navigate(-2, &catalog);
+    assert!(selector.can_confirm(&catalog, Some(&game)));
+    assert_eq!(game.active_ship(), "minecraft");
+    let SelectionTransition::ChangedShip(next) = selector.confirm(&catalog, Some(&game)).unwrap()
+    else {
+        panic!("wrong transition")
+    };
+    assert_eq!(next.first_ship(), "minecraft");
+    assert_eq!(next.active_ship(), "starwars");
+    assert!(next.is_unlocked("minecraft") && next.is_unlocked("starwars"));
+    let mut configured = ships;
+    catalog.configure_active(&next, &mut configured).unwrap();
+    assert_eq!(configured.active_ship, "starwars");
+    assert!(configured.active().unwrap().model.contains("mandalorian"));
+}

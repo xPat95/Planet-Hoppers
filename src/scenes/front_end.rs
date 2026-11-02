@@ -30,18 +30,20 @@ enum Screen {
 pub fn run() -> Result<(), Error> {
     let mut smoke = false;
     let mut returns = false;
+    let mut docking = false;
     let mut goal = "minecraft".to_string();
     let mut args = std::env::args().skip(1);
     while let Some(arg) = args.next() {
         match arg.as_str() {
             "--smoke" => smoke = true,
+            "--smoke-docking" => { smoke = true; docking = true; }
             "--smoke-returns" => {
                 smoke = true;
                 returns = true;
             }
             "--ship" => goal = args.next().ok_or("--ship necesita un identificador")?,
             "--help" | "-h" => {
-                println!("cargo run --locked -- [--smoke | --smoke-returns] [--ship halloween|starwars|smilingfriends|minecraft|regularshow|southpark]");
+                println!("cargo run --locked -- [--smoke | --smoke-returns | --smoke-docking] [--ship halloween|starwars|smilingfriends|minecraft|regularshow|southpark]");
                 println!("Sin opciones: menú principal. Desarrollo: cargo run --bin solarsystem o --bin southpark.");
                 return Ok(());
             }
@@ -57,7 +59,9 @@ pub fn run() -> Result<(), Error> {
     if let Some(SelectionTransition::StartAdventure(game)) = selected {
         // Initial abduction cinematic goes HERE, before solar_system::run_with_game.
         // A future station consumes ChangedShip inside its existing solar Session instead.
-        let flags = if returns {
+        let flags = if docking {
+            vec!["--smoke-docking".into()]
+        } else if returns {
             vec!["--smoke-returns".into()]
         } else if smoke {
             vec!["--smoke-launch".into()]
@@ -66,7 +70,7 @@ pub fn run() -> Result<(), Error> {
         };
         let game = super::solar_system::run_with_game(game, flags.into_iter())?;
         if smoke {
-            if game.active_ship() != goal || game.first_ship() != goal || game.unlocked_count() != 1
+            if game.first_ship() != goal || (!docking && (game.active_ship() != goal || game.unlocked_count() != 1))
             {
                 return Err("El sistema solar no conservó la selección inicial".into());
             }
@@ -87,10 +91,15 @@ pub fn select(
     mode: SelectionMode,
     game: Option<GameState>,
 ) -> Result<Option<SelectionTransition>, Error> {
-    if mode == SelectionMode::Change && game.is_none() {
+    if mode != SelectionMode::Initial && game.is_none() {
         return Err("Cambiar nave requiere una partida activa".into());
     }
     view(Screen::Hangar, mode, game, None)
+}
+
+/// Called only after the flight window and its GPU resources have been released.
+pub(crate) fn dock(game: GameState, smoke_goal: Option<String>) -> Result<Option<SelectionTransition>, Error> {
+    view(Screen::Hangar, SelectionMode::Docked, Some(game), smoke_goal)
 }
 
 const MENU_BUTTON_GAP: f32 = 14.0;
@@ -346,6 +355,7 @@ fn view(
     let catalog = ShipCatalog::load(&root.join("config/ship-selection.json"), &ships)?;
     let goal_index = smoke_goal
         .as_ref()
+        .filter(|id| id.as_str() != "@cancel")
         .map(|id| {
             catalog
                 .choices
@@ -356,7 +366,9 @@ fn view(
         .transpose()?;
     let embedded = screen == Screen::Hangar;
     let mut selection = ShipSelection::new(mode, game.as_ref(), &catalog);
+    let entry_ship = selection.index;
     let mut shown = None;
+    let mut hangar_view=0;
     let (mut rl, thread) = raylib::init()
         .size(1280, 800)
         .resizable()
@@ -400,7 +412,7 @@ fn view(
                 || rl.is_key_down(KeyboardKey::KEY_RIGHT_CONTROL))
                 && rl.is_key_pressed(KeyboardKey::KEY_Q))
         {
-            return Ok(None);
+            return Ok(if mode==SelectionMode::Docked {Some(SelectionTransition::Quit)} else {None});
         }
         // Exercise the same menu layout on real window resizes before the existing smoke flow.
         if smoke_goal.is_some() {
@@ -413,7 +425,18 @@ fn view(
             }
         }
         let (w, h) = (rl.get_screen_width(), rl.get_screen_height());
-        if let Some(goal) = goal_index {
+        if embedded && smoke_goal.is_some() {
+            for key in [KeyboardKey::KEY_ENTER,KeyboardKey::KEY_ESCAPE,KeyboardKey::KEY_RIGHT] {
+                unsafe { ffi::PlayAutomationEvent(ffi::AutomationEvent { frame:0,type_:1,params:[key as i32,0,0,0] }); }
+            }
+            let steps=(goal_index.unwrap_or(entry_ship)+6-entry_ship)%6;
+            let key=if frame>=12 && frame<12+steps as u32*4 && (frame-12)%4==0 {
+                Some(KeyboardKey::KEY_RIGHT)
+            } else if frame==44 {
+                Some(if smoke_goal.as_deref()==Some("@cancel") {KeyboardKey::KEY_ESCAPE} else {KeyboardKey::KEY_ENTER})
+            } else {None};
+            if let Some(key)=key { unsafe { ffi::PlayAutomationEvent(ffi::AutomationEvent {frame:0,type_:2,params:[key as i32,0,0,0]}); } }
+        } else if let Some(goal) = goal_index {
             inject_smoke(frame, w, h, goal);
         }
         let mouse = rl.get_mouse_position();
@@ -439,6 +462,7 @@ fn view(
                 }
             }
             Screen::Hangar => {
+                if rl.is_key_pressed(KeyboardKey::KEY_V) {hangar_view=(hangar_view+1)%3;}
                 if escape || hit(back_button(w)) {
                     if embedded {
                         return Ok(None);
@@ -456,10 +480,11 @@ fn view(
                     {
                         let transition = selection.confirm(&catalog, game.as_ref())?;
                         if smoke_goal.is_some() {
-                            if !controls_seen
+                            if embedded && Some(selection.index)!=goal_index {return Err("El hangar no confirmó la nave solicitada".into());}
+                            if !embedded && (!controls_seen
                                 || !back_seen
                                 || seen.len() != 6
-                                || Some(selection.index) != goal_index
+                                || Some(selection.index) != goal_index)
                             {
                                 return Err("Recorrido de menú/selector incompleto".into());
                             }
@@ -468,7 +493,7 @@ fn view(
                                 captures.join("selection-validation.json"),
                                 serde_json::to_string_pretty(&report)?,
                             )?;
-                            println!("SELECTION_SMOKE_PASS {report}");
+                            println!("{}_SMOKE_PASS {report}",if embedded {"DOCK_SELECTION"} else {"SELECTION"});
                         }
                         return Ok(Some(transition));
                     }
@@ -505,7 +530,7 @@ fn view(
                 _ => {}
             }
         }
-        let camera = if screen == Screen::Hangar {
+        let mut camera = if screen == Screen::Hangar {
             hangar.camera(
                 Vector2::new(w as f32, h as f32),
                 Vector2::new(HANGAR_HEADER, HANGAR_FOOTER),
@@ -523,6 +548,7 @@ fn view(
                 50.0,
             )
         };
+        if screen==Screen::Hangar && hangar_view>0 {camera=hangar.inspection_camera(hangar_view==2);}
         let sky_frame = sky.project(&rl, camera);
         let menu_time = rl.get_time() as f32;
         let mut d = rl.begin_drawing(&thread);
@@ -574,7 +600,7 @@ fn view(
                     ("Shift", "Turbo"),
                     ("Tab / B", "Elegir objetivo / piloto automático"),
                     ("Espacio", "Subir (ascenso vertical)"),
-                    ("E / Enter", "Explorar planeta cercano"),
+                    ("E / Enter", "Explorar planeta / entrar a estación"),
                     ("C / O", "Vista general / órbitas"),
                     ("Esc", "Soltar o recapturar mouse en el espacio"),
                     (
@@ -599,9 +625,9 @@ fn view(
                 d.draw_rectangle(0, 0, w, HANGAR_HEADER as i32, Color::new(4, 12, 21, 220));
                 d.draw_text(
                     if mode == SelectionMode::Initial {
-                        "HANGAR / TU PRIMERA NAVE"
+                        "CIUDADELA / TU PRIMERA NAVE"
                     } else {
-                        "HANGAR / CAMBIAR NAVE"
+                        "CIUDADELA / HANGAR DEL PRESIDIUM"
                     },
                     36,
                     28,
@@ -639,6 +665,8 @@ fn view(
                 );
                 let status = if mode == SelectionMode::Initial {
                     "Elige libremente tu nave inicial"
+                } else if mode == SelectionMode::Docked {
+                    "Flota de la estación / cambio libre durante esta sesión"
                 } else if selection.can_confirm(&catalog, game.as_ref()) {
                     "Nave desbloqueada"
                 } else {
@@ -658,7 +686,9 @@ fn view(
                     if !enabled {
                         "Bloqueada"
                     } else if mode == SelectionMode::Initial {
-                        "Comenzar aventura"
+                        "Despegar"
+                    } else if mode == SelectionMode::Docked {
+                        "Despegar con esta nave"
                     } else {
                         "Activar nave"
                     },
@@ -667,7 +697,7 @@ fn view(
                     true,
                 );
                 let count = format!(
-                    "{:02} / 06    Flechas: elegir    Enter: confirmar    Esc: volver",
+                    "{:02}/06  Flechas: elegir  Enter: despegar  V: vista  Esc: volver",
                     selection.index + 1
                 );
                 d.draw_text(
@@ -680,7 +710,15 @@ fn view(
             }
         }
         if smoke_goal.is_some() {
-            if frame == 94 && (screen != Screen::Hangar || selection.index != 4) {
+            if !embedded && ((frame==26 && hangar_view!=1) || (frame==27 && hangar_view!=2)) {
+                return Err("V no cambió la vista de inspección del hangar".into());
+            }
+            if embedded && frame==6 {
+                if selection.index!=entry_ship { return Err("La entrada al hangar cambió la nave".into()); }
+                save_frame(&captures.join("docked-entry.png"),w,h)?;
+            }
+            if embedded && frame==40 { save_frame(&captures.join("docked-selected.png"),w,h)?; }
+            if !embedded && frame == 94 && (screen != Screen::Hangar || selection.index != 4) {
                 return Err("La flecha izquierda no cambió la nave".into());
             }
             let name = match frame {
@@ -690,6 +728,8 @@ fn view(
                     controls_seen = screen == Screen::Controls;
                     Some("controls.png".into())
                 }
+                26 if !embedded => Some("hangar-complete.png".into()),
+                27 if !embedded => Some("hangar-exit.png".into()),
                 24 | 34 | 46 | 58 | 70 | 82 if screen == Screen::Hangar => {
                     seen.insert(catalog.choices[selection.index].id.clone());
                     Some(format!(
@@ -739,6 +779,7 @@ fn inject_smoke(frame: u32, w: i32, h: i32, goal: usize) {
         KeyboardKey::KEY_ENTER,
         KeyboardKey::KEY_LEFT,
         KeyboardKey::KEY_RIGHT,
+        KeyboardKey::KEY_V,
     ] {
         event(1, [key as i32, 0, 0, 0]);
     }
@@ -757,6 +798,7 @@ fn inject_smoke(frame: u32, w: i32, h: i32, goal: usize) {
         event(6, [0, 0, 0, 0]);
     };
     match frame {
+        25 | 27 | 29 => key(KeyboardKey::KEY_V),
         5 => click(menu_button(w, h, 1)),
         12 => key(KeyboardKey::KEY_ESCAPE),
         16 | 108 => click(menu_button(w, h, 0)),
