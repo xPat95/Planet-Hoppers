@@ -1,0 +1,8 @@
+{
+  "initial_seconds": 150.0,
+  "required_diamonds": 8,
+  "available_diamonds": 16,
+  "lava_penalty_seconds": 10.0,
+  "lava_protection_seconds": 1.5,
+  "warning_seconds": 30.0
+}

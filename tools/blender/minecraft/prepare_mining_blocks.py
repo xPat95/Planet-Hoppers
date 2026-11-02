@@ -12,6 +12,7 @@ ROOT=Path(__file__).resolve().parents[3]
 SOURCE=ROOT/'assets/models/minigames/minecraft/mine'
 OUT=ROOT/'assets/models/minigames/minecraft/mining'
 REPORT=ROOT/'docs/references/minecraft/phase4'
+SOURCE_LABEL=None
 spec=importlib.util.spec_from_file_location('mine_tools',Path(__file__).with_name('build_underground_mine.py'))
 m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
 
@@ -37,7 +38,7 @@ def main():
     m.GROUPS.update({name:bpy.data.collections['DRM_'+name] for name in ('Static','Interactive','Lava','Colliders','Markers','Presentation')})
     m.v.MATS.update({mat.name.removeprefix('DR_'):mat for mat in bpy.data.materials if mat.name.startswith('DR_')})
     kinds={'coal_ore':'coal','iron_ore':'iron','gold_ore':'gold','redstone_ore':'redstone','lapis_ore':'lapis'}
-    found={};removed=0
+    found={};removed=0;original_block_count=len(data['interactive_blocks'])
     for obj in list(m.GROUPS['Static'].objects):
         if not obj.name.startswith('Shell_'):continue
         faces=[]
@@ -105,7 +106,7 @@ def main():
             item=c.copy();item.update(min=lo,max=hi)
             if len(parts)!=1 or lo!=c['min'] or hi!=c['max']:item['name']=c['name']+'_piece_%03d'%i
             colliders.append(item)
-    for b in data['interactive_blocks'][26:]:
+    for b in data['interactive_blocks'][original_block_count:]:
         colliders.append(dict(name=b['collider_id'],shape='aabb',role='solid',category=b['kind'],min=b['min'],max=b['max']))
     data['colliders']=colliders
     for obj in list(m.GROUPS['Colliders'].objects):bpy.data.objects.remove(obj,do_unlink=True)
@@ -114,7 +115,7 @@ def main():
         b=m.v.Batch('COL_'+c['name'],c['category']);b.box(c['min'],c['max'],'stone')
         obj=b.finish(m.GROUPS['Colliders']);obj.display_type='WIRE';obj.hide_render=True;obj.hide_set(True)
     data['phase']=4;data['counts']['extractable_blocks']=len(data['interactive_blocks']);data['counts']['common_ores']=60
-    data['source']=str((SOURCE/'minecraft_mine.blend').relative_to(ROOT)).replace('\\','/')
+    data['source']=SOURCE_LABEL or str((SOURCE/'minecraft_mine.blend').relative_to(ROOT)).replace('\\','/')
     data['source_sha256']=hashlib.sha256((SOURCE/'minecraft_mine.blend').read_bytes()).hexdigest()
     data['extractable_common_ores']=data.pop('decorative_ores')
     data['notes']=['Phase-4 derivative; original phase-3 resources untouched.',

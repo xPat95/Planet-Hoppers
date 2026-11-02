@@ -9,9 +9,9 @@ uniform float alphaCutoff;
 uniform int textureIsSrgb;
 uniform vec3 emission;
 uniform int lightCount;
-uniform vec3 lightPosition[24];
-uniform vec3 lightColor[24];
-uniform float lightRadius[24];
+uniform vec3 lightPosition[48];
+uniform vec3 lightColor[48];
+uniform float lightRadius[48];
 out vec4 finalColor;
 vec3 toLinear(vec3 c) {
     return mix(c/12.92, pow((c+0.055)/1.055, vec3(2.4)), step(vec3(0.04045), c));

@@ -37,6 +37,8 @@ pub struct LavaRegion {
     pub min: [f32; 3],
     pub max: [f32; 3],
     pub damage_enabled: bool,
+    #[serde(default)]
+    pub safe_return: Option<[f32; 3]>,
 }
 #[derive(Deserialize)]
 pub struct MineLight {
@@ -159,7 +161,7 @@ impl MineScene {
             });
         }
         if data.lights.is_empty()
-            || data.lights.len() > 24
+            || data.lights.len() > 48
             || data.lights.iter().any(|l| {
                 !l.radius.is_finite()
                     || l.radius <= 0.0
@@ -173,11 +175,31 @@ impl MineScene {
             return Err("Invalid mine lighting metadata".into());
         }
         if data.lava_regions.iter().any(|r| {
-            r.damage_enabled
-                || !r.min.iter().chain(r.max.iter()).all(|v| v.is_finite())
+            !r.min.iter().chain(r.max.iter()).all(|v| v.is_finite())
                 || r.min.iter().zip(r.max).any(|(a, b)| *a >= b)
         }) {
-            return Err("Mine lava must remain a valid inactive sensor".into());
+            return Err("Invalid mine lava region".into());
+        }
+        for r in &data.lava_regions {
+            if r.damage_enabled {
+                let p = r
+                    .safe_return
+                    .ok_or("Active lava needs a safe return point")?;
+                let feet = from_blender(p);
+                if !p.iter().all(|v| v.is_finite())
+                    || (feet.y - world.ground_y).abs() > 0.001
+                    || !world.can_occupy(feet, player.config.radius, player.config.body_height)
+                    || data.lava_regions.iter().any(|other| {
+                        from_blender_bounds(other.min, other.max).overlaps(world.body(
+                            feet,
+                            player.config.radius,
+                            player.config.body_height,
+                        ))
+                    })
+                {
+                    return Err("Lava return point is not safe".into());
+                }
+            }
         }
         Ok(Self {
             manifest,

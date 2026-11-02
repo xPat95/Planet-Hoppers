@@ -414,7 +414,7 @@ impl StaticModel {
     ) -> Result<(), Box<dyn std::error::Error>> {
         if !self.underground
             || positions.is_empty()
-            || positions.len() > 24
+            || positions.len() > 48
             || positions.len() != colors.len()
             || positions.len() != radii.len()
             || radii.iter().any(|r| !r.is_finite() || *r <= 0.0)

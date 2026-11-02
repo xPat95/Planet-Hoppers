@@ -54,6 +54,10 @@ COLLIDERS=[]
 INTERACTIVE=[]
 LIGHTS=[]
 GROUPS={}
+ORE_SPEC=[('coal_ore',14,-3,28),('iron_ore',14,6,40),('gold_ore',10,28,58),('redstone_ore',12,28,58),('lapis_ore',10,26,58)]
+
+def layout_bounds(height):
+    return min(x for x,y in height)-4,min(y for x,y in height)-4,max(x for x,y in height)+5,max(y for x,y in height)+5
 
 
 def rect_cells(rect):
@@ -141,8 +145,7 @@ def build_geometry():
             if p not in void:candidates.add(p)
     rng=random.Random(9307)
     ore_materials={}
-    for material,count,low,high in [('coal_ore',14,-3,28),('iron_ore',14,6,40),('gold_ore',10,28,58),
-                                  ('redstone_ore',12,28,58),('lapis_ore',10,26,58)]:
+    for material,count,low,high in ORE_SPEC:
         choices=sorted(p for p in candidates if p[2] in (1,2) and low<=p[1]<=high and p not in ore_materials)
         for p in rng.sample(choices,count):ore_materials[p]=material
     batches={}
@@ -162,13 +165,14 @@ def build_geometry():
     for b in batches.values():b.finish(GROUPS['Static'])
     # Exact solid complement of the floor footprint, merged into rectangular wall volumes.
     ore_columns={(p[0],p[1]) for p in diamond_cells}
-    wall_cells={(x,y) for x in range(-26,28) for y in range(-7,62)}-set(height)-ore_columns
+    x0,y0,x1,y1=layout_bounds(height);wall_top=max(8,max(height.values())+1)
+    wall_cells={(x,y) for x in range(x0,x1) for y in range(y0,y1)}-set(height)-ore_columns
     for i,(x,y,xx,yy) in enumerate(rectangles(wall_cells)):
-        collider('Wall_%03d'%i,(x,y,0),(xx,yy,8),'wall')
+        collider('Wall_%03d'%i,(x,y,0),(xx,yy,wall_top),'wall')
     for index,(_,p) in enumerate(DIAMONDS):
         x,y,z=p
         collider('Ore_column_lower_%02d'%index,(x,y,0),(x+1,y+1,z),'wall')
-        collider('Ore_column_upper_%02d'%index,(x,y,z+1),(x+1,y+1,8),'wall')
+        collider('Ore_column_upper_%02d'%index,(x,y,z+1),(x+1,y+1,wall_top),'wall')
     by_height=defaultdict(set)
     for p,h in height.items():by_height[h].add(p)
     for h,cells in by_height.items():
@@ -283,7 +287,8 @@ def main():
             bsdf=next(n for n in v.MATS[name].node_tree.nodes if n.type=='BSDF_PRINCIPLED')
             bsdf.inputs['Emission Color'].default_value=(*color,1);bsdf.inputs['Emission Strength'].default_value=.8
     lava_material();height,gates,ore_materials=build_geometry();lava=decorations(height)
-    COLLIDERS.insert(0,dict(name='Mine_floor',shape='plane',role='walkable',category='floor',min=[-26,-7],max=[28,62],z=0))
+    x0,y0,x1,y1=layout_bounds(height)
+    COLLIDERS.insert(0,dict(name='Mine_floor',shape='plane',role='walkable',category='floor',min=[x0,y0],max=[x1,y1],z=0))
     for c in COLLIDERS:
         if c['shape']!='aabb':continue
         b=v.Batch('COL_'+c['name'],c['category']);b.box(c['min'],c['max'],'stone')

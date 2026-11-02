@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "common_ores": 60,
+  "removed_static_faces": 70,
+  "extractable_blocks": 88,
+  "solid_colliders": 465,
+  "source_sha256": "3ef130d8c41bb485fd5c8f4c45c23d3b7893175bae529e0ead4bf68d0216225c"
+}

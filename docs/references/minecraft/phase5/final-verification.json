@@ -1,0 +1,40 @@
+{
+  "branch": "feature/minecraft-minigame",
+  "tests_passed": 157,
+  "checks": [
+    {
+      "command": "cargo fmt --check",
+      "exit_code": 1,
+      "output": "Existing formatting differences in unmodified files; see files.",
+      "files": [
+        "\\\\?\\C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\src\\audio.rs",
+        "\\\\?\\C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\src\\graphics\\space.rs",
+        "\\\\?\\C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\src\\lib.rs",
+        "\\\\?\\C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\src\\minigames\\southpark\\session.rs",
+        "\\\\?\\C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\src\\scenes\\front_end.rs",
+        "\\\\?\\C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\src\\scenes\\session_smoke.rs",
+        "\\\\?\\C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\src\\scenes\\session_ui.rs",
+        "\\\\?\\C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\src\\scenes\\solar_system.rs",
+        "\\\\?\\C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\src\\scenes\\southpark_dev.rs",
+        "\\\\?\\C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\src\\scenes\\southpark_entry.rs",
+        "\\\\?\\C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\src\\ships\\mod.rs",
+        "\\\\?\\C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\src\\solarSystem\\mod.rs",
+        "\\\\?\\C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\tests\\ships.rs",
+        "\\\\?\\C:\\Documentos\\Pat\\uvg\\6to Semestre\\Graficas\\proyecto final\\Planet-Hoppers\\tests\\solar_system.rs"
+      ]
+    },
+    {
+      "command": "rustfmt scoped",
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "output": "warning: in the working copy of 'docs/references/southpark/phase6b/intro-validation.json', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/references/southpark/phase6b/runtime-validation.json', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'src/bin/minecraft.rs', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'src/graphics/resources.rs', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'src/graphics/shaders/mine.fs', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'src/minigames/minecraft/mine.rs', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'src/minigames/minecraft/mod.rs', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'src/scenes/mod.rs', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'tools/blender/minecraft/build_underground_mine.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'tools/blender/minecraft/prepare_mining_blocks.py', LF will be replaced by CRLF the next time Git touches it\n"
+    }
+  ],
+  "protected_files_unchanged": true,
+  "manual_playtest": false,
+  "manual_audio_review": false
+}

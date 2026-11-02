@@ -10,6 +10,8 @@ use serde::Deserialize;
 use std::path::Path;
 pub mod mine;
 pub mod mining;
+pub mod rush;
+pub mod sound;
 
 #[derive(Clone, Deserialize)]
 #[serde(deny_unknown_fields)]
