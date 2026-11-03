@@ -28,6 +28,7 @@ use serde_json::json;
 use std::{path::PathBuf, time::Instant};
 
 use super::southpark_entry::{EntryConfig, SouthParkEntry, SouthParkExit, SouthParkVisits};
+use super::southpark_video::{skip_button, VideoIntro};
 use crate::minigames::common::host::{MinigameResult, ReturnConfirmation};
 
 pub fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -240,6 +241,15 @@ pub fn run_visit_with_args(
     let mut entry =
         SouthParkEntry::new(visits, entry_config.clone(), audio.intro_duration(), &scene)?;
     entry.active = !smoke && !session_smoke && !dev_threats;
+    let mut video = if entry.active && entry.full_intro {
+        Some(VideoIntro::load(&mut rl, &thread, &root)?)
+    } else { None };
+    if let Some(clip) = &video {
+        if audio.intro_duration().is_some_and(|length| (length - clip.duration()).abs() > 0.2) {
+            return Err("South Park video/audio durations differ; regenerate both from the MP4".into());
+        }
+        entry.duration = clip.duration();
+    }
     let mut entry_case = 0;
     let mut entry_checks = Vec::new();
     let mut entry_captures = std::collections::BTreeSet::new();
@@ -247,7 +257,9 @@ pub fn run_visit_with_args(
     let mut return_confirmation = ReturnConfirmation::default();
     let captures = if let Some(goal) = return_smoke_goal {
         root.join(format!("target/minigame-return-{goal:?}"))
-    } else { root.join(if entry_smoke || world_smoke {
+    } else { root.join(if entry_smoke {
+        "target/southpark-video"
+    } else if world_smoke {
         "docs/references/southpark/phase6b"
     } else if session_smoke {
         "target/southpark-session-smoke"
@@ -262,6 +274,7 @@ pub fn run_visit_with_args(
         std::fs::create_dir_all(&captures)?;
     }
     let mut cursor = CursorCapture::default();
+    if entry.active { cursor.captured = false; }
     cursor.apply(&mut rl);
     let mut debug = false;
     let mut help = dev_threats || smoke;
@@ -346,6 +359,20 @@ pub fn run_visit_with_args(
             }
         }
         if entry_smoke
+            && entry.active && entry.elapsed >= 0.2 && entry_case == 3
+        {
+            let rect = skip_button(rl.get_screen_width(), rl.get_screen_height());
+            unsafe {
+                ffi::PlayAutomationEvent(ffi::AutomationEvent {
+                    frame: 0, type_: 7,
+                    params: [(rect.x + rect.width * 0.5) as i32, (rect.y + rect.height * 0.5) as i32, 0, 0],
+                });
+                if entry.elapsed >= 0.6 {
+                    ffi::PlayAutomationEvent(ffi::AutomationEvent { frame: 0, type_: 6, params: [0, 0, 0, 0] });
+                }
+            }
+        }
+        if entry_smoke
             && entry.active
             && entry.elapsed >= 0.6
             && (entry_case == 1 || entry_case == 2)
@@ -372,14 +399,24 @@ pub fn run_visit_with_args(
             entry.update_audio(
                 dt,
                 rl.is_key_pressed(KeyboardKey::KEY_SPACE)
-                    || rl.is_key_pressed(KeyboardKey::KEY_ENTER),
+                    || rl.is_key_pressed(KeyboardKey::KEY_ENTER)
+                    || rl.is_key_pressed(KeyboardKey::KEY_ESCAPE)
+                    || (rl.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_LEFT)
+                        && skip_button(rl.get_screen_width(), rl.get_screen_height())
+                            .check_collision_point_rec(rl.get_mouse_position())),
                 visits,
                 intro_clock,
             );
             if !entry.active {
+                // Stop the one video track before gameplay music can start.
+                audio.set_music(crate::audio::MusicMode::Silent);
+                video = None;
                 cursor.captured = true;
                 cursor.apply(&mut rl);
             }
+        }
+        if entry.active {
+            if let Some(clip) = &mut video { clip.update(entry.elapsed)?; }
         }
         if !intro_was_active
             && session.state == SessionState::Exploring
@@ -724,197 +761,208 @@ pub fn run_visit_with_args(
         {
             let width = rl.get_screen_width();
             let height = rl.get_screen_height();
+            let rl_mouse = rl.get_mouse_position();
             let mut d = rl.begin_drawing(&thread);
             d.clear_background(Color::new(184, 212, 237, 255));
-            {
-                let mut view = d.begin_mode3D(camera);
-                model.draw(&mut view, camera.position);
-                for (index, target) in scene.targets.iter().enumerate() {
-                    if target.id == KENNY_ID || target.id.starts_with(PREFIX) {
-                        continue;
-                    }
-                    let color = [
-                        Color::new(202, 134, 72, 255),
-                        Color::new(65, 167, 176, 255),
-                        Color::new(162, 104, 195, 255),
-                    ][index % 3];
-                    let p = target.bounds.center();
-                    let s = target.bounds.size();
-                    view.draw_cube(p, s.x, s.y, s.z, color);
-                    view.draw_cube_wires(
-                        p,
-                        s.x + 0.01,
-                        s.y + 0.01,
-                        s.z + 0.01,
-                        if selected == Some(index) {
-                            Color::YELLOW
-                        } else {
-                            Color::DARKGRAY
-                        },
-                    );
-                }
-                if debug {
-                    for obstacle in &scene.world.obstacles {
-                        if obstacle.id.starts_with("boundary-") {
+            // The video replaces the cinematic entirely: no town/HUD render underneath.
+            if !(entry.active && entry.full_intro) {
+                {
+                    let mut view = d.begin_mode3D(camera);
+                    model.draw(&mut view, camera.position);
+                    for (index, target) in scene.targets.iter().enumerate() {
+                        if target.id == KENNY_ID || target.id.starts_with(PREFIX) {
                             continue;
                         }
-                        let s = obstacle.bounds.size();
+                        let color = [
+                            Color::new(202, 134, 72, 255),
+                            Color::new(65, 167, 176, 255),
+                            Color::new(162, 104, 195, 255),
+                        ][index % 3];
+                        let p = target.bounds.center();
+                        let s = target.bounds.size();
+                        view.draw_cube(p, s.x, s.y, s.z, color);
                         view.draw_cube_wires(
-                            obstacle.bounds.center(),
-                            s.x,
-                            s.y,
-                            s.z,
-                            Color::new(230, 80, 90, 150),
+                            p,
+                            s.x + 0.01,
+                            s.y + 0.01,
+                            s.z + 0.01,
+                            if selected == Some(index) {
+                                Color::YELLOW
+                            } else {
+                                Color::DARKGRAY
+                            },
                         );
                     }
+                    if debug {
+                        for obstacle in &scene.world.obstacles {
+                            if obstacle.id.starts_with("boundary-") {
+                                continue;
+                            }
+                            let s = obstacle.bounds.size();
+                            view.draw_cube_wires(
+                                obstacle.bounds.center(),
+                                s.x,
+                                s.y,
+                                s.z,
+                                Color::new(230, 80, 90, 150),
+                            );
+                        }
+                    }
+                    threat_models.draw(&mut view, camera.position, &scene.threats);
+                    if scene.threats.visible_kenny() {
+                        sprite.draw(&mut view, &pose);
+                    }
                 }
-                threat_models.draw(&mut view, camera.position, &scene.threats);
-                if scene.threats.visible_kenny() {
-                    sprite.draw(&mut view, &pose);
-                }
-            }
-            d.draw_text("SOUTH PARK - SAVE KENNY!", 16, 14, 20, Color::DARKGRAY);
-            if !entry.active
-                && !smoke
-                && !dev_threats
-                && session.state == SessionState::Exploring
-                && scene.dialogue == KennyDialogue::Closed
-            {
-                d.draw_text(
-                    "E: hablar | M: mapa | Retroceso: salir de South Park",
-                    16,
-                    46,
-                    16,
-                    Color::DARKBLUE,
-                );
-            }
-            if !smoke && dev_threats {
-                d.draw_fps(width - 100, 14);
-            }
-            if active
-                && threat_capture.is_none()
-                && !(smoke && frame == 75)
-                && !(kenny_smoke && frame == 195)
-            {
-                let color = if selected.is_some() {
-                    Color::YELLOW
-                } else {
-                    Color::WHITE
-                };
-                d.draw_circle(width / 2, height / 2, 3.0, Color::BLACK);
-                d.draw_line(width / 2 - 7, height / 2, width / 2 + 7, height / 2, color);
-                d.draw_line(width / 2, height / 2 - 7, width / 2, height / 2 + 7, color);
-                if let Some(index) = selected {
-                    let text = if index == kenny_index {
-                        "[E] Hablar con Kenny".into()
-                    } else if scene.targets[index].id.starts_with(PREFIX) {
-                        format!("[E] {}", scene.targets[index].label)
-                    } else {
-                        format!("[E] Interactuar - {}", scene.targets[index].label)
-                    };
-                    let x = (width - d.measure_text(&text, 22)) / 2;
-                    d.draw_rectangle(
-                        x - 10,
-                        height / 2 + 24,
-                        d.measure_text(&text, 22) + 20,
-                        34,
-                        Color::new(20, 30, 40, 220),
+                d.draw_text("SOUTH PARK - SAVE KENNY!", 16, 14, 20, Color::DARKGRAY);
+                if !entry.active
+                    && !smoke
+                    && !dev_threats
+                    && session.state == SessionState::Exploring
+                    && scene.dialogue == KennyDialogue::Closed
+                {
+                    d.draw_text(
+                        "E: hablar | M: mapa | Retroceso: salir de South Park",
+                        16,
+                        46,
+                        16,
+                        Color::DARKBLUE,
                     );
-                    d.draw_text(&text, x, height / 2 + 30, 22, Color::YELLOW);
                 }
-            } else if !active
-                && !cursor.captured
-                && scene.dialogue == KennyDialogue::Closed
-                && !session.blocks_controls()
-            {
-                d.draw_rectangle(0, height / 2 - 30, width, 60, Color::new(20, 30, 40, 210));
-                d.draw_text(
-                    "Cursor libre - pulsa ESC para retomar",
-                    (width - 480) / 2,
-                    height / 2 - 10,
-                    24,
-                    Color::WHITE,
-                );
-            }
-            if let Some((text, _)) = &scene.confirmation {
-                if !(smoke && frame == 75) && !session.in_match() {
-                    d.draw_text(text, 16, 46, 20, Color::DARKGREEN);
+                if !smoke && dev_threats {
+                    d.draw_fps(width - 100, 14);
                 }
-            }
-            if help && !session.blocks_controls() {
-                let help_x = if smoke { 16 } else { 220 };
-                d.draw_rectangle(
-                    help_x - 16,
-                    height - 55,
-                    width - help_x + 16,
-                    55,
-                    Color::new(20, 30, 40, 210),
-                );
-                d.draw_text(
-                    if smoke {
-                        "WASD caminar | Shift correr | Mouse mirar | E interactuar | ESC cursor"
+                if active
+                    && threat_capture.is_none()
+                    && !(smoke && frame == 75)
+                    && !(kenny_smoke && frame == 195)
+                {
+                    let color = if selected.is_some() {
+                        Color::YELLOW
                     } else {
-                        "WASD: mover | Mouse: mirar | E: usar"
-                    },
-                    help_x,
-                    height - 48,
-                    if smoke { 18 } else { 14 },
-                    Color::WHITE,
-                );
-                d.draw_text(
-                    if smoke {
-                        "F1 ayuda | F2 colisiones | F3 Kenny | F12 captura | Ctrl+Q salir"
-                    } else {
-                        "Shift: correr | M: mapa | Esc/P: pausa"
-                    },
-                    help_x,
-                    height - 25,
-                    if smoke { 18 } else { 14 },
-                    Color::LIGHTGRAY,
-                );
-            }
-            if scene.kenny_hint
-                && !session.in_match()
-                && scene.dialogue == KennyDialogue::Closed
-                && !(kenny_smoke && frame == 195)
-            {
-                d.draw_text(
-                    &format!(
-                        "Kenny: {:.1} m | F3 ocultar indicador",
-                        (scene.kenny.position() - scene.player.feet).length()
-                    ),
-                    16,
-                    73,
-                    18,
-                    Color::new(130, 65, 15, 255),
-                );
-            }
-            if scene.dialogue != KennyDialogue::Closed {
-                kenny_dialogue::draw(&mut d, scene.dialogue, width, height);
-            }
-            if !session.in_match() {
-                draw_status(&mut d, &scene.threats, width);
-            }
-            session_ui.draw(&mut d, &session, &scene.threats, width, height, &return_confirmation);
-            if let Some(test) = &mut return_test {
-                if let Some(name) = test.capture(&session, &return_confirmation) {
-                    save_frame(&captures.join(name), width, height)?;
+                        Color::WHITE
+                    };
+                    d.draw_circle(width / 2, height / 2, 3.0, Color::BLACK);
+                    d.draw_line(width / 2 - 7, height / 2, width / 2 + 7, height / 2, color);
+                    d.draw_line(width / 2, height / 2 - 7, width / 2, height / 2 + 7, color);
+                    if let Some(index) = selected {
+                        let text = if index == kenny_index {
+                            "[E] Hablar con Kenny".into()
+                        } else if scene.targets[index].id.starts_with(PREFIX) {
+                            format!("[E] {}", scene.targets[index].label)
+                        } else {
+                            format!("[E] Interactuar - {}", scene.targets[index].label)
+                        };
+                        let x = (width - d.measure_text(&text, 22)) / 2;
+                        d.draw_rectangle(
+                            x - 10,
+                            height / 2 + 24,
+                            d.measure_text(&text, 22) + 20,
+                            34,
+                            Color::new(20, 30, 40, 220),
+                        );
+                        d.draw_text(&text, x, height / 2 + 30, 22, Color::YELLOW);
+                    }
+                } else if !active
+                    && !cursor.captured
+                    && scene.dialogue == KennyDialogue::Closed
+                    && !session.blocks_controls()
+                {
+                    d.draw_rectangle(0, height / 2 - 30, width, 60, Color::new(20, 30, 40, 210));
+                    d.draw_text(
+                        "Cursor libre - pulsa ESC para retomar",
+                        (width - 480) / 2,
+                        height / 2 - 10,
+                        24,
+                        Color::WHITE,
+                    );
+                }
+                if let Some((text, _)) = &scene.confirmation {
+                    if !(smoke && frame == 75) && !session.in_match() {
+                        d.draw_text(text, 16, 46, 20, Color::DARKGREEN);
+                    }
+                }
+                if help && !session.blocks_controls() {
+                    let help_x = if smoke { 16 } else { 220 };
+                    d.draw_rectangle(
+                        help_x - 16,
+                        height - 55,
+                        width - help_x + 16,
+                        55,
+                        Color::new(20, 30, 40, 210),
+                    );
+                    d.draw_text(
+                        if smoke {
+                            "WASD caminar | Shift correr | Mouse mirar | E interactuar | ESC cursor"
+                        } else {
+                            "WASD: mover | Mouse: mirar | E: usar"
+                        },
+                        help_x,
+                        height - 48,
+                        if smoke { 18 } else { 14 },
+                        Color::WHITE,
+                    );
+                    d.draw_text(
+                        if smoke {
+                            "F1 ayuda | F2 colisiones | F3 Kenny | F12 captura | Ctrl+Q salir"
+                        } else {
+                            "Shift: correr | M: mapa | Esc/P: pausa"
+                        },
+                        help_x,
+                        height - 25,
+                        if smoke { 18 } else { 14 },
+                        Color::LIGHTGRAY,
+                    );
+                }
+                if scene.kenny_hint
+                    && !session.in_match()
+                    && scene.dialogue == KennyDialogue::Closed
+                    && !(kenny_smoke && frame == 195)
+                {
+                    d.draw_text(
+                        &format!(
+                            "Kenny: {:.1} m | F3 ocultar indicador",
+                            (scene.kenny.position() - scene.player.feet).length()
+                        ),
+                        16,
+                        73,
+                        18,
+                        Color::new(130, 65, 15, 255),
+                    );
+                }
+                if scene.dialogue != KennyDialogue::Closed {
+                    kenny_dialogue::draw(&mut d, scene.dialogue, width, height);
+                }
+                if !session.in_match() {
+                    draw_status(&mut d, &scene.threats, width);
+                }
+                session_ui.draw(&mut d, &session, &scene.threats, width, height, &return_confirmation);
+                if let Some(test) = &mut return_test {
+                    if let Some(name) = test.capture(&session, &return_confirmation) {
+                        save_frame(&captures.join(name), width, height)?;
+                    }
+                }
+                if !entry.active && scene.dialogue == KennyDialogue::Closed {
+                    world_map.draw(&mut d, &scene, &session, width, height);
+                }
+                if help && scene.confirmation.is_none() && (dev_threats || smoke) && !session.in_match()
+                {
+                    d.draw_text(
+                        "F5 bus | F6 OVNI | F7 tapa | F10 piano | F11 nieve | F8 reiniciar | F9 explorar",
+                        16,
+                        50,
+                        18,
+                        Color::DARKGRAY,
+                    );
                 }
             }
-            if !entry.active && scene.dialogue == KennyDialogue::Closed {
-                world_map.draw(&mut d, &scene, &session, width, height);
+            if let Some(clip) = video.as_ref().filter(|_| entry.active && entry.full_intro) {
+                clip.draw(&mut d, width, height, rl_mouse);
+            } else {
+                entry.draw(&mut d, width, height);
             }
-            if help && scene.confirmation.is_none() && (dev_threats || smoke) && !session.in_match()
-            {
-                d.draw_text(
-                    "F5 bus | F6 OVNI | F7 tapa | F10 piano | F11 nieve | F8 reiniciar | F9 explorar",
-                    16,
-                    50,
-                    18,
-                    Color::DARKGRAY,
-                );
+            if entry_smoke && intro_was_active && !entry.active {
+                save_frame(&captures.join(format!("gameplay-case-{entry_case}.png")), width, height)?;
             }
-            entry.draw(&mut d, width, height);
             if entry_smoke && entry_case == 0 && entry.active {
                 for (at, name) in [
                     (3.0, "intro-30.png"),
@@ -924,6 +972,17 @@ pub fn run_visit_with_args(
                     if entry.elapsed >= at && entry_captures.insert(name) {
                         save_frame(&captures.join(name), width, height)?;
                     }
+                }
+            }
+            if entry_smoke && entry.active && entry.elapsed >= 0.3 {
+                let name = match entry_case {
+                    1 => Some("intro-small.png"),
+                    2 => Some("intro-wide.png"),
+                    3 => Some("intro-portrait-hover.png"),
+                    _ => None,
+                };
+                if let Some(name) = name {
+                    if entry_captures.insert(name) { save_frame(&captures.join(name), width, height)?; }
                 }
             }
             if manual_capture {
@@ -974,14 +1033,17 @@ pub fn run_visit_with_args(
             if !visits.intro_seen || !cursor.captured || !rl.is_cursor_hidden() {
                 return Err("Entry did not restore visit/cursor".into());
             }
-            if entry_case == 0 && !intro_clock.finished {
+            if entry_case == 0 && intro_clock.position.is_some() && !intro_clock.finished {
                 return Err("Intro ended before its stream finished".into());
             }
-            entry_checks.push(json!({"case":entry_case,"elapsed":entry.elapsed,
+            if audio.intro_clock().position.is_some() || video.is_some() {
+                return Err("Video resources or intro audio survived the transition".into());
+            }
+            entry_checks.push(json!({"case":entry_case,"input": (["natural", "space", "enter", "click", "return_visit"][entry_case]), "intro_audio_stopped":true, "video_released":true,"elapsed":entry.elapsed,
                 "full_intro":entry.full_intro,"cursor_captured":cursor.captured,
                 "audio_finished":intro_clock.finished,"audio_position":intro_clock.position,"duration":entry.duration,
                 "kenny_distance":(scene.kenny.position()-scene.player.feet).length()}));
-            if entry_case == 3 {
+            if entry_case == 4 {
                 let report = json!({"status":"PASS","cases":entry_checks,"audio":audio.audit,
                     "manual_listening_verified":false,"physical_input_verified":false,"clock":"stream playback clock; first intro waits for natural audio completion"});
                 std::fs::write(
@@ -992,7 +1054,14 @@ pub fn run_visit_with_args(
                 break;
             }
             entry_case += 1;
-            visits.intro_seen = entry_case == 3;
+            match entry_case {
+                1 => rl.set_window_size(640, 480),
+                2 => rl.set_window_size(1920, 1080),
+                3 => rl.set_window_size(800, 1000),
+                _ => rl.set_window_size(1280, 800),
+            }
+            visits.intro_seen = entry_case == 4;
+            unsafe { ffi::PlayAutomationEvent(ffi::AutomationEvent { frame: 0, type_: 5, params: [0, 0, 0, 0] }); }
             for key in [KeyboardKey::KEY_SPACE, KeyboardKey::KEY_ENTER] {
                 unsafe {
                     ffi::PlayAutomationEvent(ffi::AutomationEvent {
@@ -1004,6 +1073,10 @@ pub fn run_visit_with_args(
             }
             entry =
                 SouthParkEntry::new(visits, entry_config.clone(), audio.intro_duration(), &scene)?;
+            video = if entry.full_intro { Some(VideoIntro::load(&mut rl, &thread, &root)?) } else { None };
+            if let Some(clip) = &video { entry.duration = clip.duration(); }
+            cursor.captured = false;
+            cursor.apply(&mut rl);
         }
         if session_smoke {
             session_test.after_frame(&scene, &session, &audio)?;

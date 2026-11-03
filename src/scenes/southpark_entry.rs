@@ -71,25 +71,9 @@ impl SouthParkEntry {
     ) -> Result<Self, String> {
         let eye = scene.player.eye();
         let full_intro = !visits.intro_seen;
-        let points = if full_intro {
-            vec![
-                (
-                    Vector3::new(-180.0, 110.0, 95.0),
-                    Vector3::new(-20.0, 0.0, 0.0),
-                ),
-                (
-                    Vector3::new(-95.0, 75.0, -42.9),
-                    Vector3::new(30.0, 0.0, -42.9),
-                ),
-                (
-                    Vector3::new(eye.x, 40.0, eye.z),
-                    Vector3::new(eye.x + 35.0, 0.0, eye.z),
-                ),
-                (eye, eye + scene.player.direction()),
-            ]
-        } else {
-            vec![(eye, eye + scene.player.direction()); 2]
-        };
+        // The video is the only first-visit presentation. The return fade uses
+        // the exact FPS pose; no cinematic camera path runs behind the clip.
+        let points = vec![(eye, eye + scene.player.direction()); 2];
         let entry = Self {
             elapsed: 0.0,
             duration: if full_intro {
@@ -148,7 +132,7 @@ impl SouthParkEntry {
     pub fn update(&mut self, dt: f32, skip: bool, visits: &mut SouthParkVisits) {
         self.update_audio(dt, skip, visits, crate::audio::VoiceClock::default());
     }
-    /// Use the stream clock for both camera animation and completion. No fixed cap.
+    /// Use the video audio clock for playback and completion. No fixed cap.
     pub fn update_audio(
         &mut self,
         dt: f32,
@@ -191,29 +175,9 @@ impl SouthParkEntry {
         if !self.active {
             return;
         }
-        let bar = (h as f32 * 0.1) as i32;
-        d.draw_rectangle(0, 0, w, bar, Color::BLACK);
-        d.draw_rectangle(0, h - bar, w, bar, Color::BLACK);
-        if self.full_intro {
-            let size = (w / 12).clamp(36, 100);
-            let title = "SOUTH PARK";
-            let x = (w - d.measure_text(title, size)) / 2;
-            d.draw_text(title, x + 4, bar + 24, size, Color::BLACK);
-            d.draw_text(title, x, bar + 20, size, Color::new(255, 222, 130, 255));
-            d.draw_text(
-                "Espacio / Enter: saltar",
-                24,
-                h - bar + 12,
-                20,
-                Color::WHITE,
-            );
-        }
-        // Fade the final camera approach into the exact FPS pose.
-        let alpha = if self.full_intro {
-            ((self.elapsed / self.duration - 0.94) / 0.06).max(0.0)
-        } else {
-            1.0 - self.elapsed / self.duration
-        };
+        // The full intro is drawn by VideoIntro, with no legacy letterbox/title.
+        if self.full_intro { return; }
+        let alpha = 1.0 - self.elapsed / self.duration;
         if alpha > 0.0 {
             d.draw_rectangle(0, 0, w, h, Color::new(12, 24, 38, (alpha * 255.0) as u8));
         }

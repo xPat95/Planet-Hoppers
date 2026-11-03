@@ -101,7 +101,7 @@ impl<'a> AudioController<'a> {
             });
             loaded
         };
-        let intro = music("assets/audio/music/South Park/intro.mp3", false);
+        let intro = music(crate::scenes::southpark_video::AUDIO, false);
         let exploration = music("assets/audio/music/South Park/exploration.mp3", true);
         let challenge = music("assets/audio/music/South Park/save_kenny.mp3", true);
         let voice = music("assets/audio/sfx/South Park/they_killed_kenny.mp3", false);

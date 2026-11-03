@@ -12,5 +12,6 @@ mod session_ui;
 pub mod solar_system;
 pub mod southpark_dev;
 pub mod southpark_entry;
+pub mod southpark_video;
 mod threat_smoke;
 pub mod world_map;
