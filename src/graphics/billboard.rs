@@ -112,7 +112,17 @@ impl SpriteBillboard {
         path: &Path,
         height: f32,
     ) -> Result<Self, Box<dyn std::error::Error>> {
-        let image = Image::load_image(path.to_str().ok_or("Invalid Kenny PNG path")?)?;
+        Self::load_image(rl, thread, path, height, false)
+    }
+    /// Remove source canvas margins in RAM, keeping the original PNG untouched.
+    pub fn load_trimmed(rl: &mut RaylibHandle, thread: &RaylibThread, path: &Path, height: f32)
+        -> Result<Self, Box<dyn std::error::Error>> {
+        Self::load_image(rl, thread, path, height, true)
+    }
+    fn load_image(rl: &mut RaylibHandle, thread: &RaylibThread, path: &Path, height: f32, trim: bool)
+        -> Result<Self, Box<dyn std::error::Error>> {
+        let mut image = Image::load_image(path.to_str().ok_or("Invalid sprite PNG path")?)?;
+        if trim { image.alpha_crop(0.125); }
         let (pixel_width, pixel_height) = (image.width() as usize, image.height() as usize);
         let alpha: Vec<_> = image.get_image_data().iter().map(|p| p.a).collect();
         if pixel_width == 0 || pixel_height == 0 || !alpha.contains(&0) || !alpha.contains(&255) {

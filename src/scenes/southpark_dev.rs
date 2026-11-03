@@ -29,6 +29,8 @@ use std::{path::PathBuf, time::Instant};
 
 use super::southpark_entry::{EntryConfig, SouthParkEntry, SouthParkExit, SouthParkVisits};
 use super::southpark_video::{skip_button, VideoIntro};
+use super::southpark_ike::IkePlayback;
+use crate::minigames::southpark::ike::{self, IkeEvent};
 use crate::minigames::common::host::{MinigameResult, ReturnConfirmation};
 
 pub fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -58,8 +60,10 @@ pub fn run_visit_with_args(
     let mut return_smoke_goal = None;
     let mut dev_threats = false;
     let mut muted = false;
+    let mut ike_smoke = false;
     while let Some(arg) = args.next() {
         match arg.as_str() {
+            "--smoke-ike" => { ike_smoke = true; no_probes = true; }
             "--smoke-return" => {
                 return_smoke_goal = Some(match args.next().as_deref() {
                     Some("victory") => MinigameResult::Victory,
@@ -112,6 +116,7 @@ pub fn run_visit_with_args(
                 config_path = PathBuf::from(args.next().ok_or("--config requires a JSON path")?)
             }
             "--help" | "-h" => {
+                println!("--smoke-ike: prueba grafica del easter egg; capturas en target/southpark-ike-smoke.");
                 println!("Intro: Espacio/Enter saltar. Backspace: confirmar regreso al sistema solar durante exploracion. --smoke-entry: validar intro y visitas.\nM: mapa ampliado (pausa el mundo). Arrastrar: mover; rueda: zoom; R: jugador; M/Esc: cerrar.\n--smoke-world: prueba gráfica del mundo dinámico y los mapas.\ncargo run --bin southpark-locations: auditoría de zonas sin ventana.");
                 println!("Partida normal: hablá con Kenny y elegí Comenzar desafío. Esc/P: pausa, reiniciar o regresar al sistema solar.\n--dev-threats: habilitar F5/F6/F7/F10/F11 para pruebas individuales.\n--smoke-session: partida automatizada con audio y capturas de fase 5.\n--mute: cargar y verificar audio con volúmenes en cero.");
                 println!("cargo run --bin southpark -- [--config PATH] [--no-test-objects] [--threat bus|ufo|sewer|piano|snowman] [--smoke] [--smoke-kenny] [--smoke-threats]\nWASD: caminar | Shift: correr | mouse: mirar | E: interactuar\nEsc: pausa / cerrar mapa o dialogo | Enter: aceptar / continuar\nF5: autobús | F6: OVNI | F7: alcantarilla | F10: piano | F11: nieve | F8: reiniciar | F9: explorar\nF1: ayuda | F2: colisionadores | F3: indicador Kenny | F12: captura | Ctrl+Q: salir");
@@ -151,7 +156,7 @@ pub fn run_visit_with_args(
         .build();
     rl.set_exit_key(None);
     rl.set_window_min_size(640, 480);
-    if smoke || session_smoke || entry_smoke || return_smoke_goal.is_some() {
+    if smoke || session_smoke || entry_smoke || ike_smoke || return_smoke_goal.is_some() {
         rl.set_window_state(WindowState::default().set_window_hidden(true));
     }
     // The session smoke uses the real audio clock, so do not exhaust its frame
@@ -175,6 +180,7 @@ pub fn run_visit_with_args(
         audio_config.voice_volume = 0.0;
         audio_config.footsteps_volume = 0.0;
     }
+    let ike_volume = audio_config.voice_volume;
     let mut audio = AudioController::load(device.as_ref(), &root, audio_config);
     let mut session = SaveKennySession::new(SessionConfig::load(
         &root.join("config/southpark-session.json"),
@@ -220,6 +226,14 @@ pub fn run_visit_with_args(
         &root.join("assets/textures/minigames/South Park/KennyMcCormick.png"),
         NPC_HEIGHT,
     )?;
+    let ike_sprite = if dynamic_mode {
+        match SpriteBillboard::load_trimmed(&mut rl, &thread, &root.join(ike::SPRITE), ike::HEIGHT) {
+            Ok(sprite) => Some(sprite),
+            Err(error) => { eprintln!("IKE_WARNING {error}"); None }
+        }
+    } else { None };
+    let mut ike = IkeEvent::default();
+    let mut ike_playback: Option<IkePlayback<'_>> = None;
     println!(
         "SCENE {} | {} solid proxies | {:?}",
         manifest.id,
@@ -241,6 +255,7 @@ pub fn run_visit_with_args(
     let mut entry =
         SouthParkEntry::new(visits, entry_config.clone(), audio.intro_duration(), &scene)?;
     entry.active = !smoke && !session_smoke && !dev_threats;
+    if ike_smoke { entry.active = false; }
     let mut video = if entry.active && entry.full_intro {
         Some(VideoIntro::load(&mut rl, &thread, &root)?)
     } else { None };
@@ -255,7 +270,9 @@ pub fn run_visit_with_args(
     let mut entry_captures = std::collections::BTreeSet::new();
     let mut exit = SouthParkExit::WindowClosed;
     let mut return_confirmation = ReturnConfirmation::default();
-    let captures = if let Some(goal) = return_smoke_goal {
+    let captures = if ike_smoke {
+        root.join("target/southpark-ike-smoke")
+    } else if let Some(goal) = return_smoke_goal {
         root.join(format!("target/minigame-return-{goal:?}"))
     } else { root.join(if entry_smoke {
         "target/southpark-video"
@@ -270,7 +287,7 @@ pub fn run_visit_with_args(
     } else {
         "target/southpark-smoke"
     }) };
-    if smoke || session_smoke || entry_smoke || return_smoke_goal.is_some() {
+    if smoke || session_smoke || entry_smoke || ike_smoke || return_smoke_goal.is_some() {
         std::fs::create_dir_all(&captures)?;
     }
     let mut cursor = CursorCapture::default();
@@ -301,7 +318,28 @@ pub fn run_visit_with_args(
     let mut modal_cursor_free = false;
     let kenny_start = scene.kenny.position();
     let initial_look = (scene.player.yaw, scene.player.pitch);
+    let mut ike_smoke_position = None;
+    let mut ike_smoke_player = None;
     while !rl.window_should_close() {
+        if ike_smoke {
+            if frame == 2 || frame == 10 || frame == 550 || frame == 560 || frame == 20 || frame == 45 {
+                let (key, down) = match frame {
+                    2 | 550 => (KeyboardKey::KEY_E, true),
+                    10 | 560 => (KeyboardKey::KEY_E, false),
+                    20 => (KeyboardKey::KEY_D, true),
+                    _ => (KeyboardKey::KEY_D, false),
+                };
+                unsafe { ffi::PlayAutomationEvent(ffi::AutomationEvent {
+                    frame: 0, type_: if down { 2 } else { 1 }, params: [key as i32, 0, 0, 0],
+                }); }
+            }
+            if frame == 548 {
+                let direction = (ike.position.ok_or("Ike smoke lost spawn")? + Vector3::up() * 0.48 - scene.player.eye()).normalized();
+                scene.player.yaw = direction.z.atan2(direction.x);
+                scene.player.pitch = direction.y.asin();
+            }
+            if frame == 575 { session.start(&mut scene, seed)?; }
+        }
         audio.update();
         if let Some(test) = &mut return_test {
             test.before_frame(&rl, &mut scene, &session, &return_confirmation, entry.active)?;
@@ -561,7 +599,7 @@ pub fn run_visit_with_args(
             running_read |= input.forward > 0.0 && input.sprint;
         }
         let old_yaw = scene.player.yaw;
-        let focused = smoke || session_smoke || return_test.is_some() || rl.is_window_focused();
+        let focused = smoke || session_smoke || ike_smoke || return_test.is_some() || rl.is_window_focused();
         let active = !modal_at_start && cursor.update(&mut rl, &mut input, focused);
         let previous_feet = scene.player.feet;
         if active {
@@ -615,6 +653,38 @@ pub fn run_visit_with_args(
         } else {
             session.music()
         });
+        ike.sync(session.state, entry.active);
+        if ike.available && !ike.spawn_attempted && ike_sprite.is_some() {
+            ike.spawn_attempted = true;
+            if let Some(locations) = &session.locations {
+                ike.position = ike::choose_position(&scene, locations, &mut seed);
+                if let Some(position) = ike.position { println!("IKE_SPAWN {position:?}"); }
+                else { eprintln!("IKE_WARNING no safe spawn available"); }
+            }
+        }
+        if !ike.playing { ike_playback = None; }
+        if let Some(clip) = &mut ike_playback {
+            let done = match clip.update() {
+                Ok(done) => done,
+                Err(error) => { eprintln!("IKE_VIDEO_WARNING {error}"); true }
+            };
+            if done { ike_playback = None; ike.finish(); }
+        }
+        audio.duck_exploration(ike_playback.is_some());
+        if ike_smoke && frame == 0 {
+            let p = ike.position.ok_or("Ike smoke: no safe spawn")?;
+            let start = [Vector3::new(0.0, 0.0, -2.5), Vector3::new(0.0, 0.0, 2.5),
+                Vector3::new(-2.5, 0.0, 0.0), Vector3::new(2.5, 0.0, 0.0)]
+                .into_iter().map(|offset| p + offset)
+                .find(|point| scene.world.can_occupy(*point, 0.35, 1.8))
+                .ok_or("Ike smoke: no safe approach")?;
+            scene.player.feet = start;
+            let direction = (p + Vector3::up() * 0.48 - scene.player.eye()).normalized();
+            scene.player.yaw = direction.z.atan2(direction.x);
+            scene.player.pitch = direction.y.asin();
+            ike_smoke_position = Some(p);
+            ike_smoke_player = Some(start);
+        }
         for cue in session.take_cues() {
             audio.cue(cue);
         }
@@ -659,15 +729,33 @@ pub fn run_visit_with_args(
         pose.height *= scene.threats.sprite_height_scale();
         let kenny_index = scene.kenny_target();
         scene.targets[kenny_index].bounds = pose.bounds();
+        // Temporary candidate list shares the existing nearest-hit/solid-occlusion raycast.
+        // Ike never enters scene.targets (threats and objective code only see their own targets).
+        let ike_pose = ike.position.zip(ike_sprite.as_ref()).map(|(p, sprite)|
+            sprite.pose(p, camera.position, 0.0, 0.0));
+        let mut interaction_targets = scene.targets.clone();
+        let ike_index = if ike.visible() {
+            ike_pose.as_ref().map(|pose| {
+                let index = interaction_targets.len();
+                interaction_targets.push(crate::minigames::common::interaction::InteractionTarget {
+                    id: "easter-egg:ike".into(), label: "Hablar con Ike".into(),
+                    bounds: pose.bounds(), action: "ike-video".into(),
+                });
+                index
+            })
+        } else { None };
         let selected = if active && session.permits_interaction() && !session.blocks_controls() {
             select_target_with(
-                &scene.targets,
+                &interaction_targets,
                 &scene.world,
                 scene.player.eye(),
                 scene.player.direction(),
                 scene.interaction_distance.max(scene.threats.range()),
                 |index, origin, direction, range, broad| {
-                    if index == kenny_index {
+                    if Some(index) == ike_index {
+                        ike_sprite.as_ref()?.hit(ike_pose.as_ref()?, origin, direction,
+                            range.min(scene.interaction_distance))
+                    } else if index == kenny_index {
                         if session.in_match()
                             || scene.threats.owns_kenny()
                             || !scene.threats.visible_kenny()
@@ -699,7 +787,14 @@ pub fn run_visit_with_args(
         };
         if active && input.interact {
             if let Some(index) = selected {
-                scene.interact(index);
+                if Some(index) == ike_index {
+                    if ike.begin() {
+                        match IkePlayback::load(&mut rl, &thread, &root, device.as_ref(), ike_volume) {
+                            Ok(clip) => { ike_playback = Some(clip); audio.duck_exploration(true); }
+                            Err(error) => { eprintln!("IKE_VIDEO_WARNING {error}"); ike.finish(); }
+                        }
+                    }
+                } else { scene.interact(index); }
             }
         }
         if (scene.dialogue != KennyDialogue::Closed || session.blocks_controls()) && cursor.captured
@@ -812,6 +907,13 @@ pub fn run_visit_with_args(
                     if scene.threats.visible_kenny() {
                         sprite.draw(&mut view, &pose);
                     }
+                    if ike.available {
+                        if let (Some(clip), Some(position)) = (&ike_playback, ike.position) {
+                            clip.video.draw_world(&mut view, camera, position);
+                        } else if let (Some(sprite), Some(pose)) = (&ike_sprite, &ike_pose) {
+                            if ike.visible() { sprite.draw(&mut view, pose); }
+                        }
+                    }
                 }
                 d.draw_text("SOUTH PARK - SAVE KENNY!", 16, 14, 20, Color::DARKGRAY);
                 if !entry.active
@@ -845,7 +947,9 @@ pub fn run_visit_with_args(
                     d.draw_line(width / 2 - 7, height / 2, width / 2 + 7, height / 2, color);
                     d.draw_line(width / 2, height / 2 - 7, width / 2, height / 2 + 7, color);
                     if let Some(index) = selected {
-                        let text = if index == kenny_index {
+                        let text = if Some(index) == ike_index {
+                            "[E] Hablar con Ike".into()
+                        } else if index == kenny_index {
                             "[E] Hablar con Kenny".into()
                         } else if scene.targets[index].id.starts_with(PREFIX) {
                             format!("[E] {}", scene.targets[index].label)
@@ -990,6 +1094,28 @@ pub fn run_visit_with_args(
                 save_frame(&path, width, height)?;
                 println!("Captura: {}", path.display());
             }
+            if ike_smoke {
+                if matches!(frame, 3 | 30 | 555) && ike_playback.is_none() {
+                    return Err(format!("Ike smoke: playback missing at frame {frame}").into());
+                }
+                if frame == 530 {
+                    if !ike.visible() || ike_playback.is_some() || ike.position != ike_smoke_position {
+                        return Err("Ike smoke: natural completion did not restore original sprite".into());
+                    }
+                    if (scene.player.feet - ike_smoke_player.unwrap()).length() < 0.1 {
+                        return Err("Ike smoke: FPS movement blocked during video".into());
+                    }
+                }
+                if frame == 590 && (ike.visible() || ike.playing || ike_playback.is_some() || ike.position.is_some()) {
+                    return Err("Ike smoke: challenge did not release easter egg".into());
+                }
+                let capture = match frame {
+                    1 => Some("01-ike.png"), 30 => Some("02-video-world.png"),
+                    80 => Some("03-moved.png"), 530 => Some("04-restored.png"),
+                    555 => Some("05-replay.png"), 590 => Some("06-challenge.png"), _ => None,
+                };
+                if let Some(name) = capture { save_frame(&captures.join(name), width, height)?; }
+            }
             if smoke && !kenny_smoke && !threat_smoke && [0, 55, 65, 75].contains(&frame) {
                 let name = match frame {
                     0 => "street.png",
@@ -1025,6 +1151,10 @@ pub fn run_visit_with_args(
             scene.player.pitch = 0.0;
         }
         frame += 1;
+        if ike_smoke && frame >= 600 {
+            println!("IKE_SMOKE_OK raycast playback movement completion repeat challenge_cleanup");
+            break;
+        }
         if let Some(test) = &mut return_test {
             test.after_frame(&scene, &session, &audio)?;
             if frame > 12000 { return Err("Return smoke timed out".into()); }
@@ -1104,6 +1234,8 @@ pub fn run_visit_with_args(
             break;
         }
     }
+    drop(ike_playback);
+    audio.duck_exploration(false);
     audio.set_music(crate::audio::MusicMode::Silent);
     audio.stop_effects();
     audio.silence_voice();

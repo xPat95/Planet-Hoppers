@@ -254,6 +254,12 @@ impl<'a> AudioController<'a> {
             .map(Music::get_time_length)
             .filter(|v| v.is_finite() && *v > 0.0)
     }
+    /// Temporary multiplier; the configured user volume remains unchanged.
+    pub fn duck_exploration(&self, active: bool) {
+        if let Some(music) = &self.exploration {
+            music.set_volume(self.config.music_volume * if active { 0.2 } else { 1.0 });
+        }
+    }
     pub fn voice_duration(&self) -> Option<f32> {
         self.voice
             .as_ref()

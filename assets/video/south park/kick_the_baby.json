@@ -1,0 +1,13 @@
+{
+  "source": "assets/video/south park/Kick_the_baby.mp4",
+  "source_sha256": "1adecfeb7c2b2c2b2e6daf8ed042648059164f612bf1d18567f4a3d265384268",
+  "width": 640,
+  "height": 640,
+  "fps": 24,
+  "frames": 91,
+  "duration_seconds": 3.7916666666666665,
+  "audio": "kick_the_baby.ogg",
+  "video": "kick_the_baby.sfv",
+  "video_sha256": "97acc638e46733dfedc4a36de65ecc12d48a81a98a9695f99bbc5a3667936400",
+  "audio_sha256": "6b8dc74dd7ab08e579a8b8d11f4bee48ac161bc3fa6d42b06cdd78f07cfff24b"
+}
