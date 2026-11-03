@@ -61,13 +61,15 @@ STRATA = [mat("Strata%d" % i, h) for i, h in
           enumerate(("#a3352a", "#ad3d30", "#b74536", "#9e3127", "#b04034", "#ba4b3b"))]   # Rojos cercanos
 RUST_D = mat("RustDark", "#6e2019")
 CHAR = mat("Char", "#3b1c13")
-INNER = mat("Inner", "#0f1a10")                         # Adentro: roca negra verdosa
+INNER = mat("Inner", "#0f1a10")                         # Adentro, en las zonas verdes: roca negra verdosa
+INNER_CRUST = mat("InnerCrust", "#2e0905")               # Adentro: costra de lava enfriada, rojo casi negro
+INNER_LAVA = mat("InnerLava", "#c22a0c", emit=1.6, rough=0.5)   # Lava que corre entre las costras
 TEETH = mat("Teeth", "#c87a5e")
 LAVA = mat("Lava", "#b50d0b", emit=2.5, rough=0.5)              # Grietas rojo profundo
 LAVA_HOT = mat("LavaHot", "#e0261a", emit=3.5, rough=0.5)
-GLOW = mat("InnerGlow", "#8fd61e", emit=1.4, rough=0.5)  # Venas de adentro: verde cálido...
-GLOW_HOT = mat("InnerGlowHot", "#ff7a14", emit=2.5, rough=0.5)  # ...que en el centro pasa a naranja
-MATS = STRATA + [RUST_D, CHAR, INNER, TEETH, LAVA, LAVA_HOT, GLOW, GLOW_HOT]
+GLOW = mat("InnerGlow", "#8fd61e", emit=1.4, rough=0.5)  # Lava verde (en pocas zonas de adentro)
+GLOW_HOT = mat("InnerGlowHot", "#ff7a14", emit=2.5, rough=0.5)  # El centro de la lava: naranja que quema
+MATS = STRATA + [RUST_D, CHAR, INNER, TEETH, LAVA, LAVA_HOT, GLOW, GLOW_HOT, INNER_CRUST, INNER_LAVA]
 M = {m: i for i, m in enumerate(MATS)}
 
 # --- Ruido (valor 3D en una red periódica, con semilla) ----------------------------------------------------
@@ -294,7 +296,7 @@ for i, x in enumerate(axes[0]):                          # Por rebanadas, para n
     F[i] = planet(pts).reshape(gy.shape)
 
 
-def surface_nets(F):
+def surface_nets(F, lo=LO, h=H):
     """Un vértice por celda que cruza la superficie y un cuadrilátero por arista de la rejilla que la cruza."""
     ins = F < 0
     nx, ny, nz = F.shape
@@ -318,7 +320,7 @@ def surface_nets(F):
             t = fa[m] / (fa[m] - fb[m])
             acc[m] += ia[m] + t[:, None] * (np.array(b) - np.array(a))
             n[m] += 1
-    verts = LO + H * acc / n[:, None]
+    verts = lo + h * acc / n[:, None]
     quads = []
     for ax in range(3):
         bx, cx = (ax + 1) % 3, (ax + 2) % 3
@@ -455,12 +457,30 @@ idx = np.where((fh < 0.034) & ~inner, M[RUST_D], idx)
 
 
 
-# Adentro: roca oscura con venas verdes, que se ven brillar por los ojos, la nariz y la boca
+# Adentro: un mar de lava que se ve brillar por los ojos, la nariz y la boca. Costras oscuras flotando sobre lava
+# roja que corre entre ellas, con el centro naranja; en unas pocas zonas la lava es verde
 vein, vkeep = crack_net(60, 200.0, 0.02, 0.3)
-idx = np.where(inner, M[INNER], idx)
-veins = inner & vkeep & (hole_d > 0.08)                 # Sin venas cerca de las aberturas
-idx = np.where(veins & (vein < 0.03), M[GLOW], idx)
-idx = np.where(veins & (vein < 0.016), M[GLOW_HOT], idx)
+# Pocas zonas verdes, puestas a mano: una chica que se asoma por el ojo izquierdo y las otras fuera de la vista
+GREEN_SPOTS = [((0.3, 0.2, 0.93), 0.45), ((0.7, 0.1, -0.7), 0.4)]
+# La que se asoma: donde llega la vista de frente por la parte de arriba del ojo izquierdo (la primera cara de adentro)
+o_ = Vector((-0.27 * R, -2.0 * R, -0.03 * R))
+for _ in range(12):
+    hit_, loc_, nrm_, fi_ = ob.ray_cast(o_, Vector((0, 1, 0)))
+    if not hit_:
+        break
+    if inner[fi_]:
+        GREEN_SPOTS.append((tuple(loc_ / R), 0.2))
+        break
+    o_ = loc_ + Vector((0, 0.01 * R, 0))
+gd = np.full(len(pd), 9.0)
+for c_, r_ in GREEN_SPOTS:
+    c_ = np.array(c_) / np.linalg.norm(c_)
+    gd = np.minimum(gd, np.linalg.norm(pd - c_, axis=1) / r_)
+green = inner & (gd + 0.35 * (vnoise(pd, 6.0, 131.0) - 0.5) < 1.0)   # Borde disparejo
+idx = np.where(inner, np.where(green, M[INNER], M[INNER_CRUST]), idx)
+flow = inner & (hole_d > 0.05)                           # Sin lava pegada a las aberturas
+idx = np.where(flow & (vein < 0.05), np.where(green, M[GLOW], M[INNER_LAVA]), idx)
+idx = np.where(flow & (vein < 0.02), np.where(green, M[GLOW], M[GLOW_HOT]), idx)
 idx = np.where(hole_wall, M[CHAR], idx)
 is_lava &= ~hole_wall & ~tooth
 idx = np.where(is_lava, M[LAVA], idx)
@@ -493,7 +513,7 @@ me.update()
 
 # --- Versión lejana (LOD) -----------------------------------------------------------------------------------
 # El mismo cráneo, ya pintado, con muchas menos caras; va oculto en LOD_Far y el motor lo usa cuando el planeta está
-# lejos. A esa distancia los personajes, las notas y las serpientes no se ven, así que la versión lejana no los lleva.
+# lejos. A esa distancia los personajes, las notas y la sangre no se ven, así que la versión lejana no los lleva.
 FAR_TRIS = 22000
 lod = bpy.data.collections.new("LOD_Far")
 scene.collection.children.link(lod)
@@ -517,7 +537,8 @@ print("TRIS %-18s %6d (lejos)" % (fob.name, len(fme.loop_triangles)))
 # malla de su pose. Las que bailan se paran en el piso de cada órbita (a la vista desde el frente); las que trepan
 # se cuelgan del borde de arriba. El piso y el borde se buscan con rayos dentro de la órbita.
 WITCH_BLEND = os.path.join(REPO, "assets", "models", "characters", "halloween", "witch.blend")
-WITCH_SCALE = 1.9                                        # La bruja mide ~1.25: en el planeta, ~2.4 unidades
+WITCH_SCALE = 3.4                                        # La bruja mide ~1.25: en el planeta, ~4.3 unidades
+SWING_WITCH_SCALE = 2.6                                  # Las de las hamacas de sangre, a la medida de la curva
 with bpy.data.libraries.load(WITCH_BLEND) as (src, dst):
     dst.meshes = [n for n in src.meshes if n.startswith("HW_Witch_")]
 WMESH = {m.name.replace("HW_Witch_", ""): m for m in dst.meshes}
@@ -546,39 +567,37 @@ def floor_spot(s, u, y0=-0.73):
     return None
 
 
-def put(kind, loc, yaw):
+def put(kind, loc, yaw, scale=WITCH_SCALE):
     w = bpy.data.objects.new("HW_Witch_%s_%02d" % (kind, len(witches.objects)), WMESH[kind])
     witches.objects.link(w)
     w.parent = ROOT
     w.location = loc
     w.rotation_euler = (0, 0, math.radians(yaw))
-    w.scale = (WITCH_SCALE,) * 3
+    w.scale = (scale,) * 3
 
 
-# Cada órbita con su propio arreglo (no en espejo): quién baila dónde, cuántas cuelgan y cuántas salen gateando
+# Cada órbita con su propio arreglo (no en espejo): pocas y grandes, tres bailando cerca del borde. En una, la pareja
+# y una sola; en la otra, tres solas (una de cada pose). La que está sentada va en los dientes de abajo (ver la sangre)
 LAYOUTS = {
-    1: dict(floor=(("Solo_A", -0.55), ("Pair", 0.05), ("Solo_C", 0.62)), hang=(0.35,), creep=(0.05,), wall=(-1,),
-            back=(("Solo_B", -0.3), ("Pair", 0.35), ("Solo_A", -0.75)),
-            peek=(-0.15,), sit=((0.75, -35),)),
-    -1: dict(floor=(("Solo_B", -0.45), ("Solo_A", 0.2), ("Pair", 0.62)), hang=(-0.5, 0.15), creep=(0.55,), wall=(),
-             back=(("Solo_C", -0.15), ("Solo_B", 0.42), ("Solo_A", -0.68)),
-             peek=(0.4,), sit=((-0.1, None),)),
+    1: dict(floor=(("Solo_B", -0.42, 25), ("Pair", 0.38, None)), hang=(), creep=(), wall=(), back=(), peek=(),
+            sit=()),
+    -1: dict(floor=(("Solo_A", -0.55, None), ("Solo_C", -0.05, None), ("Solo_B", 0.45, -25)), hang=(), creep=(),
+             wall=(), back=(), peek=(), sit=()),
 }
-SHADOW = mat("ContactShadow", "#0c0705")                  # Sombra de contacto bajo los pies (las ancla al piso)
-shadow_v, shadow_f = [], []
-
-
-def contact_shadow(loc, nrm, rx_, ry_):
-    """Óvalo oscuro sobre el piso, siguiendo su inclinación, apenas levantado."""
-    t = Vector((1, 0, 0)) - nrm * nrm.x                  # A lo ancho de la cara del cráneo
-    t.normalize()
-    b2 = nrm.cross(t)
-    c = len(shadow_v)
-    shadow_v.append(loc + nrm * 0.04)
-    for k in range(10):
-        a_ = math.tau * k / 10
-        shadow_v.append(loc + nrm * 0.04 + t * rx_ * math.cos(a_) + b2 * ry_ * math.sin(a_))
-    shadow_f.extend((c, c + 1 + k, c + 1 + (k + 1) % 10) for k in range(10))
+def lift_feet(w):
+    """El piso de la órbita es inclinado: si algún pie queda hundido, sube a la bruja hasta que ninguno lo esté."""
+    bpy.context.view_layer.update()
+    mw = w.matrix_world
+    co = [mw @ v.co for v in w.data.vertices]
+    floor_z = min(c.z for c in co)
+    feet = [c for c in co if c.z < floor_z + 0.06 * WITCH_SCALE]   # Las suelas
+    sink = 0.0
+    for c in feet[::3]:
+        hit, loc, _, _ = ob.ray_cast(c + Vector((0, 0, 0.5 * WITCH_SCALE)), Vector((0, 0, -1)),
+                                     distance=0.8 * WITCH_SCALE)
+        if hit:
+            sink = max(sink, loc.z - c.z)
+    w.location.z += sink
 
 
 def brow_spot(s, u, dz0=0.9):
@@ -594,20 +613,17 @@ def brow_spot(s, u, dz0=0.9):
 
 wrng = np.random.default_rng(SEED + 1)
 for s, lay in LAYOUTS.items():
-    # Bailando en el piso, un poco más adentro de la órbita
-    for kind, u in lay["floor"]:
-        spot = floor_spot(s, u)
+    # Bailando en el piso, cerca del borde de la órbita
+    for kind, u, yaw in lay["floor"]:                     # yaw: giro a mano (None = un poco al azar)
+        spot = floor_spot(s, u, -0.78)
         if spot:
-            put(kind, spot[0], wrng.uniform(-20, 20))
-            w = 2.4 if kind == "Pair" else 1.0
-            contact_shadow(spot[0], spot[1], 0.32 * WITCH_SCALE * w, 0.22 * WITCH_SCALE)
+            put(kind, spot[0], yaw if yaw is not None else wrng.uniform(-20, 20))
+            lift_feet(witches.objects[-1])
     # Una fila de atrás, más adentro y entre las de adelante, para que se vea lleno
     for kind, u in lay["back"]:
         spot = floor_spot(s, u, -0.66)
         if spot:
             put(kind, spot[0], wrng.uniform(-30, 30))
-            w = 2.4 if kind == "Pair" else 1.0
-            contact_shadow(spot[0], spot[1], 0.32 * WITCH_SCALE * w, 0.22 * WITCH_SCALE)
     # Colgadas del borde de arriba (las manos justo debajo del borde)
     for u in lay["hang"]:
         hit, loc, _, _ = ob.ray_cast(orbit_point(s, u, 0.0, -0.73), Vector((0, 0, 1)), distance=0.4 * R)
@@ -626,7 +642,6 @@ for s, lay in LAYOUTS.items():
             put("Crawl", loc, 0)
             w_ob = witches.objects[-1]
             w_ob.rotation_euler = Matrix((xax, yax, nrm)).transposed().to_euler()
-            contact_shadow(loc, nrm, 0.36 * WITCH_SCALE, 0.16 * WITCH_SCALE)
     # Asomándose de cabeza desde el techo de la órbita (como por una ventana, pero al revés): acostada en el
     # techo, con la cabeza y los hombros afuera del borde
     for u in lay["peek"]:
@@ -655,27 +670,29 @@ for s, lay in LAYOUTS.items():
     for u, yaw in lay.get("sit", ()):                    # yaw: giro a mano (None = un poco al azar)
         # La cresta del borde de abajo: rayos hacia abajo desde la boca de la órbita, del frente hacia adentro; el
         # punto más alto es el filo entre la mejilla (afuera) y el piso de la órbita (adentro)
-        best = None
+        hits = []
         o = orbit_point(s, u, 0.0)
-        for yy in np.linspace(-1.0, -0.74, 27):
+        for yy in np.linspace(-1.0, -0.74, 53):
             hit, loc, _, _ = ob.ray_cast(Vector((o.x, yy * R, o.z)), Vector((0, 0, -1)), distance=0.35 * R)
-            if hit and (best is None or loc.z > best.z):
-                best = loc
-        if best is not None:
-            put("Sit", best + Vector((0, -0.1, 0.05)), yaw if yaw is not None else wrng.uniform(-15, 15))
-sme = bpy.data.meshes.new("HW_Witch_Shadows")
-sme.from_pydata([tuple(v) for v in shadow_v], [], shadow_f)
-sme.materials.append(SHADOW)
-sob = bpy.data.objects.new("HW_Witch_Shadows", sme)
-witches.objects.link(sob)
-sob.parent = ROOT
+            if hit:
+                hits.append(loc)
+        if hits:
+            # El filo: el primer punto (desde el frente) que ya llega a la altura del borde; ahí se sienta, con las
+            # piernas colgando por fuera, sobre la mejilla
+            top = max(h.z for h in hits)
+            edge = next(h for h in hits if h.z > top - 0.025 * R)
+            # Un poco más afuera, sobre el labio del borde, para que las caderas queden en el filo
+            hit, out, _, _ = ob.ray_cast(Vector((edge.x, edge.y - 0.025 * R, edge.z + 0.1 * R)), Vector((0, 0, -1)),
+                                         distance=0.3 * R)
+            seat = out if hit and out.z > edge.z - 0.03 * R else edge
+            put("Sit", seat + Vector((0, 0, 0.05)), yaw if yaw is not None else wrng.uniform(-15, 15))
 # --- Diablitos bailando en las grietas -----------------------------------------------------------------------
 # Modelos de tools/blender/halloween/build_devil.py (se ejecuta antes): solo la mitad de arriba, con el origen en la
 # cintura, que queda hundida en la grieta. Van repartidos, bailando, en todas las grietas de afuera (también la de la
 # frente), con notas musicales alrededor (ver más abajo).
 ZOMBIE_BLEND = os.path.join(REPO, "assets", "models", "characters", "halloween", "devil.blend")   # Diablitos
-ZOMBIE_SCALE = 4.2
-DEVIL_COUNT = 46                                         # Repartidos por todas las grietas
+ZOMBIE_SCALE = 5.7
+DEVIL_COUNT = 38                                         # Repartidos por todas las grietas
 with bpy.data.libraries.load(ZOMBIE_BLEND) as (src, dst):
     dst.meshes = [n for n in src.meshes if n.startswith("HW_Devil_")]
 ZMESH = {m.name.replace("HW_Devil_", ""): m for m in dst.meshes}
@@ -714,22 +731,23 @@ print("DEVILS %d" % len(zombies.objects))
 
 # En el planeta las brujas toman la luz de la escena (los diablitos guardan su brillo para destacar sobre el cráneo) (con su luz propia de ilustración se veían pegadas encima)
 for m in bpy.data.materials:
-    if m.name.startswith("HW_Witch") and "Eyes" not in m.name and m.node_tree:   # (no la sombra)
+    if m.name.startswith("HW_Witch") and "Eyes" not in m.name and m.node_tree:
         m.node_tree.nodes["Principled BSDF"].inputs["Emission Strength"].default_value = 0.18
-print("WITCHES %d" % (len(witches.objects) - 1))
 
-# --- Serpientes que salen de la boca -----------------------------------------------------------------------
-# Pocas, finas y con escamas, cabeza redonda con ojitos y bailando (la parte de adelante se menea), con la cola
-# apoyada en el cráneo: casi todas gatean desde adentro de la boca por la
-# mandíbula de abajo y levantan la cabeza hacia quien mira; otras cuelgan de los dientes de abajo o de arriba. Verde oscuro mate, en
-# anillos alternados: escamas un poco más gruesas y oscuras entre bandas más claras.
-SNAKE = mat("Snake", "#3d7a2e", rough=0.8)
-SNAKE_D = mat("SnakeScales", "#24521f", rough=0.8)
-SNAKE_SIDES, SNAKE_SEGS = 8, 40
-SNAKE_EYE = mat("SnakeEyes", "#0a0a0a", rough=0.3)
-snake_heads = []                                         # Dónde quedan las cabezas (para las notas)
-
-snrng = np.random.default_rng(SEED + 5)
+# --- Sangre que sale de la boca --------------------------------------------------------------------------------
+# Un solo líquido, espeso y brillante (mojado), distinto del rojo mate del cráneo, que sale solo por los dientes de
+# abajo. Pensado como líquido de verdad: pesa, así que se junta en un charco grueso sobre los dientes (llena los
+# huecos entre ellos) y se derrama por delante como una capa pegada al hueso. La capa se abre en regueros chatos y
+# anchos (no tubos), que engordan y se angostan al bajar; donde el mentón dobla hacia abajo el líquido se junta en
+# gotas pesadas que cuelgan. De las más cargadas cae un hilo que se afina y se cuenta en cuentas, y abajo se curva
+# en una J gorda donde se sientan brujas felices, como en una hamaca. Todo es una sola forma (distancia con signo,
+# unida en suave) para que se lea como líquido y no como piezas pegadas.
+BLOOD = mat("Blood", "#c4001f", emit=0.25, rough=0.08)   # Rojo vivo y brillante: se lee sobre el cráneo oscuro
+BLOOD_H = 0.0035                                         # Rejilla de la sangre (más fina que la del cráneo)
+BLOOD_TRIS = 14000
+BLOOD_K = 0.014                                          # Qué tanto se funden las partes entre sí
+brng = np.random.default_rng(SEED + 5)
+chains, drops = [], []                                   # Partes del líquido (en unidades de R)
 
 
 def jaw_open(q):
@@ -739,246 +757,260 @@ def jaw_open(q):
     return np.stack([q[:, 0], q[:, 1] * c - q[:, 2] * s_, q[:, 1] * s_ + q[:, 2] * c], axis=1) + JAW_PIVOT + JAW_SLIDE
 
 
-def surf(p, dz):
-    """Punto de la superficie del cráneo bajo (dz < 0) o sobre (dz > 0) p, buscando con un rayo vertical."""
-    hit, loc, _, _ = ob.ray_cast(Vector(p * R), Vector((0, 0, np.sign(dz))), distance=abs(dz) * R)
-    return np.array(loc) / R if hit else None
+def sdf_grad(q, e=0.004):
+    g = np.stack([(planet(q + e * ax) - planet(q - e * ax)) / (2 * e) for ax in np.eye(3)], axis=1)
+    return g / np.maximum(np.linalg.norm(g, axis=1), 1e-9)[:, None]
 
 
-def snake_path(kind, x):
-    """Camino de una serpiente: la cola apoyada en el cráneo (dientes y encía) y la parte de adelante mirando hacia
-    quien mira. kind: "crawl" (gatea sobre la mandíbula de abajo y levanta la cabeza), "hang_low" (cuelga por
-    delante de los dientes de abajo) o "hang_up" (cuelga de los dientes de arriba)."""
-    pts, r = [], 0.007
-    if kind == "hang_up":                                 # Cola pegada bajo los dientes de arriba, hacia adentro
-        for u in np.linspace(0.1, 0.0, 6):
-            q = surf(np.array([x, arch(abs(x), -0.84) + u, -0.75]), 0.2)
-            if q is not None:
-                pts.append(q - np.array([0, 0, r]))
-        if not pts:
-            return None
-        end = pts[-1]
-        hang = snrng.uniform(0.05, 0.08)
-        for k in range(1, 6):                             # Cuelga y la cabeza gira hacia adelante
-            t = k / 5
-            pts.append(end + np.array([0, -0.03 * t * t, -hang * math.sin(t * math.pi / 2)]))
-        for k in range(1, 4):
-            pts.append(pts[-1] + np.array([0, -0.02, 0.005 * k]))
-        return pts
-    g = jaw_open(np.array([[x, arch(abs(x), -0.8), -0.74]]))[0]
-    z = None
-    for u in np.linspace(0.14, -0.03, 10):                # De adentro de la boca hasta delante de los dientes
-        q = surf(g + np.array([0, u, 0.1]), -0.25)
-        if q is None:
-            if z is None:
-                continue
-            q = np.array([g[0], g[1] + u, z - 0.01])      # Por el hueco de la U: la cola cae hacia adentro
-        z = q[2]
-        pts.append(q + np.array([0, 0, r]))
-    if len(pts) < 3:
-        return None
-    end = pts[-1]
-    drift = snrng.uniform(-0.15, 0.15)
-    d = np.array([x * 0.8 + drift, -1.0, 0.0])
-    d /= np.linalg.norm(d)
-    sd_ = np.array([-d[1], d[0], 0.0])
-    if kind == "hang_low":                                # Por delante de los dientes, colgando por la mandíbula
-        for k in range(1, 4):
-            pts.append(end + np.array([0.01 * drift * k, -0.01 * k, -0.02 * k]))
-        end = pts[-1]
-        for k in range(1, 4):
-            pts.append(end + np.array([0.02 * drift * k, -0.02 * k, 0.008 * k * k / 3]))
-    else:                                                 # Hacia adelante, hacia quien mira: cae un poco por su
-        L = snrng.uniform(0.06, 0.11)                     # peso y levanta apenas la cabeza (solo se asoman)
-        amp, ph = snrng.uniform(0.012, 0.02), snrng.uniform(0, math.tau)
-        for k in range(1, 9):
-            t = k / 8
-            pts.append(end + d * L * t + sd_ * amp * math.sin(math.tau * 1.6 * t + ph) * t
-                       + np.array([0, 0, L * (-0.12 * math.sin(math.pi * t) + 0.1 * t ** 3)]))
-    return pts
+def blood_tube(pts, radii):
+    """Un hilo de líquido por los puntos, con el grosor de cada punto."""
+    chains.append((np.asarray(pts, float), np.asarray(radii, float)))
 
 
-kinds_s = ["crawl"] * 10 + ["hang_low"] * 4 + ["hang_up"] * 4
-sv, sf, sm = [], [], []
-xs_s = np.linspace(-0.2, 0.2, len(kinds_s)) + snrng.uniform(-0.01, 0.01, len(kinds_s))   # Repartidas a lo ancho
-snrng.shuffle(xs_s)
-for i, kind in enumerate(kinds_s):
-    path = snake_path(kind, xs_s[i])
-    if path is None:
+def drop(c, r, stretch=1.6):
+    """Gota con forma de lágrima, la punta hacia arriba."""
+    drops.append((np.asarray(c, float), r, stretch))
+
+
+def ragged(x, f, off):
+    """Borde disparejo del líquido, entre 0 y 1."""
+    return np.clip(0.5 + 0.35 * np.sin(x * f + off) + 0.25 * np.sin(x * f * 2.3 + off * 3.1), 0, 1)
+
+
+def smoothstep(a, b, x):
+    t = np.clip((x - a) / (b - a), 0, 1)
+    return t * t * (3 - 2 * t)
+
+
+POOL_X = 0.27                                            # Hasta dónde llega el charco hacia los costados
+
+
+def lower_coat(p):
+    """Charco sobre las coronas de los dientes de abajo: grueso (el líquido pesa y se junta) y metido en los huecos
+    entre dientes; por el frente baja solo un poco, con borde disparejo. Los dientes giran con la mandíbula."""
+    q = jaw_closed(p)
+    d = sd_rbox(q, *LOWER_TEETH[0], 0.02)
+    for c, b in LOWER_TEETH[1:]:
+        d = smin(d, sd_rbox(q, c, b, 0.02), 0.02)         # Unidos en suave: el líquido tapa los huecos
+    thick = 0.006 + 0.008 * smoothstep(-0.66, -0.61, q[:, 2])   # Más grueso arriba
+    # Hacia los costados se va afinando hasta desaparecer (sin cortes: un corte deja puntas)
+    thick *= smoothstep(POOL_X, POOL_X - 0.07, np.abs(q[:, 0]) + 0.02 * ragged(q[:, 0], 17.0, 0.9))
+    thick *= smoothstep(-0.56, -0.66, q[:, 1])          # Y hacia el fondo de la boca también
+    d = np.where(thick > 0.0015, d - thick, 1.0)
+    low = -0.643 - 0.025 * ragged(q[:, 0], 27.0, 0.3)    # Hasta dónde baja por el frente de los dientes
+    mask = np.maximum(low - q[:, 2], q[:, 1] - arch(np.abs(q[:, 0]), -0.815) - 0.025)
+    return -smin(-d, -mask, 0.015)                       # Bordes redondeados, como líquido
+
+
+def surface_walk(p, min_steps=6):
+    """Baja por la superficie desde p hasta que queda debajo de algo (de ahí cae). Devuelve el camino suavizado."""
+    path = []
+    down = np.array([0.0, 0.0, -1.0])
+    for _ in range(120):
+        d = planet(p[None])[0]
+        n = sdf_grad(p[None])[0]
+        p = p - n * (d - 0.012)                          # Sobre la superficie, apenas afuera
+        path.append(p.copy())
+        if n[2] < -0.55 and len(path) > min_steps:       # Ya está debajo: de acá cae
+            break
+        t = down - n * down.dot(n)
+        p = p + t / max(np.linalg.norm(t), 1e-6) * 0.012
+    path = np.array(path)
+    for _ in range(3):                                   # Suavizar el tramo pegado al hueso
+        path[1:-1] = (path[:-2] + 2 * path[1:-1] + path[2:]) / 4
+    return path
+
+
+# Gotas que cuelgan del borde de la capa (x en el mentón, largo, tipo): "seat" = baja hasta donde termina el mentón y
+# ahí se curva en una J con una bruja sentada; "drip" = baja hasta el borde del mentón y cuelga una gota pesada (y
+# otra ya se soltó); "short" = se frena a mitad del mentón con la cabeza gorda
+STREAMS = [(-0.15, 0.0, "seat"), (-0.075, 0.0, "drip"), (0.0, 0.0, "seat"), (0.075, 0.0, "drip"),
+           (0.15, 0.0, "seat")]
+SHORT = [(-0.215, 0.27), (0.215, 0.3)]
+# Borde de abajo de la capa: en cada gota baja (ahí empieza la gota) y entre gota y gota sube en un arco de media
+# luna, como en un dibujo de sangre que chorrea
+DRIP_X = np.array(sorted([x_ for x_, _, _ in STREAMS] + [x_ for x_, _ in SHORT]))
+DRIP_Z = -0.8 + brng.uniform(-0.012, 0.012, len(DRIP_X))   # En coordenadas de la mandíbula cerrada
+ARCH_H = np.array([0.03, 0.062, 0.036, 0.07, 0.028, 0.052])   # Cada arco a su altura (no todos iguales)
+
+
+def sheet_edge(x):
+    """Altura del borde de abajo de la capa en cada x (coordenadas de la mandíbula cerrada)."""
+    i = np.clip(np.searchsorted(DRIP_X, x) - 1, 0, len(DRIP_X) - 2)
+    t = np.clip((x - DRIP_X[i]) / (DRIP_X[i + 1] - DRIP_X[i]), 0, 1)
+    e = DRIP_Z[i] + (DRIP_Z[i + 1] - DRIP_Z[i]) * t + ARCH_H[i] * np.sin(math.pi * t) ** 0.8
+    # Más allá de las gotas de los costados el borde sube de a poco hasta los dientes
+    tl = smoothstep(DRIP_X[0], -POOL_X, x)
+    tr = smoothstep(DRIP_X[-1], POOL_X, x)
+    e = np.where(x < DRIP_X[0], DRIP_Z[0] + (-0.7 - DRIP_Z[0]) * tl, e)
+    return np.where(x > DRIP_X[-1], DRIP_Z[-1] + (-0.7 - DRIP_Z[-1]) * tr, e)
+rivulets = []                                            # Regueros sobre el mentón: (camino, alto, ancho)
+seats = []                                               # Dónde se sientan las brujas (punto y giro)
+down = np.array([0.0, 0.0, -1.0])
+for x, fall, kind in STREAMS + [(x_, l_, "short") for x_, l_ in SHORT]:
+    # Arranca en el charco de arriba de los dientes y baja pegado a los dientes, la encía y el mentón
+    path = surface_walk(jaw_open(np.array([[x, arch(abs(x), -0.815) - 0.05, -0.63]]))[0])
+    seg = np.r_[0, np.cumsum(np.linalg.norm(np.diff(path, axis=0), axis=1))]
+    if kind == "short":                                  # Se frena antes: se corta el camino
+        keep = max(3, int(np.searchsorted(seg, fall)))
+        path, seg = path[:keep], seg[:keep]
+    u = seg / seg[-1]
+    ph = brng.uniform(0, math.tau)
+    wob = 1 + 0.3 * np.sin(seg * 55 + ph) * np.sin(seg * 23 + 2 * ph)    # Engorda y se angosta al bajar
+    if kind == "short":                                  # Cabeza gorda y redonda donde se frenó
+        gather = 1 + 0.9 * smoothstep(0.6, 1.0, u)
+    else:
+        gather = 1 + 0.45 * smoothstep(0.65, 1.0, u)    # Se junta antes de colgar
+    rivulets.append((path, 0.011 * wob * gather, 0.019 * (0.85 + 0.3 * wob) * gather))
+    if kind == "short":
         continue
-    raw = np.array(path)
-    for _ in range(2):                                    # Suavizar el camino
-        raw[1:-1] = (raw[:-2] + 2 * raw[1:-1] + raw[2:]) / 4
-    # Todo el cuerpo ondula en S (más hacia la cabeza), para que se vea suelto y no como un tubo
-    sl0 = np.r_[0, np.cumsum(np.linalg.norm(np.diff(raw, axis=0), axis=1))]
-    tw = sl0 / max(sl0[-1], 1e-9)
-    tg = np.gradient(raw, axis=0)
-    tg /= np.maximum(np.linalg.norm(tg, axis=1), 1e-9)[:, None]
-    lat = np.cross(tg, (0.0, 0.0, 1.0))
-    bad_l = np.linalg.norm(lat, axis=1) < 0.2
-    lat[bad_l] = np.cross(tg[bad_l], (0.0, 1.0, 0.0))
-    lat /= np.maximum(np.linalg.norm(lat, axis=1), 1e-9)[:, None]
-    wave_a, wave_f, wave_p = snrng.uniform(0.008, 0.014), snrng.uniform(1.6, 2.4), snrng.uniform(0, math.tau)
-    raw = raw + lat * (wave_a * np.sin(math.tau * wave_f * tw + wave_p) * (0.25 + 0.75 * tw))[:, None]
-    def resample(path, n):
-        sl = np.r_[0, np.cumsum(np.linalg.norm(np.diff(path, axis=0), axis=1))]
-        tt = np.linspace(0, sl[-1], n)
-        return np.stack([np.interp(tt, sl, path[:, c]) for c in range(3)], axis=1), tt
+    end = path[-1]
+    if kind == "drip":
+        # Gota pesada colgando donde el mentón dobla hacia abajo, unida al reguero por un cuello
+        rp = brng.uniform(0.019, 0.023)
+        pend = end + down * rp * 1.1
+        drop(pend, rp, 1.5)
+        drop(pend + down * (0.07 + brng.uniform(0, 0.04)), rp * 0.6, 1.8)   # Una que ya se soltó
+        continue
+    # J gorda de costado justo donde termina el mentón (para que la bruja se vea de frente): baja, pasa por abajo
+    # (el asiento) y sube un poco del otro lado; más pesada abajo, donde se junta el líquido
+    rc = brng.uniform(0.044, 0.05)
+    side = -1.0 if x < 0 else 1.0
+    sdir = np.array([side, 0.0, 0.0])
+    c = end + sdir * rc
+    angs = np.linspace(0, 0.8 * math.pi, 16)            # Solo hasta sostener a la bruja: un labio corto del otro lado
+    curl = [c + rc * (-sdir * math.cos(a) + down * math.sin(a)) for a in angs]
+    curl_r = 0.011 + 0.005 * np.sin(np.clip(angs / (0.75 * math.pi), 0, 1) * math.pi / 2)
+    curl_r[-4:] *= np.linspace(1.0, 0.85, 4)
+    blood_tube([path[-3], path[-2]] + curl, np.r_[0.011, 0.011, curl_r])
+    drop(curl[-1] + np.array([0, 0, 0.003]), curl_r[-1] * 1.15, 1.0)   # La punta termina en una bola
+    seat_pt = c + down * rc                              # El fondo de la curva
+    seats.append((seat_pt, 0.0))
+    drop(seat_pt + down * 0.03, 0.017, 1.6)              # Y abajo del asiento se está juntando otra gota
 
-    def push_out(q, clear=0.03):
-        """Que ningún punto quede dentro del cráneo (dientes incluidos): se empuja hacia afuera siguiendo la
-        distancia a la superficie, con margen para el ruido de roca de la malla."""
-        for _ in range(8):
-            dist = planet(q)
-            bad = dist < clear
-            if not bad.any():
-                break
-            e = 0.004
-            grad = np.stack([(planet(q + e * ax) - planet(q - e * ax)) / (2 * e) for ax in np.eye(3)], axis=1)
-            grad /= np.maximum(np.linalg.norm(grad, axis=1), 1e-9)[:, None]
-            q[bad] += grad[bad] * (clear - dist[bad])[:, None]
-        return q
-    dense, _ = resample(raw, 60)                          # Revisión fina: pasa por encima de los dientes
-    dense = push_out(dense)
-    for _ in range(2):
-        dense[1:-1] = (dense[:-2] + 2 * dense[1:-1] + dense[2:]) / 4
-    dense = push_out(dense)
-    pts, t = resample(dense, SNAKE_SEGS)
-    pts = push_out(pts)
 
-    def pierces(q, rad):
-        """Revisión con la malla de verdad (tiene ruido de roca que la forma ideal no tiene): rayos por el centro y
-        por los bordes del cuerpo de la serpiente."""
-        offs = [np.zeros(3)] + [rad * np.array(v) for v in ((1, 0, 0), (-1, 0, 0), (0, 0, 1), (0, 0, -1), (0, 1, 0))]
-        for o in offs:
-            for i0 in range(len(q) - 1):
-                a0, b0 = (q[i0] + o) * R, (q[i0 + 1] + o) * R
-                seg = Vector(b0 - a0)
-                if seg.length < 1e-6:
-                    continue
-                hit, _, _, _ = ob.ray_cast(Vector(a0), seg.normalized(), distance=seg.length)
-                if hit:
-                    return True
-        return False
-    clear = 0.03
-    while pierces(pts, 0.012) and clear < 0.08:          # Si todavía atraviesa, más margen
-        clear += 0.012
-        pts = push_out(pts, clear)
-    if pierces(pts, 0.012):
-        continue                                          # Si no hay forma, esa serpiente no va
-    # Solo la cabeza: los últimos tramos giran de a poco hasta mirar de frente a quien mira (no hacia arriba)
-    nh = 6
-    head_pts = pts.copy()
-    step = np.linalg.norm(pts[-1] - pts[-2])
-    prev = pts[-nh - 1] - pts[-nh - 2]
-    prev /= np.linalg.norm(prev)
-    look = np.array([0.0, -1.0, -0.05])
-    look /= np.linalg.norm(look)
-    for k in range(1, nh + 1):
-        tk = k / nh
-        dk = (1 - tk) * prev + tk * look
-        head_pts[-nh - 1 + k] = head_pts[-nh - 2 + k] + dk / np.linalg.norm(dk) * step
-    if not pierces(head_pts, 0.012):
-        pts = head_pts
-    # Bailando: la parte de adelante se menea en S hacia un costado y sube y baja un poco (la cola no se mueve)
-    nd = 9
-    dance = pts.copy()
-    fwd = pts[-1] - pts[-nd - 1]
-    fwd /= np.linalg.norm(fwd)
-    side_d = np.cross(fwd, (0.0, 0.0, 1.0))
-    if np.linalg.norm(side_d) < 0.2:
-        side_d = np.array([1.0, 0.0, 0.0])
-    side_d /= np.linalg.norm(side_d)
-    amp_d, ph_d = snrng.uniform(0.018, 0.028) * (1 if i % 2 else -1), snrng.uniform(0, math.pi)
-    for k in range(1, nd + 1):
-        tk = k / nd
-        dance[-nd - 1 + k] += side_d * amp_d * math.sin(math.pi * 1.5 * tk) * tk             + np.array([0, 0, 0.008 * math.sin(math.pi * tk + ph_d) * tk])
-    if not pierces(dance, 0.012):
-        pts = dance
-    # La cola tiene que tocar la boca: se busca la superficie más cercana (arriba para las que cuelgan del paladar,
-    # abajo para las demás) y los primeros tramos se pegan a ella, con la punta un poco hundida en el hueso
-    dz = 1.0 if kind == "hang_up" else -1.0
-    hit, loc, _, _ = ob.ray_cast(Vector(pts[0] * R), Vector((0, 0, dz)), distance=0.15 * R)
-    if hit:
-        v = np.array(loc) / R - pts[0] + np.array([0, 0, dz * 0.006])
-        for k, w_ in enumerate((1.0, 0.65, 0.35, 0.12)):
-            pts[k] += v * w_
-    up = np.array([0.0, 0.0, 1.0])
-    r0 = snrng.uniform(0.0065, 0.0085)                   # Un poco más gruesas
-    tq = t / t[-1]
-    # Se afina parejo: cola fina, cuerpo lleno, se angosta un poco en el cuello antes de la cabeza; escamas sutiles
-    radius = r0 * (0.35 + 0.65 * np.minimum(tq * 2.5, 1) ** 0.7) * (1 - 0.18 * np.exp(-((tq - 0.93) / 0.05) ** 2))
-    radius *= np.where(np.arange(SNAKE_SEGS) % 2 == 0, 1.05, 0.98)
-    base = len(sv)
-    for j in range(SNAKE_SEGS):                           # Anillos perpendiculares al camino
-        tan = pts[min(j + 1, SNAKE_SEGS - 1)] - pts[max(j - 1, 0)]
-        tan /= np.linalg.norm(tan)
-        a_ = np.cross(tan, up)
-        if np.linalg.norm(a_) < 0.2:                      # Tramo casi vertical (colgando)
-            a_ = np.cross(tan, (0.0, 1.0, 0.0))
-        a_ /= np.linalg.norm(a_)
-        b_ = np.cross(a_, tan)
-        for k in range(SNAKE_SIDES):
-            ang = math.tau * k / SNAKE_SIDES + (j % 2) * math.pi / SNAKE_SIDES   # Anillos girados: más escamoso
-            sv.append(pts[j] + radius[j] * (math.cos(ang) * a_ + math.sin(ang) * b_))
-    for j in range(SNAKE_SEGS - 1):
-        for k in range(SNAKE_SIDES):
-            k1 = (k + 1) % SNAKE_SIDES
-            r_, s2 = base + j * SNAKE_SIDES, base + (j + 1) * SNAKE_SIDES
-            sf.append((r_ + k, r_ + k1, s2 + k1, s2 + k))
-            sm.append(1 if j % 2 == 0 else 0)
-    last = base + (SNAKE_SEGS - 1) * SNAKE_SIDES          # Tapa el final del cuerpo (queda dentro de la cabeza)
-    tip = len(sv)
-    sv.append(pts[-1].copy())
-    for k in range(SNAKE_SIDES):
-        sf.append((last + k, last + (k + 1) % SNAKE_SIDES, tip))
-        sm.append(1)
+def chin_film(p):
+    """Capa pegada a los dientes de abajo y al mentón, con el borde en arcos, y los regueros (las gotas) que bajan
+    de ella: chatos y anchos, con los bordes apoyados en el hueso."""
+    ds = planet(p)
+    q = jaw_closed(p)
+    edge = sheet_edge(q[:, 0])
+    rim = 0.008 + 0.006 * np.exp(-((q[:, 2] - edge - 0.012) / 0.01) ** 2)   # El borde se engorda (tensión)
+    th = rim * smoothstep(edge, edge + 0.01, q[:, 2]) * smoothstep(POOL_X, POOL_X - 0.04, np.abs(q[:, 0]))
+    th *= (q[:, 2] < -0.6) & (q[:, 1] < arch(np.abs(q[:, 0]), -0.815))      # Solo el frente, hasta los dientes
+    th *= smoothstep(-0.56, -0.66, q[:, 1])             # Sin colarse hacia el fondo por los dientes de los costados
+    for path, hh, ww in rivulets:
+        best = np.full(len(p), 9.0)
+        hb, wb = np.zeros(len(p)), np.ones(len(p))
+        for j in range(len(path) - 1):
+            a_, b_ = path[j], path[j + 1]
+            ba = b_ - a_
+            h_ = np.clip((p - a_) @ ba / max(ba @ ba, 1e-12), 0, 1)
+            dd = np.linalg.norm(p - a_ - h_[:, None] * ba, axis=1)
+            m = dd < best
+            best[m] = dd[m]
+            hb[m] = hh[j] + (hh[j + 1] - hh[j]) * h_[m]
+            wb[m] = ww[j] + (ww[j + 1] - ww[j]) * h_[m]
+        # Corte de un reguero: chato y ancho, con los bordes que se apoyan en el hueso
+        th = np.maximum(th, hb * np.clip(1 - (best / wb) ** 2, 0, 1))
+    th = np.where(th > 0.0015, th, -0.05)
+    return np.maximum(ds - th, -ds - 0.02)               # Solo una cáscara por fuera del hueso
 
-    def blob(c, axes, radii, m, seg, rings):
-        """Elipsoide con ejes propios (para la cabeza y los ojos)."""
-        top = len(sv)
-        sv.append(c + axes[2] * radii[2])
-        for ii in range(1, rings):
-            th = math.pi * ii / rings
-            for kk in range(seg):
-                ph2 = math.tau * kk / seg
-                sv.append(c + axes[0] * radii[0] * math.sin(th) * math.cos(ph2)
-                          + axes[1] * radii[1] * math.sin(th) * math.sin(ph2) + axes[2] * radii[2] * math.cos(th))
-        bot = len(sv)
-        sv.append(c - axes[2] * radii[2])
-        for kk in range(seg):
-            k1 = (kk + 1) % seg
-            sf.append((top, top + 1 + k1, top + 1 + kk))
-            sf.append((bot, top + 1 + (rings - 2) * seg + kk, top + 1 + (rings - 2) * seg + k1))
-            sm.extend([m, m])
-        for ii in range(rings - 2):
-            for kk in range(seg):
-                k1 = (kk + 1) % seg
-                a0, a1 = top + 1 + ii * seg, top + 1 + (ii + 1) * seg
-                sf.append((a0 + kk, a0 + k1, a1 + k1, a1 + kk))
-                sm.append(m)
-    # Cabeza redonda (un óvalo un poco más ancho que el cuerpo) y dos ojitos negros a los lados
-    hc = pts[-1] + tan * r0 * 1.2
-    blob(hc, (a_, b_, tan), (r0 * 1.9, r0 * 1.6, r0 * 2.3), 0, 5, 4)
-    closed = i % 2 == 0                                   # La mitad, con los ojos cerrados (rayita)
-    for sg in (-1, 1):
-        eye_r = (r0 * 0.55, r0 * 0.12, r0 * 0.3) if closed else (r0 * 0.45,) * 3
-        blob(hc + a_ * sg * r0 * 1.5 + b_ * r0 * 0.6 + tan * r0 * 0.9, (a_, b_, tan), eye_r, 2, 4, 3)
-    snake_heads.append((hc.copy(), tan.copy()))
-sme3 = bpy.data.meshes.new("HW_Mouth_Snakes")
-sme3.from_pydata((np.array(sv) * R).tolist(), [], sf)
-sme3.validate()
-sme3.materials.append(SNAKE)
-sme3.materials.append(SNAKE_D)
-sme3.materials.append(SNAKE_EYE)
-sme3.polygons.foreach_set("material_index", sm)
-sme3.polygons.foreach_set("use_smooth", np.ones(len(sme3.polygons), bool))
-snake_ob = bpy.data.objects.new("HW_Mouth_Snakes", sme3)
-zones.objects.link(snake_ob)
-snake_ob.parent = ROOT
-snake_ob.visible_shadow = False                          # Sin sombras rayando la cara
-sme3.calc_loop_triangles()
-print("TRIS %-18s %6d" % (snake_ob.name, len(sme3.loop_triangles)))
+
+# Todo en una rejilla fina alrededor de la boca y el mentón; cada parte se calcula solo en su caja y se une en suave
+jaw_box = jaw_open(np.array([(x, y, z) for x in (-0.33, 0.33) for y in (-0.95, -0.6) for z in (-0.76, -0.56)]))
+chin_box = jaw_open(np.array([(x, y, z) for x in (-0.33, 0.33) for y in (-1.0, -0.6) for z in (-1.0, -0.58)]))
+riv_pts = np.concatenate([r[0] for r in rivulets])
+lo_b = [jaw_box.min(0), np.minimum(riv_pts.min(0) - 0.06, chin_box.min(0))]
+hi_b = [jaw_box.max(0), np.maximum(riv_pts.max(0) + 0.06, chin_box.max(0))]
+for pts, radii in chains:
+    lo_b.append(pts.min(0) - radii.max())
+    hi_b.append(pts.max(0) + radii.max())
+for c, r, st in drops:
+    lo_b.append(c - r * 2)
+    hi_b.append(c + r * 2.5)
+B_LO = np.min(lo_b, axis=0) - 0.03
+B_HI = np.max(hi_b, axis=0) + 0.03
+b_axes = [np.arange(B_LO[i], B_HI[i] + BLOOD_H, BLOOD_H) for i in range(3)]
+BF = np.full([len(ax) for ax in b_axes], 9.0, np.float32)
+
+
+def box(lo, hi):
+    """Los índices de la rejilla dentro de la caja, y los puntos que les tocan."""
+    i0 = np.clip(np.floor((np.asarray(lo) - B_LO) / BLOOD_H).astype(int), 0, None)
+    i1 = np.minimum(np.ceil((np.asarray(hi) - B_LO) / BLOOD_H).astype(int) + 1, BF.shape)
+    sl = tuple(slice(i0[i], i1[i]) for i in range(3))
+    g = np.meshgrid(*[b_axes[i][sl[i]] for i in range(3)], indexing="ij")
+    return sl, np.stack([gi.ravel() for gi in g], axis=1)
+
+
+def blend(sl, d, k=BLOOD_K):
+    BF[sl] = smin(BF[sl], d.reshape(BF[sl].shape), k)
+
+
+sl, pp = box(lo_b[0], hi_b[0])
+blend(sl, lower_coat(pp))
+sl, pp = box(lo_b[1], hi_b[1])
+blend(sl, chin_film(pp), 0.02)
+for pts, radii in chains:
+    sl, _ = box(pts.min(0) - radii.max() - BLOOD_H, pts.max(0) + radii.max() + BLOOD_H)
+    loc = np.full(BF[sl].shape, 9.0, np.float32)        # El hilo entero primero (sin hincharse en las uniones)
+    off = np.array([x.start for x in sl])
+    for a_, b_, ra, rb in zip(pts, pts[1:], radii, radii[1:]):
+        ssl, pp = box(np.minimum(a_, b_) - max(ra, rb) - BLOOD_H, np.maximum(a_, b_) + max(ra, rb) + BLOOD_H)
+        lsl = tuple(slice(ssl[i].start - off[i], ssl[i].stop - off[i]) for i in range(3))
+        ba = b_ - a_
+        h_ = np.clip((pp - a_) @ ba / max(ba @ ba, 1e-12), 0, 1)
+        d = np.linalg.norm(pp - a_ - h_[:, None] * ba, axis=1) - (ra + (rb - ra) * h_)
+        loc[lsl] = np.minimum(loc[lsl], d.reshape(loc[lsl].shape))
+    BF[sl] = smin(BF[sl], loc, BLOOD_K)
+for c, r, st in drops:
+    sl, pp = box(c - r * 2, c + r * (st * 1.4 + 1))
+    tip = c + np.array([0, 0, r * st * 1.3])             # Lágrima: bola abajo que se afina hacia la punta
+    ba = tip - c
+    h_ = np.clip((pp - c) @ ba / (ba @ ba), 0, 1)
+    cone = np.linalg.norm(pp - c - h_[:, None] * ba, axis=1) - r * (1 - h_) ** 1.5
+    blend(sl, smin(sd_sphere(pp, c, r), cone, r * 0.5), r * 0.6)
+bverts, bquads = surface_nets(BF, B_LO, BLOOD_H)
+del BF
+bme = bpy.data.meshes.new("HW_Chin_Blood")
+bme.from_pydata((bverts * R).tolist(), [], bquads.tolist())
+bme.validate()
+blood_ob = bpy.data.objects.new("HW_Chin_Blood", bme)
+zones.objects.link(blood_ob)
+blood_ob.parent = ROOT
+sm = blood_ob.modifiers.new("Smooth", "SMOOTH")         # Superficie de líquido: lisa, sin escalones de la rejilla
+sm.factor, sm.iterations = 0.6, 4
+dm = blood_ob.modifiers.new("Decimate", "DECIMATE")
+dm.ratio = min(1.0, BLOOD_TRIS / (2 * len(bquads)))
+dg = bpy.context.evaluated_depsgraph_get()
+low_b = bpy.data.meshes.new_from_object(blood_ob.evaluated_get(dg))
+blood_ob.modifiers.clear()
+blood_ob.data = low_b
+bpy.data.meshes.remove(bme)
+bme = low_b
+bme.name = "HW_Chin_Blood"
+bme.materials.append(BLOOD)
+bme.polygons.foreach_set("use_smooth", np.ones(len(bme.polygons), bool))
+bme.calc_loop_triangles()
+print("TRIS %-18s %6d" % (blood_ob.name, len(bme.loop_triangles)))
+# Brujas sentadas en las curvas, felices, mirando hacia adelante (hacia quien mira)
+for seat_pt, twist in seats:
+    put("SitHappy", Vector(seat_pt * R) + Vector((0, 0, 0.018 * R)), math.degrees(twist), SWING_WITCH_SCALE)
+# Una bruja sentada en el centro de los dientes de abajo, sobre el charco, de frente, con las piernas colgando por
+# delante de los dientes
+# Sentada en el filo de arriba del charco, sobre los dos dientes del centro, para que las piernas cuelguen por
+# delante de la sangre (y no adentro)
+bco = np.array([v.co[:] for v in blood_ob.data.vertices]) / R
+center = jaw_open(np.array([[0.0, arch(0.0, -0.815), -0.6]]))[0]
+near = bco[(np.abs(bco[:, 0]) < 0.03) & (np.linalg.norm(bco[:, 1:] - center[1:], axis=1) < 0.08)]
+top_z = near[:, 2].max()
+band = near[near[:, 2] > top_z - 0.035]                 # Lo de arriba del charco, con su panza de adelante
+y_seat = band[:, 1].min() + 0.006                        # En el filo de adelante: las piernas cuelgan por fuera
+under = near[np.abs(near[:, 1] - y_seat) < 0.008]
+seat = np.array([0.0, y_seat, under[:, 2].max()])
+put("Sit", Vector(seat * R) + Vector((0, 0, 0.004 * R)), 0, WITCH_SCALE * 1.5)   # Más grande que las de las órbitas
+print("WITCHES %d" % len(witches.objects))
 
 # --- Notas musicales alrededor de las brujas y los diablitos que bailan --------------------------------------------------
 # Notas chicas que brillan, flotando a distintas alturas alrededor de cada bailarina, de frente a quien mira:
@@ -1036,12 +1068,6 @@ for w in list(zombies.objects):                         # Y alrededor de los dia
             continue
         rot = drot @ Matrix.Rotation(math.radians(nrng.uniform(-25, 25)), 3, "Y") @             Matrix.Rotation(math.radians(nrng.uniform(-20, 20)), 3, "Z")
         music_note(c, rot, nrng.random() < 0.3)
-for hc, tan in snake_heads:                              # Y una junto a cada serpiente, arriba de la cabeza
-    c = Vector(hc * R) + Vector((nrng.uniform(-0.5, 0.5), nrng.uniform(-0.4, 0.0), nrng.uniform(0.4, 0.7)))
-    if planet(np.array([c]) / R)[0] < 0.02:
-        continue
-    rot = Matrix.Rotation(math.radians(nrng.uniform(-25, 25)), 3, "Y")
-    music_note(c, rot, False)
 nme = bpy.data.meshes.new("HW_Music_Notes")
 nme.from_pydata([tuple(v) for v in nv], [], nf_)
 nme.validate()
@@ -1070,7 +1096,7 @@ for name, rot, col, e in (("Key", (math.radians(60), 0, math.radians(-120)), "#f
     pres.objects.link(lo_)
     lo_.rotation_euler = rot
 ld = bpy.data.lights.new("InnerGlow", "POINT")
-ld.energy, ld.color, ld.shadow_soft_size = 12000, srgb("#b4d83a"), 3.0
+ld.energy, ld.color, ld.shadow_soft_size = 12000, srgb("#ff6a1e"), 3.0   # Resplandor de lava
 pres.objects.link(bpy.data.objects.new("InnerGlow", ld))
 cam = bpy.data.objects.new("Cam", bpy.data.cameras.new("Cam"))
 pres.objects.link(cam)

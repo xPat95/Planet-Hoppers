@@ -109,7 +109,8 @@ POSES = {
 }
 
 
-def build_witch(pose):
+def build_witch(pose, happy=False):
+    """happy: ojos cerrados de felicidad (arcos ∩) y una sonrisa grande, en vez de los ojitos verdes."""
     B = Builder(MATS)
     pel = Vector((0, 0, 0.5))
     Rp = rz(pose["pelvis"][2]) @ ry(pose["pelvis"][1]) @ rx(pose["pelvis"][0])
@@ -144,9 +145,17 @@ def build_witch(pose):
     # Cuello y cabeza (cara casi sin detalle: solo dos ojitos verdes)
     B.tube([neck - Rt @ Vector((0, 0, 0.04)), neck + Rh @ Vector((0, 0, 0.03))], [0.024, 0.022], 8, SKIN)
     B.ellipsoid(head, Rh, (0.058 * HS, 0.064 * HS, 0.075 * HS), SKIN, seg=10, rings=7)
-    for s in (-1, 1):
-        B.ellipsoid(head + Rh @ Vector((s * 0.024, -0.052, 0.012)) * HS, Rh, (0.009 * HS, 0.006 * HS, 0.006 * HS), EYES,
-                    seg=5, rings=3)
+    face = lambda x, z: head + Rh @ Vector((x, -0.064 * HS * (1 - (x / (0.058 * HS)) ** 2 - (z / (0.075 * HS)) ** 2) ** 0.5 - 0.002, z))   # noqa: E731
+    if happy:
+        for s in (-1, 1):                                # Ojos cerrados de felicidad: arcos ∩ brillantes
+            arc = [face(s * 0.024 * HS + t * 0.011 * HS, (0.012 + 0.008 * (1 - t * t)) * HS) for t in (-1.0, -0.5, 0.0, 0.5, 1.0)]
+            B.tube(arc, [0.0028 * HS] * 5, 4, EYES)
+        smile = [face(t * 0.03 * HS, (-0.022 - 0.012 * (1 - t * t)) * HS) for t in (-1.0, -0.6, -0.2, 0.2, 0.6, 1.0)]
+        B.tube(smile, [0.003 * HS] * 6, 4, BLACK)        # Sonrisa grande (U)
+    else:
+        for s in (-1, 1):
+            B.ellipsoid(head + Rh @ Vector((s * 0.024, -0.052, 0.012)) * HS, Rh, (0.009 * HS, 0.006 * HS, 0.006 * HS), EYES,
+                        seg=5, rings=3)
 
     # Pelo: un solo panel. Arriba envuelve toda la cabeza hasta la coronilla (sin huecos de cuero cabelludo),
     # enmarca la cara a los lados y cae ondulando por la espalda con el borde en ondas. Va con las caras para los
@@ -310,6 +319,9 @@ make("HW_Witch_Crawl", build_witch(POSES["crawl"]), "feet", 0.7)
 make("HW_Witch_Climb", build_witch(POSES["climb"]), "hands", 1.4)
 make("HW_Witch_Peek", build_witch(POSES["peek"]), "chest", 2.2)
 make("HW_Witch_Sit", build_witch(POSES["sit"]), "seat", 3.0)
+# Sentada y feliz, saludando con los dos brazos: va sentada en las gotas de sangre que caen del mentón
+make("HW_Witch_SitHappy", build_witch(dict(POSES["sit"], head=(-4, 0, 0), arm_R=(150, 20, -20, 0), arm_L=(140, -15, -30, 0)),
+                                      happy=True), "seat", 3.7)
 
 # --- Presentación ------------------------------------------------------------------------------------------
 pres = bpy.data.collections.new("Presentation")
