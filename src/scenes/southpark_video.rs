@@ -1,7 +1,12 @@
 //! The supplied South Park clip, prepared offline as SFV1 JPEGs + Ogg audio.
 //! Only the displayed JPEG is decoded; the audio controller owns the one clock.
 use raylib::prelude::*;
-use std::{io::Read, path::Path};
+use std::{
+    cell::RefCell,
+    fs::File,
+    io::{Read, Seek, SeekFrom},
+    path::Path,
+};
 
 pub const VIDEO: &str = "assets/video/south park/intro.sfv";
 pub const AUDIO: &str = "assets/video/south park/intro.ogg";
@@ -9,6 +14,7 @@ type Error = Box<dyn std::error::Error>;
 
 pub struct VideoFrames {
     bytes: Vec<u8>,
+    file: Option<RefCell<File>>,
     spans: Vec<(usize, usize)>,
     pub width: i32,
     pub height: i32,
@@ -17,7 +23,7 @@ pub struct VideoFrames {
 
 impl VideoFrames {
     pub fn load(path: &Path) -> Result<Self, Error> {
-        let file = std::fs::File::open(path).map_err(|e| {
+        let mut file = std::fs::File::open(path).map_err(|e| {
             format!(
                 "{}: {e}. Prepare el MP4 con python tools/video/prepare_southpark_intro.py",
                 path.display()
@@ -27,9 +33,44 @@ impl VideoFrames {
         if file.metadata()?.len() > 256 * 1024 * 1024 {
             return Err("South Park video pack exceeds 256 MiB".into());
         }
-        let mut bytes = Vec::new();
-        file.take(256 * 1024 * 1024 + 1).read_to_end(&mut bytes)?;
-        Self::from_bytes(bytes)
+        let length = file.metadata()?.len();
+        let mut header = [0u8; 20];
+        file.read_exact(&mut header)?;
+        // Reuse metadata validation without retaining the encoded frames.
+        let field = |at| u32::from_le_bytes(header[at..at + 4].try_into().unwrap());
+        let (width, height, fps, count) = (field(4), field(8), field(12), field(16));
+        if &header[..4] != b"SFV1"
+            || !(1..=1920).contains(&width)
+            || !(1..=1080).contains(&height)
+            || !(1..=60).contains(&fps)
+            || !(1..=10_000).contains(&count)
+        {
+            return Err("Invalid South Park video metadata".into());
+        }
+        let mut spans = Vec::with_capacity(count as usize);
+        for _ in 0..count {
+            let mut size = [0u8; 4];
+            file.read_exact(&mut size)?;
+            let size = u32::from_le_bytes(size) as u64;
+            let start = file.stream_position()?;
+            let end = start.checked_add(size).ok_or("Invalid frame length")?;
+            if size == 0 || end > length {
+                return Err("Truncated or empty video frame".into());
+            }
+            spans.push((start as usize, end as usize));
+            file.seek(SeekFrom::Start(end))?;
+        }
+        if file.stream_position()? != length {
+            return Err("Unexpected video data".into());
+        }
+        Ok(Self {
+            bytes: vec![],
+            file: Some(RefCell::new(file)),
+            spans,
+            width: width as i32,
+            height: height as i32,
+            fps,
+        })
     }
 
     pub fn from_bytes(bytes: Vec<u8>) -> Result<Self, Error> {
@@ -69,6 +110,7 @@ impl VideoFrames {
         }
         Ok(Self {
             bytes,
+            file: None,
             spans,
             width: width as i32,
             height: height as i32,
@@ -84,7 +126,17 @@ impl VideoFrames {
     }
     fn image(&self, frame: usize) -> Result<Image, Error> {
         let (start, end) = self.spans[frame];
-        let image = Image::load_image_from_mem(".jpg", &self.bytes[start..end])?;
+        let mut encoded = Vec::new();
+        let data = if let Some(file) = &self.file {
+            let mut file = file.borrow_mut();
+            file.seek(SeekFrom::Start(start as u64))?;
+            encoded.resize(end - start, 0);
+            file.read_exact(&mut encoded)?;
+            &encoded[..]
+        } else {
+            &self.bytes[start..end]
+        };
+        let image = Image::load_image_from_mem(".jpg", data)?;
         if image.width != self.width || image.height != self.height {
             return Err("South Park video frame dimensions changed".into());
         }
@@ -92,32 +144,56 @@ impl VideoFrames {
     }
 }
 
-pub struct VideoIntro {
+pub struct VideoTexture {
     frames: VideoFrames,
     texture: Texture2D,
     current: usize,
-    font: Font,
 }
 
-impl VideoIntro {
-    pub fn load(rl: &mut RaylibHandle, thread: &RaylibThread, root: &Path) -> Result<Self, Error> {
-        let frames = VideoFrames::load(&root.join(VIDEO))?;
+impl VideoTexture {
+    /// World-space cylindrical billboard, centered on Ike rather than the screen.
+    pub fn draw_world(
+        &self,
+        view: &mut RaylibMode3D<RaylibDrawHandle>,
+        camera: Camera3D,
+        feet: Vector3,
+    ) {
+        let aspect = self.frames.width as f32 / self.frames.height as f32;
+        let height = 1.05f32.min(1.65 / aspect);
+        let width = height * aspect;
+        let position = feet + Vector3::up() * 0.48;
+        let level_camera = Camera3D::perspective(
+            Vector3::new(camera.position.x, position.y, camera.position.z),
+            position,
+            Vector3::up(),
+            camera.fovy,
+        );
+        view.draw_billboard_pro(
+            level_camera,
+            *self.texture.as_ref(),
+            Rectangle::new(
+                0.0,
+                0.0,
+                self.frames.width as f32,
+                self.frames.height as f32,
+            ),
+            position,
+            Vector3::up(),
+            Vector2::new(width, height),
+            Vector2::new(width * 0.5, height * 0.5),
+            0.0,
+            Color::WHITE,
+        );
+    }
+    pub fn load(rl: &mut RaylibHandle, thread: &RaylibThread, path: &Path) -> Result<Self, Error> {
+        let frames = VideoFrames::load(path)?;
         let image = frames.image(0)?;
         let texture = rl.load_texture_from_image(thread, &image)?;
         texture.set_texture_filter(thread, TextureFilter::TEXTURE_FILTER_BILINEAR);
-        let font = rl.load_font_ex(
-            thread,
-            &root
-                .join("assets/fonts/Bungee-Regular.ttf")
-                .to_string_lossy(),
-            64,
-            None,
-        )?;
         Ok(Self {
             frames,
             texture,
             current: 0,
-            font,
         })
     }
     pub fn duration(&self) -> f32 {
@@ -137,6 +213,31 @@ impl VideoIntro {
             self.current = frame;
         }
         Ok(())
+    }
+}
+
+pub struct VideoIntro {
+    clip: VideoTexture,
+    font: Font,
+}
+impl VideoIntro {
+    pub fn load(rl: &mut RaylibHandle, thread: &RaylibThread, root: &Path) -> Result<Self, Error> {
+        let clip = VideoTexture::load(rl, thread, &root.join(VIDEO))?;
+        let font = rl.load_font_ex(
+            thread,
+            &root
+                .join("assets/fonts/Bungee-Regular.ttf")
+                .to_string_lossy(),
+            64,
+            None,
+        )?;
+        Ok(Self { clip, font })
+    }
+    pub fn duration(&self) -> f32 {
+        self.clip.duration()
+    }
+    pub fn update(&mut self, seconds: f32) -> Result<(), Error> {
+        self.clip.update(seconds)
     }
     pub fn draw(&self, d: &mut RaylibDrawHandle, w: i32, h: i32, mouse: Vector2) {
         let (wf, hf) = (w as f32, h as f32);
@@ -173,7 +274,7 @@ impl VideoIntro {
             1.0,
             Color::new(70, 61, 45, 255),
         );
-        let rect = video_rect(w, h, self.frames.width, self.frames.height);
+        let rect = video_rect(w, h, self.clip.frames.width, self.clip.frames.height);
         let border = (hf * 0.021).clamp(8.0, 19.0);
         let paper = Rectangle::new(
             rect.x - border,
@@ -198,12 +299,12 @@ impl VideoIntro {
             Color::new(202, 163, 108, 255),
         );
         d.draw_texture_pro(
-            &self.texture,
+            &self.clip.texture,
             Rectangle::new(
                 0.0,
                 0.0,
-                self.frames.width as f32,
-                self.frames.height as f32,
+                self.clip.frames.width as f32,
+                self.clip.frames.height as f32,
             ),
             rect,
             Vector2::zero(),

@@ -30,6 +30,28 @@ fn rejects_truncation_invalid_metadata_and_trailing_data() {
 }
 
 #[test]
+fn indexed_file_reader_validates_lengths_and_matches_memory_reader() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("target/video-index-test");
+    std::fs::create_dir_all(&root).unwrap();
+    let path = root.join("validation.sfv");
+    let valid = pack(16, 9, 24, &[b"jpeg", b"jpeg2"]);
+    for length in 0..valid.len() {
+        std::fs::write(&path, &valid[..length]).unwrap();
+        assert!(VideoFrames::load(&path).is_err());
+    }
+    std::fs::write(&path, &valid).unwrap();
+    let disk = VideoFrames::load(&path).unwrap();
+    let memory = VideoFrames::from_bytes(valid.clone()).unwrap();
+    assert_eq!(disk.duration(), memory.duration());
+    assert_eq!(disk.frame_at(1.0), memory.frame_at(1.0));
+    drop(disk);
+    let mut trailing = valid;
+    trailing.push(0);
+    std::fs::write(&path, trailing).unwrap();
+    assert!(VideoFrames::load(&path).is_err());
+}
+
+#[test]
 fn frame_selection_follows_the_stream_clock_and_clamps_at_the_end() {
     let frames = VideoFrames::from_bytes(pack(16, 9, 30, &[b"a", b"b", b"c"])).unwrap();
     assert_eq!(frames.frame_at(-1.0), 0);
