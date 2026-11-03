@@ -1,0 +1,11 @@
+{
+  "source": "assets/video/south park/South_park_intro.mp4",
+  "source_sha256": "c92b02f5851ea628bc928d9fc72888103f679812e893c041a08d797a7d56eddb",
+  "width": 1280,
+  "height": 720,
+  "fps": 30,
+  "frames": 801,
+  "duration_seconds": 26.7,
+  "audio": "intro.ogg",
+  "video": "intro.sfv"
+}
