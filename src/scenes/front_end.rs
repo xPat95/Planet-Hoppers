@@ -35,19 +35,21 @@ pub fn run() -> Result<(), Error> {
     let mut smoke = false;
     let mut returns = false;
     let mut docking = false;
+    let mut minecraft = false;
     let mut goal = "minecraft".to_string();
     let mut args = std::env::args().skip(1);
     while let Some(arg) = args.next() {
         match arg.as_str() {
             "--smoke" => smoke = true,
             "--smoke-docking" => { smoke = true; docking = true; }
+            "--smoke-minecraft" => { smoke = true; minecraft = true; }
             "--smoke-returns" => {
                 smoke = true;
                 returns = true;
             }
             "--ship" => goal = args.next().ok_or("--ship necesita un identificador")?,
             "--help" | "-h" => {
-                println!("cargo run --locked -- [--smoke | --smoke-returns | --smoke-docking] [--ship halloween|starwars|smilingfriends|minecraft|regularshow|southpark]");
+                println!("cargo run --locked -- [--smoke | --smoke-returns | --smoke-docking | --smoke-minecraft] [--ship halloween|starwars|smilingfriends|minecraft|regularshow|southpark]");
                 println!("Sin opciones: menú principal. Desarrollo: cargo run --bin solarsystem o --bin southpark.");
                 return Ok(());
             }
@@ -65,6 +67,8 @@ pub fn run() -> Result<(), Error> {
         // A future station consumes ChangedShip inside its existing solar Session instead.
         let flags = if docking {
             vec!["--smoke-docking".into()]
+        } else if minecraft {
+            vec!["--smoke-minecraft".into()]
         } else if returns {
             vec!["--smoke-returns".into()]
         } else if smoke {

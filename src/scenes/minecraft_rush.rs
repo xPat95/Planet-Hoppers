@@ -1,4 +1,4 @@
-//! Complete independent Minecraft host: one graphics context and one music stream.
+//! Minecraft visit and standalone adapter: one graphics context and one music stream.
 use crate::{
     graphics::{
         mining::MiningVisuals,
@@ -7,6 +7,7 @@ use crate::{
     minigames::{
         common::{
             fps::{CursorCapture, PlayerInput},
+            host::{MinigameExit, MinigameResult, ReturnConfirmation},
             manifest::from_blender,
         },
         minecraft::{
@@ -14,6 +15,7 @@ use crate::{
             mining::{MiningConfig, MiningEvent, MiningSession},
             rush::{RushConfig, RushSession, RushState},
             sound::MinecraftAudio,
+            visit::{MinecraftVisits, VillageAction, VillageMenu},
             MenuAction, MinecraftConfig, MinecraftScene, SurfacePose, SurfaceState,
         },
     },
@@ -93,10 +95,31 @@ impl MineRun {
 }
 
 pub fn run(args: Vec<String>) -> Result<(), Error> {
+    run_visit(args).map(|_| ())
+}
+
+pub fn run_visit(args: Vec<String>) -> Result<MinigameExit, Error> {
+    run_visit_with_state(args, &mut MinecraftVisits::default())
+}
+
+pub fn run_visit_with_state(
+    args: Vec<String>,
+    visits: &mut MinecraftVisits,
+) -> Result<MinigameExit, Error> {
+    let result = run_inner(args, visits);
+    // Window close/error also ends a genuinely active attempt; completed victories stay intact.
+    visits.finish(MinigameResult::Abandoned);
+    result
+}
+
+fn run_inner(args: Vec<String>, visits: &mut MinecraftVisits) -> Result<MinigameExit, Error> {
+    let visit_start = visits.completed().len();
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let mut direct = false;
     let mut test = false;
     let mut mute = false;
+    let mut host_smoke = false;
+    let mut exploration_smoke = false;
     let mut output = root.join("docs/references/minecraft/phase5");
     let mut config = root.join("config/minecraft-rush.json");
     let mut args = args.into_iter();
@@ -107,6 +130,17 @@ pub fn run(args: Vec<String>) -> Result<(), Error> {
                 test = true;
                 mute = true;
             }
+            "--smoke-host" => {
+                test = true;
+                mute = true;
+                host_smoke = true;
+            }
+            "--smoke-exploration-exit" => {
+                test = true;
+                mute = true;
+                host_smoke = true;
+                exploration_smoke = true;
+            }
             "--mute" => mute = true,
             "--capture-dir" => {
                 output = PathBuf::from(args.next().ok_or("Missing capture directory")?)
@@ -114,7 +148,7 @@ pub fn run(args: Vec<String>) -> Result<(), Error> {
             "--rush-config" => config = PathBuf::from(args.next().ok_or("Missing rush config")?),
             "--help" | "-h" => {
                 println!("cargo run --bin minecraft -- [--mine] [--mute] [--smoke-rush] [--rush-config FILE] [--capture-dir DIR]");
-                return Ok(());
+                return Ok(MinigameExit::WindowClosed);
             }
             _ => return Err(format!("Unknown Minecraft option {arg}").into()),
         }
@@ -151,10 +185,57 @@ pub fn run(args: Vec<String>) -> Result<(), Error> {
     cursor.apply(&mut rl);
     let mut last = Instant::now();
     let mut frame = 0;
-    let mut smoke = smoke::Smoke::default();
+    let mut smoke = if host_smoke && !exploration_smoke {
+        smoke::Smoke::winning_return()
+    } else {
+        smoke::Smoke::default()
+    };
+    let mut village_menu = VillageMenu::Closed;
+    let mut exit = MinigameExit::WindowClosed;
+    let mut abandonment = ReturnConfirmation::default();
+    let mut host_tick = 0;
+    let mut host_frozen = None;
+    let mut host_mine_time = None;
     while !rl.window_should_close() {
-        if test {
+        if test && !smoke.done() && !exploration_smoke {
             smoke.before(frame, &mut surface, mine.as_mut(), in_mine, &rl);
+        }
+        if host_smoke && (smoke.done() || exploration_smoke) {
+            host_tick += 1;
+            let event = match host_tick {
+                1 => Some((KeyboardKey::KEY_ESCAPE, true)),
+                2 => Some((KeyboardKey::KEY_ESCAPE, false)),
+                3 => Some((KeyboardKey::KEY_R, true)),
+                _ => None,
+            };
+            if let Some((key, down)) = event {
+                unsafe {
+                    ffi::PlayAutomationEvent(ffi::AutomationEvent {
+                        frame: 0,
+                        type_: if down { 2 } else { 1 },
+                        params: [key as i32, 0, 0, 0],
+                    });
+                }
+            }
+            if host_tick == 2 {
+                host_frozen = Some(surface.pose());
+                host_mine_time = mine.as_ref().map(|m| m.game.remaining);
+            }
+            if host_tick > 2 {
+                let held = host_frozen.unwrap();
+                if surface.player.feet != held.feet
+                    || surface.player.yaw != held.yaw
+                    || surface.player.pitch != held.pitch
+                {
+                    return Err("Minecraft host smoke: village moved during exit menu".into());
+                }
+                if mine.as_ref().map(|m| m.game.remaining) != host_mine_time {
+                    return Err("Minecraft host smoke: mine timer advanced in village".into());
+                }
+            }
+            if visits.active_attempt().is_some() {
+                return Err("Minecraft host smoke: challenge still active in village".into());
+            }
         }
         let now = Instant::now();
         let dt = if test {
@@ -172,13 +253,23 @@ pub fn run(args: Vec<String>) -> Result<(), Error> {
         let old_mine = in_mine;
         let old_state = mine.as_ref().map(|m| m.game.state);
         let old_surface = surface.state;
+        let old_village_menu = village_menu;
         let before = if in_mine {
             mine.as_ref().unwrap().scene.player.feet
         } else {
             surface.player.feet
         };
         if !in_mine {
-            if surface.state == SurfaceState::Exploring {
+            if village_menu != VillageMenu::Closed {
+                if focused && village_menu.apply(village_input(&rl, village_menu)) {
+                    exit = visits.exit_since(visit_start);
+                    break;
+                }
+            } else if surface.state == SurfaceState::Exploring && focused && input.toggle_cursor {
+                village_menu.apply(VillageAction::Pause);
+                surface.selected = None;
+                audio.reset_effects();
+            } else if surface.state == SurfaceState::Exploring {
                 if focused
                     && !cursor.captured
                     && rl.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_LEFT)
@@ -211,6 +302,7 @@ pub fn run(args: Vec<String>) -> Result<(), Error> {
                     mine = Some(MineRun::load(&root, &mut rl, &thread, settings.clone())?);
                 }
                 mine.as_mut().unwrap().game.ready();
+                visits.start_attempt();
                 in_mine = true;
                 skip = true;
                 last = Instant::now();
@@ -231,7 +323,22 @@ pub fn run(args: Vec<String>) -> Result<(), Error> {
             ) && focused
                 && !skip
             {
-                let action = if m.game.state == RushState::Paused {
+                let action = if abandonment.pending {
+                    match two_buttons_input(&rl, true) {
+                        1 => {
+                            abandonment.confirm();
+                            visits.finish(MinigameResult::Abandoned);
+                            returned = true;
+                        }
+                        2 => {
+                            abandonment.cancel();
+                            m.game.resume();
+                            skip = true;
+                        }
+                        _ => {}
+                    }
+                    0
+                } else if m.game.state == RushState::Paused {
                     pause_input(&rl)
                 } else {
                     two_buttons_input(&rl, false)
@@ -243,11 +350,13 @@ pub fn run(args: Vec<String>) -> Result<(), Error> {
                     }
                     (RushState::Paused, 2) | (RushState::Victory | RushState::Defeat, 1) => {
                         m.restart();
+                        visits.start_attempt();
                         skip = true;
                     }
-                    (RushState::Paused, 3) | (RushState::Victory | RushState::Defeat, 2) => {
-                        returned = true
+                    (RushState::Paused, 3) if visits.active_attempt().is_some() => {
+                        abandonment.request();
                     }
+                    (RushState::Victory | RushState::Defeat, 2) => returned = true,
                     _ => {}
                 }
             }
@@ -271,6 +380,8 @@ pub fn run(args: Vec<String>) -> Result<(), Error> {
                 last = Instant::now();
             }
             if returned {
+                // Retained resources may be reused, but no active countdown survives in the village.
+                m.game.pause();
                 audio.reset_effects();
                 in_mine = false;
                 surface.state = SurfaceState::Exploring;
@@ -293,7 +404,9 @@ pub fn run(args: Vec<String>) -> Result<(), Error> {
             let events = m.mining.drain_events();
             m.sync(&events);
             audio.mining(&events);
-            audio.cues(&m.game.drain_cues());
+            let cues = m.game.drain_cues();
+            visits.record_cues(&cues);
+            audio.cues(&cues);
         }
         let state = if in_mine {
             Some(mine.as_ref().unwrap().game.state)
@@ -303,11 +416,12 @@ pub fn run(args: Vec<String>) -> Result<(), Error> {
         let captured = if in_mine {
             state == Some(RushState::Running)
         } else {
-            surface.state == SurfaceState::Exploring
+            surface.state == SurfaceState::Exploring && village_menu == VillageMenu::Closed
         };
         if old_mine != in_mine
             || old_state != state && in_mine
             || old_surface != surface.state && !in_mine
+            || old_village_menu != village_menu
         {
             cursor.captured = captured;
             cursor.apply(&mut rl);
@@ -330,7 +444,7 @@ pub fn run(args: Vec<String>) -> Result<(), Error> {
             state,
             in_mine && mine.as_ref().unwrap().game.warning,
         );
-        if test {
+        if test && !smoke.done() && !exploration_smoke {
             smoke.after(frame, &surface, mine.as_ref(), in_mine, &cursor, &audio)?;
         }
         let w = rl.get_screen_width();
@@ -390,7 +504,21 @@ pub fn run(args: Vec<String>) -> Result<(), Error> {
                     m.game.state,
                     RushState::Paused | RushState::Victory | RushState::Defeat
                 ) {
-                    draw_result(&mut d, w, h, m);
+                    if abandonment.pending {
+                        panel(
+                            &mut d,
+                            w,
+                            h,
+                            "ABANDONAR DIAMOND RUSH",
+                            &[
+                                "Perderás el progreso de la partida actual.".into(),
+                                "¿Querés volver a la aldea?".into(),
+                            ],
+                            &["Abandonar", "Cancelar"],
+                        );
+                    } else {
+                        draw_result(&mut d, w, h, m);
+                    }
                 }
             } else {
                 let camera = surface.player.camera();
@@ -400,7 +528,7 @@ pub fn run(args: Vec<String>) -> Result<(), Error> {
                 }
                 draw_header(&mut d, w, "MINECRAFT | OVERWORLD");
                 d.draw_text(
-                    "WASD / Mouse / Shift   E: interactuar   Esc: cursor",
+                    "WASD / Mouse / Shift   E: interactuar   Esc: pausa / salir",
                     20,
                     h - 32,
                     18,
@@ -421,8 +549,14 @@ pub fn run(args: Vec<String>) -> Result<(), Error> {
                 if let Some(text) = &surface.confirmation {
                     d.draw_text(text, 20, 110, 20, Color::YELLOW);
                 }
-                if !cursor.captured && surface.state == SurfaceState::Exploring {
-                    d.draw_text("Clic o Esc para continuar", 20, 85, 20, Color::WHITE);
+                if !cursor.captured
+                    && surface.state == SurfaceState::Exploring
+                    && village_menu == VillageMenu::Closed
+                {
+                    d.draw_text("Clic para retomar | Esc: pausa", 20, 85, 20, Color::WHITE);
+                }
+                if village_menu != VillageMenu::Closed {
+                    draw_village_menu(&mut d, w, h, village_menu);
                 }
             }
             if cursor.captured {
@@ -434,13 +568,17 @@ pub fn run(args: Vec<String>) -> Result<(), Error> {
                     std::fs::create_dir_all(&output)?;
                     save_frame(&output.join(file), w, h)?;
                 }
+                if host_smoke && matches!(host_tick, 2 | 4 | 7) {
+                    std::fs::create_dir_all(&output)?;
+                    save_frame(&output.join(format!("host-menu-{host_tick}.png")), w, h)?;
+                }
             } else if d.is_key_pressed(KeyboardKey::KEY_F12) {
                 std::fs::create_dir_all(&output)?;
                 save_frame(&output.join("manual.png"), w, h)?;
             }
         }
         frame += 1;
-        if test && smoke.done() {
+        if test && smoke.done() && !host_smoke {
             break;
         }
         if test && frame > 5000 {
@@ -448,11 +586,62 @@ pub fn run(args: Vec<String>) -> Result<(), Error> {
         }
     }
     rl.enable_cursor();
-    if test {
+    audio.stop();
+    if test && !exploration_smoke {
         smoke.finish(&output, &audio, mine.as_ref())?;
     }
     println!("MINECRAFT_AUDIO {}", serde_json::to_string(&audio.audit)?);
-    Ok(())
+    if host_smoke {
+        let expected = if exploration_smoke {
+            MinigameExit::ReturnedWithoutResult
+        } else {
+            MinigameExit::Returned(MinigameResult::Victory)
+        };
+        if exit != expected
+            || visits.active_attempt().is_some()
+            || visits.completed().len() != visit_start + usize::from(!exploration_smoke)
+        {
+            return Err(
+                "Minecraft host smoke: incorrect or duplicated result on village exit".into(),
+            );
+        }
+        println!("MINECRAFT_HOST_PASS exit={exit:?} village_warning=false attempts_total={} audio_stopped={}", visits.completed().len(), !audio.music_playing());
+    }
+    Ok(exit)
+}
+
+fn village_input(rl: &RaylibHandle, menu: VillageMenu) -> VillageAction {
+    let b = buttons(rl.get_screen_width(), rl.get_screen_height(), 2);
+    let click = rl.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_LEFT);
+    let mouse = rl.get_mouse_position();
+    let first = click && b[0].check_collision_point_rec(mouse);
+    let second = click && b[1].check_collision_point_rec(mouse);
+    match menu {
+        VillageMenu::Paused
+            if rl.is_key_pressed(KeyboardKey::KEY_ESCAPE)
+                || rl.is_key_pressed(KeyboardKey::KEY_ENTER)
+                || first =>
+        {
+            VillageAction::Continue
+        }
+        VillageMenu::Paused if rl.is_key_pressed(KeyboardKey::KEY_R) || second => {
+            VillageAction::RequestReturn
+        }
+        _ => VillageAction::None,
+    }
+}
+
+fn draw_village_menu(d: &mut RaylibDrawHandle, w: i32, h: i32, menu: VillageMenu) {
+    if menu == VillageMenu::Paused {
+        panel(
+            d,
+            w,
+            h,
+            "PAUSA | OVERWORLD",
+            &["La exploración está en pausa.".into()],
+            &["Continuar", "Regresar al sistema solar"],
+        );
+    }
 }
 fn draw_header(d: &mut RaylibDrawHandle, w: i32, title: &str) {
     d.draw_rectangle(0, 0, w, 62, Color::new(8, 16, 20, 235));

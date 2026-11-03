@@ -58,7 +58,7 @@
       "start_angle_degrees": 0.0,
       "color": "#5daa3c",
       "model": "assets/models/planets/minecraft/exports/minecraft_planet.glb",
-      "minigame": null
+      "minigame": "minecraft"
     },
     {
       "id": "regularshow",

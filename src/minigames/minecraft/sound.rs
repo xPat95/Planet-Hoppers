@@ -180,4 +180,10 @@ impl<'a> MinecraftAudio<'a> {
     pub fn music_playing(&self) -> bool {
         self.music.as_ref().is_some_and(|m| m.is_stream_playing())
     }
+    pub fn stop(&mut self) {
+        self.reset_effects();
+        if let Some(music) = &self.music {
+            music.stop_stream();
+        }
+    }
 }

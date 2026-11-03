@@ -12,6 +12,7 @@ pub mod mine;
 pub mod mining;
 pub mod rush;
 pub mod sound;
+pub mod visit;
 
 #[derive(Clone, Deserialize)]
 #[serde(deny_unknown_fields)]

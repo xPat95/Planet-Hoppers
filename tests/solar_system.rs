@@ -40,8 +40,8 @@ fn la_proximidad_conserva_la_identidad_y_el_minijuego_en_las_nuevas_orbitas() {
         let index = system.planet_in_reach(point).expect("planeta al alcance");
         let reached = &system.planets[index].config;
         assert_eq!(reached.id, id);
-        // Planetas con minijuego conectado: South Park y Smiling Friends
-        let expected = if matches!(id, "southpark" | "smilingfriends") { Some(id) } else { None };
+        // Each connected planet dispatches by its own identity.
+        let expected = if matches!(id, "southpark" | "smilingfriends" | "minecraft") { Some(id) } else { None };
         assert_eq!(reached.minigame.as_deref(), expected, "{id}");
         assert!(reached.model.as_deref().unwrap().contains(&format!("/planets/{id}/")));
     }

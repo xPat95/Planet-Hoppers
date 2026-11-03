@@ -7,11 +7,11 @@ El sistema solar y South Park se ejecutan como funciones del mismo proceso. Los 
 `src/minigames/common/host.rs` define:
 
 - `MinigameResult::{Victory, Defeat, Abandoned}`.
-- `MinigameExit::{Returned(MinigameResult), WindowClosed}`: cerrar explícitamente la ventana no se confunde con abandonar desde pausa.
+- `MinigameExit::{Returned(MinigameResult), ReturnedWithoutResult, WindowClosed}`: regresar de exploración sin un desafío no fabrica un abandono; cerrar explícitamente la ventana permanece diferenciado. Minecraft usa `ReturnedWithoutResult` en visitas sin partidas; los demás adaptadores conservan sus retornos anteriores.
 - `MinigameCompletion { planet_id, minigame_id, result }`: resultado estructurado que el anfitrión retiene en memoria para futuros consumidores de progreso. También se imprime como `MINIGAME_RETURN` en JSON.
 - `ReturnConfirmation`: pedir, cancelar y confirmar un abandono; confirmar sin petición pendiente no produce un resultado.
 
-`scenes::minigame_host::run` centraliza el despacho y el estado entre visitas. Actualmente solo registra South Park. Para integrar otro minijuego se agrega su adaptador aquí y se configura el identificador en el planeta. El adaptador devuelve `MinigameExit` y conserva únicamente el contexto entre visitas que corresponda. Minecraft, Smiling Friends, Halloween/Calaca, Regular Show y Star Wars no se implementan ni se modifican en este ajuste.
+`scenes::minigame_host::run` centraliza el despacho y el estado entre visitas. Registra South Park, Smiling Friends y Minecraft. Cada adaptador devuelve `MinigameExit` y conserva únicamente el contexto entre visitas que corresponda. Minecraft reutiliza el host completo de aldea y Diamond Rush; su salida y recuperación de aproximación se detallan en [la integración Minecraft](minecraft-solar-integration.md). Halloween/Calaca, Regular Show y Star Wars siguen sin minijuego conectado.
 
 `SouthParkExit` permanece como alias del contrato compartido para compatibilidad. El único estado de South Park entre visitas es `intro_seen`: no se conserva el progreso del intento. No se entregan tokens, recompensas, desbloqueos ni cinemáticas.
 

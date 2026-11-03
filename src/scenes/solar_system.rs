@@ -2,6 +2,7 @@
 //! (vuelo y choques) con la representación de `graphics::space`, y coordina las visitas: "Explorar planeta" cierra
 //! esta ventana, abre el minijuego y al terminar vuelve al mismo sistema solar, con la nave junto al planeta.
 use super::minigame_host::{self, MinigameVisits};
+use crate::gameplay::planet_visit::PlanetReturnPose;
 use crate::gameplay::station::{chase_position, DepartureBounds, Station};
 use crate::minigames::common::host::{MinigameCompletion, MinigameExit, MinigameResult};
 use crate::graphics::resources::save_frame;
@@ -101,6 +102,8 @@ struct Session {
     departing: bool,
     game: Option<GameState>,
     returning_from: Option<usize>,
+    return_pose: Option<PlanetReturnPose>,
+    minecraft_smoke: bool,
     /// Prueba de ida y vuelta a un minijuego (--smoke-visit): cuántas visitas van.
     visit_smoke: Option<u32>,
 }
@@ -179,6 +182,7 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
     let mut ships_path = root.join("config/ships.json");
     let mut smoke = false;
     let mut visit_smoke = false;
+    let mut minecraft_smoke = false;
     let mut return_smoke = false;
     let mut launch_smoke = false;
     let mut station_smoke = false;
@@ -194,6 +198,7 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
             "--debug-collisions" => collision_debug = true,
             "--smoke-docking" => { smoke = true; docking_smoke = true; }
             "--smoke-returns" => { smoke = true; visit_smoke = true; return_smoke = true; }
+            "--smoke-minecraft" => { smoke = true; visit_smoke = true; minecraft_smoke = true; }
             "--smoke-visit" => {
                 smoke = true;
                 visit_smoke = true;
@@ -207,6 +212,7 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
                 println!("Nave:\n{HELP_SHIP}\nVista general:\n{HELP_OVERVIEW}");
                 println!("--smoke: recorrido automático sin ventana visible; guarda capturas en target/solarsystem/");
                 println!("--smoke-visit: ida y vuelta a South Park (con su prueba de entrada) y captura al volver");
+                println!("--smoke-minecraft: dos visitas a la aldea y Diamond Rush, regreso confirmado y misma nave");
                 println!("--smoke-returns: victoria, derrota, pausa/reinicio/abandono y cuatro visitas a South Park");
                 println!("--smoke-station: estación fija, aproximación y controles de ascenso/piloto");
                 println!("--smoke-docking: tres entradas al hangar, selección, cambio, cancelación y despegue");
@@ -254,6 +260,8 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
         departing: true,
         game,
         returning_from: None,
+        return_pose: None,
+        minecraft_smoke,
         visit_smoke: visit_smoke.then_some(0),
     };
     loop {
@@ -294,12 +302,18 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
                 session.departing=true;
                 session.target=None;
                 session.returning_from=None;
+                session.return_pose=None;
             }
             Exit::Visit(i) => {
+                if session.system.planets[i].config.id == "minecraft" {
+                    session.return_pose = Some(PlanetReturnPose::capture(&session.ship, &session.system.planets[i]));
+                }
                 // La ventana del sistema solar ya se cerró: el minijuego abre la suya
                 let planet = &session.system.planets[i].config;
                 let id = planet.minigame.clone().ok_or("El planeta no tiene minijuego")?;
-                let args = if session.return_smoke {
+                let args = if session.minecraft_smoke {
+                    vec!["--smoke-host".into(), "--capture-dir".into(), root.join(format!("target/minecraft-host-{}", session.visit_smoke.unwrap())).to_string_lossy().into_owned()]
+                } else if session.return_smoke {
                     let goal = ["victory", "defeat", "abandoned", "abandoned"][session.visit_smoke.unwrap() as usize];
                     vec!["--smoke-return".into(), goal.into(), "--mute".into()]
                 } else {
@@ -316,7 +330,7 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
                     }
                     _ => {}
                 }
-                if session.return_smoke && (session.ship_index != ship_index
+                if (session.return_smoke || session.minecraft_smoke) && (session.ship_index != ship_index
                     || session.system.planets.iter().map(|p| p.orbit_angle).collect::<Vec<_>>() != orbit_angles) {
                     return Err("La visita alteró la nave o las órbitas del anfitrión".into());
                 }
@@ -459,7 +473,14 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
     }
 
     if let Some(i) = s.returning_from.take() {
-        park_ship(&mut s.ship, &s.system.planets[i], 2.2, false);
+        if let Some(pose) = s.return_pose.take() {
+            let margin = station_ship_radius(s, &ship_model);
+            pose.restore(&mut s.ship, &s.system, i, margin,
+                |point| s.station.push_out(point, point, margin).is_none())?;
+            println!("PLANET_RETURN_POSE planet={} ship={} position={:?}", s.system.planets[i].config.id, s.ships.ships[s.ship_index].id, s.ship.position);
+        } else {
+            park_ship(&mut s.ship, &s.system.planets[i], 2.2, false);
+        }
     }
     if s.view == View::Ship && !smoke {
         rl.disable_cursor();
@@ -490,7 +511,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         }
         let dt = if smoke { 1.0 / 60.0 } else { rl.get_frame_time().min(0.1) };
         // Sin teclado durante las pruebas ni mientras se sale hacia un minijuego
-        let accepts_input = (!smoke || s.launch_smoke || s.station_smoke || s.docking_smoke.is_some()) && leaving.is_none() && !entering_station;
+        let accepts_input = (!smoke || s.launch_smoke || s.station_smoke || s.minecraft_smoke || s.docking_smoke.is_some()) && leaving.is_none() && !entering_station;
         let pressed = |rl: &RaylibHandle, k: KeyboardKey| accepts_input && rl.is_key_pressed(k);
         let down = |rl: &RaylibHandle, k: KeyboardKey| accepts_input && rl.is_key_down(k);
         if pressed(&rl,KeyboardKey::KEY_F3) {s.collision_debug=!s.collision_debug;}
@@ -636,30 +657,42 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             }
         } else if let Some(visits) = s.visit_smoke {
             // Ida: estacionar junto a South Park y explorar. Vuelta: capturar la nave junto al planeta y salir
-            let total = if s.return_smoke { 4 } else { 1 };
+            let destination = if s.minecraft_smoke { s.system.planets.iter().position(|p| p.config.id == "minecraft").unwrap() } else { southpark };
+            let total = if s.minecraft_smoke { 2 } else if s.return_smoke { 4 } else { 1 };
+            if s.minecraft_smoke {
+                let event = if visits > 0 && frame == 0 || visits < total && frame == 30 { Some(2) }
+                    else if frame == 10 || frame == 31 { Some(1) } else { None };
+                if let Some(kind) = event { unsafe { ffi::PlayAutomationEvent(ffi::AutomationEvent {
+                    frame: 0, type_: kind, params: [KeyboardKey::KEY_E as i32, 0, 0, 0],
+                }); } }
+                if visits > 0 && frame == 12 && leaving.is_some() {
+                    return Err("Held E re-entered Minecraft before a new press".into());
+                }
+            }
             match (visits, frame) {
                 (_, 0) => {
                     if visits > 0 {
-                        if s.system.planet_in_reach(s.ship.position).is_some() || s.ship.speed != 0.0 {
+                        if (!s.minecraft_smoke && s.system.planet_in_reach(s.ship.position).is_some()) || s.ship.speed != 0.0
+                            || s.system.planets[destination].push_out(s.ship.position, station_ship_radius(s, &ship_model)).is_some() {
                             return Err("Retorno inseguro o dentro del alcance de exploración".into());
                         }
                         capture = Some(format!("after-return-{visits}.png"));
                     }
-                    if visits == 0 { park_ship(&mut s.ship, &s.system.planets[southpark], 1.7, true); }
+                    if visits == 0 { park_ship(&mut s.ship, &s.system.planets[destination], 1.7, true); }
                     snap = true;
                 }
                 (_, 1) if visits > 0 && visits < total => {
                     if s.game.is_none() { s.ship_index = visits as usize % s.ships.ships.len(); }
                     ship_model = load_ship_model(&mut rl, &thread, root, &shader, s);
-                    park_ship(&mut s.ship, &s.system.planets[southpark], 1.7, true);
+                    park_ship(&mut s.ship, &s.system.planets[destination], 1.7, true);
                     snap = true;
                 }
                 (_, 30) if visits < total => {
                     capture = Some("before-visit.png".into());
-                    if s.system.planet_in_reach(s.ship.position) != Some(southpark) {
+                    if s.system.planet_in_reach(s.ship.position) != Some(destination) {
                         return Err("La nave no quedó al alcance de South Park".into());
                     }
-                    leaving = Some(southpark);
+                    if !s.minecraft_smoke { leaving = Some(destination); }
                 }
                 (_, 60) if visits == total => capture = Some("after-visit.png".into()),
                 (_, 61) if visits == total => {
@@ -1204,7 +1237,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 let title = format!("Explorar {}", p.name);
                 let tw = d.measure_text(&title, 24);
                 d.draw_text(&title, (w / 2.0) as i32 - tw / 2, (h - 140.0) as i32, 24, white);
-                let sub = if p.minigame.is_some() { "[E] o clic" } else { "[E]  (minijuego en construcción)" };
+                let sub = if p.minigame.is_some() { "[E] Explorar planeta" } else { "[E]  (minijuego en construcción)" };
                 let sw = d.measure_text(sub, 16);
                 d.draw_text(sub, (w / 2.0) as i32 - sw / 2, (h - 110.0) as i32, 16, dim);
             }

@@ -11,6 +11,8 @@ pub enum MinigameResult {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum MinigameExit {
     Returned(MinigameResult),
+    /// Navigation back to the host without a challenge result (free exploration).
+    ReturnedWithoutResult,
     WindowClosed,
 }
 

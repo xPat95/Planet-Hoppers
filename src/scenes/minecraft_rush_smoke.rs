@@ -16,6 +16,7 @@ pub struct Smoke {
     file: Option<&'static str>,
     paused_time: f32,
     done: bool,
+    victory_return: bool,
 }
 fn key(k: KeyboardKey, down: bool) {
     unsafe {
@@ -50,6 +51,12 @@ fn aim(m: &mut MineRun, id: &str) {
     m.scene.player.pitch = d.y.asin();
 }
 impl Smoke {
+    pub fn winning_return() -> Self {
+        Self {
+            victory_return: true,
+            ..Self::default()
+        }
+    }
     pub fn before(
         &mut self,
         frame: u32,
@@ -156,6 +163,8 @@ impl Smoke {
                     key(KeyboardKey::KEY_E, false);
                     self.file = Some("runtime_victory.png");
                 }
+                6 if self.victory_return => click_button(rl, 2, 1),
+                7 if self.victory_return => click(false),
                 6 => key(KeyboardKey::KEY_ENTER, true),
                 7 => key(KeyboardKey::KEY_ENTER, false),
                 _ => {}
@@ -170,24 +179,16 @@ impl Smoke {
             4 => match self.tick {
                 0 => key(KeyboardKey::KEY_BACKSPACE, true),
                 1 => key(KeyboardKey::KEY_BACKSPACE, false),
-                2 => {
-                    let r = buttons(rl.get_screen_width(), rl.get_screen_height(), 3)[2];
-                    unsafe {
-                        ffi::PlayAutomationEvent(ffi::AutomationEvent {
-                            frame: 0,
-                            type_: 7,
-                            params: [
-                                (r.x + r.width * 0.5) as i32,
-                                (r.y + r.height * 0.5) as i32,
-                                0,
-                                0,
-                            ],
-                        });
-                    }
-                    click(true);
-                }
-                3 => click(false),
-                4 => self.file = Some("runtime_return.png"),
+                2 | 10 => click_button(rl, 3, 2),
+                3 | 11 => click(false),
+                4 => self.file = Some("runtime_abandon_warning.png"),
+                5 => key(KeyboardKey::KEY_ESCAPE, true),
+                6 => key(KeyboardKey::KEY_ESCAPE, false),
+                8 => key(KeyboardKey::KEY_BACKSPACE, true),
+                9 => key(KeyboardKey::KEY_BACKSPACE, false),
+                12 => key(KeyboardKey::KEY_ENTER, true),
+                13 => key(KeyboardKey::KEY_ENTER, false),
+                14 => self.file = Some("runtime_return.png"),
                 _ => {}
             },
             _ => {}
@@ -281,6 +282,14 @@ impl Smoke {
                     check(m.game.state==RushState::Victory&&!c.captured,"E at actual exit with time and diamonds produces victory and releases cursor")?;
                 }
                 if self.tick == 7 {
+                    if self.victory_return {
+                        check(
+                            !in_mine && s.state == SurfaceState::Exploring && c.captured,
+                            "Victory returns to village without turning into abandonment",
+                        )?;
+                        self.done = true;
+                        return Ok(());
+                    }
                     check(
                         m.game.state == RushState::Running
                             && m.game.remaining > 149.9
@@ -315,6 +324,18 @@ impl Smoke {
             }
             4 => {
                 if self.tick == 4 {
+                    check(
+                        in_mine && m.game.state == RushState::Paused && !c.captured,
+                        "Active attempt requests abandonment confirmation before leaving mine",
+                    )?;
+                }
+                if self.tick == 6 {
+                    check(
+                        in_mine && m.game.state == RushState::Running && c.captured,
+                        "Cancel abandonment resumes the same active attempt",
+                    )?;
+                }
+                if self.tick == 14 {
                     check(
                         !in_mine && s.state == SurfaceState::Exploring && c.captured,
                         "Return restores surface FPS in the same graphics context",
@@ -367,4 +388,21 @@ impl Smoke {
         println!("RUSH_SMOKE_PASS {}", report);
         Ok(())
     }
+}
+
+fn click_button(rl: &RaylibHandle, count: usize, index: usize) {
+    let r = buttons(rl.get_screen_width(), rl.get_screen_height(), count)[index];
+    unsafe {
+        ffi::PlayAutomationEvent(ffi::AutomationEvent {
+            frame: 0,
+            type_: 7,
+            params: [
+                (r.x + r.width * 0.5) as i32,
+                (r.y + r.height * 0.5) as i32,
+                0,
+                0,
+            ],
+        });
+    }
+    click(true);
 }
