@@ -165,9 +165,9 @@ pub(super) fn hangar_title(
 ) {
     text(d, body, context, 38.0, 17.0, 17.0, CYAN);
     let fit = (w as f32 - 280.0) / title.measure_text(name, 100.0, 1.0).x * 100.0;
-    heading(d, title, name, 36.0, 40.0, fit.min(32.0));
-    text(d, body, detail, 39.0, 82.0, 18.0, INK);
-    slanted(d, 39.0, 110.0, 70.0, 3.0, |t| chrome(t, 0.0));
+    heading(d, title, name, 36.0, 38.0, fit.min(46.0));
+    text(d, body, detail, 39.0, 99.0, 18.0, INK);
+    slanted(d, 39.0, 128.0, 70.0, 3.0, |t| chrome(t, 0.0));
 }
 
 pub(super) fn controls(d: &mut RaylibDrawHandle, title: &Font, body: &Font, w: i32, h: i32) {

@@ -13,6 +13,8 @@ pub struct SpaceShader {
     emissive: i32,
     ambient: i32,
     outline: i32,
+    transport: i32,
+    dissolve: i32,
 }
 
 impl SpaceShader {
@@ -37,10 +39,12 @@ impl SpaceShader {
         let loc = |name: &str| shader.get_shader_location(name);
         let (light, camera, emissive, ambient) = (loc("lightPosition"), loc("cameraPosition"), loc("emissive"), loc("ambient"));
         let outline = loc("outline");
-        if !shader.is_shader_valid() || [light, camera, emissive, ambient, outline].contains(&-1) {
+        let transport = loc("transportGlow");
+        let dissolve = loc("transportDissolve");
+        if !shader.is_shader_valid() || [light, camera, emissive, ambient, outline, transport].contains(&-1) {
             return Err("El shader del espacio no compiló".into());
         }
-        Ok(Self { shader, camera_position: Vector3::zero(), light, camera, emissive, ambient, outline })
+        Ok(Self { shader, camera_position: Vector3::zero(), light, camera, emissive, ambient, outline, transport, dissolve })
     }
 
     /// Valores que no cambian en todo el cuadro.
@@ -49,6 +53,14 @@ impl SpaceShader {
         self.shader.set_shader_value(self.light, sun);
         self.shader.set_shader_value(self.camera, camera);
         self.shader.set_shader_value(self.ambient, ambient);
+        self.shader.set_shader_value(self.transport, 0.0f32);
+        if self.dissolve >= 0 { self.shader.set_shader_value(self.dissolve, 0.0f32); }
+    }
+    pub fn set_transport_glow(&mut self, intensity: f32) {
+        self.shader.set_shader_value(self.transport, intensity);
+    }
+    pub fn set_transport_dissolve(&mut self, amount: f32) {
+        if self.dissolve >= 0 { self.shader.set_shader_value(self.dissolve, amount); }
     }
 }
 

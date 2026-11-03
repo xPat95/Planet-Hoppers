@@ -11,7 +11,14 @@ uniform vec3 emissive;
 uniform float ambient;
 uniform float outline;
 uniform float bakedRadiance;
+uniform float transportGlow;
 out vec4 finalColor;
+
+vec3 transportLight(vec3 color) {
+    vec3 delta = worldPosition - vec3(0.0, 1.3, 0.0);
+    float reach = clamp(transportGlow * 0.38 / (1.0 + dot(delta, delta) * 0.23), 0.0, 0.8);
+    return mix(color, color * vec3(0.58, 0.82, 1.05) + vec3(0.02, 0.10, 0.20), reach);
+}
 
 vec3 fixture(vec3 p, vec3 tint, float power, vec3 n, vec3 v, vec3 base) {
     vec3 delta = p-worldPosition;
@@ -33,7 +40,7 @@ void main() {
         if (!gl_FrontFacing) n=-n;
         float roof=smoothstep(7.5,11.0,worldPosition.y)*(0.2+0.8*max(-n.y,0.0));
         vec3 bounce=pow(max(colDiffuse.rgb*0.06*roof,vec3(0.0)),vec3(1.0/2.2));
-        finalColor=vec4(max(tex.rgb,bounce),tex.a*colDiffuse.a);
+        finalColor=vec4(transportLight(max(tex.rgb,bounce)),tex.a*colDiffuse.a);
         return;
     }
     vec3 base=pow(tex.rgb,vec3(2.2))*colDiffuse.rgb;
@@ -58,7 +65,7 @@ void main() {
     lit+=fixture(vec3(0.0,10.0,-23.0),vec3(0.65,0.78,1.0),0.60,n,v,base);
     float fresnel=pow(1.0-max(dot(n,v),0.0),4.0);
     lit+=base*fresnel*vec3(0.04,0.065,0.1)+emissive;
-    finalColor=vec4(pow(max(lit,vec3(0.0)),vec3(1.0/2.2)),tex.a*colDiffuse.a);
+    finalColor=vec4(transportLight(pow(max(lit,vec3(0.0)),vec3(1.0/2.2))),tex.a*colDiffuse.a);
     if (outline>1.5) finalColor=tex;
     else if (outline>0.5) finalColor=vec4(0.02,0.02,0.03,1.0);
 }

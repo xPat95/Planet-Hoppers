@@ -108,6 +108,7 @@ pub struct Hangar {
     half_extents: Vector3,
     angle: f32,
     exhibit_yaw_offset: f32,
+    frontal_preview: bool,
 }
 impl Hangar {
     pub fn load(
@@ -145,6 +146,7 @@ impl Hangar {
             half_extents: Vector3::one() * 3.0,
             angle: 0.0,
             exhibit_yaw_offset: 0.0,
+            frontal_preview: false,
         })
     }
     pub fn exhibit(
@@ -156,6 +158,13 @@ impl Hangar {
     ) {
         // Drop the previous exhibit before loading the next: only one ship is retained.
         self.ship = None;
+        // Hangar presentation only; flight scale and collision dimensions are untouched.
+        let display_scale = match ship.id.as_str() {
+            "starwars" => 1.50,
+            "smilingfriends" => 1.30,
+            "minecraft" => 1.10,
+            _ => 1.0,
+        };
         if !ship.model.is_empty() {
             self.ship = SpaceModel::load(
                 rl,
@@ -163,7 +172,7 @@ impl Hangar {
                 &root.join(&ship.model),
                 &self.shader,
                 ship.model_rotation_degrees,
-                Fit::Length(self.style.display_length),
+                Fit::Length(self.style.display_length * display_scale),
             )
             .map_err(|e| eprintln!("HANGAR_MODEL_WARNING {}: {e}", ship.id))
             .ok();
@@ -179,7 +188,10 @@ impl Hangar {
             self.center.y = self.style.platform_top + 0.225 * self.style.display_length / 4.0;
         }
         self.angle = 0.0;
-        self.exhibit_yaw_offset = super::ship_presentation::hangar_start_yaw(ship, self.camera.position);
+        self.frontal_preview = ship.id == "starwars";
+        self.exhibit_yaw_offset = if self.frontal_preview { 0.0 } else {
+            super::ship_presentation::hangar_start_yaw(ship, self.camera.position)
+        };
     }
     pub fn update(&mut self, dt: f32) {
         self.angle = (self.angle + dt * self.style.rotation_degrees_per_second).rem_euclid(360.0);
@@ -191,6 +203,24 @@ impl Hangar {
     pub fn camera(&self, viewport: Vector2, insets: Vector2) -> Camera3D {
         self.camera
             .camera(self.center, self.half_extents, viewport, insets)
+    }
+    /// A fixed room view prevents the architecture from shifting when the ship changes.
+    pub fn wide_camera(&self) -> Camera3D {
+        Camera3D::perspective(self.camera.position, self.camera.target, Vector3::up(), self.camera.fov)
+    }
+    /// Move toward the exhibit while keeping the platform and some of the room in frame.
+    pub fn close_camera(&self, ship_id: &str) -> Camera3D {
+        let (position, target, fov) = match ship_id {
+            // The long N-1 reads more balanced from a slightly more frontal angle.
+            "starwars" => (Vector3::new(0.0, 5.0, 10.0), Vector3::new(0.0, 1.7, 0.0), 50.0),
+            // Leave room above the mast without undoing the larger display size.
+            "minecraft" => (Vector3::new(6.6, 4.4, 9.2), Vector3::new(0.0, 2.0, 0.0), 52.0),
+            _ => (Vector3::new(6.6, 4.4, 8.4), Vector3::new(0.0, 1.7, 0.0), 47.0),
+        };
+        Camera3D::perspective(position, target, Vector3::up(), fov)
+    }
+    pub fn ship_center(&self) -> Vector3 {
+        self.center
     }
     pub fn draw_backdrop(&mut self, d: &mut impl RaylibDraw, camera: Camera3D, viewport: Vector2) {
         self.backdrop.draw(d, camera, viewport);
@@ -214,17 +244,29 @@ impl Hangar {
             )
         }
     }
-    pub fn draw(&mut self, d: &mut impl RaylibDraw3D, camera: Camera3D) {
+    pub fn draw(&mut self, d: &mut impl RaylibDraw3D, camera: Camera3D, morph: Option<f32>) {
+        let pulse = morph.map_or(0.0, |p| (std::f32::consts::PI * p).sin().max(0.0));
         self.shader.begin_frame(
             self.style.light_position,
             camera.position,
             self.style.ambient,
         );
+        self.shader.set_transport_glow(pulse * 3.6);
+        self.shader.set_transport_dissolve(pulse);
         self.environment_shader.begin_frame(self.style.light_position, camera.position, 0.50);
+        self.environment_shader.set_transport_glow(pulse * 3.6);
         self.station.draw(d, &mut self.environment_shader, Matrix::identity());
         self.draw_platform(d);
-        let exhibit_angle = self.angle + self.exhibit_yaw_offset;
-        let world = Matrix::rotate_y(exhibit_angle.to_radians())
+        let exhibit_angle = if self.frontal_preview {
+            // A broad N-1 looks off-centre when its nearer engine dominates the frame.
+            // A small turn keeps it lively while preserving a balanced frontal silhouette.
+            self.angle.to_radians().sin() * 6.0
+        } else {
+            self.angle + self.exhibit_yaw_offset
+        };
+        let ship_scale = if self.ship.is_some() { 1.0 } else { 1.0 - 0.88 * pulse };
+        let world = Matrix::scale(ship_scale, ship_scale, ship_scale)
+            * Matrix::rotate_y(exhibit_angle.to_radians())
             * Matrix::translate(self.center.x, self.center.y, self.center.z);
         if let Some(ship) = &self.ship {
             ship.draw(d, &mut self.shader, world);
@@ -233,8 +275,25 @@ impl Hangar {
                 d,
                 self.center,
                 Vector3::new(0.0, exhibit_angle, 0.0),
-                self.style.display_length,
+                self.style.display_length * ship_scale,
             );
+        }
+        if let Some(progress) = morph {
+            self.draw_transport(d, progress, pulse);
+        }
+    }
+    fn draw_transport(&self, d: &mut impl RaylibDraw3D, progress: f32, pulse: f32) {
+        let base = self.style.platform_top + 0.035;
+        let ring_y = base + (progress * 3.6).rem_euclid(3.6);
+        d.draw_cylinder_wires(Vector3::new(0.0, ring_y, 0.0), 1.45, 1.45, 0.015,
+            48, Color::new(174, 234, 255, (pulse * 185.0) as u8));
+        for i in 0..18 {
+            let seed = i as f32 * 2.399_963_1;
+            let y = base + (progress * (2.0 + i as f32 * 0.07) + i as f32 * 0.29).rem_euclid(3.8);
+            let radius = 0.35 + (i % 5) as f32 * 0.38;
+            let start = Vector3::new(radius * seed.cos(), y, radius * seed.sin());
+            d.draw_line_3D(start, start + Vector3::new(0.0, 0.12 + 0.18 * pulse, 0.0),
+                Color::new(152, 234, 255, (pulse * 210.0) as u8));
         }
     }
     /// Original circular exhibition base, independent from the station architecture.
@@ -267,7 +326,7 @@ impl Hangar {
             self.style.interior.graphite,
         );
         for i in 0..12 {
-            let angle = self.angle.to_radians() + i as f32 * std::f32::consts::TAU / 12.0;
+            let angle = i as f32 * std::f32::consts::TAU / 12.0;
             let ray = Vector3::new(angle.cos(), 0.0, angle.sin());
             let at = Vector3::up() * (top + 0.01);
             d.draw_line_3D(

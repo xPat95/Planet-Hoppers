@@ -20,8 +20,9 @@ type Error = Box<dyn std::error::Error>;
 const INK: Color = Color::new(221, 234, 244, 255);
 const MUTED: Color = Color::new(133, 157, 179, 255);
 const CYAN: Color = Color::new(105, 213, 234, 255);
-const HANGAR_HEADER: f32 = 151.0;
-const HANGAR_FOOTER: f32 = 156.0;
+const MORPH_DURATION: f32 = 0.42;
+const HANGAR_WIDE_HOLD: f32 = 0.35;
+const HANGAR_APPROACH: f32 = 1.25;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Screen {
@@ -287,6 +288,37 @@ fn draw_moving_stars(d: &mut RaylibDrawHandle, width: i32, height: i32, time: f3
 fn back_button(w: i32) -> Rectangle {
     Rectangle::new(w as f32 - 182.0, 24.0, 150.0, 42.0)
 }
+fn eased(t: f32) -> f32 {
+    let t = t.clamp(0.0, 1.0);
+    t * t * (3.0 - 2.0 * t)
+}
+
+fn blended_camera(a: Camera3D, b: Camera3D, t: f32) -> Camera3D {
+    let t = eased(t);
+    Camera3D::perspective(
+        a.position + (b.position - a.position) * t,
+        a.target + (b.target - a.target) * t,
+        Vector3::up(),
+        a.fovy + (b.fovy - a.fovy) * t,
+    )
+}
+
+fn draw_ship_morph(d: &mut RaylibDrawHandle, base: Vector2, top: Vector2, center: Vector2, progress: f32) {
+    let peak = (std::f32::consts::PI * progress).sin().max(0.0);
+    let mut light = d.begin_blend_mode(BlendMode::BLEND_ADDITIVE);
+    for step in 0..=10 {
+        let t = step as f32 / 10.0;
+        let at = base + (top - base) * t;
+        let fade = peak * (0.55 + 0.45 * (std::f32::consts::PI * t).sin());
+        for (radius, alpha) in [(105.0, 7.0), (55.0, 11.0), (24.0, 13.0)] {
+            light.draw_circle_gradient(at.x as i32, at.y as i32, radius,
+                Color::new(85, 186, 255, (alpha * fade) as u8), Color::new(40, 131, 255, 0));
+        }
+    }
+    let flash = (1.0 - (progress - 0.5).abs() / 0.14).clamp(0.0, 1.0);
+    light.draw_circle_gradient(center.x as i32, center.y as i32, 65.0 + 55.0 * flash,
+        Color::new(226, 251, 255, (155.0 * flash) as u8), Color::new(70, 178, 255, 0));
+}
 fn arrow(w: i32, h: i32, right: bool) -> Rectangle {
     Rectangle::new(
         if right { w as f32 - 90.0 } else { 32.0 },
@@ -323,7 +355,9 @@ fn view(
     let mut selection = ShipSelection::new(mode, game.as_ref(), &catalog);
     let entry_ship = selection.index;
     let mut shown = None;
-    let mut hangar_view=0;
+    let mut hangar_elapsed = 0.0f32;
+    let mut morph: Option<f32> = None;
+    let mut close_focus: Option<Camera3D> = None;
     let (mut rl, thread) = raylib::init()
         .size(1280, 800)
         .resizable()
@@ -411,6 +445,9 @@ fn view(
                     screen = Screen::Hangar;
                     selection = ShipSelection::new(mode, game.as_ref(), &catalog);
                     shown = None;
+                    morph = None;
+                    hangar_elapsed = 0.0;
+                    close_focus = None;
                 } else if hit(menu_button(w, h, 1)) {
                     screen = Screen::Controls;
                 } else if hit(menu_button(w, h, 2)) || escape {
@@ -423,7 +460,6 @@ fn view(
                 }
             }
             Screen::Hangar => {
-                if rl.is_key_pressed(KeyboardKey::KEY_V) {hangar_view=(hangar_view+1)%3;}
                 if escape || hit(back_button(w)) {
                     if embedded {
                         return Ok(None);
@@ -461,41 +497,59 @@ fn view(
                 }
             }
         }
-        if screen == Screen::Hangar && shown != Some(selection.index) {
-            hangar.exhibit(
-                &mut rl,
-                &thread,
-                &root,
-                &catalog.model(&catalog.choices[selection.index], &ships),
-            );
-            shown = Some(selection.index);
-            if smoke_goal.is_some()
-                && hangar.placeholder != catalog.choices[selection.index].ship_id.is_none()
-            {
-                return Err("No cargó un modelo integrado del hangar".into());
-            }
-        }
         let dt = if smoke_goal.is_some() {
             1.0 / 60.0
         } else {
             rl.get_frame_time().min(0.1)
         };
+        if screen == Screen::Hangar {
+            hangar_elapsed += dt;
+            if shown.is_none() {
+                hangar.exhibit(&mut rl, &thread, &root,
+                    &catalog.model(&catalog.choices[selection.index], &ships));
+                shown = Some(selection.index);
+            } else if morph.is_none() && shown != Some(selection.index) {
+                morph = Some(0.0);
+            }
+            if let Some(progress) = morph {
+                let next = progress + dt / MORPH_DURATION;
+                if progress < 0.5 && next >= 0.5 {
+                    hangar.exhibit(&mut rl, &thread, &root,
+                        &catalog.model(&catalog.choices[selection.index], &ships));
+                    shown = Some(selection.index);
+                }
+                morph = (next < 1.0).then_some(next);
+            }
+            if smoke_goal.is_some() && morph.is_none() && shown == Some(selection.index)
+                && hangar.placeholder != catalog.choices[selection.index].ship_id.is_none() {
+                return Err("Hangar exhibit did not load".into());
+            }
+        }
         hangar.update(dt);
         if screen == Screen::Main {
             intro += dt;
         }
-        if smoke_goal.is_some() && catalog.choices[selection.index].id == "smilingfriends" {
-            match frame {
-                47 => hangar.set_preview_angle(115.0),
-                48 => hangar.set_preview_angle(205.0),
+        if smoke_goal.is_some() {
+            match (catalog.choices[selection.index].id.as_str(), frame) {
+                ("starwars", 157) => hangar.set_preview_angle(90.0),
+                ("smilingfriends", 197) | ("minecraft", 237) => hangar.set_preview_angle(115.0),
+                ("smilingfriends", 198) | ("minecraft", 238) => hangar.set_preview_angle(205.0),
                 _ => {}
             }
         }
-        let mut camera = if screen == Screen::Hangar {
-            hangar.camera(
-                Vector2::new(w as f32, h as f32),
-                Vector2::new(HANGAR_HEADER, HANGAR_FOOTER),
-            )
+        let camera = if screen == Screen::Hangar {
+            let approach = ((hangar_elapsed - HANGAR_WIDE_HOLD) / HANGAR_APPROACH).clamp(0.0, 1.0);
+            let destination = hangar.close_camera(&catalog.choices[selection.index].id);
+            let focus = close_focus.get_or_insert(destination);
+            let current = *focus;
+            let follow = 1.0 - (-dt * 7.0).exp();
+            *focus = Camera3D::perspective(
+                current.position + (destination.position - current.position) * follow,
+                current.target + (destination.target - current.target) * follow,
+                Vector3::up(),
+                current.fovy + (destination.fovy - current.fovy) * follow,
+            );
+            blended_camera(hangar.wide_camera(), *focus, approach)
         } else {
             let time = rl.get_time() as f32;
             Camera3D::perspective(
@@ -509,7 +563,13 @@ fn view(
                 50.0,
             )
         };
-        if screen==Screen::Hangar && hangar_view>0 {camera=hangar.inspection_camera(hangar_view==2);}
+        let morph_points = if screen == Screen::Hangar && morph.is_some() {
+            Some((
+                rl.get_world_to_screen(Vector3::new(0.0, 0.9, 0.0), camera),
+                rl.get_world_to_screen(Vector3::new(0.0, 4.5, 0.0), camera),
+                rl.get_world_to_screen(hangar.ship_center(), camera),
+            ))
+        } else { None };
         let sky_frame = sky.project(&rl, camera);
         let menu_time = rl.get_time() as f32;
         let left_active = rl.is_key_down(KeyboardKey::KEY_LEFT);
@@ -565,7 +625,10 @@ fn view(
             Screen::Hangar => {
                 {
                     let mut d3 = d.begin_mode3D(camera);
-                    hangar.draw(&mut d3, camera);
+                    hangar.draw(&mut d3, camera, morph);
+                }
+                if let (Some(progress), Some((base, top, center))) = (morph, morph_points) {
+                    draw_ship_morph(&mut d, base, top, center, progress);
                 }
                 ui::hangar_shade(&mut d, w, h);
                 let choice = &catalog.choices[selection.index];
@@ -600,19 +663,20 @@ fn view(
                 );
                 let count = format!("{:02} / {:02}", selection.index + 1, catalog.choices.len());
                 ui::text(&mut d, &secondary_title, &count, 38.0, h as f32 - 34.0, 18.0, CYAN);
-                ui::centered(&mut d, &body_font, "FLECHAS / elegir     ENTER / despegar     V / vista     ESC / volver", w, h as f32 - 26.0, 16.0, INK);
+                ui::centered(&mut d, &body_font, "FLECHAS / elegir     ENTER / despegar     ESC / volver", w, h as f32 - 26.0, 16.0, INK);
             }
         }
         if smoke_goal.is_some() {
-            if !embedded && ((frame==26 && hangar_view!=1) || (frame==27 && hangar_view!=2)) {
-                return Err("V no cambió la vista de inspección del hangar".into());
+            if !embedded && ((frame == 24 && hangar_elapsed >= HANGAR_WIDE_HOLD)
+                || (frame == 116 && hangar_elapsed < HANGAR_WIDE_HOLD + HANGAR_APPROACH)) {
+                return Err("La cámara del hangar no completó su acercamiento".into());
             }
             if embedded && frame==6 {
                 if selection.index!=entry_ship { return Err("La entrada al hangar cambió la nave".into()); }
                 save_frame(&captures.join("docked-entry.png"),w,h)?;
             }
             if embedded && frame==40 { save_frame(&captures.join("docked-selected.png"),w,h)?; }
-            if !embedded && frame == 94 && (screen != Screen::Hangar || selection.index != 4) {
+            if !embedded && frame == 355 && (screen != Screen::Hangar || selection.index != 4) {
                 return Err("La flecha izquierda no cambió la nave".into());
             }
             let name = match frame {
@@ -624,25 +688,46 @@ fn view(
                 }
                 6 | 7 | 9 if !embedded => Some(format!("controls-{w}x{h}.png")),
                 30 | 31 | 32 if !embedded => Some(format!("hangar-{w}x{h}.png")),
-                26 if !embedded => Some("hangar-complete.png".into()),
-                27 if !embedded => Some("hangar-exit.png".into()),
-                24 | 34 | 46 | 58 | 70 | 82 if screen == Screen::Hangar => {
+                24 if !embedded => {
+                    seen.insert(catalog.choices[selection.index].id.clone());
+                    save_frame(&captures.join("hangar-halloween.png"), w, h)?;
+                    Some("hangar-complete.png".into())
+                }
+                70 if !embedded => Some("hangar-approach.png".into()),
+                116 if !embedded => Some("hangar-arrival.png".into()),
+                133 if !embedded => Some("hangar-transform.png".into()),
+                356 if !embedded => Some("hangar-close-up.png".into()),
+                155 | 195 | 235 | 275 | 315 if screen == Screen::Hangar => {
                     seen.insert(catalog.choices[selection.index].id.clone());
                     Some(format!(
                         "hangar-{}.png",
                         catalog.choices[selection.index].id
                     ))
                 }
-                47 | 48
+                157 if screen == Screen::Hangar
+                    && catalog.choices[selection.index].id == "starwars" =>
+                {
+                    Some("hangar-starwars-sway.png".into())
+                }
+                197 | 198
                     if screen == Screen::Hangar
                         && catalog.choices[selection.index].id == "smilingfriends" =>
                 {
                     Some(format!(
                         "hangar-smilingfriends-{}.png",
-                        if frame == 47 { "side" } else { "back" }
+                        if frame == 197 { "side" } else { "back" }
                     ))
                 }
-                102 => {
+                237 | 238
+                    if screen == Screen::Hangar
+                        && catalog.choices[selection.index].id == "minecraft" =>
+                {
+                    Some(format!(
+                        "hangar-minecraft-{}.png",
+                        if frame == 237 { "side" } else { "back" }
+                    ))
+                }
+                364 => {
                     back_seen = screen == Screen::Main;
                     Some("back-to-menu.png".into())
                 }
@@ -651,7 +736,7 @@ fn view(
             if let Some(name) = name {
                 save_frame(&captures.join(name), w, h)?;
             }
-            if frame > 180 {
+            if frame > 560 {
                 return Err("La prueba del menú no llegó al lanzamiento".into());
             }
         }
@@ -675,7 +760,6 @@ fn inject_smoke(frame: u32, w: i32, h: i32, goal: usize) {
         KeyboardKey::KEY_ENTER,
         KeyboardKey::KEY_LEFT,
         KeyboardKey::KEY_RIGHT,
-        KeyboardKey::KEY_V,
     ] {
         event(1, [key as i32, 0, 0, 0]);
     }
@@ -694,17 +778,16 @@ fn inject_smoke(frame: u32, w: i32, h: i32, goal: usize) {
         event(6, [0, 0, 0, 0]);
     };
     match frame {
-        25 | 27 | 29 => key(KeyboardKey::KEY_V),
         5 => click(menu_button(w, h, 1)),
         12 => key(KeyboardKey::KEY_ESCAPE),
-        16 | 108 => click(menu_button(w, h, 0)),
-        28 | 40 | 52 | 64 | 76 => click(arrow(w, h, true)),
-        90 => click(arrow(w, h, false)),
-        98 => click(back_button(w)),
-        f if f >= 112 && f < 112 + goal as u32 * 4 && (f - 112) % 4 == 0 => {
+        16 | 370 => click(menu_button(w, h, 0)),
+        120 | 160 | 200 | 240 | 280 => click(arrow(w, h, true)),
+        320 => click(arrow(w, h, false)),
+        360 => click(back_button(w)),
+        f if f >= 470 && f < 470 + goal as u32 * 4 && (f - 470) % 4 == 0 => {
             key(KeyboardKey::KEY_RIGHT)
         }
-        140 => click(launch_button(w, h)),
+        510 => click(launch_button(w, h)),
         _ => {}
     }
 }

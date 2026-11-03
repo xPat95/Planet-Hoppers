@@ -10,6 +10,8 @@ uniform vec3 cameraPosition;
 uniform vec3 emissive;
 uniform float ambient;
 uniform float outline;   // 1 = contorno de caricatura: negro liso; 2 = personaje plano (sin luz)
+uniform float transportGlow;
+uniform float transportDissolve;
 out vec4 finalColor;
 void main() {
     // Las imágenes vienen en sRGB y los factores de glTF son lineales: todo se pasa a lineal antes de iluminar
@@ -37,5 +39,15 @@ void main() {
         finalColor = vec4(tex.rgb, 1.0);
     } else if (outline > 0.5) {
         finalColor = vec4(0.02, 0.02, 0.03, 1.0);
+    }
+    vec3 fromCenter = worldPosition - vec3(0.0, 1.3, 0.0);
+    float reach = clamp(transportGlow * 0.45 / (1.0 + dot(fromCenter, fromCenter) * 0.38), 0.0, 0.9);
+    finalColor.rgb = mix(finalColor.rgb,
+        finalColor.rgb * vec3(0.54, 0.82, 1.05) + vec3(0.05, 0.13, 0.24), reach);
+    if (transportDissolve > 0.001) {
+        float grain = fract(sin(dot(floor(worldPosition * 21.0), vec3(12.9898, 78.233, 37.719))) * 43758.5453);
+        if (grain < transportDissolve) discard;
+        float edge = 1.0 - smoothstep(0.0, 0.13, grain - transportDissolve);
+        finalColor.rgb = mix(finalColor.rgb, vec3(0.40, 0.86, 1.0), edge * 0.75);
     }
 }
