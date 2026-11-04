@@ -34,6 +34,8 @@ EXPORTS = {
                   "assets/models/planets/halloween/exports/halloween_planet.glb", "near"),
     "halloween_far": ("assets/models/planets/halloween/halloween_planet.blend", "Halloween_Planet_ROOT",
                       "assets/models/planets/halloween/exports/halloween_planet_far.glb", "far"),
+    "halloween_ship": ("assets/models/ships/halloween/witch_broom.blend", "Halloween_Ship_ROOT",
+                       "assets/models/ships/halloween/exports/witch_broom.glb", "near"),
     "smilingfriends_ship": ("assets/models/ships/smilingfriends/smilingfriends_ship.blend",
                             "SmilingFriends_Ship_ROOT",
                             "assets/models/ships/smilingfriends/exports/smilingfriends_ship.glb", "near", True),

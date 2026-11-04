@@ -1,6 +1,6 @@
 {
   "choices": [
-    { "id": "halloween", "name": "Calaca", "ship_id": null },
+    { "id": "halloween", "name": "Calaca", "ship_id": "halloween" },
     { "id": "starwars", "name": "Estrella de la Muerte", "ship_id": "starwars_mandalorian" },
     { "id": "smilingfriends", "name": "Smiling Friends", "ship_id": "smilingfriends" },
     { "id": "minecraft", "name": "Minecraft", "ship_id": "minecraft" },

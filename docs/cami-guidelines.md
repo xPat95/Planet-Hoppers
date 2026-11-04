@@ -261,20 +261,19 @@ Este planeta cubre justo lo que el disco de Smiling Friends no puede:
 | --- | --- |
 | Planeta y zonas | `assets/models/planets/halloween/` |
 | Personajes | `assets/models/characters/halloween/` |
-| Nave de zombies | `assets/models/ships/halloween/` |
+| Nave (bruja en escoba) | `assets/models/ships/halloween/` |
 | Texturas | `assets/textures/planets/halloween/`, `assets/textures/characters/` |
 | Capturas y referencias | `docs/references/halloween/` |
 | Scripts de Blender | `tools/blender/halloween/` |
 
-### 2.6 Nave: nave de cuerpos
+### 2.6 Nave: bruja en escoba
 
-Una nave **formada por zombies**: literalmente cuerpos sobre cuerpos, amontonados y entrelazados, que dan la forma de una nave. Tiene que dar miedo.
+Una de las brujas del planeta (la misma ilustración de moda: piel verde, sombrero de punta curvada, vestido negro, medias a rayas y botas de tacón) **montada en una escoba**, en lugar de una nave de metal.
 
-- **Silueta clara de nave** desde lejos (forma de flecha o de nave de combate), para que se lea como nave y no como un montón informe.
-- **De cerca se notan los cuerpos:** brazos colgando y estirándose, cabezas, torsos retorcidos y manos aferradas a otras.
-- **Colores de carne podrida:** gris verdoso, morado, café y rojo oscuro. Sin brillo metálico.
-- **Propulsión:** brillo rojo de lava saliendo por detrás, conectado visualmente con el planeta.
-- **Low-poly:** se arma con **un solo modelo de zombie** (el mismo del planeta, o una versión aún más simple) **repetido y rotado** muchas veces sobre una forma base de nave. No se esculpe cada cuerpo.
+- **Pose:** sentada de costado en el palo (como amazona, no a horcajadas), con las dos piernas juntas colgando de un lado y el torso girado hacia adelante, inclinada como volando rápido; con **ojos de cuenta rojos y brillantes** (chicos y separados, con un brillito), cachetes rosados, sin nariz ni boca, con el pelo de siempre pero **azul azabache** (muy oscuro, que se distinga del vestido negro) (una sola pieza de pelo, no mechones en tubo), con una mano en el palo y la otra saludando (codo doblado, antebrazo arriba). **Falda de tela asimétrica**, con pliegues: corta adelante (sobre el regazo, hasta la mitad del muslo; se ven las rodillas y las medias a rayas) y larga atrás, donde el viento la lleva hacia atrás.
+- **Escoba:** palo de madera, atado morado (como la cinta del sombrero) y paja tupida en mechones que se abren hacia atrás. Va un poco girada bajo ella (ella mira para adelante), para que de atrás se vean el palo y la paja al costado.
+- **Estela:** detrás de la paja, una estela corta y ondulada de **estrellas infladas de colores** (gorditas, con puntas cortas y redondas) en colores de Halloween (verde veneno, morado oscuro, naranja calabaza, rojo sangre y verde lima), cada vez más chicas, con chispitas alrededor.
+- **Grande:** se escala para que se vea del mismo tamaño que las naves de los otros planetas (el lado más largo es de la punta del palo al final de la estela).
 - La abducción de Ghost Face también sale de esta nave.
 
 ### 2.7 Decisiones abiertas

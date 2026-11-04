@@ -161,6 +161,8 @@ impl Hangar {
         // Hangar presentation only; flight scale and collision dimensions are untouched.
         let display_scale = match ship.id.as_str() {
             "starwars" => 1.50,
+            // The broom is long and thin: without this the witch reads tiny next to the others.
+            "halloween" => 1.50,
             "smilingfriends" => 1.30,
             "minecraft" => 1.10,
             _ => 1.0,

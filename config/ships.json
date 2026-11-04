@@ -2,6 +2,17 @@
   "active_ship": "smilingfriends",
   "ships": [
     {
+      "id": "halloween",
+      "name": "Bruja en escoba",
+      "model": "assets/models/ships/halloween/exports/witch_broom.glb",
+      "length": 7.0,
+      "model_rotation_degrees": [
+        0.0,
+        180.0,
+        0.0
+      ]
+    },
+    {
       "id": "smilingfriends",
       "name": "Nave de Smiling Friends",
       "model": "assets/models/ships/smilingfriends/exports/smilingfriends_ship.glb",
