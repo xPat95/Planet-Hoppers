@@ -105,6 +105,7 @@ pub struct Hangar {
     station: SpaceModel,
     pub placeholder: bool,
     center: Vector3,
+    exhibit_origin_offset: Vector3,
     half_extents: Vector3,
     angle: f32,
     exhibit_yaw_offset: f32,
@@ -143,6 +144,7 @@ impl Hangar {
             station,
             placeholder: true,
             center: Vector3::zero(),
+            exhibit_origin_offset: Vector3::zero(),
             half_extents: Vector3::one() * 3.0,
             angle: 0.0,
             exhibit_yaw_offset: 0.0,
@@ -161,8 +163,8 @@ impl Hangar {
         // Hangar presentation only; flight scale and collision dimensions are untouched.
         let display_scale = match ship.id.as_str() {
             "starwars" => 1.50,
-            // The broom is long and thin: without this the witch reads tiny next to the others.
-            "halloween" => 1.50,
+            // Keep the witch and her tall hat within the close view of the platform.
+            "halloween" => 1.30,
             "smilingfriends" => 1.30,
             "minecraft" => 1.10,
             _ => 1.0,
@@ -180,6 +182,16 @@ impl Hangar {
             .ok();
         }
         self.placeholder = self.ship.is_none();
+        // The Halloween star trail shifts the model's bounding-box center away from
+        // the rider. Rotate around the witch's seat so she stays over the platform.
+        self.exhibit_origin_offset = if ship.id == "halloween" {
+            self.ship.as_ref().map_or(Vector3::zero(), |model| {
+                let seat = Vector3::zero().transform_with(model.fit);
+                Vector3::new(-seat.x, 0.0, -seat.z)
+            })
+        } else {
+            Vector3::zero()
+        };
         self.half_extents = self
             .ship
             .as_ref()
@@ -215,6 +227,7 @@ impl Hangar {
         let (position, target, fov) = match ship_id {
             // The long N-1 reads more balanced from a slightly more frontal angle.
             "starwars" => (Vector3::new(0.0, 5.0, 10.0), Vector3::new(0.0, 1.7, 0.0), 50.0),
+            "halloween" => (Vector3::new(6.6, 4.4, 9.2), Vector3::new(0.0, 2.0, 0.0), 52.0),
             // Leave room above the mast without undoing the larger display size.
             "minecraft" => (Vector3::new(6.6, 4.4, 9.2), Vector3::new(0.0, 2.0, 0.0), 52.0),
             _ => (Vector3::new(6.6, 4.4, 8.4), Vector3::new(0.0, 1.7, 0.0), 47.0),
@@ -255,6 +268,7 @@ impl Hangar {
         );
         self.shader.set_transport_glow(pulse * 3.6);
         self.shader.set_transport_dissolve(pulse);
+        self.shader.set_studio(true);                    // Este shader es solo del hangar: la nave en exhibición
         self.environment_shader.begin_frame(self.style.light_position, camera.position, 0.50);
         self.environment_shader.set_transport_glow(pulse * 3.6);
         self.station.draw(d, &mut self.environment_shader, Matrix::identity());
@@ -268,6 +282,7 @@ impl Hangar {
         };
         let ship_scale = if self.ship.is_some() { 1.0 } else { 1.0 - 0.88 * pulse };
         let world = Matrix::scale(ship_scale, ship_scale, ship_scale)
+            * Matrix::translate(self.exhibit_origin_offset.x, self.exhibit_origin_offset.y, self.exhibit_origin_offset.z)
             * Matrix::rotate_y(exhibit_angle.to_radians())
             * Matrix::translate(self.center.x, self.center.y, self.center.z);
         if let Some(ship) = &self.ship {

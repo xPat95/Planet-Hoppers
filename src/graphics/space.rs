@@ -15,6 +15,8 @@ pub struct SpaceShader {
     outline: i32,
     transport: i32,
     dissolve: i32,
+    roughness: i32,
+    studio: i32,
 }
 
 impl SpaceShader {
@@ -44,7 +46,9 @@ impl SpaceShader {
         if !shader.is_shader_valid() || [light, camera, emissive, ambient, outline, transport].contains(&-1) {
             return Err("El shader del espacio no compiló".into());
         }
-        Ok(Self { shader, camera_position: Vector3::zero(), light, camera, emissive, ambient, outline, transport, dissolve })
+        let (roughness, studio) = (loc("roughness"), loc("studio"));   // Solo en space.fs (-1 en el del hangar)
+        Ok(Self { shader, camera_position: Vector3::zero(), light, camera, emissive, ambient, outline, transport, dissolve,
+                  roughness, studio })
     }
 
     /// Valores que no cambian en todo el cuadro.
@@ -58,6 +62,10 @@ impl SpaceShader {
     }
     pub fn set_transport_glow(&mut self, intensity: f32) {
         self.shader.set_shader_value(self.transport, intensity);
+    }
+    /// Luces de estudio (clave, contorno y de abajo) para lucir la nave en el hangar; en el espacio, apagadas.
+    pub fn set_studio(&mut self, on: bool) {
+        if self.studio >= 0 { self.shader.set_shader_value(self.studio, if on { 1.0f32 } else { 0.0 }); }
     }
     pub fn set_transport_dissolve(&mut self, amount: f32) {
         if self.dissolve >= 0 { self.shader.set_shader_value(self.dissolve, amount); }
@@ -129,6 +137,8 @@ struct Part {
     outline: bool,
     /// Personaje de caricatura (material `*_Sticker`): el color de su imagen tal cual, sin luz ni sombra.
     sticker: bool,
+    /// Rugosidad del material (glTF `roughnessFactor`, 1 si no tiene): define qué tan chico y fuerte es el brillo.
+    roughness: f32,
     /// Malla rearmada que reemplaza a la de raylib (ver `rebuild_large_meshes`).
     rebuilt: Option<Mesh>,
 }
@@ -274,6 +284,11 @@ impl SpaceModel {
             let sticker = m["name"].as_str().is_some_and(|n| n.ends_with("_Sticker"));
             (Vector3::new(f(0), f(1), f(2)) * strength, m["alphaMode"].as_str() == Some("BLEND"), outline, sticker)
         };
+        let roughness = |i: usize| -> f32 {
+            i.checked_sub(1).and_then(|k| materials.get(k)).map_or(1.0, |m| {
+                m["pbrMetallicRoughness"]["roughnessFactor"].as_f64().unwrap_or(1.0) as f32
+            })
+        };
         for material in model.materials_mut() {
             *material.shader_mut() = unsafe { WeakShader::from_raw(*shader.shader.as_ref()) };
         }
@@ -292,6 +307,7 @@ impl SpaceModel {
                 transparent: blend || alpha < 250,
                 outline,
                 sticker,
+                roughness: roughness(material),
                 rebuilt: rebuilt[i].take(),
             });
         }
@@ -340,6 +356,7 @@ impl SpaceModel {
                 depth_writes = false;
             }
             shader.shader.set_shader_value(shader.emissive, part.emissive);
+            if shader.roughness >= 0 { shader.shader.set_shader_value(shader.roughness, part.roughness); }
             shader.shader.set_shader_value(shader.outline, if part.sticker { 2.0f32 } else if part.outline { 1.0 } else { 0.0 });
             if part.outline {
                 unsafe { ffi::rlEnableBackfaceCulling() };

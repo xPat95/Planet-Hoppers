@@ -535,6 +535,8 @@ fn view(
         }
         if smoke_goal.is_some() {
             match (catalog.choices[selection.index].id.as_str(), frame) {
+                ("halloween", 117) => hangar.set_preview_angle(115.0),
+                ("halloween", 118) => hangar.set_preview_angle(205.0),
                 ("starwars", 157) => hangar.set_preview_angle(90.0),
                 ("smilingfriends", 197) | ("minecraft", 237) => hangar.set_preview_angle(115.0),
                 ("smilingfriends", 198) | ("minecraft", 238) => hangar.set_preview_angle(205.0),
@@ -698,7 +700,18 @@ fn view(
                     Some("hangar-complete.png".into())
                 }
                 70 if !embedded => Some("hangar-approach.png".into()),
-                116 if !embedded => Some("hangar-arrival.png".into()),
+                116 if !embedded => {
+                    if catalog.choices[selection.index].id == "halloween" {
+                        save_frame(&captures.join("hangar-halloween-close.png"), w, h)?;
+                    }
+                    Some("hangar-arrival.png".into())
+                }
+                117 | 118 if screen == Screen::Hangar
+                    && catalog.choices[selection.index].id == "halloween" =>
+                {
+                    Some(format!("hangar-halloween-{}.png",
+                        if frame == 117 { "side" } else { "back" }))
+                }
                 133 if !embedded => Some("hangar-transform.png".into()),
                 356 if !embedded => Some("hangar-close-up.png".into()),
                 155 | 195 | 235 | 275 | 315 if screen == Screen::Hangar => {

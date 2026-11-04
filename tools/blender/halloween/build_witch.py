@@ -46,7 +46,9 @@ BLUSH = mat("WitchBlush", "#ff8fb4")                     # Cachetes rosados
 HAIR_JET = mat("WitchHairJet", "#0d1430")
 BEAD_RED = mat("WitchBeadEyesRed", "#c8102a", emit=0.6, rough=0.08)   # Ojos de cuenta rojos y brillantes
 SHINE = mat("WitchEyeShine", "#ffffff", emit=3.0)        # El brillito de los ojos                # Azul azabache: muy oscuro, pero se distingue del negro
-MATS = [SKIN, BLACK, HAIR, BAND, EYES, WHITE, BEAD, BLUSH, HAIR_JET, BEAD_RED, SHINE]
+BAND_EDGE = mat("WitchBandEdge", "#75518b")
+MATS = [SKIN, BLACK, HAIR, BAND, EYES, WHITE, BEAD, BLUSH, HAIR_JET, BEAD_RED, SHINE,
+        BAND_EDGE]
 
 
 HS = 0.78                    # Escala de la cabeza (cabeza chica, como en ilustración de moda)
@@ -109,9 +111,11 @@ POSES = {
     # juntas colgando de ese lado, y el torso girado de vuelta hacia adelante, inclinado como volando rápido. Una mano
     # en el palo y la otra saludando
     "ride": {
-        "pelvis": (-4, 0, -42), "torso": (16, -4, 34), "head": (-18, 0, 10),
-        "leg_R": (-80, 2, 88), "leg_L": (-76, -2, 96),
-        "arm_R": (24, -58, -25, 0), "arm_L": (100, -15, -85, 90),   # Saludando: codo doblado, antebrazo arriba
+        # Suelta, nada de robot: la cadera apenas ladeada, el torso curvado de costado y más inclinado, la cabeza
+        # ladeada mirando un poco hacia quien mira, una pierna más doblada que la otra
+        "pelvis": (-4, 4, -42), "torso": (21, -10, 29), "head": (-13, 12, 17),
+        "leg_R": (-84, 4, 80), "leg_L": (-71, -5, 106),
+        "arm_R": (24, -58, -25, 0), "arm_L": (100, 10, -72, 60),   # Saludando al costado: codo suave, muñeca girada
     },
     # Colgada del borde de la órbita: brazos estirados arriba y piernas colgando, una pateando
     "climb": {
@@ -139,7 +143,7 @@ def skirt_long(B, pose, pel, Rp, waist):
     rings = []
     for j in range(rows):
         t = j / (rows - 1)
-        r = 0.048 + 0.21 * t ** 0.9                      # Nace apenas adentro de la cintura (sale del cuerpo, sin
+        r = 0.048 + 0.21 * t ** 0.9 - 0.015 * max(0.0, 1 - t / 0.3)  # Tuck early rings inside the hip.
         #                                                  escalón) y se abre por encima de la cadera
         ring = []
         for k in range(n):
@@ -197,7 +201,7 @@ def skirt_long(B, pose, pel, Rp, waist):
 
 
 def build_witch(pose, happy=False, smooth=False, nose=False, beads=False, long_skirt=False, blush=False,
-                flowy_hair=False, hair_mat=None, bead_mat=None):
+                flowy_hair=False, hair_mat=None, bead_mat=None, ride_detail=False):
     """happy: ojos cerrados de felicidad (arcos ∩) y una sonrisa grande, en vez de los ojitos verdes. smooth: el
     cuerpo (torso, cuello, cabeza, brazos, manos y piernas) de una sola pieza, con las uniones redondeadas en vez de
     tubos que se cruzan; más triángulos, para la bruja que se ve de cerca (la de la escoba). nose: naricita en punta.
@@ -229,7 +233,9 @@ def build_witch(pose, happy=False, smooth=False, nose=False, beads=False, long_s
         B.tube(torso, [0.08, 0.05, 0.066, 0.07, 0.056], 10, BLACK, sx=1.3, sy=0.9, ref=Rt @ Vector((0, -1, 0)),
                cap1=True)
     if long_skirt:
+        skirt_start = len(B.v)
         skirt_long(B, pose, pel, Rp, waist)
+        B.skirt_range = (skirt_start, len(B.v))
     else:
         hem = []
         n = 14
@@ -257,10 +263,25 @@ def build_witch(pose, happy=False, smooth=False, nose=False, beads=False, long_s
     face = lambda x, z: head + Rh @ Vector((x, -0.064 * HS * (1 - (x / (0.058 * HS)) ** 2 - (z / (0.075 * HS)) ** 2) ** 0.5 - 0.002, z))   # noqa: E731
     if beads:
         for s in (-1, 1):                                # Ojos de cuenta: bolitas negras que asoman de la cara
-            B.ellipsoid(face(s * 0.03 * HS, 0.012 * HS), Rh, (0.0075 * HS, 0.006 * HS, 0.0085 * HS), bead_mat or BEAD,
+            eye_c = face(s * 0.03 * HS, 0.012 * HS)
+            eye_start = len(B.v)
+            eye_shape = ((0.0095 * HS, 0.006 * HS, 0.0095 * HS) if ride_detail
+                         else (0.0075 * HS, 0.006 * HS, 0.0085 * HS))
+            B.ellipsoid(eye_c, Rh, eye_shape, bead_mat or BEAD,
                         seg=10, rings=6)
+            if ride_detail:
+                # Lower each eye's inner top corner toward the nose. The eye itself
+                # supplies the angry diagonal; there is no separate eyebrow mesh.
+                inv = Rh.inverted()
+                for i in range(eye_start, len(B.v)):
+                    local = inv @ (B.v[i] - eye_c)
+                    local.z = min(local.z, 0.001 * HS + 0.85 * s * local.x)
+                    B.v[i] = eye_c + Rh @ local
             if bead_mat:                                 # Brillito arriba al costado: ojo brillante
-                B.ellipsoid(face(s * 0.03 * HS - 0.0025 * HS, 0.0155 * HS) + Rh @ Vector((0, -0.0045 * HS, 0)), Rh,
+                glint = (eye_c + Rh @ Vector((s * 0.002 * HS, -0.0055 * HS, -0.001 * HS))
+                         if ride_detail else face(s * 0.03 * HS - 0.0025 * HS, 0.0155 * HS)
+                         + Rh @ Vector((0, -0.0045 * HS, 0)))
+                B.ellipsoid(glint, Rh,
                             (0.0022 * HS, 0.0012 * HS, 0.0022 * HS), SHINE, seg=6, rings=4)
     if blush:
         for s in (-1, 1):                                # Círculos rosados chatos, pegados a los cachetes
@@ -294,6 +315,8 @@ def build_witch(pose, happy=False, smooth=False, nose=False, beads=False, long_s
         else:
             r, z = 0.066 + 0.05 * v, 0.03 - 0.36 * v
         r *= rs
+        if ride_detail and v > 0:
+            r += 0.027 * min(v / 0.7, 1.0)  # Fuller hair mass below the crown, clear of the face.
         phi = math.radians(-reach + 2 * reach * u)
         vv = max(v, 0)
         wave = 0.012 * math.sin(3 * vv + 5 * u) * vv
@@ -314,12 +337,28 @@ def build_witch(pose, happy=False, smooth=False, nose=False, beads=False, long_s
         front = len(B.v)
         B.v.extend(p for row in pts_grid for p in row)
         backv = len(B.v)
-        B.v.extend(p.copy() for row in pts_grid for p in row)
+        if ride_detail and not flowy_hair:
+            for row in pts_grid:
+                for i, p in enumerate(row):
+                    phi = math.radians(-110 + 220 * i / (cols_ - 1))
+                    inward = Rh @ Vector((math.sin(phi), math.cos(phi) * 0.9, 0))
+                    B.v.append(p - inward * (0.014 * HS))
+        else:
+            B.v.extend(p.copy() for row in pts_grid for p in row)
         for j in range(rows_ - 1):
             for i in range(cols_ - 1):
                 q = (j * cols_ + i, j * cols_ + i + 1, (j + 1) * cols_ + i + 1, (j + 1) * cols_ + i)
                 B.add(tuple(front + k for k in q), hair_m)
                 B.add(tuple(backv + k for k in q[::-1]), hair_m)
+        if ride_detail and not flowy_hair:
+            # Close the edge so the hair reads as a thick sheet from the side and back.
+            for j in range(rows_ - 1):
+                for i in (0, cols_ - 1):
+                    a, b = j * cols_ + i, (j + 1) * cols_ + i
+                    B.add((front + a, front + b, backv + b, backv + a), hair_m)
+            for i in range(cols_ - 1):
+                a, b = (rows_ - 1) * cols_ + i, (rows_ - 1) * cols_ + i + 1
+                B.add((front + a, front + b, backv + b, backv + a), hair_m)
 
     cols, rows = (61, 18) if smooth else (13, 10)       # De cerca: más columnas y filas, para que el borde ondule suave
     v_end = 0.12 if flowy_hair else 1.0                  # Con mechones, el panel termina en la nuca
@@ -350,6 +389,42 @@ def build_witch(pose, happy=False, smooth=False, nose=False, beads=False, long_s
                                  if j == 13 else Vector()) for i in range(15)])   # Borde en ondas
             hair_sheet(layer)
 
+    if ride_detail:
+        # Flequillo: una lámina de pelo pegada a la frente, de sien a sien, bajo el ala del sombrero, con el borde
+        # de abajo en mechones redondeados que llegan justo arriba de los ojos (un poco más largo a los costados)
+        def brow_pt(x, z, out):
+            k = max(0.06, 1 - (x / (0.06 * HS)) ** 2 - (z / (0.077 * HS)) ** 2)
+            return head + Rh @ Vector((x * 1.04, -0.066 * HS * k ** 0.5 - out, z))
+        bc, br = 61, 9
+        fr = []
+        for j in range(br):
+            row = []
+            for i in range(bc):
+                u = i / (bc - 1) * 2 - 1                     # -1 a 1, de sien a sien
+                x = u * 0.058 * HS
+                # Tres mechones grandes y redondeados: cada uno baja en una curva redonda y entre mechón y mechón
+                # sube en una muesca chica; a los costados bajan más, enmarcando la cara
+                ph = (u + 1) / 2 * 3                          # 0..3: en qué mechón está
+                f = ph - math.floor(ph)                       # 0..1 dentro del mechón
+                bulge = math.sqrt(max(0.0, 1 - (2 * f - 1) ** 2))   # Medio círculo: punta redonda abajo
+                side_drop = max(0.0, (abs(u) - 0.62) / 0.38) ** 1.5
+                fringe = 0.034 - 0.013 * bulge - 0.042 * side_drop
+                z = (0.064 - (0.064 - fringe) * j / (br - 1)) * HS
+                row.append(brow_pt(x, z, 0.004 * HS * (1 + 0.8 * j / (br - 1))))
+            fr.append(row)
+        f0 = len(B.v)
+        B.v.extend(p for row in fr for p in row)
+        f1 = len(B.v)
+        B.v.extend(p + Rh @ Vector((0, 0.003 * HS, 0)) for row in fr for p in row)   # Cara de atrás, hacia la frente
+        for j in range(br - 1):
+            for i in range(bc - 1):
+                q = (j * bc + i, j * bc + i + 1, (j + 1) * bc + i + 1, (j + 1) * bc + i)
+                B.add(tuple(f0 + k for k in q[::-1]), hair_m)
+                B.add(tuple(f1 + k for k in q), hair_m)
+        for i in range(bc - 1):                              # Borde de abajo, con grosor
+            a_, b_ = (br - 1) * bc + i, (br - 1) * bc + i + 1
+            B.add((f0 + a_, f0 + b_, f1 + b_, f1 + a_), hair_m)
+
     # Sombrero: ala ancha (con grosor), cinta y cono con la punta doblada hacia atrás
     hb = head + Rh @ Vector((0, 0.005, 0.05)) * HS
     hr = Rh @ rx(-8)
@@ -367,11 +442,19 @@ def build_witch(pose, happy=False, smooth=False, nose=False, beads=False, long_s
     for k in range(seg):                                 # El ala cae un poco hacia los lados
         t = math.tau * k / seg
         for idx in (outer_t, outer_b):
-            B.v[idx + k] = B.v[idx + k] - up * 0.018 * abs(math.cos(t))
+            p = B.v[idx + k] - up * 0.018 * abs(math.cos(t))
+            if ride_detail:
+                p += (p - hb).normalized() * (0.006 * math.sin(5 * t + 0.4))
+                p += up * (0.005 * math.sin(3 * t - 0.5))
+            B.v[idx + k] = p
     cone = [hb + up * 0.004, hb + up * 0.07, hb + up * 0.135 + hbv * 0.015, hb + up * 0.185 + hbv * 0.05,
             hb + up * 0.21 + hbv * 0.1, hb + up * 0.2 + hbv * 0.15, hb + up * 0.17 + hbv * 0.18 - ha * 0.01]
     B.tube(cone, [0.066, 0.05, 0.036, 0.024, 0.015, 0.008, 0.002], 12, BLACK, cap1=True, ref=hbv)
     B.tube([hb + up * 0.006, hb + up * 0.026], [0.068, 0.062], 12, BAND, ref=hbv)
+    if ride_detail:
+        band_trim = [hb + up * 0.024 + (ha * math.cos(math.tau * i / 32)
+                    + hbv * math.sin(math.tau * i / 32)) * 0.063 for i in range(33)]
+        B.tube(band_trim, [0.002] * len(band_trim), 5, BAND_EDGE)
 
     # Brazos (piel) con manos pequeñas
     for side, key in ((1, "arm_R"), (-1, "arm_L")):
@@ -549,7 +632,8 @@ def ride_fk(pose):
 # La escoba se gira BROOM_YAW bajo ella (ella sigue mirando para adelante) y el brazo que agarra el palo se acomoda
 # para que la mano quede sobre el palo girado: se busca la pose del brazo más parecida a la original que lo logra
 ride_pose = dict(POSES["ride"])
-RIDE_KW = dict(smooth=True, beads=True, long_skirt=True, blush=True, hair_mat=HAIR_JET, bead_mat=BEAD_RED)
+RIDE_KW = dict(smooth=True, nose=True, beads=True, long_skirt=True, blush=False, hair_mat=HAIR_JET,
+               bead_mat=BEAD_RED, ride_detail=True)
 # Primero, dónde termina la cola: el palo va justo debajo (apoyada encima, sin atravesarla)
 probe = build_witch(ride_pose, **RIDE_KW)
 bum = min(v.z for v in probe.v if (v.x - probe.seat.x) ** 2 + (v.y - probe.seat.y) ** 2 < 0.045 ** 2
@@ -573,6 +657,7 @@ ride_pose["arm_R"] = best[1]
 print("RIDE_ARM", best[1], "miss %.4f" % best[2])
 ride = build_witch(ride_pose, **RIDE_KW)                # Sin boca: ojos de cuenta rojos y cachetes
 ride_ob = make("HW_Witch_Ride", ride, "seat", 4.5)
+ride_ob.data["skirt_range"] = ride.skirt_range
 ride_ob.data["grip"] = tuple(ride.hands[0] - ride.seat)
 ride_ob.data["broom_dir"] = tuple(broom_dir)              # build_witch_broom.py pone el palo en esta dirección
 ride_ob.data["stick_at"] = tuple(stick_at)                # ...pasando por acá (justo bajo la cola)
