@@ -74,7 +74,7 @@ impl OrbitCamera {
             self.pitch.sin(),
             self.pitch.cos() * self.yaw.sin(),
         ) * (self.distance / aspect.clamp(0.1, 1.0));
-        Camera3D::perspective(target + offset, target, Vector3::up(), 50.0)
+        Camera3D::perspective(target + offset, target, Vector3::up(), 45.0)
     }
 }
 
@@ -1046,7 +1046,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 } else {
                     Vector3::zero()
                 };
-                Camera3D::perspective(chase + jitter, s.ship.position + fwd * ship_len * 2.0, Vector3::up(), 60.0)
+                Camera3D::perspective(chase + jitter, s.ship.position + fwd * ship_len * 2.0, Vector3::up(), 47.0)
             }
         };
         snap = false;

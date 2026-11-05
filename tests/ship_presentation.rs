@@ -32,7 +32,7 @@ fn six_exhibits_show_a_thirty_degree_front_and_rotate_toward_the_viewer() {
 }
 
 #[test]
-fn flight_camera_is_closer_without_changing_ship_geometry_or_fov() {
+fn flight_camera_preserves_ship_clearance_with_narrower_lens() {
     let root = Path::new(env!("CARGO_MANIFEST_DIR"));
     let ships = ShipsConfig::load(&root.join("config/ships.json")).unwrap();
     for model in &ships.ships {
@@ -41,9 +41,9 @@ fn flight_camera_is_closer_without_changing_ship_geometry_or_fov() {
         let camera = chase_position(position, forward, model.camera_length());
         let rear = -(camera - position).dot(forward);
         let expected_ratio = if model.model.contains("/starwars/") {
-            0.552
+            0.732
         } else {
-            0.92
+            1.22
         };
         assert!((rear / (model.length * 3.0) - expected_ratio).abs() < 0.0001);
         // Even a sphere enclosing a cube of this maximum dimension clears near=.5.
