@@ -1,4 +1,5 @@
-//! Session-only ship ownership and shared selection rules. No tokens or persistence.
+//! Session-only adventure state, ship ownership and shared selection rules.
+use super::progress::ProgressState;
 use crate::ships::{ShipModel, ShipsConfig};
 use serde::Deserialize;
 use std::{collections::BTreeSet, path::Path};
@@ -94,6 +95,7 @@ pub struct GameState {
     first_ship: String,
     active_ship: String,
     unlocked: BTreeSet<String>,
+    pub(super) progress: ProgressState,
 }
 impl GameState {
     pub fn new_game(id: &str, catalog: &ShipCatalog) -> Result<Self, String> {
@@ -104,7 +106,12 @@ impl GameState {
             first_ship: id.into(),
             active_ship: id.into(),
             unlocked: BTreeSet::from([id.to_string()]),
+            progress: ProgressState::default(),
         })
+    }
+    /// Read-only progress; attempt outcomes are applied through rewards::record_result.
+    pub fn progress(&self) -> &ProgressState {
+        &self.progress
     }
     pub fn first_ship(&self) -> &str {
         &self.first_ship
@@ -125,7 +132,7 @@ impl GameState {
         self.active_ship = id.into();
         Ok(())
     }
-    /// Future progression hook; this does not charge tokens or trigger a cinematic.
+    /// Unlock ownership without granting tokens, changing ships or triggering a cinematic.
     pub fn unlock(&mut self, id: &str, catalog: &ShipCatalog) -> Result<bool, String> {
         if catalog.choice(id).is_none() {
             return Err("Nave desconocida".into());
@@ -138,8 +145,7 @@ impl GameState {
 pub enum SelectionMode {
     Initial,
     Change,
-    /// Functional station fleet during the prototype: free session-only changes.
-    /// Change retains the ownership restriction for future progression integration.
+    /// Station fleet: all ships can be previewed, only owned ships can be activated.
     Docked,
 }
 
@@ -167,7 +173,6 @@ impl ShipSelection {
     }
     pub fn can_confirm(&self, catalog: &ShipCatalog, game: Option<&GameState>) -> bool {
         self.mode == SelectionMode::Initial
-            || self.mode == SelectionMode::Docked && game.is_some()
             || game.is_some_and(|g| g.is_unlocked(&catalog.choices[self.index].id))
     }
     pub fn confirm(
@@ -182,9 +187,6 @@ impl ShipSelection {
             )?)),
             SelectionMode::Change | SelectionMode::Docked => {
                 let mut next = game.ok_or("No hay partida activa")?.clone();
-                if self.mode == SelectionMode::Docked {
-                    next.unlock(id, catalog)?;
-                }
                 next.activate(id)?;
                 Ok(SelectionTransition::ChangedShip(next))
             }

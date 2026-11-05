@@ -200,7 +200,10 @@ fn exhibition_camera_fits_rotating_bounds_between_header_and_footer() {
 #[test]
 fn docked_fleet_changes_are_confirmed_and_preserve_the_first_ship() {
     let (catalog, ships) = setup();
-    let game = GameState::new_game("minecraft", &catalog).unwrap();
+    let mut game = GameState::new_game("minecraft", &catalog).unwrap();
+    planet_hoppers::gameplay::rewards::record_result(
+        &mut game, "starwars", planet_hoppers::minigames::common::host::MinigameResult::Victory, &catalog,
+    ).unwrap();
     let mut selector = ShipSelection::new(SelectionMode::Docked, Some(&game), &catalog);
     assert_eq!(catalog.choices[selector.index].id, game.active_ship());
     selector.navigate(-2, &catalog);
@@ -216,5 +219,53 @@ fn docked_fleet_changes_are_confirmed_and_preserve_the_first_ship() {
     let mut configured = ships;
     catalog.configure_active(&next, &mut configured).unwrap();
     assert_eq!(configured.active_ship, "starwars");
+    let ship_index = configured.ships.iter().position(|s| s.id == next.active_ship()).unwrap();
+    assert_eq!(configured.ships[ship_index].id, next.active_ship());
+    assert_eq!(next.progress(), game.progress());
     assert!(configured.active().unwrap().model.contains("mandalorian"));
+}
+
+#[test]
+fn docked_locked_ship_is_visible_but_cannot_be_confirmed_or_unlocked() {
+    let (catalog, _) = setup();
+    let game = GameState::new_game("minecraft", &catalog).unwrap();
+    let before = game.clone();
+    let mut selector = ShipSelection::new(SelectionMode::Docked, Some(&game), &catalog);
+    assert!(selector.can_confirm(&catalog, Some(&game)));
+    for _ in 0..catalog.choices.len() {
+        selector.navigate(1, &catalog);
+        let id = &catalog.choices[selector.index].id;
+        assert_eq!(selector.can_confirm(&catalog, Some(&game)), id == "minecraft");
+        if id != "minecraft" { assert!(selector.confirm(&catalog, Some(&game)).is_err()); }
+        assert_eq!(game, before);
+    }
+}
+
+#[test]
+fn docked_can_activate_every_earned_ship_with_synchronized_flight_metadata() {
+    use planet_hoppers::{gameplay::rewards::record_result, minigames::common::host::MinigameResult};
+    let (catalog, mut ships) = setup();
+    let mut game = GameState::new_game("halloween", &catalog).unwrap();
+    for id in ["minecraft", "southpark", "smilingfriends", "starwars"] {
+        record_result(&mut game, id, MinigameResult::Victory, &catalog).unwrap();
+    }
+    for (index, choice) in catalog.choices.iter().enumerate() {
+        let selector = ShipSelection { index, mode: SelectionMode::Docked };
+        if choice.id == "regularshow" {
+            assert!(!selector.can_confirm(&catalog, Some(&game)));
+            assert!(selector.confirm(&catalog, Some(&game)).is_err());
+            continue;
+        }
+        let SelectionTransition::ChangedShip(next) = selector.confirm(&catalog, Some(&game)).unwrap() else {
+            panic!("expected a ship change");
+        };
+        catalog.configure_active(&next, &mut ships).unwrap();
+        let ship_index = ships.ships.iter().position(|ship| ship.id == next.active_ship()).unwrap();
+        assert_eq!(next.active_ship(), choice.id);
+        assert_eq!(ships.active_ship, next.active_ship());
+        assert_eq!(ships.ships[ship_index].id, next.active_ship());
+        assert_eq!(next.progress().token_count(), 4);
+        assert_eq!(next.unlocked_count(), 5);
+        game = next;
+    }
 }

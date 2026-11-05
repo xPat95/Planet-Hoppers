@@ -59,6 +59,16 @@ pub struct RushSession {
     pub notice: Option<(String, f32)>,
     cues: Vec<RushCue>,
 }
+impl crate::minigames::common::host::AttemptOutcome for RushSession {
+    fn attempt_outcome(&self) -> Option<crate::minigames::common::host::MinigameResult> {
+        use crate::minigames::common::host::MinigameResult;
+        match self.state {
+            RushState::Victory => Some(MinigameResult::Victory),
+            RushState::Defeat => Some(MinigameResult::Defeat),
+            _ => None,
+        }
+    }
+}
 impl RushSession {
     pub fn new(config: RushConfig) -> Self {
         Self {

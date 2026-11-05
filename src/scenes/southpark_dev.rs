@@ -45,8 +45,17 @@ pub fn run_visit(
 /// Host entry (solar system): the host's own command-line options are not South Park's.
 pub fn run_visit_with_args(
     visits: &mut SouthParkVisits,
-    mut args: impl Iterator<Item = String>,
+    args: impl Iterator<Item = String>,
 ) -> Result<SouthParkExit, Box<dyn std::error::Error>> {
+    run_visit_with_results(visits, args, &mut |_| Ok(()))
+}
+
+pub fn run_visit_with_results(
+    visits: &mut SouthParkVisits,
+    mut args: impl Iterator<Item = String>,
+    observer: &mut crate::minigames::common::host::ResultObserver<'_>,
+) -> Result<SouthParkExit, Box<dyn std::error::Error>> {
+    let mut reporter = crate::minigames::common::host::AttemptReporter::default();
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let mut config_path = root.join("config/southpark-dev.json");
     let mut smoke = false;
@@ -481,6 +490,7 @@ pub fn run_visit_with_args(
                 world_map.view.fit();
             }
         }
+        reporter.observe(&session, observer)?;
         let map_consumed = map_was_open || session.state == SessionState::MapOpen;
         let mut restarted = false;
         if !smoke && !intro_was_active && !map_consumed && !had_dialogue {
@@ -685,6 +695,7 @@ pub fn run_visit_with_args(
             ike_smoke_position = Some(p);
             ike_smoke_player = Some(start);
         }
+        reporter.observe(&session, observer)?;
         for cue in session.take_cues() {
             audio.cue(cue);
         }

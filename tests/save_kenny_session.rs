@@ -77,6 +77,59 @@ fn shuffle_is_seeded_and_always_a_permutation_of_five() {
     }
     assert!(variants.len() > 30);
 }
+
+#[test]
+fn real_victory_survives_rebuilt_session_loss_and_abandonment() {
+    use planet_hoppers::{
+        gameplay::{rewards::record_result, selection::{GameState, ShipCatalog}},
+        minigames::common::host::{AttemptReporter, MinigameResult},
+        scenes::southpark_entry::restart_attempt,
+        ships::ShipsConfig,
+    };
+    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    let ships = ShipsConfig::load(&root.join("config/ships.json")).unwrap();
+    let catalog = ShipCatalog::load(&root.join("config/ship-selection.json"), &ships).unwrap();
+    let mut game = GameState::new_game("minecraft", &catalog).unwrap();
+    let mut reporter = AttemptReporter::default();
+    let mut session = SaveKennySession::default();
+    let mut world = scene();
+    let mut outcomes = vec![];
+    let mut observer = |result| {
+        outcomes.push(record_result(&mut game, "southpark", result, &catalog)?);
+        Ok(())
+    };
+    reporter.observe(&session, &mut observer).unwrap();
+    for _ in 0..5 {
+        win(&mut session, &mut world);
+        tick(&mut session, &mut world, 1.5);
+        reporter.observe(&session, &mut observer).unwrap();
+        if session.state == SessionState::Success {
+            session.continue_match(&mut world).unwrap();
+        }
+    }
+    assert_eq!(session.state, SessionState::Victory);
+    reporter.observe(&session, &mut observer).unwrap();
+    let manifest = SceneManifest::load(&root.join("assets/models/minigames/southpark/southpark_town.scene.json")).unwrap();
+    let mut config = DevConfig::load(&root.join("config/southpark-dev.json")).unwrap();
+    config.test_objects = false;
+    restart_attempt(&mut world, &mut session, &manifest, &config, 42).unwrap();
+    reporter.observe(&session, &mut observer).unwrap();
+    for _ in 0..3 {
+        reach_death_dialogue(&mut session, &mut world);
+        tick(&mut session, &mut world, 4.0);
+        reporter.observe(&session, &mut observer).unwrap();
+    }
+    assert_eq!(session.state, SessionState::Defeat);
+    assert_eq!(outcomes.len(), 2);
+    assert!(outcomes[0].token_obtained && outcomes[0].ship_unlocked);
+    assert!(!outcomes[1].token_obtained);
+    assert_eq!(game.progress().token_count(), 1);
+    assert!(game.is_unlocked("southpark"));
+    assert_eq!(game.active_ship(), "minecraft");
+    restart_attempt(&mut world, &mut session, &manifest, &config, 43).unwrap();
+    record_result(&mut game, "southpark", MinigameResult::Abandoned, &catalog).unwrap();
+    assert_eq!(game.progress().token_count(), 1);
+}
 #[test]
 fn invitation_cancel_preserves_free_exploration_and_start_resets_scores() {
     let mut w = scene();

@@ -1,4 +1,4 @@
-//! Contract between a minigame and its host. No rewards or saved attempt state.
+//! Navigation and attempt reporting contracts. No reward rules or persistence.
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -6,6 +6,40 @@ pub enum MinigameResult {
     Victory,
     Defeat,
     Abandoned,
+}
+
+pub type ResultObserver<'a> =
+    dyn FnMut(MinigameResult) -> Result<(), Box<dyn std::error::Error>> + 'a;
+
+/// Read-only terminal outcome from the actual challenge rules.
+pub trait AttemptOutcome {
+    fn attempt_outcome(&self) -> Option<MinigameResult>;
+}
+
+/// Lives outside the challenge state so rebuilding that state cannot erase a win.
+#[derive(Default)]
+pub struct AttemptReporter {
+    reported: bool,
+}
+
+impl AttemptReporter {
+    /// Observe after simulation and before any restart/return input can discard it.
+    /// A new nonterminal attempt rearms reporting; terminal frames are delivered once.
+    pub fn observe(
+        &mut self,
+        attempt: &impl AttemptOutcome,
+        observer: &mut ResultObserver<'_>,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        if let Some(result) = attempt.attempt_outcome() {
+            if !self.reported {
+                observer(result)?;
+                self.reported = true;
+            }
+        } else {
+            self.reported = false;
+        }
+        Ok(())
+    }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

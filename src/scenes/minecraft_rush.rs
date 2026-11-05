@@ -106,13 +106,22 @@ pub fn run_visit_with_state(
     args: Vec<String>,
     visits: &mut MinecraftVisits,
 ) -> Result<MinigameExit, Error> {
-    let result = run_inner(args, visits);
+    run_visit_with_results(args, visits, &mut |_| Ok(()))
+}
+
+pub fn run_visit_with_results(
+    args: Vec<String>,
+    visits: &mut MinecraftVisits,
+    observer: &mut crate::minigames::common::host::ResultObserver<'_>,
+) -> Result<MinigameExit, Error> {
+    let result = run_inner(args, visits, observer);
     // Window close/error also ends a genuinely active attempt; completed victories stay intact.
     visits.finish(MinigameResult::Abandoned);
     result
 }
 
-fn run_inner(args: Vec<String>, visits: &mut MinecraftVisits) -> Result<MinigameExit, Error> {
+fn run_inner(args: Vec<String>, visits: &mut MinecraftVisits, observer: &mut crate::minigames::common::host::ResultObserver<'_>) -> Result<MinigameExit, Error> {
+    let mut reporter = crate::minigames::common::host::AttemptReporter::default();
     let visit_start = visits.completed().len();
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let mut direct = false;
@@ -406,6 +415,7 @@ fn run_inner(args: Vec<String>, visits: &mut MinecraftVisits) -> Result<Minigame
             audio.mining(&events);
             let cues = m.game.drain_cues();
             visits.record_cues(&cues);
+            reporter.observe(&m.game, observer)?;
             audio.cues(&cues);
         }
         let state = if in_mine {

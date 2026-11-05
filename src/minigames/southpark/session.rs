@@ -117,6 +117,16 @@ impl Default for SaveKennySession {
         Self::new(SessionConfig::default())
     }
 }
+impl crate::minigames::common::host::AttemptOutcome for SaveKennySession {
+    fn attempt_outcome(&self) -> Option<crate::minigames::common::host::MinigameResult> {
+        use crate::minigames::common::host::MinigameResult;
+        match self.state {
+            SessionState::Victory => Some(MinigameResult::Victory),
+            SessionState::Defeat => Some(MinigameResult::Defeat),
+            _ => None,
+        }
+    }
+}
 impl SaveKennySession {
     pub fn new(config: SessionConfig) -> Self {
         Self {

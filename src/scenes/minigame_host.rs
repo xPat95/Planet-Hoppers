@@ -33,9 +33,23 @@ pub fn run_with_ship(
     root: &std::path::Path,
     args: impl Iterator<Item = String>,
 ) -> Result<MinigameExit, Box<dyn std::error::Error>> {
-    if id == "starwars" {
-        crate::minigames::starwars::run(root, selected, args)
-    } else {
-        run(id, visits, args)
+    run_with_ship_and_results(id, visits, selected, root, args, &mut |_| Ok(()))
+}
+
+/// Reports actual attempts immediately; navigation continues to use MinigameExit.
+pub fn run_with_ship_and_results(
+    id: &str,
+    visits: &mut MinigameVisits,
+    selected: &crate::ships::ShipModel,
+    root: &std::path::Path,
+    args: impl Iterator<Item = String>,
+    observer: &mut crate::minigames::common::host::ResultObserver<'_>,
+) -> Result<MinigameExit, Box<dyn std::error::Error>> {
+    match id {
+        "southpark" => southpark_dev::run_visit_with_results(&mut visits.southpark, args, observer),
+        "smilingfriends" => smilingfriends_entry::run_with_results(args, observer),
+        "minecraft" => minecraft_rush::run_visit_with_results(args.collect(), &mut visits.minecraft, observer),
+        "starwars" => crate::minigames::starwars::run_with_results(root, selected, args, observer),
+        _ => Err(format!("Minijuego no implementado: {id}").into()),
     }
 }

@@ -455,6 +455,18 @@ impl Default for Game {
         }
     }
 }
+impl crate::minigames::common::host::AttemptOutcome for Game {
+    fn attempt_outcome(&self) -> Option<crate::minigames::common::host::MinigameResult> {
+        use crate::minigames::common::host::MinigameResult;
+        match self.phase {
+            // Reactor destruction ends the challenge; the outro is navigation/presentation.
+            Phase::Explosion | Phase::Outro | Phase::Won => Some(MinigameResult::Victory),
+            Phase::Lost => Some(MinigameResult::Defeat),
+            _ => None,
+        }
+    }
+}
+
 impl Game {
     pub fn start(&mut self) {
         let half = self.ship_half;
@@ -1225,6 +1237,36 @@ mod tests {
         }
         assert_eq!(g.phase, Phase::Outro);
         assert_eq!(g.reactor_hp, 0);
+        use crate::{
+            gameplay::{rewards::record_result, selection::{GameState, ShipCatalog}},
+            minigames::common::host::AttemptReporter,
+            ships::ShipsConfig,
+        };
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+        let ships = ShipsConfig::load(&root.join("config/ships.json")).unwrap();
+        let catalog = ShipCatalog::load(&root.join("config/ship-selection.json"), &ships).unwrap();
+        let mut adventure = GameState::new_game("minecraft", &catalog).unwrap();
+        let mut reporter = AttemptReporter::default();
+        let mut observer = |result| {
+            record_result(&mut adventure, "starwars", result, &catalog)?;
+            Ok(())
+        };
+        // Award before the outro ends, including if the player restarts it.
+        reporter.observe(&g, &mut observer).unwrap();
+        reporter.observe(&g, &mut observer).unwrap();
+        g.intro();
+        reporter.observe(&g, &mut observer).unwrap();
+        g.finish_video();
+        g.start();
+        for _ in 0..3 {
+            g.invulnerability = 0.0;
+            g.damage();
+        }
+        assert_eq!(g.phase, Phase::Lost);
+        reporter.observe(&g, &mut observer).unwrap();
+        assert_eq!(adventure.progress().token_count(), 1);
+        assert!(adventure.is_unlocked("starwars"));
+        assert_eq!(adventure.active_ship(), "minecraft");
     }
     #[test]
     fn approach_lasers_cannot_trigger_reactor_early() {

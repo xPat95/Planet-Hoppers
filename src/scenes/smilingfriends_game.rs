@@ -509,6 +509,11 @@ fn draw_scene_card(d: &mut RaylibDrawHandle, title: &Font, text: &str, backdrop:
 
 /// Juega el minijuego en una ventana ya abierta. `None` si se cerró la ventana.
 pub fn play(rl: &mut RaylibHandle, thread: &RaylibThread, root: &Path, smoke: bool) -> Result<Option<MinigameResult>, Box<dyn std::error::Error>> {
+    play_with_results(rl, thread, root, smoke, &mut |_| Ok(()))
+}
+
+pub fn play_with_results(rl: &mut RaylibHandle, thread: &RaylibThread, root: &Path, smoke: bool, observer: &mut crate::minigames::common::host::ResultObserver<'_>) -> Result<Option<MinigameResult>, Box<dyn std::error::Error>> {
+    let mut reporter = crate::minigames::common::host::AttemptReporter::default();
     let dialogue = Dialogue::load(&root.join(DIALOGUE))?;
     let title = rl.load_font_ex(thread, &root.join("assets/fonts/Bungee-Regular.ttf").to_string_lossy(), 72, Some(CHARSET))?;
     let body = rl.load_font_ex(thread, &root.join("assets/fonts/TitilliumWeb-Bold.ttf").to_string_lossy(), 64, Some(CHARSET))?;
@@ -646,6 +651,7 @@ pub fn play(rl: &mut RaylibHandle, thread: &RaylibThread, root: &Path, smoke: bo
         if let Some(i) = picked {
             game.choose(i);
         }
+        reporter.observe(&game, observer)?;
         if game.step != last_step {
             // Paso nuevo: animaciones de entrada, strikes y festejos
             let strikes_before = strike_time.iter().filter(|t| **t < f32::MAX).count() as u32;

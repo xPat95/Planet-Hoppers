@@ -90,6 +90,10 @@ fn update_frame(
 }
 
 pub fn run(args: impl Iterator<Item = String>) -> Result<MinigameExit, Box<dyn std::error::Error>> {
+    run_with_results(args, &mut |_| Ok(()))
+}
+
+pub fn run_with_results(args: impl Iterator<Item = String>, observer: &mut crate::minigames::common::host::ResultObserver<'_>) -> Result<MinigameExit, Box<dyn std::error::Error>> {
     let mut smoke = false;
     let mut mute = false;
     for arg in args {
@@ -147,7 +151,7 @@ pub fn run(args: impl Iterator<Item = String>) -> Result<MinigameExit, Box<dyn s
             save_frame(&dir.join("intro-last.png"), w, h)?;
         }
         // El juego completo, jugado solo con las mejores respuestas
-        let result = super::smilingfriends_game::play(&mut rl, &thread, root, true)?;
+        let result = super::smilingfriends_game::play_with_results(&mut rl, &thread, root, true, observer)?;
         if result != Some(MinigameResult::Victory) {
             return Err(format!("La prueba del minijuego terminó en {result:?}").into());
         }
@@ -191,7 +195,7 @@ pub fn run(args: impl Iterator<Item = String>) -> Result<MinigameExit, Box<dyn s
                 }
             }
         } else {
-            return Ok(match super::smilingfriends_game::play(&mut rl, &thread, root, false)? {
+            return Ok(match super::smilingfriends_game::play_with_results(&mut rl, &thread, root, false, observer)? {
                 Some(result) => MinigameExit::Returned(result),
                 None => MinigameExit::WindowClosed,
             });

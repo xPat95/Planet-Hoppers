@@ -231,6 +231,13 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
         let catalog = ShipCatalog::load(&root.join("config/ship-selection.json"), &ships)?;
         game = Some(GameState::new_game("minecraft", &catalog)?);
     }
+    if docking_smoke {
+        // Test fixture: two owned ships for selection/cancellation checks. No fake win/token.
+        let catalog = ShipCatalog::load(&root.join("config/ship-selection.json"), &ships)?;
+        let game = game.as_mut().unwrap();
+        let owned_id = if game.active_ship() == "starwars" { "southpark" } else { "starwars" };
+        game.unlock(owned_id, &catalog)?;
+    }
     if let Some(game) = &game {
         let catalog = ShipCatalog::load(&root.join("config/ship-selection.json"), &ships)?;
         catalog.configure_active(game, &mut ships)?;
@@ -329,7 +336,14 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
                 let ship_index = session.ship_index;
                 let selected_ship=session.ships.ships[ship_index].clone();
                 let orbit_angles: Vec<_> = session.system.planets.iter().map(|p| p.orbit_angle).collect();
-                match minigame_host::run_with_ship(&id, &mut session.minigames, &selected_ship, &root, args.into_iter())? {
+                let catalog = ShipCatalog::load(&root.join("config/ship-selection.json"), &session.ships)?;
+                let mut on_result = |result| {
+                    if let Some(game) = &mut session.game {
+                        crate::gameplay::rewards::record_result(game, &id, result, &catalog)?;
+                    }
+                    Ok(())
+                };
+                match minigame_host::run_with_ship_and_results(&id, &mut session.minigames, &selected_ship, &root, args.into_iter(), &mut on_result)? {
                     MinigameExit::WindowClosed if session.visit_smoke.is_none() => return Ok(session.game),
                     MinigameExit::Returned(result) => {
                         let completion = MinigameCompletion { planet_id: planet.id.clone(), minigame_id: id, result };

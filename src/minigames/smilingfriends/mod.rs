@@ -248,6 +248,17 @@ pub struct Game {
     pub strikes: u32,
 }
 
+impl crate::minigames::common::host::AttemptOutcome for Game {
+    fn attempt_outcome(&self) -> Option<crate::minigames::common::host::MinigameResult> {
+        use crate::minigames::common::host::MinigameResult;
+        match self.step {
+            Step::Victory => Some(MinigameResult::Victory),
+            Step::Defeat => Some(MinigameResult::Defeat),
+            _ => None,
+        }
+    }
+}
+
 impl Game {
     pub fn new(dialogue: Dialogue) -> Self {
         Self { dialogue, step: Step::Boss { line: 0 }, laugh: 0, strikes: 0 }

@@ -378,6 +378,18 @@ fn two_real_controller_routes_can_mine_eight_and_return_inside_initial_time() {
         assert!(exit);
         g.inspect_world(&mut s, &mut m, exit);
         assert_eq!(g.state, RushState::Victory);
+        // Use the same terminal observer as the scene, after real movement/mining.
+        let ships = planet_hoppers::ships::ShipsConfig::load(&root().join("config/ships.json")).unwrap();
+        let catalog = planet_hoppers::gameplay::selection::ShipCatalog::load(&root().join("config/ship-selection.json"), &ships).unwrap();
+        let mut game = planet_hoppers::gameplay::selection::GameState::new_game("southpark", &catalog).unwrap();
+        let mut reporter = planet_hoppers::minigames::common::host::AttemptReporter::default();
+        reporter.observe(&g, &mut |result| {
+            planet_hoppers::gameplay::rewards::record_result(&mut game, "minecraft", result, &catalog)?;
+            Ok(())
+        }).unwrap();
+        assert_eq!(game.progress().token_count(), 1);
+        assert!(game.is_unlocked("minecraft"));
+        assert_eq!(game.active_ship(), "southpark");
         reports.push(serde_json::json!({"strategy":if deep_first{"new sectors first"}else{"nearest safe ore"},"walked_metres":distance,"seconds_used":150.0-g.remaining,"remaining":g.remaining,"diamonds":collected,"method":"Real FPS swept collisions and mining, fixed 20 Hz; instant orientation, known safe routes; no manual playtest."}));
     }
     let report = serde_json::json!({"initial_seconds":150,"routes":reports});

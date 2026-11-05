@@ -151,7 +151,17 @@ pub fn run(
     selected: &crate::ships::ShipModel,
     args: impl Iterator<Item = String>,
 ) -> Result<crate::minigames::common::host::MinigameExit, Box<dyn std::error::Error>> {
+    run_with_results(project_root, selected, args, &mut |_| Ok(()))
+}
+
+pub fn run_with_results(
+    project_root: &Path,
+    selected: &crate::ships::ShipModel,
+    args: impl Iterator<Item = String>,
+    observer: &mut crate::minigames::common::host::ResultObserver<'_>,
+) -> Result<crate::minigames::common::host::MinigameExit, Box<dyn std::error::Error>> {
     use crate::minigames::common::host::{MinigameExit, MinigameResult};
+    let mut reporter = crate::minigames::common::host::AttemptReporter::default();
     let args: Vec<_> = args.collect();
     if args.iter().any(|a| a == "--help") {
         println!("Star Wars: nave activa de la sesión. --capture --smoke-hidden --check-startup --check-ships");
@@ -494,6 +504,10 @@ pub fn run(
                     accumulator -= STEP;
                 }
             }
+        }
+        // Captures stage synthetic scenes and must never award progress.
+        if !capture {
+            reporter.observe(&game, observer)?;
         }
         if let Some(music) = &mut soundtrack {
             music.update(if media_error.is_none() {

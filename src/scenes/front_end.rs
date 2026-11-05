@@ -82,7 +82,10 @@ pub fn run() -> Result<(), Error> {
         };
         let game = super::solar_system::run_with_game(game, flags.into_iter())?;
         if smoke {
-            if game.first_ship() != goal || (!docking && (game.active_ship() != goal || game.unlocked_count() != 1))
+            let expected_tokens = usize::from(returns || minecraft || starwars);
+            let expected_unlocked = 1 + game.progress().completed().filter(|f| f.as_str() != game.first_ship()).count();
+            if game.first_ship() != goal || (!docking && (game.active_ship() != goal
+                || game.unlocked_count() != expected_unlocked || game.progress().token_count() != expected_tokens))
             {
                 return Err("El sistema solar no conservó la selección inicial".into());
             }
@@ -655,8 +658,6 @@ fn view(
                 ui::arrow(&mut d, arrow(w, h, true), true, mouse, right_active);
                 let status = if mode == SelectionMode::Initial {
                     "Elige libremente tu nave inicial"
-                } else if mode == SelectionMode::Docked {
-                    "Flota de la estación / cambio libre durante esta sesión"
                 } else if selection.can_confirm(&catalog, game.as_ref()) {
                     "Nave desbloqueada"
                 } else {
