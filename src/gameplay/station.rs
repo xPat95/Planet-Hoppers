@@ -61,9 +61,9 @@ pub struct Departure {
 
 /// Shared with the flight view so launch clearance cannot drift from its camera.
 pub fn chase_position(position: Vector3, forward: Vector3, ship_length: f32) -> Vector3 {
-    // Keep the ship's on-screen size close to the old 60-degree view with a
-    // narrower 47-degree lens. Departure clearance shares this camera offset.
-    position - forward * ship_length * 3.66 + Vector3::up() * ship_length * 1.19
+    // Preserve the ship's on-screen size with the narrower 44-degree flight lens.
+    // Departure clearance shares this camera offset.
+    position - forward * ship_length * 3.94 + Vector3::up() * ship_length * 1.28
 }
 
 impl Station {

@@ -41,9 +41,9 @@ fn flight_camera_preserves_ship_clearance_with_narrower_lens() {
         let camera = chase_position(position, forward, model.camera_length());
         let rear = -(camera - position).dot(forward);
         let expected_ratio = if model.model.contains("/starwars/") {
-            0.732
+            0.788
         } else {
-            1.22
+            1.3133334
         };
         assert!((rear / (model.length * 3.0) - expected_ratio).abs() < 0.0001);
         // Even a sphere enclosing a cube of this maximum dimension clears near=.5.

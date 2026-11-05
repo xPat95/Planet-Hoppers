@@ -595,7 +595,7 @@ fn view(
         if screen == Screen::Hangar {
             hangar.draw_backdrop(&mut d, camera, Vector2::new(w as f32, h as f32));
         } else {
-            sky.draw(&mut d, &sky_frame);
+            sky.draw(&mut d, &sky_frame, menu_time);
         }
         if matches!(screen, Screen::Main | Screen::Controls) {
             draw_moving_stars(&mut d, w, h, menu_time);

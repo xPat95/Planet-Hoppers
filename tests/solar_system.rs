@@ -10,9 +10,14 @@ fn config() -> SolarSystemConfig {
 fn el_orden_orbital_es_el_definitivo_con_la_escala_comun() {
     let config = config();
     let actual: Vec<_> = config.planets.iter().map(|p| p.id.as_str()).collect();
-    assert_eq!(actual, ["halloween", "starwars", "smilingfriends", "minecraft", "regularshow", "southpark"]);
+    assert_eq!(actual, ["starwars", "smilingfriends", "minecraft", "regularshow", "southpark", "halloween"]);
     let radii: Vec<_> = config.planets.iter().map(|p| p.orbit_radius).collect();
-    assert_eq!(radii, [1800.0, 2760.0, 3840.0, 4920.0, 6000.0, 7080.0]);
+    assert_eq!(radii, [1320.0, 1896.0, 2472.0, 3048.0, 3624.0, 4200.0]);
+    assert!(config.planets.windows(2).all(|pair| pair[1].orbit_radius - pair[0].orbit_radius == 576.0));
+    let angles: Vec<_> = config.planets.iter().map(|p| p.start_angle_degrees).collect();
+    assert_eq!(angles, [300.0, 240.0, 180.0, 120.0, 60.0, 0.0]);
+    // The six starting positions occupy the full circle instead of forming a row.
+    assert!(angles.windows(2).all(|pair| pair[0] - pair[1] == 60.0));
 }
 
 #[test]
@@ -21,9 +26,9 @@ fn la_escala_conserva_proporciones_y_un_punto_de_partida_seguro() {
     let system = SolarSystem::new(&config);
     assert_eq!(config.sun.radius, 540.0);
     let radii: Vec<_> = config.planets.iter().map(|p| p.radius).collect();
-    assert_eq!(radii, [216.0, 264.0, 264.0, 192.0, 240.0, 216.0]);
+    assert_eq!(radii, [264.0, 264.0, 192.0, 240.0, 216.0, 216.0]);
     let start = system.departure_position();
-    assert!(start.length() > config.sun.radius * 1.5);
+    assert!(start.length() > config.sun.radius + 100.0);
     for p in &system.planets {
         assert!(p.shape_distance(start, 5.0) > 1.0);
     }

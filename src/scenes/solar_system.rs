@@ -6,28 +6,126 @@ use crate::gameplay::planet_visit::PlanetReturnPose;
 use crate::gameplay::station::{chase_position, DepartureBounds, Station};
 use crate::minigames::common::host::{MinigameCompletion, MinigameExit, MinigameResult};
 use crate::graphics::resources::save_frame;
-use crate::graphics::space::{draw_sun_glow, Fit, Sky, SpaceModel, SpaceShader, SunShader, SKY_BACKGROUND};
+use crate::graphics::space::{draw_sun_glow, Fit, NebulaSky, Sky, SpaceModel, SpaceShader, SunShader, SKY_BACKGROUND};
 use crate::ships::{FlightInput, Ship, ShipsConfig};
 use crate::gameplay::selection::{GameState, ShipCatalog, SelectionTransition};
 use crate::solar_system::{hex_color, Planet, SolarSystem, SolarSystemConfig};
 use raylib::{ffi, prelude::*};
+use std::ffi::CString;
 use std::path::{Path, PathBuf};
 
 const HELP_SHIP: &str = "W/S: acelerar / frenar | Mouse o A/D: girar | Espacio: subir | Shift: turbo | Tab: objetivo | B: piloto automático\n\
-                         E: explorar / entrar a estación | C: vista general | N: otra nave | O: órbitas | Esc: soltar el mouse | Ctrl+Q: salir";
+                         E: explorar / entrar a estación | C: vista general | N: otra nave | Esc: soltar el mouse | Ctrl+Q: salir";
 const HELP_OVERVIEW: &str = "Arrastrar: girar cámara | Rueda: acercar | Tab: seguir objetivo | P: pausa | Arriba/Abajo: velocidad del tiempo\n\
-                             C: volver a la nave | O: órbitas | F12: captura | Ctrl+Q: salir";
+                             C: volver a la nave | F12: captura | Ctrl+Q: salir";
 
 /// El plano cercano conserva el detalle de las naves; el lejano se calcula con el sistema.
 const NEAR_PLANE: f64 = 0.5;
 /// Distancia de la vista general y alejamiento máximo, en múltiplos de la órbita más lejana.
 const OVERVIEW: f32 = 2.7;
 const MAX_ZOOM_OUT: f32 = 3.5;
-const ORBIT_SEGMENTS: usize = 256;
 /// Más lejos que esto (en radios del planeta) se usa la versión liviana del modelo.
 const FAR_LOD: f32 = 9.0;
 /// Duración del fundido a negro al entrar o salir (segundos).
 const FADE: f32 = 0.6;
+const ENTRY_STATION_HOLD: f32 = 0.15;
+const ENTRY_CAMERA_MOVE: f32 = 1.35;
+const ORBIT_SEGMENTS: usize = 144;
+
+fn help_button(width: i32, height: i32) -> Rectangle {
+    Rectangle::new((width - 156) as f32, (height - 68) as f32, 136.0, 48.0)
+}
+
+fn draw_help_overlay(d: &mut impl RaylibDraw, regular: &Font, bold: &Font, width: i32, height: i32, progress: f32, open: bool) {
+    let button = help_button(width, height);
+    let cyan = Color::new(137, 228, 255, 255);
+    let blue = Color::new(66, 173, 223, 255);
+    let orange = Color::new(255, 174, 89, 255);
+    let ink = Color::new(223, 238, 255, 255);
+    if progress < 0.01 {
+        d.draw_rectangle_rec(Rectangle::new(button.x + 4.0, button.y + 4.0, button.width, button.height), Color::new(2, 8, 24, 220));
+        d.draw_rectangle_rec(button, Color::new(20, 48, 87, 245));
+        d.draw_rectangle_lines_ex(button, 2.0, cyan);
+        d.draw_rectangle_rec(Rectangle::new(button.x + 4.0, button.y + 4.0, button.width - 8.0, 4.0), blue);
+        d.draw_rectangle_rec(Rectangle::new(button.x + 4.0, button.y + button.height - 8.0, button.width - 8.0, 4.0), orange);
+        let label = "?  AYUDA";
+        draw_ui(d, bold, label, (button.x + (button.width - text_width(bold, label, 23.0) as f32) * 0.5) as i32, button.y as i32 + 12, 23.0, ink);
+        return;
+    }
+    let eased = progress * progress * (3.0 - 2.0 * progress);
+    d.draw_rectangle(0, 0, width, height, Color::new(1, 6, 20, (eased * 202.0) as u8));
+    let panel_w = (width - 36).min(820) as f32;
+    let panel_h = (height - 38).min(580) as f32;
+    let w = button.width + (panel_w - button.width) * eased;
+    let h = button.height + (panel_h - button.height) * eased;
+    let cx = button.x + button.width * 0.5 + (width as f32 * 0.5 - button.x - button.width * 0.5) * eased;
+    let cy = button.y + button.height * 0.5 + (height as f32 * 0.5 - button.y - button.height * 0.5) * eased;
+    let x = cx - w * 0.5;
+    let y = cy - h * 0.5;
+    let panel = Rectangle::new(x, y, w, h);
+    d.draw_rectangle_rec(Rectangle::new(x + 6.0, y + 6.0, w, h), Color::new(1, 5, 20, 220));
+    d.draw_rectangle_rec(panel, Color::new(10, 27, 55, 250));
+    d.draw_rectangle_lines_ex(panel, 3.0, cyan);
+    d.draw_rectangle_rec(Rectangle::new(x + 8.0, y + 8.0, w - 16.0, 7.0), blue);
+    d.draw_rectangle_rec(Rectangle::new(x + 8.0, y + h - 15.0, w - 16.0, 7.0), orange);
+    if eased < 0.8 { return; }
+    let scale = (panel_w / 820.0).min(panel_h / 580.0);
+    let tx = |v: f32| (x + v * scale) as i32;
+    let ty = |v: f32| (y + v * scale) as i32;
+    let fs = |v: f32| v * scale;
+    draw_ui(d, bold, "CONTROLES", tx(72.0), ty(53.0), fs(31.0), cyan);
+    draw_ui(d, regular, "Sistema solar / guia de vuelo", tx(72.0), ty(94.0), fs(19.0), ink);
+    d.draw_line(tx(70.0), ty(130.0), tx(750.0), ty(130.0), blue);
+    d.draw_line(tx(410.0), ty(150.0), tx(410.0), ty(514.0), Color::new(57, 108, 150, 255));
+    let columns: [(f32, &str, &[(&str, &str)]); 2] = [
+        (72.0, "PILOTAR LA NAVE", &[
+            ("W / S", "Acelerar / frenar"), ("Mouse o A / D", "Girar"),
+            ("Espacio", "Subir"), ("Shift", "Turbo"),
+            ("Tab", "Cambiar objetivo"), ("B", "Piloto automatico"),
+            ("E", "Explorar / entrar al hangar"), ("C", "Vista general"),
+            ("N", "Otra nave"), ("Esc", "Soltar el mouse"),
+        ]),
+        (440.0, "VISTA GENERAL", &[
+            ("Arrastrar", "Girar camara"), ("Rueda", "Acercar / alejar"),
+            ("Tab", "Seguir objetivo"), ("P", "Pausa"),
+            ("Arriba / Abajo", "Velocidad del tiempo"), ("C", "Volver a la nave"),
+            ("O", "Mostrar / ocultar orbitas"), ("H", "Abrir esta guia"),
+            ("F12", "Guardar captura"), ("Ctrl + Q", "Salir del juego"),
+        ]),
+    ];
+    for (col, heading, rows) in columns {
+        draw_ui(d, bold, heading, tx(col), ty(151.0), fs(23.0), orange);
+        for (i, (key, action)) in rows.iter().enumerate() {
+            let yy = ty(197.0 + i as f32 * 32.0);
+            draw_ui(d, bold, key, tx(col), yy, fs(19.0), cyan);
+            draw_ui(d, regular, action, tx(col + 112.0), yy, fs(19.0), ink);
+        }
+    }
+    if open {
+        draw_ui(d, bold, "X", tx(737.0), ty(34.0), fs(24.0), orange);
+        draw_ui(d, regular, "H o Esc para cerrar", tx(346.0), ty(534.0), fs(18.0), ink);
+    }
+}
+
+fn load_solar_font(path: &Path) -> Result<Font, Box<dyn std::error::Error>> {
+    let path = CString::new(path.to_string_lossy().as_bytes())?;
+    let mut glyphs: Vec<i32> = (32..=126).collect();
+    glyphs.extend("áéíóúÁÉÍÓÚñÑüÜ¿¡".chars().map(|c| c as i32));
+    let raw = unsafe { ffi::LoadFontEx(path.as_ptr(), 64, glyphs.as_mut_ptr(), glyphs.len() as i32) };
+    if raw.glyphs.is_null() || raw.texture.id == 0 {
+        return Err("No se pudo cargar Advent Pro".into());
+    }
+    unsafe { ffi::SetTextureFilter(raw.texture, TextureFilter::TEXTURE_FILTER_BILINEAR as i32) };
+    Ok(unsafe { Font::from_raw(raw) })
+}
+
+fn text_width(font: &Font, text: &str, size: f32) -> i32 {
+    font.measure_text(text, size, 1.0).x.ceil() as i32
+}
+
+fn draw_ui(d: &mut impl RaylibDraw, font: &Font, text: &str, x: i32, y: i32, size: f32, color: Color) {
+    d.draw_text_ex(font, text, Vector2::new(x as f32, y as f32), size, 1.0, color);
+}
 
 #[derive(Clone, Copy, PartialEq)]
 enum View {
@@ -74,7 +172,7 @@ impl OrbitCamera {
             self.pitch.sin(),
             self.pitch.cos() * self.yaw.sin(),
         ) * (self.distance / aspect.clamp(0.1, 1.0));
-        Camera3D::perspective(target + offset, target, Vector3::up(), 45.0)
+        Camera3D::perspective(target + offset, target, Vector3::up(), 42.0)
     }
 }
 
@@ -91,15 +189,17 @@ struct Session {
     paused: bool,
     time_scale: f32,
     target: Option<Destination>,
-    show_orbits: bool,
     minigames: MinigameVisits,
     last_completion: Option<MinigameCompletion>,
     return_smoke: bool,
     launch_smoke: bool,
+    intro_smoke: bool,
+    help_smoke: bool,
     station_smoke: bool,
     collision_debug: bool,
     docking_smoke: Option<u32>,
     departing: bool,
+    intro_pending: bool,
     game: Option<GameState>,
     returning_from: Option<usize>,
     return_pose: Option<PlanetReturnPose>,
@@ -187,6 +287,8 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
     let mut starwars_smoke = false;
     let mut return_smoke = false;
     let mut launch_smoke = false;
+    let mut intro_smoke = false;
+    let mut help_smoke = false;
     let mut station_smoke = false;
     let mut collision_debug = false;
     let mut docking_smoke = false;
@@ -196,6 +298,8 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
         match arg.as_str() {
             "--smoke" => smoke = true,
             "--smoke-launch" => { smoke = true; launch_smoke = true; }
+            "--smoke-intro" => { smoke = true; intro_smoke = true; }
+            "--smoke-help" => { smoke = true; help_smoke = true; overview = true; }
             "--smoke-station" => { smoke = true; station_smoke = true; }
             "--debug-collisions" => collision_debug = true,
             "--smoke-docking" => { smoke = true; docking_smoke = true; }
@@ -219,6 +323,7 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
                 println!("--smoke-minecraft: dos visitas a la aldea y Diamond Rush, regreso confirmado y misma nave");
                 println!("--smoke-returns: victoria, derrota, pausa/reinicio/abandono y cuatro visitas a South Park");
                 println!("--smoke-station: estación fija, aproximación y controles de ascenso/piloto");
+                println!("--smoke-intro: capturas de la entrada y transición de cámara");
                 println!("--smoke-docking: tres entradas al hangar, selección, cambio, cancelación y despegue");
                 return Ok(game);
             }
@@ -260,15 +365,17 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
         paused: false,
         time_scale: 1.0,
         target: Some(Destination::Planet(0)),
-        show_orbits: true,
         minigames: MinigameVisits::default(),
         last_completion: None,
         return_smoke,
         launch_smoke,
+        intro_smoke,
+        help_smoke,
         station_smoke,
         collision_debug,
         docking_smoke: docking_smoke.then_some(0),
         departing: true,
+        intro_pending: true,
         game,
         returning_from: None,
         return_pose: None,
@@ -456,6 +563,8 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         println!("COLLISION_HULL boxes={} cell={} offset_fraction={:?} world_limit=none",s.station.hull.rows.len(),s.station.hull.cell,s.station.hull.offset_fraction);
     }
     let departing = std::mem::take(&mut s.departing);
+    let mut intro_time = (s.intro_pending && (!smoke || s.intro_smoke)).then_some(0.0_f32);
+    s.intro_pending = false;
     let departure = if departing {
         let length = s.ships.ships[s.ship_index].length;
         let half = ship_model.as_ref().map_or(Vector3::one() * length * 0.5, |m| m.half_extents);
@@ -472,6 +581,16 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             camera_radius,
         })?;
         s.ship = plan.ship.clone();
+        if intro_time.is_some() {
+            // Start on the station's central axis so its full ring frames the ship.
+            // This point is beyond the hull and is checked before the first frame.
+            s.ship.position.y = s.station.center().y;
+            let ship_radius = plan.ship_radius;
+            if (s.ship.position - s.station.center()).length() <= s.station.collision_radius + ship_radius
+                || s.station.push_out(s.ship.position, s.ship.position, ship_radius).is_some() {
+                return Err("La posición inicial de la nave toca la estación".into());
+            }
+        }
         if smoke {
             println!("DEPARTURE_SAFE {}", serde_json::json!({
                 "ship":s.ships.ships[s.ship_index].id,
@@ -485,7 +604,14 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         }
         Some(plan)
     } else { None };
+    let entry_start_yaw = s.ship.yaw;
+    let entry_start_pitch = s.ship.pitch;
+    let mut entry_goal = s.ship.clone();
+    entry_goal.look_at(s.system.planets[0].position());
     let sky = Sky::new();
+    let mut nebula = NebulaSky::load(&mut rl, &thread)?;
+    let ui_regular = load_solar_font(&root.join("assets/fonts/AdventPro-Regular.ttf"))?;
+    let ui_bold = load_solar_font(&root.join("assets/fonts/AdventPro-Bold.ttf"))?;
     let outer = outer_orbit(&s.system);
     // Las pruebas siguen a South Park por identidad, aunque cambie de órbita.
     let southpark = s.system.planets.iter().position(|p| p.config.id == "southpark").expect("South Park validado");
@@ -522,6 +648,10 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
     let mut frame = 0u32;
     let mut shake = 0.0_f32;
     let mut side_camera: Option<Camera3D> = None; // Solo para las capturas de prueba
+    let mut help_open = s.help_smoke;
+    let mut help_progress = if s.help_smoke { 1.0_f32 } else { 0.0_f32 };
+    let mut help_restore_cursor = false;
+    let mut show_orbits = true;
 
     loop {
         if rl.window_should_close() {
@@ -532,11 +662,35 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             return Ok(Exit::Quit);
         }
         let dt = if smoke { 1.0 / 60.0 } else { rl.get_frame_time().min(0.1) };
+        let help_click = !smoke && !rl.is_cursor_hidden() && rl.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_LEFT);
+        let help_icon_hit = help_button(rl.get_screen_width(), rl.get_screen_height()).check_collision_point_rec(rl.get_mouse_position());
+        let panel_w = (rl.get_screen_width() - 36).min(820) as f32;
+        let panel_h = (rl.get_screen_height() - 38).min(580) as f32;
+        let panel_x = (rl.get_screen_width() as f32 - panel_w) * 0.5;
+        let panel_y = (rl.get_screen_height() as f32 - panel_h) * 0.5;
+        let panel_hit = Rectangle::new(panel_x, panel_y, panel_w, panel_h).check_collision_point_rec(rl.get_mouse_position());
+        let close_hit = Rectangle::new(panel_x + panel_w - 86.0, panel_y + 22.0, 55.0, 55.0).check_collision_point_rec(rl.get_mouse_position());
+        let toggle_help = !smoke && (rl.is_key_pressed(KeyboardKey::KEY_H) || (help_click && help_icon_hit));
+        let close_help = help_open && !smoke && (rl.is_key_pressed(KeyboardKey::KEY_ESCAPE)
+            || (help_click && (close_hit || !panel_hit)));
+        if toggle_help || close_help {
+            help_open = !help_open;
+            if help_open {
+                help_restore_cursor = rl.is_cursor_hidden();
+                rl.enable_cursor();
+            } else if help_restore_cursor && s.view == View::Ship {
+                rl.disable_cursor();
+                discard_mouse_frames = 2;
+            }
+        }
+        help_progress = (help_progress + if help_open { dt * 4.0 } else { -dt * 4.0 }).clamp(0.0, 1.0);
         // Sin teclado durante las pruebas ni mientras se sale hacia un minijuego
-        let accepts_input = (!smoke || s.launch_smoke || s.station_smoke || s.minecraft_smoke || s.docking_smoke.is_some()) && leaving.is_none() && !entering_station;
+        let intro_controls_ready = intro_time.is_none_or(|elapsed| elapsed >= ENTRY_STATION_HOLD + ENTRY_CAMERA_MOVE - 0.15);
+        let accepts_input = (!smoke || s.launch_smoke || s.station_smoke || s.minecraft_smoke || s.docking_smoke.is_some()) && !help_open && !toggle_help && !close_help && intro_controls_ready && leaving.is_none() && !entering_station;
         let pressed = |rl: &RaylibHandle, k: KeyboardKey| accepts_input && rl.is_key_pressed(k);
         let down = |rl: &RaylibHandle, k: KeyboardKey| accepts_input && rl.is_key_down(k);
         if pressed(&rl,KeyboardKey::KEY_F3) {s.collision_debug=!s.collision_debug;}
+        if pressed(&rl,KeyboardKey::KEY_O) { show_orbits = !show_orbits; }
         debug_camera="ninguna";
 
         // --- Recorrido automático de prueba (--smoke) -------------------------------------------------------
@@ -730,6 +884,16 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 }
                 _ => {}
             }
+        } else if s.help_smoke {
+            if frame == 10 { capture = Some("help-frame.png".into()); }
+            if frame == 12 { println!("HELP_SMOKE_PASS"); return Ok(Exit::Quit); }
+        } else if s.intro_smoke {
+            if frame == 7 { capture = Some("entry-station.png".into()); }
+            if frame == 50 { capture = Some("entry-transition.png".into()); }
+            if frame == 100 {
+                capture = Some("entry-flight.png".into());
+            }
+            if frame == 102 { println!("ENTRY_SMOKE_PASS"); return Ok(Exit::Quit); }
         } else if s.launch_smoke {
             unsafe { ffi::PlayAutomationEvent(ffi::AutomationEvent {frame:0,type_:1,params:[KeyboardKey::KEY_W as i32,0,0,0]}); }
             if (2..=12).contains(&frame) {
@@ -851,9 +1015,6 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 rl.enable_cursor();
             }
         }
-        if pressed(&rl, KeyboardKey::KEY_O) {
-            s.show_orbits = !s.show_orbits;
-        }
         if pressed(&rl, KeyboardKey::KEY_N) {
             // Development keeps the complete catalog; adventures respect ownership.
             let next = (1..=s.ships.ships.len()).map(|step| (s.ship_index + step) % s.ships.ships.len())
@@ -887,7 +1048,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                         None => OVERVIEW * outer,
                     };
                 }
-                if !smoke && rl.is_mouse_button_down(MouseButton::MOUSE_BUTTON_LEFT) {
+                if !smoke && !help_open && !help_icon_hit && rl.is_mouse_button_down(MouseButton::MOUSE_BUTTON_LEFT) {
                     let delta = rl.get_mouse_delta();
                     s.orbit.yaw += delta.x * 0.005;
                     s.orbit.pitch = (s.orbit.pitch + delta.y * 0.005).clamp(-1.45, 1.45);
@@ -897,7 +1058,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                     let nearest = s.focus.map_or(s.system.sun.radius, |destination| destination.radius(s)) * 1.6;
                     s.orbit.distance = (s.orbit.distance * (1.0 - wheel * 0.1)).clamp(nearest, outer * MAX_ZOOM_OUT);
                 }
-                if !s.paused {
+                if !s.paused && !help_open {
                     s.system.update(dt * s.time_scale);
                 }
             }
@@ -948,8 +1109,8 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 if s.target==Some(Destination::Station) && input.aim_at.is_some() {
                     s.station.assist_approach(&s.ship,&mut input,&s.ships.flight);
                 }
-                s.system.update(dt);
-                if leaving.is_none() && !entering_station {
+                if !help_open { s.system.update(dt); }
+                if !help_open && leaving.is_none() && !entering_station {
                     let before = s.ship.position;
                     s.ship.update(dt, &input, &s.ships.flight, &s.system);
                     if s.ship.bumped {
@@ -1032,6 +1193,14 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 s.orbit.camera(target, aspect)
             }
             View::Ship => {
+                if let Some(elapsed) = intro_time.filter(|elapsed| *elapsed < ENTRY_STATION_HOLD + ENTRY_CAMERA_MOVE - 0.15) {
+                    let t = ((elapsed - ENTRY_STATION_HOLD) / ENTRY_CAMERA_MOVE).clamp(0.0, 1.0);
+                    let eased = t * t * (3.0 - 2.0 * t);
+                    let turn = (entry_goal.yaw - entry_start_yaw + std::f32::consts::PI)
+                        .rem_euclid(std::f32::consts::TAU) - std::f32::consts::PI;
+                    s.ship.yaw = entry_start_yaw + turn * eased;
+                    s.ship.pitch = entry_start_pitch + (entry_goal.pitch - entry_start_pitch) * eased;
+                }
                 // Cámara de persecución: detrás y un poco arriba, siguiendo con suavidad
                 let fwd = s.ship.forward();
                 let wanted = chase_position(s.ship.position, fwd, s.ships.ships[s.ship_index].camera_length());
@@ -1060,12 +1229,31 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 } else {
                     Vector3::zero()
                 };
-                Camera3D::perspective(chase + jitter, s.ship.position + fwd * ship_len * 2.0, Vector3::up(), 47.0)
+                let flight_target = s.ship.position + fwd * ship_len * 2.0;
+                if let Some(elapsed) = intro_time {
+                    // Begin with the station framing the ship, then move directly
+                    // into the downward chase view as the ship turns toward the planets.
+                    let t = ((elapsed - ENTRY_STATION_HOLD) / ENTRY_CAMERA_MOVE).clamp(0.0, 1.0);
+                    let eased = t * t * (3.0 - 2.0 * t);
+                    let radius = s.ships.ships[s.ship_index].camera_length() * 3.94;
+                    let start_forward = Vector3::new(-entry_start_yaw.sin(), 0.0, -entry_start_yaw.cos());
+                    let start_camera = s.ship.position + start_forward * radius
+                        + Vector3::up() * s.ships.ships[s.ship_index].camera_length() * 1.28;
+                    let position = start_camera * (1.0 - eased) + wanted * eased;
+                    let target = (s.ship.position + Vector3::up() * ship_len * 0.95) * (1.0 - eased)
+                        + flight_target * eased;
+                    let next = elapsed + if fade <= 0.0 { dt } else { 0.0 };
+                    intro_time = (next < ENTRY_STATION_HOLD + ENTRY_CAMERA_MOVE).then_some(next);
+                    if intro_time.is_none() { chase = wanted; }
+                    Camera3D::perspective(position, target, Vector3::up(), 44.0)
+                } else {
+                    Camera3D::perspective(chase + jitter, flight_target, Vector3::up(), 44.0)
+                }
             }
         };
         snap = false;
-        // Launch starts in the real chase view, behind the nose. No reverse
-        // reveal camera or interpolation through the station during takeoff.
+        // The launch safety smoke uses the real chase view from frame zero.
+        // The entry shot only moves the camera; the ship follows the same safe path.
         if let Some(plan) = &departure {
             if smoke && (s.launch_smoke || s.docking_smoke.is_some()) && frame < 30 {
                 if s.ship.bumped || (s.station.center()-s.ship.position).dot(s.ship.forward()) >= 0.0
@@ -1128,25 +1316,22 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         // --- Dibujo --------------------------------------------------------------------------------------------
         let mut d = rl.begin_drawing(&thread);
         d.clear_background(SKY_BACKGROUND);
-        sky.draw(&mut d, &sky_frame);
+        nebula.draw(&mut d, camera, width, height);
+        sky.draw(&mut d, &sky_frame, time);
         if let Some((at, radius)) = sun_glow {
             draw_sun_glow(&mut d, at, radius, Vector2::new(width as f32, height as f32));
         }
         {
             let mut d3 = d.begin_mode3D(camera);
-            if s.show_orbits {
+            if show_orbits {
                 for p in &s.system.planets {
-                    // Anillos sutiles que se apagan con la distancia a la cámara
-                    let r = p.config.orbit_radius;
-                    let at = |k: usize| {
-                        let a = k as f32 / ORBIT_SEGMENTS as f32 * std::f32::consts::TAU;
-                        center + Vector3::new(r * a.cos(), 0.0, -r * a.sin())
+                    let radius = p.config.orbit_radius;
+                    let point = |k: usize| {
+                        let angle = k as f32 * std::f32::consts::TAU / ORBIT_SEGMENTS as f32;
+                        center + Vector3::new(radius * angle.cos(), 0.0, -radius * angle.sin())
                     };
-                    let reach = (camera.position - center).length() + outer;
                     for k in 0..ORBIT_SEGMENTS {
-                        let far = (at(k) - camera.position).length() / reach;
-                        let alpha = (55.0 * (1.2 - far).clamp(0.1, 1.0)) as u8;
-                        d3.draw_line_3D(at(k), at(k + 1), Color::new(95, 110, 170, alpha));
+                        d3.draw_line_3D(point(k), point(k + 1), Color::new(96, 139, 194, 64));
                     }
                 }
             }
@@ -1209,8 +1394,9 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 (Vector2::new(0.0,10.0), Vector2::new(-10.0,0.0)),
                 (Vector2::new(-10.0,0.0), Vector2::new(0.0,-10.0))] { d.draw_line_v(at+a, at+b, c); }
             let label = format!("{} / Hangar  {:.0}", s.station.name, (s.station.exit_position() - s.ship.position).length());
-            let label_x = (at.x as i32 - d.measure_text(&label,16)/2).clamp(8, (width-d.measure_text(&label,16)-8).max(8));
-            d.draw_text(&label, label_x, at.y as i32 + 16, 16, c);
+            let label_w = text_width(&ui_regular, &label, 18.0);
+            let label_x = (at.x as i32 - label_w / 2).clamp(8, (width-label_w-8).max(8));
+            draw_ui(&mut d, &ui_regular, &label, label_x, at.y as i32 + 16, 18.0, c);
         }
         if s.view == View::Ship {
             for (i, (p, m)) in s.system.planets.iter().zip(&markers).enumerate() {
@@ -1222,9 +1408,8 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 let on_screen = m.radius.is_some() && at.x > 0.0 && at.y > 0.0 && at.x < width as f32 && at.y < height as f32;
                 if let (true, Some(radius)) = (on_screen, m.radius) {
                     let r = radius.max(14.0) + 6.0;
-                    d.draw_circle_lines(at.x as i32, at.y as i32, r, c);
-                    let w = d.measure_text(&label, 16);
-                    d.draw_text(&label, at.x as i32 - w / 2, (at.y + r) as i32 + 4, 16, c);
+                    let w = text_width(&ui_regular, &label, 18.0);
+                    draw_ui(&mut d, &ui_regular, &label, at.x as i32 - w / 2, (at.y + r) as i32 + 4, 18.0, c);
                 } else if is_target {
                     // Flecha en el borde de la pantalla hacia el objetivo
                     let angle = m.angle;
@@ -1235,8 +1420,8 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                     let side = Vector2::new(-angle.sin(), angle.cos()) * 10.0;
                     d.draw_triangle(tip, tip + back - side, tip + back + side, c);
                     d.draw_triangle(tip, tip + back + side, tip + back - side, c);
-                    let w = d.measure_text(&label, 16);
-                    d.draw_text(&label, (tip.x + back.x * 2.5) as i32 - w / 2, (tip.y + back.y * 2.5) as i32 - 8, 16, c);
+                    let w = text_width(&ui_regular, &label, 18.0);
+                    draw_ui(&mut d, &ui_regular, &label, (tip.x + back.x * 2.5) as i32 - w / 2, (tip.y + back.y * 2.5) as i32 - 8, 18.0, c);
                 }
             }
             let (cx, cy) = (width / 2, height / 2);
@@ -1246,12 +1431,12 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             d.draw_line(cx, cy + 3, cx, cy + 8, white);
             let ship_name = &s.ships.ships[s.ship_index].name;
             let boosting = s.ship.speed > s.ships.flight.cruise_speed + 1.0;
-            d.draw_text(ship_name, 16, 14, 22, white);
-            d.draw_text(&format!("Velocidad {:.0}{}", s.ship.speed, if boosting { "  TURBO" } else { "" }), 16, 42, 18, dim);
+            draw_ui(&mut d, &ui_bold, ship_name, 16, 14, 25.0, white);
+            draw_ui(&mut d, &ui_regular, &format!("Velocidad {:.0}{}", s.ship.speed, if boosting { "  TURBO" } else { "" }), 16, 44, 21.0, dim);
             let target = s.target.map_or("ninguno", |destination| destination.name(s));
-            d.draw_text(&format!("Objetivo: {target}"), 16, 64, 18, dim);
+            draw_ui(&mut d, &ui_regular, &format!("Objetivo: {target}"), 16, 69, 21.0, dim);
             if let Some(i) = s.ship.carried_by {
-                d.draw_text(&format!("Acompañando la órbita de {}", s.system.planets[i].config.name), 16, 86, 18, dim);
+                draw_ui(&mut d, &ui_regular, &format!("Acompañando la órbita de {}", s.system.planets[i].config.name), 16, 94, 21.0, dim);
             }
             if let Some(i) = in_reach {
                 let p = &s.system.planets[i].config;
@@ -1261,34 +1446,33 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 d.draw_rectangle_rounded(button, 0.3, 8, Color::new(20, 24, 48, 220));
                 d.draw_rectangle_rounded_lines(button, 0.3, 8, Color::new(255, 214, 90, (255.0 * pulse) as u8));
                 let title = format!("Explorar {}", p.name);
-                let tw = d.measure_text(&title, 24);
-                d.draw_text(&title, (w / 2.0) as i32 - tw / 2, (h - 140.0) as i32, 24, white);
+                let tw = text_width(&ui_bold, &title, 28.0);
+                draw_ui(&mut d, &ui_bold, &title, (w / 2.0) as i32 - tw / 2, (h - 140.0) as i32, 28.0, white);
                 let sub = if p.minigame.is_some() { "[E] Explorar planeta" } else { "[E]  (minijuego en construcción)" };
-                let sw = d.measure_text(sub, 16);
-                d.draw_text(sub, (w / 2.0) as i32 - sw / 2, (h - 110.0) as i32, 16, dim);
+                let sw = text_width(&ui_regular, sub, 18.0);
+                draw_ui(&mut d, &ui_regular, sub, (w / 2.0) as i32 - sw / 2, (h - 110.0) as i32, 18.0, dim);
             }
             if station_reentry_delay<=0.0 && s.station.in_reach(s.ship.position, station_ship_radius(s, &ship_model)) {
                 let text = "[E] Entrar a la estación espacial";
-                d.draw_text(text, (width - d.measure_text(text, 20)) / 2, height - 112, 20, Color::new(109,222,239,255));
+                draw_ui(&mut d, &ui_bold, text, (width - text_width(&ui_bold, text, 22.0)) / 2, height - 112, 22.0, Color::new(109,222,239,255));
             }
         } else {
             let focus = s.focus.map_or("Sol", |destination| destination.name(s));
             let status = format!("Vista general   Tiempo x{}{}   Siguiendo: {focus}", s.time_scale, if s.paused { "  (pausa)" } else { "" });
-            d.draw_text(&status, 16, 14, 20, white);
+            draw_ui(&mut d, &ui_bold, &status, 16, 14, 23.0, white);
             for (p, m) in s.system.planets.iter().zip(&markers) {
                 if let Some(r) = m.radius {
-                    let w = d.measure_text(&p.config.name, 18);
-                    d.draw_text(&p.config.name, m.at.x as i32 - w / 2, (m.at.y - r) as i32 - 24, 18, white);
+                    let w = text_width(&ui_bold, &p.config.name, 21.0);
+                    draw_ui(&mut d, &ui_bold, &p.config.name, m.at.x as i32 - w / 2, (m.at.y - r) as i32 - 26, 21.0, white);
                 }
             }
         }
         if let Some((text, t)) = &notice {
             let a = (t.min(1.0) * 255.0) as u8;
-            let w = d.measure_text(text, 22);
-            d.draw_text(text, width / 2 - w / 2, 70, 22, Color::new(255, 214, 90, a));
+            let w = text_width(&ui_bold, text, 25.0);
+            draw_ui(&mut d, &ui_bold, text, width / 2 - w / 2, 70, 25.0, Color::new(255, 214, 90, a));
         }
-        let help = if s.view == View::Ship { HELP_SHIP } else { HELP_OVERVIEW };
-        d.draw_text(help, 16, height - 48, 15, Color::new(150, 156, 185, 255));
+        draw_help_overlay(&mut d, &ui_regular, &ui_bold, width, height, help_progress, help_open);
         d.draw_fps(width - 96, 14);
         if s.collision_debug {
             crate::graphics::station_debug::hud(&mut d,&s.station,s.ship.position,station_ship_radius(s,&ship_model),&debug_last,debug_camera);

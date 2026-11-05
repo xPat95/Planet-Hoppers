@@ -74,15 +74,15 @@ impl SpaceShader {
 
 /// Shader de la superficie del Sol (sin luz: brilla solo).
 // Apariencia solar: no cambia el radio, las colisiones ni la luz de los planetas.
-const SUN_EMISSION: f32 = 3.2;
+const SUN_EMISSION: f32 = 2.0;
 const SUN_DETAIL_SCALE: f32 = 18.0;
 const SUN_ACTIVITY_SPEED: f32 = 0.08;
 const SUN_CONTRAST: f32 = 0.65;
 const SUN_HALO_LAYERS: [(f32, Color); 4] = [
-    (5.0, Color::new(255, 165, 70, 12)),
-    (2.8, Color::new(255, 185, 90, 32)),
-    (1.65, Color::new(255, 215, 140, 100)),
-    (1.18, Color::new(255, 245, 210, 210)),
+    (5.0, Color::new(255, 165, 70, 8)),
+    (2.8, Color::new(255, 185, 90, 24)),
+    (1.65, Color::new(255, 215, 140, 72)),
+    (1.18, Color::new(255, 245, 210, 150)),
 ];
 const SUN_HALO_SCREEN_LIMIT: f32 = 1.6;
 
@@ -393,15 +393,18 @@ impl SpaceModel {
 }
 
 // Parámetros del fondo espacial, independientes de los materiales y efectos del Sol.
-pub const SKY_BACKGROUND: Color = Color::new(0, 1, 3, 255);
-const SKY_STAR_COUNT: usize = 2200;
+pub const SKY_BACKGROUND: Color = Color::new(3, 8, 26, 255);
+const SKY_STAR_COUNT: usize = 9000;
 const SKY_SEED: u32 = 0x5eed_1234;
-const SKY_TINTS: [(u8, u8, u8); 4] = [(155, 180, 215), (180, 200, 225), (205, 215, 235), (220, 225, 235)];
-// Probabilidad acumulada, radio en píxeles y opacidad: predominan los puntos apenas visibles.
+const SKY_TINTS: [(u8, u8, u8); 7] = [
+    (100, 164, 255), (145, 205, 255), (195, 230, 255), (235, 244, 255),
+    (189, 135, 255), (225, 150, 230), (255, 178, 215),
+];
+// Probabilidad acumulada, radio en píxeles y opacidad.
 const SKY_STAR_TIERS: [(f32, (f32, f32), (f32, f32)); 3] = [
-    (0.80, (0.35, 0.75), (22.0, 68.0)),
-    (0.98, (0.60, 1.00), (70.0, 120.0)),
-    (1.00, (1.00, 1.25), (135.0, 175.0)),
+    (0.76, (0.45, 0.85), (75.0, 135.0)),
+    (0.96, (0.80, 1.25), (140.0, 215.0)),
+    (1.00, (1.25, 1.85), (215.0, 255.0)),
 ];
 
 /// Estrella del fondo. Está "en el infinito": solo importa su dirección, así que no se acerca al mover la cámara
@@ -428,7 +431,7 @@ fn sky_dir(next: &mut impl FnMut() -> f32) -> Vector3 {
     Vector3::new(s * a.cos(), z, s * a.sin())
 }
 
-/// Vacío frío y oscuro: estrellas pequeñas y estables, sin nubes, bandas ni halos.
+/// Cielo azul oscuro con estrellas reproducibles y un brillo tenue entre ellas.
 pub struct Sky {
     stars: Vec<Star>,
 }
@@ -462,18 +465,34 @@ impl Sky {
         camera.target -= camera.position;
         camera.position = Vector3::zero();
         let forward = (camera.target - camera.position).normalized();
+        let right = forward.cross(camera.up).normalized();
+        let up = right.cross(forward).normalized();
+        let half_vertical = (camera.fovy.to_radians() * 0.5).tan();
+        let half_horizontal = half_vertical * rl.get_screen_width() as f32 / rl.get_screen_height().max(1) as f32;
         let project = |dir: Vector3| {
-            (dir.dot(forward) > 0.05).then(|| rl.get_world_to_screen(camera.position + dir * 1000.0, camera))
+            let depth = dir.dot(forward);
+            // Reject stars outside the viewport before raylib's projection call.
+            // A small margin retains the edge glow and avoids popping on turns.
+            (depth > 0.05
+                && dir.dot(right).abs() <= depth * half_horizontal * 1.08
+                && dir.dot(up).abs() <= depth * half_vertical * 1.08)
+                .then(|| rl.get_world_to_screen(camera.position + dir * 1000.0, camera))
         };
         SkyFrame {
             stars: self.stars.iter().enumerate().filter_map(|(i, s)| project(s.dir).map(|at| (at, i))).collect(),
         }
     }
 
-    pub fn draw(&self, d: &mut impl RaylibDraw, frame: &SkyFrame) {
+    pub fn draw(&self, d: &mut impl RaylibDraw, frame: &SkyFrame, time: f32) {
         for (at, i) in &frame.stars {
             let s = &self.stars[*i];
-            d.draw_circle_v(*at, s.size, s.color);
+            let shimmer = 0.82 + 0.18 * (time * (0.7 + (*i % 7) as f32 * 0.17) + *i as f32 * 1.71).sin();
+            let alpha = (s.color.a as f32 * shimmer).min(255.0) as u8;
+            d.draw_circle_v(*at, s.size, Color::new(s.color.r, s.color.g, s.color.b, alpha));
+            if *i % 67 == 0 {
+                let glow = Color::new(s.color.r, s.color.g, s.color.b, (alpha as f32 * 0.30) as u8);
+                d.draw_circle_gradient(at.x as i32, at.y as i32, 6.0, glow, Color::new(glow.r, glow.g, glow.b, 0));
+            }
         }
     }
 }
@@ -481,6 +500,48 @@ impl Sky {
 impl Default for Sky {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+/// Seamless low-frequency color field on the sky sphere. No projected patches
+/// can enter or leave the screen as the camera rotates.
+pub struct NebulaSky {
+    shader: Shader,
+    forward: i32,
+    right: i32,
+    up: i32,
+    projection: i32,
+    resolution: i32,
+}
+
+impl NebulaSky {
+    pub fn load(rl: &mut RaylibHandle, thread: &RaylibThread) -> Result<Self, Box<dyn std::error::Error>> {
+        let shader = rl.load_shader_from_memory(thread, None, Some(include_str!("shaders/sky_nebula.fs")));
+        let forward = shader.get_shader_location("viewForward");
+        let right = shader.get_shader_location("viewRight");
+        let up = shader.get_shader_location("viewUp");
+        let projection = shader.get_shader_location("projectionScale");
+        let resolution = shader.get_shader_location("resolution");
+        if !shader.is_shader_valid() || [forward, right, up, projection, resolution].contains(&-1) {
+            return Err("No se pudo cargar el fondo continuo de la galaxia".into());
+        }
+        Ok(Self { shader, forward, right, up, projection, resolution })
+    }
+
+    pub fn draw(&mut self, d: &mut impl RaylibDraw, camera: Camera3D, width: i32, height: i32) {
+        let forward = (camera.target - camera.position).normalized();
+        let right = forward.cross(camera.up).normalized();
+        let up = right.cross(forward).normalized();
+        self.shader.set_shader_value(self.forward, forward);
+        self.shader.set_shader_value(self.right, right);
+        self.shader.set_shader_value(self.up, up);
+        self.shader.set_shader_value(self.projection, Vector2::new(
+            width as f32 / height.max(1) as f32,
+            (camera.fovy.to_radians() * 0.5).tan(),
+        ));
+        self.shader.set_shader_value(self.resolution, Vector2::new(width as f32, height as f32));
+        let mut layer = d.begin_shader_mode(&mut self.shader);
+        layer.draw_rectangle(0, 0, width, height, Color::WHITE);
     }
 }
 
