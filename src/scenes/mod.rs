@@ -1,3 +1,4 @@
+mod button_style;
 pub mod front_end;
 mod kenny_dialogue;
 pub mod minecraft_dev;

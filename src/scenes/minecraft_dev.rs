@@ -1,4 +1,5 @@
 //! Standalone development host. The default front end and solar system are unchanged.
+use super::button_style;
 use crate::{
     graphics::resources::{save_frame, StaticModel},
     minigames::{
@@ -298,9 +299,7 @@ fn draw_menu(d: &mut RaylibDrawHandle, w: i32, h: i32, state: SurfaceState) {
     } else {
         ["Volver a explorar", "Cerrar"]
     }) {
-        d.draw_rectangle_rec(rect, Color::new(74, 111, 49, 255));
-        let x = rect.x as i32 + (rect.width as i32 - d.measure_text(label, 21)) / 2;
-        d.draw_text(label, x, rect.y as i32 + 14, 21, Color::WHITE);
+        button_style::draw(d, rect, label, 21, Vector2::zero(), true);
     }
 }
 fn capture_frame(dir: &Path, name: &str, w: i32, h: i32) -> Result<(), Error> {

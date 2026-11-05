@@ -1,3 +1,4 @@
+use super::button_style;
 use crate::minigames::southpark::KennyDialogue;
 use raylib::prelude::*;
 
@@ -91,14 +92,6 @@ pub fn draw(d: &mut RaylibDrawHandle, state: KennyDialogue, width: i32, height: 
         if i == 1 && state == KennyDialogue::Preparing {
             continue;
         }
-        d.draw_rectangle_rec(
-            rect,
-            if i == 0 {
-                Color::new(195, 95, 30, 255)
-            } else {
-                Color::new(70, 85, 100, 255)
-            },
-        );
         let text = if state == KennyDialogue::Preparing {
             "Volver a explorar"
         } else if i == 0 {
@@ -106,13 +99,8 @@ pub fn draw(d: &mut RaylibDrawHandle, state: KennyDialogue, width: i32, height: 
         } else {
             "Cancelar"
         };
-        d.draw_text(
-            text,
-            rect.x as i32 + (rect.width as i32 - d.measure_text(text, 20)) / 2,
-            rect.y as i32 + 12,
-            20,
-            Color::WHITE,
-        );
+        button_style::surface(d, rect, false, true);
+        button_style::centered_label(d, rect, text, 20, Color::new(8, 24, 55, 255));
     }
     let keys = "Enter: aceptar / continuar    Esc: cerrar";
     d.draw_text(

@@ -10,6 +10,7 @@ use crate::{
     },
     ships::ShipsConfig,
 };
+use super::button_style;
 use raylib::{ffi, prelude::*};
 use std::{collections::BTreeSet, path::PathBuf};
 
@@ -117,21 +118,9 @@ pub(crate) fn dock(game: GameState, smoke_goal: Option<String>) -> Result<Option
     view(Screen::Hangar, SelectionMode::Docked, Some(game), smoke_goal)
 }
 
-const MENU_BUTTON_GAP: f32 = 14.0;
-/// Recorte del logo dentro de `newertitle.png` (1920x1080, el resto es transparente).
-const TITLE_SOURCE: (f32, f32, f32, f32) = (338.0, 101.0, 1332.0, 926.0);
-const TITLE_ASPECT: f32 = TITLE_SOURCE.2 / TITLE_SOURCE.3;
-/// Entrada del menú: el logo crece desde chico (con un rebote) y después suben los botones, uno tras otro.
-const TITLE_INTRO: f32 = 0.9;
 const BUTTONS_DELAY: f32 = 0.55;
 const BUTTON_STAGGER: f32 = 0.12;
 const BUTTON_INTRO: f32 = 0.45;
-
-/// Sube rápido, se pasa un poco y vuelve (0 → 1).
-fn ease_out_back(t: f32) -> f32 {
-    let (c1, c3) = (1.70158, 2.70158);
-    1.0 + c3 * (t - 1.0).powi(3) + c1 * (t - 1.0).powi(2)
-}
 
 struct MenuGalaxy {
     shader: Shader,
@@ -168,37 +157,91 @@ impl MenuGalaxy {
 }
 
 struct MainMenuLayout {
-    title_y: f32,
-    title_height: f32,
     buttons_y: f32,
     button_height: f32,
+    button_width: f32,
+    buttons_x: f32,
+    button_gap: f32,
 }
 impl MainMenuLayout {
     fn new(width: i32, height: i32) -> Self {
-        // The artwork rises to the right, leaving room for the buttons below that end.
-        let title_height = (height as f32 * 0.77).min((width as f32 - 70.0) / TITLE_ASPECT);
-        let title_y = ((height as f32 - title_height) * 0.30 + height as f32 * 0.035).max(0.0);
-        let button_height = (height as f32 * 0.06).clamp(48.0, 66.0);
-        let buttons_y = height as f32 * 0.76;
+        let width = width as f32;
+        let height = height as f32;
+        let row_width = width * 0.64;
+        let button_gap = width * 0.02;
+        let button_width = (row_width - 2.0 * button_gap) / 3.0;
         Self {
-            title_y,
-            title_height,
-            buttons_y,
-            button_height,
+            buttons_y: height * 0.62,
+            button_height: (height * 0.06).clamp(46.0, 58.0),
+            button_width,
+            buttons_x: (width - row_width) * 0.5,
+            button_gap,
         }
     }
 }
 
 fn menu_button(w: i32, h: i32, row: usize) -> Rectangle {
-    let row_width = w as f32 * 0.42;
-    let width = (row_width - 2.0 * MENU_BUTTON_GAP) / 3.0;
     let layout = MainMenuLayout::new(w, h);
     Rectangle::new(
-        w as f32 * 0.52 + row as f32 * (width + MENU_BUTTON_GAP),
+        layout.buttons_x + row as f32 * (layout.button_width + layout.button_gap),
         layout.buttons_y,
-        width,
+        layout.button_width,
         layout.button_height,
     )
+}
+
+fn draw_intro_backdrop(d: &mut RaylibDrawHandle, texture: &Texture2D, width: i32, height: i32) {
+    let scale = (width as f32 / texture.width as f32).max(height as f32 / texture.height as f32);
+    let source_width = width as f32 / scale;
+    let source_height = height as f32 / scale;
+    d.draw_texture_pro(
+        texture,
+        Rectangle::new(
+            (texture.width as f32 - source_width) * 0.5,
+            (texture.height as f32 - source_height) * 0.5,
+            source_width,
+            source_height,
+        ),
+        Rectangle::new(0.0, 0.0, width as f32, height as f32),
+        Vector2::zero(),
+        0.0,
+        Color::WHITE,
+    );
+}
+
+fn draw_intro_button(
+    d: &mut RaylibDrawHandle,
+    font: &Font,
+    rect: Rectangle,
+    label: &str,
+    mouse: Vector2,
+    enabled: bool,
+) {
+    let hovered = enabled && rect.check_collision_point_rec(mouse);
+    button_style::surface(d, rect, hovered, enabled);
+
+    let size = (rect.height * 0.42).clamp(22.0, 30.0);
+    let text = font.measure_text(label, size, 1.5);
+    let at = Vector2::new(
+        rect.x + (rect.width - text.x) * 0.5,
+        rect.y + (rect.height - text.y) * 0.5,
+    );
+    let text_color = if enabled {
+        Color::new(8, 24, 55, 255)
+    } else {
+        Color::new(95, 110, 132, 255)
+    };
+    if enabled {
+        d.draw_text_ex(
+            font,
+            label,
+            at + Vector2::new(0.0, 1.5),
+            size,
+            1.5,
+            Color::new(255, 255, 255, 245),
+        );
+    }
+    d.draw_text_ex(font, label, at, size, 1.5, text_color);
 }
 
 /// Degradé del logo, de arriba (t = 0) hacia abajo (t = 1): cielo azul que se aclara hasta casi blanco, un
@@ -233,43 +276,6 @@ fn slanted(d: &mut RaylibDrawHandle, x: f32, y: f32, w: f32, h: f32, color: impl
         let shift = (1.0 - t) * h * BUTTON_SLANT;
         d.draw_rectangle((x + shift).round() as i32, (y + k as f32).round() as i32, w.round() as i32, 1, color(t));
     }
-}
-
-fn draw_menu_button(
-    d: &mut RaylibDrawHandle,
-    font: &Font,
-    rect: Rectangle,
-    label: &str,
-    mouse: Vector2,
-) {
-    let hovered = rect.check_collision_point_rec(mouse);
-    let lift = if hovered { 3.0 } else { 0.0 };
-    // El paralelogramo entra en el rectángulo del botón (que es el que recibe los clics)
-    let skew = rect.height * BUTTON_SLANT;
-    let (x, y, w, h) = (rect.x, rect.y - lift, rect.width - skew, rect.height);
-    let cyan = Color::new(99, 205, 255, 255);
-    let cobalt = Color::new(19, 4, 146, 255);
-    // Sombra dura hacia abajo, borde celeste y borde azul oscuro, como el logo
-    slanted(d, x + 3.0, y + 6.0 + lift, w, h, |_| Color::new(10, 2, 70, 255));
-    slanted(d, x - 3.0, y - 3.0, w + 6.0, h + 6.0, |_| cyan);
-    slanted(d, x, y, w, h, |_| cobalt);
-    slanted(d, x + 3.0, y + 3.0, w - 6.0, h - 6.0, |t| chrome(t, if hovered { 0.18 } else { 0.0 }));
-    // Mismo tamaño en los tres botones: el más grande que deja entrar "CONTROLES" (la palabra más larga)
-    let fit = font.measure_text("CONTROLES", 100.0, 1.0).x.max(font.measure_text(label, 100.0, 1.0).x) / 100.0;
-    let size = (h * 0.66).min((w - 30.0) / fit).max(12.0);
-    let text = font.measure_text(label, size, 1.0);
-    let at = Vector2::new(
-        x + skew * 0.5 + (w - text.x) * 0.5,
-        y + (h - text.y) * 0.5,
-    );
-    // Letras blancas con contorno celeste completo (el texto repetido en un círculo alrededor)
-    let outline = Color::new(38, 150, 235, 255);
-    let r = (size * 0.09).max(2.0);
-    for k in 0..16 {
-        let a = k as f32 / 16.0 * std::f32::consts::TAU;
-        d.draw_text_ex(font, label, at + Vector2::new(a.cos() * r, a.sin() * r), size, 1.0, outline);
-    }
-    d.draw_text_ex(font, label, at, size, 1.0, Color::WHITE);
 }
 
 fn menu_random(index: u32, salt: u32) -> f32 {
@@ -383,16 +389,14 @@ fn view(
         rl.set_window_state(WindowState::default().set_window_hidden(true));
     }
     let sky = Sky::new();
-    let title_card = rl.load_texture(&thread, &root.join("newertitle.png").to_string_lossy())?;
-    let mut galaxy = MenuGalaxy::load(&mut rl, &thread)?;
-    let menu_font = rl.load_font_ex(
+    let intro_backdrop = rl.load_texture(
         &thread,
         &root
-            .join("assets/fonts/Bungee-Regular.ttf")
+            .join("assets/ui/backgrounds/planet-hoppers-intro.png")
             .to_string_lossy(),
-        64,
-        None,
     )?;
+    let mut galaxy = MenuGalaxy::load(&mut rl, &thread)?;
+    let menu_font = ui::load_font(&root.join("assets/fonts/TitilliumWeb-Bold.ttf"))?;
     // Fuente nítida al achicarla (se carga grande y se escala según el botón)
     unsafe { ffi::SetTextureFilter(menu_font.texture, ffi::TextureFilter::TEXTURE_FILTER_BILINEAR as i32) };
     let secondary_title = ui::load_font(&root.join("assets/fonts/Bungee-Regular.ttf"))?;
@@ -589,51 +593,32 @@ fn view(
         let right_active = rl.is_key_down(KeyboardKey::KEY_RIGHT);
         let mut d = rl.begin_drawing(&thread);
         d.clear_background(SKY_BACKGROUND);
-        if matches!(screen, Screen::Main | Screen::Controls) {
+        if screen == Screen::Controls {
             galaxy.draw(&mut d, w, h, menu_time);
         }
         if screen == Screen::Hangar {
             hangar.draw_backdrop(&mut d, camera, Vector2::new(w as f32, h as f32));
-        } else {
+        } else if screen == Screen::Controls {
             sky.draw(&mut d, &sky_frame, menu_time);
         }
-        if matches!(screen, Screen::Main | Screen::Controls) {
+        if screen == Screen::Controls {
             draw_moving_stars(&mut d, w, h, menu_time);
         }
         match screen {
             Screen::Main => {
-                let layout = MainMenuLayout::new(w, h);
-                // El logo crece desde su centro, del 12 % a su tamaño, y aparece de a poco
-                let t = (intro / TITLE_INTRO).min(1.0);
-                let grow = 0.12 + 0.88 * ease_out_back(t);
-                let title_height = layout.title_height * grow;
-                let title_width = title_height * TITLE_ASPECT;
-                let center_y = layout.title_y + layout.title_height * 0.5;
-                let (sx, sy, sw, sh) = TITLE_SOURCE;
-                d.draw_texture_pro(
-                    &title_card,
-                    Rectangle::new(sx, sy, sw, sh),
-                    Rectangle::new(
-                        (w as f32 - title_width) * 0.5,
-                        center_y - title_height * 0.5,
-                        title_width,
-                        title_height,
-                    ),
-                    Vector2::zero(),
-                    0.0,
-                    Color::new(255, 255, 255, ((t * 3.0).min(1.0) * 255.0) as u8),
-                );
+                draw_intro_backdrop(&mut d, &intro_backdrop, w, h);
                 for (i, label) in ["JUGAR", "CONTROLES", "SALIR"].iter().enumerate() {
-                    // Cada botón sube desde abajo de la pantalla cuando el logo ya creció
-                    let bt = ((intro - BUTTONS_DELAY - i as f32 * BUTTON_STAGGER) / BUTTON_INTRO).clamp(0.0, 1.0);
+                    let bt = ((intro - BUTTONS_DELAY - i as f32 * BUTTON_STAGGER)
+                        / BUTTON_INTRO)
+                        .clamp(0.0, 1.0);
                     let mut rect = menu_button(w, h, i);
                     rect.y += (1.0 - bt).powi(3) * h as f32 * 0.45;
-                    draw_menu_button(&mut d, &menu_font, rect, label, mouse);
+                    draw_intro_button(&mut d, &menu_font, rect, label, mouse, true);
                 }
             }
             Screen::Controls => {
                 ui::controls(&mut d, &secondary_title, &body_font, w, h);
-                ui::action(&mut d, &secondary_title, back_button(w), "VOLVER", mouse, true);
+                ui::action(&mut d, &body_font, back_button(w), "VOLVER", mouse, true);
             }
             Screen::Hangar => {
                 {
@@ -648,12 +633,12 @@ fn view(
                 let model = catalog.model(choice, &ships);
                 let provisional = format!("NAVE PROVISIONAL / {}", choice.name);
                 ui::hangar_title(
-                    &mut d, &secondary_title, &body_font, &choice.name,
+                    &mut d, &body_font, &choice.name,
                     if hangar.placeholder { &provisional } else { &model.name },
                     if mode == SelectionMode::Initial { "CIUDADELA / TU PRIMERA NAVE" }
                     else { "CIUDADELA / HANGAR DEL PRESIDIUM" }, w,
                 );
-                ui::action(&mut d, &secondary_title, back_button(w), "VOLVER", mouse, true);
+                ui::action(&mut d, &body_font, back_button(w), "VOLVER", mouse, true);
                 ui::arrow(&mut d, arrow(w, h, false), false, mouse, left_active);
                 ui::arrow(&mut d, arrow(w, h, true), true, mouse, right_active);
                 let status = if mode == SelectionMode::Initial {
@@ -666,14 +651,14 @@ fn view(
                 ui::centered(&mut d, &body_font, status, w, h as f32 - 123.0, 18.0, INK);
                 let enabled = selection.can_confirm(&catalog, game.as_ref());
                 ui::action(
-                    &mut d, &secondary_title, launch_button(w, h),
+                    &mut d, &body_font, launch_button(w, h),
                     if !enabled { "BLOQUEADA" }
                     else if mode == SelectionMode::Initial { "DESPEGAR" }
                     else if mode == SelectionMode::Docked { "DESPEGAR CON ESTA NAVE" }
                     else { "ACTIVAR NAVE" }, mouse, enabled,
                 );
                 let count = format!("{:02} / {:02}", selection.index + 1, catalog.choices.len());
-                ui::text(&mut d, &secondary_title, &count, 38.0, h as f32 - 34.0, 18.0, CYAN);
+                ui::text(&mut d, &body_font, &count, 38.0, h as f32 - 34.0, 18.0, Color::new(230, 238, 248, 255));
                 ui::centered(&mut d, &body_font, "FLECHAS / elegir     ENTER / despegar     ESC / volver", w, h as f32 - 26.0, 16.0, INK);
             }
         }

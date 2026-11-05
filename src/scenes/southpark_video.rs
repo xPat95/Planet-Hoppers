@@ -1,5 +1,6 @@
 //! The supplied South Park clip, prepared offline as SFV1 JPEGs + Ogg audio.
 //! Only the displayed JPEG is decoded; the audio controller owns the one clock.
+use super::button_style;
 use raylib::prelude::*;
 use std::{
     cell::RefCell,
@@ -325,34 +326,13 @@ impl VideoIntro {
             );
         }
         let skip = skip_button(w, h);
-        let hover = skip.check_collision_point_rec(mouse);
-        cutout(
-            d,
-            Rectangle::new(skip.x + 3.0, skip.y + 4.0, skip.width, skip.height),
-            Color::new(104, 91, 64, 160),
-        );
-        cutout(
+        button_style::draw(
             d,
             skip,
-            if hover {
-                Color::new(244, 218, 154, 255)
-            } else {
-                Color::new(212, 180, 124, 255)
-            },
-        );
-        let size = (skip.height * 0.43).min(23.0);
-        let label = "SKIP >>";
-        let measured = self.font.measure_text(label, size, 1.0);
-        d.draw_text_ex(
-            &self.font,
-            label,
-            Vector2::new(
-                skip.x + (skip.width - measured.x) * 0.5,
-                skip.y + (skip.height - measured.y) * 0.5,
-            ),
-            size,
-            1.0,
-            Color::new(62, 49, 32, 255),
+            "SKIP >>",
+            (skip.height * 0.43).min(23.0) as i32,
+            mouse,
+            true,
         );
         d.draw_text(
             "ENTER / ESPACIO: saltar intro",

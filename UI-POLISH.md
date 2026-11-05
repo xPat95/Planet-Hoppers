@@ -2,16 +2,24 @@
 
 Trabajo en `main`, inicialmente limpio. Sin commit ni push.
 
+## Menú de introducción actual
+
+El menú principal usa `assets/ui/backgrounds/planet-hoppers-intro.png`, una ilustración 1920×1080 con el título integrado. Se escala para cubrir la ventana sin deformarse y se recorta desde el centro cuando la proporción de pantalla no es 16:9.
+
+JUGAR, CONTROLES y SALIR aparecen en una fila centrada justo debajo del título. Los botones son compactos y blancos, con esquinas más redondeadas, brillo/sombra blanca y texto azul oscuro en Titillium Web Bold con un espaciado sutil entre letras. Conservan sus zonas de clic y entrada escalonada. La galaxia animada y las estrellas siguen disponibles en la pantalla de controles.
+
+Los botones de VOLVER y DESPEGAR/ACTIVAR del hangar, AYUDA y EXPLORAR del sistema solar, opciones de diálogo y pausa, y botones para saltar intros de video usan la misma paleta de botones blancos con texto azul oscuro. En el hangar, el nombre de la nave y los metadatos usan Titillium Web y acentos blancos tenues, sin el contorno celeste ni el degradado naranja del estilo anterior. Las flechas de selección son blancas y discretas; las zonas de clic se conservan.
+
 ## Referencia y guía visual
 
-Se inspeccionó `src/scenes/front_end.rs` y se capturó el juego antes de editar. El menú usa Bungee, botones inclinados 0,32, borde cian de 3 px, sombra azul y degradado cromado azul/blanco/naranja. El fondo combina galaxia y estrellas. Sus botones tienen 48–66 px de altura y separación de 14 px.
+Bungee identifica títulos y teclas; Titillium Web Bold, ya incluido en los recursos, se usa para acciones y descripciones. Blanco para contenido, cian para secciones y naranja para acentos decorativos. Se cargan los glifos latinos para conservar tildes y nombres de naves.
 
-Las pantallas secundarias comparten los procedimientos de botón, degradado e inclinación. Bungee identifica títulos, teclas y acciones; Titillium Web Bold, ya incluido en los recursos, se usa para las descripciones. Blanco para contenido, cian para secciones y naranja para acentos. Se cargan los glifos latinos para conservar tildes y nombres de naves.
+El diseño anterior del menú usaba Bungee y botones cromados; esa apariencia ya no se usa en la pantalla principal.
 
 ## Cambios
 
-- Controles: título con contorno y sombra, dos secciones, teclas destacadas sobre sus descripciones, pequeños acentos inclinados y galaxia atenuada. Sin paneles ni tabla. VOLVER usa el botón arcade compartido.
-- Hangar: flechas pixeladas sin caja, cian en reposo y naranja con hover o tecla mantenida. Se conservan sus zonas de clic. Cabecera compacta, degradados transparentes en lugar de franjas sólidas de 151 y 156 px, acción arcade con ajuste para etiquetas largas, contador separado y ayuda discreta.
+- Controles: título con contorno y sombra, dos secciones, teclas destacadas sobre sus descripciones, pequeños acentos inclinados y galaxia atenuada. Sin paneles ni tabla. VOLVER usa el botón redondeado compartido.
+- Hangar: flechas pixeladas sin caja, blancas y atenuadas en reposo, brillantes con hover o tecla mantenida. Se conservan sus zonas de clic. Cabecera compacta, degradados transparentes en lugar de franjas sólidas de 151 y 156 px, acción redondeada, contador separado y ayuda discreta.
 - Se conservan entradas, navegación, estados, condiciones de confirmación, cámara, iluminación, plataforma, modelos y lógica de vuelo. El ajuste de letra de etiquetas largas conserva las dimensiones y el aspecto de los tres botones originales del menú.
 
 ## Capturas nativas

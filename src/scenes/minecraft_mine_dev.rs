@@ -1,4 +1,5 @@
 //! Independent mine preview. Return closes its context normally, then opens the village.
+use super::button_style;
 use crate::minigames::minecraft::mining::{MiningConfig, MiningEvent, MiningSession};
 use crate::{
     graphics::mining::MiningVisuals,
@@ -340,7 +341,6 @@ fn draw_menu(d: &mut RaylibDrawHandle, w: i32, h: i32) {
         .into_iter()
         .zip(["Volver a la aldea", "Seguir explorando"])
     {
-        d.draw_rectangle_rec(r, Color::new(47, 85, 91, 255));
-        d.draw_text(label, r.x as i32 + 18, r.y as i32 + 14, 21, Color::WHITE);
+        button_style::draw(d, r, label, 21, Vector2::zero(), true);
     }
 }

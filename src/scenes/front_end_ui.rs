@@ -1,5 +1,5 @@
-//! Secondary-screen presentation, sharing the menu's arcade drawing primitives.
-use super::{chrome, draw_menu_button, slanted, BUTTON_SLANT, CYAN, INK, MUTED};
+//! Secondary-screen presentation, sharing the menu's subdued button style.
+use super::{chrome, draw_intro_button, slanted, CYAN, INK, MUTED};
 use raylib::prelude::*;
 
 const ORANGE: Color = Color::new(255, 178, 88, 255);
@@ -85,28 +85,7 @@ pub(super) fn action(
     mouse: Vector2,
     enabled: bool,
 ) {
-    if enabled {
-        draw_menu_button(d, font, rect, label, mouse);
-    } else {
-        slanted(
-            d,
-            rect.x,
-            rect.y,
-            rect.width - rect.height * BUTTON_SLANT,
-            rect.height,
-            |_| Color::new(18, 23, 48, 230),
-        );
-        let size = 23.0;
-        text(
-            d,
-            font,
-            label,
-            rect.x + (rect.width - font.measure_text(label, size, 1.0).x) * 0.5,
-            rect.y + 12.0,
-            size,
-            MUTED,
-        );
-    }
+    draw_intro_button(d, font, rect, label, mouse, enabled);
 }
 
 pub(super) fn arrow(
@@ -130,14 +109,18 @@ pub(super) fn arrow(
             (y + 3.0) as i32,
             (pixel * 2.0) as i32,
             pixel as i32,
-            Color::new(19, 4, 90, 255),
+            Color::new(255, 255, 255, 35),
         );
         d.draw_rectangle(
             x as i32,
             y as i32,
             (pixel * 2.0) as i32,
             pixel as i32,
-            if lit { ORANGE } else { CYAN },
+            if lit {
+                Color::WHITE
+            } else {
+                Color::new(210, 220, 230, 215)
+            },
         );
     }
 }
@@ -156,18 +139,30 @@ pub(super) fn hangar_shade(d: &mut RaylibDrawHandle, w: i32, h: i32) {
 
 pub(super) fn hangar_title(
     d: &mut RaylibDrawHandle,
-    title: &Font,
-    body: &Font,
+    font: &Font,
     name: &str,
     detail: &str,
     context: &str,
     w: i32,
 ) {
-    text(d, body, context, 38.0, 17.0, 17.0, CYAN);
-    let fit = (w as f32 - 280.0) / title.measure_text(name, 100.0, 1.0).x * 100.0;
-    heading(d, title, name, 36.0, 38.0, fit.min(46.0));
-    text(d, body, detail, 39.0, 99.0, 18.0, INK);
-    slanted(d, 39.0, 128.0, 70.0, 3.0, |t| chrome(t, 0.0));
+    text(d, font, context, 38.0, 17.0, 17.0, Color::new(230, 238, 248, 255));
+    let fit = (w as f32 - 280.0) / font.measure_text(name, 100.0, 1.0).x * 100.0;
+    text(
+        d,
+        font,
+        name,
+        38.0,
+        38.0,
+        fit.min(46.0),
+        Color::WHITE,
+    );
+    text(d, font, detail, 39.0, 99.0, 18.0, Color::new(225, 233, 243, 255));
+    d.draw_rectangle_rounded(
+        Rectangle::new(39.0, 128.0, 70.0, 2.0),
+        0.5,
+        8,
+        Color::new(255, 255, 255, 190),
+    );
 }
 
 pub(super) fn controls(d: &mut RaylibDrawHandle, title: &Font, body: &Font, w: i32, h: i32) {

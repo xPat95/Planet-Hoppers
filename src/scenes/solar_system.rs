@@ -1,6 +1,7 @@
 //! Sistema solar jugable (fases 1 a 6). Une la lógica de `solar_system` (órbitas, rotación, proximidad) y `ships`
 //! (vuelo y choques) con la representación de `graphics::space`, y coordina las visitas: "Explorar planeta" cierra
 //! esta ventana, abre el minijuego y al terminar vuelve al mismo sistema solar, con la nave junto al planeta.
+use super::button_style;
 use super::minigame_host::{self, MinigameVisits};
 use crate::gameplay::planet_visit::PlanetReturnPose;
 use crate::gameplay::station::{chase_position, DepartureBounds, Station};
@@ -36,20 +37,16 @@ fn help_button(width: i32, height: i32) -> Rectangle {
     Rectangle::new((width - 156) as f32, (height - 68) as f32, 136.0, 48.0)
 }
 
-fn draw_help_overlay(d: &mut impl RaylibDraw, regular: &Font, bold: &Font, width: i32, height: i32, progress: f32, open: bool) {
+fn draw_help_overlay(d: &mut RaylibDrawHandle, regular: &Font, bold: &Font, width: i32, height: i32, progress: f32, open: bool) {
     let button = help_button(width, height);
     let cyan = Color::new(137, 228, 255, 255);
     let blue = Color::new(66, 173, 223, 255);
     let orange = Color::new(255, 174, 89, 255);
     let ink = Color::new(223, 238, 255, 255);
     if progress < 0.01 {
-        d.draw_rectangle_rec(Rectangle::new(button.x + 4.0, button.y + 4.0, button.width, button.height), Color::new(2, 8, 24, 220));
-        d.draw_rectangle_rec(button, Color::new(20, 48, 87, 245));
-        d.draw_rectangle_lines_ex(button, 2.0, cyan);
-        d.draw_rectangle_rec(Rectangle::new(button.x + 4.0, button.y + 4.0, button.width - 8.0, 4.0), blue);
-        d.draw_rectangle_rec(Rectangle::new(button.x + 4.0, button.y + button.height - 8.0, button.width - 8.0, 4.0), orange);
+        button_style::surface(d, button, false, true);
         let label = "?  AYUDA";
-        draw_ui(d, bold, label, (button.x + (button.width - text_width(bold, label, 23.0) as f32) * 0.5) as i32, button.y as i32 + 12, 23.0, ink);
+        button_style::centered_label(d, button, label, 23, Color::new(8, 24, 55, 255));
         return;
     }
     let eased = progress * progress * (3.0 - 2.0 * progress);
@@ -1309,6 +1306,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             })
             .collect();
         let (width, height) = (rl.get_screen_width(), rl.get_screen_height());
+        let draw_mouse = rl.get_mouse_position();
 
         shader.begin_frame(center, camera.position, 0.16);
         sun_shader.begin_frame(center, camera.position, time);
@@ -1442,15 +1440,28 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 let p = &s.system.planets[i].config;
                 let (w, h) = (width as f32, height as f32);
                 let button = Rectangle::new(w / 2.0 - 170.0, h - 150.0, 340.0, 64.0);
-                let pulse = 0.75 + 0.25 * (time * 4.0).sin();
-                d.draw_rectangle_rounded(button, 0.3, 8, Color::new(20, 24, 48, 220));
-                d.draw_rectangle_rounded_lines(button, 0.3, 8, Color::new(255, 214, 90, (255.0 * pulse) as u8));
+                button_style::surface(
+                    &mut d,
+                    button,
+                    button.check_collision_point_rec(draw_mouse),
+                    true,
+                );
                 let title = format!("Explorar {}", p.name);
-                let tw = text_width(&ui_bold, &title, 28.0);
-                draw_ui(&mut d, &ui_bold, &title, (w / 2.0) as i32 - tw / 2, (h - 140.0) as i32, 28.0, white);
+                button_style::centered_label(
+                    &mut d,
+                    Rectangle::new(button.x, button.y + 5.0, button.width, 32.0),
+                    &title,
+                    28,
+                    Color::new(8, 24, 55, 255),
+                );
                 let sub = if p.minigame.is_some() { "[E] Explorar planeta" } else { "[E]  (minijuego en construcción)" };
-                let sw = text_width(&ui_regular, sub, 18.0);
-                draw_ui(&mut d, &ui_regular, sub, (w / 2.0) as i32 - sw / 2, (h - 110.0) as i32, 18.0, dim);
+                button_style::centered_label(
+                    &mut d,
+                    Rectangle::new(button.x, button.y + 34.0, button.width, 23.0),
+                    sub,
+                    18,
+                    Color::new(24, 42, 70, 255),
+                );
             }
             if station_reentry_delay<=0.0 && s.station.in_reach(s.ship.position, station_ship_radius(s, &ship_model)) {
                 let text = "[E] Entrar a la estación espacial";

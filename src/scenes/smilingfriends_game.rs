@@ -1457,12 +1457,21 @@ pub fn draw_intro(d: &mut RaylibDrawHandle, video: &Texture2D, title: &Font, tim
         let tape = Rectangle::new(*cx, *cy, 90.0, 30.0);
         d.draw_rectangle_pro(tape, Vector2::new(45.0, 15.0), *ang + k as f32 * 3.0, Color::new(255, 238, 150, 200));
     }
-    // Botón SKIP: tarjeta amarilla con borde negro, que se levanta al pasar el mouse
+    // Botón SKIP: tarjeta blanca con brillo, que se levanta al pasar el mouse
     let b = skip_button(w, h);
     let hover = b.check_collision_point_rec(mouse);
     let r = Rectangle::new(b.x, b.y - if hover { 6.0 } else { 0.0 }, b.width, b.height);
-    panel(d, r, if hover { ORANGE } else { YELLOW }, if hover { -3.0 } else { -2.0 });
+    crate::scenes::button_style::surface(d, r, hover, true);
     let label = "SKIP >>";
-    let m = title.measure_text(label, 34.0, 1.0);
-    d.draw_text_pro(title, label, Vector2::new(r.x + r.width / 2.0, r.y + r.height / 2.0), m * 0.5, -2.0, 34.0, 1.0, INK);
+    let m = title.measure_text(label, 34.0, 1.6);
+    d.draw_text_pro(
+        title,
+        label,
+        Vector2::new(r.x + r.width / 2.0, r.y + r.height / 2.0),
+        m * 0.5,
+        0.0,
+        34.0,
+        1.6,
+        Color::new(8, 24, 55, 255),
+    );
 }

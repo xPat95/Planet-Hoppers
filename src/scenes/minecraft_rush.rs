@@ -1,4 +1,5 @@
 //! Minecraft visit and standalone adapter: one graphics context and one music stream.
+use super::button_style;
 use crate::{
     graphics::{
         mining::MiningVisuals,
@@ -709,8 +710,7 @@ fn panel(d: &mut RaylibDrawHandle, w: i32, h: i32, title: &str, lines: &[String]
         d.draw_text(line, x + 24, y + 90 + i as i32 * 31, 20, Color::WHITE);
     }
     for (r, label) in buttons(w, h, labels.len()).into_iter().zip(labels) {
-        d.draw_rectangle_rec(r, Color::new(52, 96, 78, 255));
-        d.draw_text(label, r.x as i32 + 12, r.y as i32 + 14, 19, Color::WHITE);
+        button_style::draw(d, r, label, 19, Vector2::zero(), true);
     }
 }
 fn draw_surface_menu(d: &mut RaylibDrawHandle, w: i32, h: i32, required: u32) {

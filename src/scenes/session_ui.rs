@@ -1,4 +1,5 @@
 //! Presentation/input only. Match rules stay in SaveKennySession.
+use super::button_style;
 use crate::minigames::southpark::{
     session::{SaveKennySession, SessionState},
     threats::{ThreatDirector, ThreatKind},
@@ -44,6 +45,21 @@ fn buttons(w: i32, h: i32) -> [Rectangle; 2] {
 pub fn pause_buttons(w: i32, h: i32) -> [Rectangle; 3] {
     let width = (w as f32 - 64.0).min(560.0);
     std::array::from_fn(|i| Rectangle::new((w as f32 - width) * 0.5, h as f32 * 0.5 + 20.0 + i as f32 * 50.0, width, 42.0))
+}
+
+fn choice_button(d: &mut RaylibDrawHandle, rect: Rectangle, label: &str, size: i32, enabled: bool) {
+    button_style::surface(d, rect, false, enabled);
+    button_style::centered_label(
+        d,
+        rect,
+        label,
+        size,
+        if enabled {
+            Color::new(8, 24, 55, 255)
+        } else {
+            Color::new(72, 86, 108, 255)
+        },
+    );
 }
 
 pub fn input(rl: &RaylibHandle, session: &SaveKennySession, confirmation: &ReturnConfirmation) -> SessionAction {
@@ -318,25 +334,9 @@ impl SessionUi {
         for (i, rect) in buttons(w, h).into_iter().enumerate() {
             let disabled =
                 i == 0 && s.state == Success && s.elapsed < s.config.success_hold_seconds;
-            d.draw_rectangle_rec(
-                rect,
-                if disabled {
-                    Color::GRAY
-                } else if i == 0 {
-                    Color::new(170, 82, 25, 255)
-                } else {
-                    Color::new(50, 77, 94, 255)
-                },
-            );
             let text = if i == 0 { left } else { right };
             let size = if rect.width < 230.0 { 16 } else { 18 };
-            d.draw_text(
-                text,
-                rect.x as i32 + (rect.width as i32 - d.measure_text(text, size)) / 2,
-                rect.y as i32 + 13,
-                size,
-                Color::WHITE,
-            );
+            choice_button(d, rect, text, size, !disabled);
         }
     }
     fn death_dialogue(&self, d: &mut RaylibDrawHandle, s: &SaveKennySession, w: i32, h: i32) {
@@ -396,9 +396,7 @@ fn draw_pause(d: &mut RaylibDrawHandle, w: i32, h: i32, confirmation: &ReturnCon
         pause_buttons(w, h).into_iter().zip(["Continuar partida", "Reiniciar minijuego", "Regresar al sistema solar"]).collect()
     };
     for (rect, label) in choices {
-        d.draw_rectangle_rec(rect, Color::new(50, 77, 94, 255));
-        let size = 18;
-        d.draw_text(label, rect.x as i32 + (rect.width as i32 - d.measure_text(label, size)) / 2, rect.y as i32 + 12, size, Color::WHITE);
+        choice_button(d, rect, label, 18, true);
     }
 }
 
