@@ -15,6 +15,7 @@ Gran Cañón) y pocas grietas de lava afuera, y roca negra verdosa con venas que
 vacío: las zonas se agregan después.
 """
 
+import bmesh
 import bpy
 import math
 import os
@@ -57,15 +58,16 @@ def mat(name, hexcol, emit=0.0, rough=0.9):
 
 
 # Paleta: estratos de roca roja quemada en tonos cercanos, roca oscura en bordes y adentro, y lava roja profunda.
-STRATA = [mat("Strata%d" % i, h) for i, h in
-          enumerate(("#a3352a", "#ad3d30", "#b74536", "#9e3127", "#b04034", "#ba4b3b"))]   # Rojos cercanos
-RUST_D = mat("RustDark", "#6e2019")
-CHAR = mat("Char", "#3b1c13")
+# El cráneo es rojo sangre y brillante, como mojado (el mismo rojo que tenía la sangre); los estratos quedan todos
+# del mismo color, así que la superficie se lee lisa y lustrosa, no como roca
+STRATA = [mat("Strata%d" % i, "#c4001f", emit=0.25, rough=0.08) for i in range(6)]
+RUST_D = mat("RustDark", "#7a0012", emit=0.15, rough=0.12)   # Alrededor de las grietas: rojo más oscuro, también mojado
+CHAR = mat("Char", "#060406")                            # Paredes de las órbitas y la nariz: negras
 INNER = mat("Inner", "#0f1a10")                         # Adentro, en las zonas verdes: roca negra verdosa
 INNER_CRUST = mat("InnerCrust", "#2e0905")               # Adentro: costra de lava enfriada, rojo casi negro
 INNER_LAVA = mat("InnerLava", "#c22a0c", emit=1.6, rough=0.5)   # Lava que corre entre las costras
-TEETH = mat("Teeth", "#c87a5e")
-LAVA = mat("Lava", "#b50d0b", emit=2.5, rough=0.5)              # Grietas rojo profundo
+TEETH = mat("Teeth", "#c4001f", emit=0.25, rough=0.08)   # Del mismo rojo brillante que el cráneo
+LAVA = mat("Lava", "#0b0709", rough=0.06)                       # Grietas: negras y brillantes, como la sangre
 LAVA_HOT = mat("LavaHot", "#e0261a", emit=3.5, rough=0.5)
 GLOW = mat("InnerGlow", "#8fd61e", emit=1.4, rough=0.5)  # Lava verde (en pocas zonas de adentro)
 GLOW_HOT = mat("InnerGlowHot", "#ff7a14", emit=2.5, rough=0.5)  # El centro de la lava: naranja que quema
@@ -271,6 +273,27 @@ def brow(p):
     return chain(mirror(p), [(0, -0.885, -0.03), (0.2, -0.875, 0.03), (0.42, -0.78, 0.07)], 0.04)
 
 
+FOREHEAD_PATHS = [[(-0.16, 0.46), (-0.27, 0.56), (-0.23, 0.68), (-0.35, 0.79), (-0.47, 0.85)],
+                  [(-0.27, 0.56), (-0.12, 0.64), (-0.06, 0.76)]]
+
+
+def front_dir(x, z):
+    return np.array([x, -math.sqrt(max(0.0, 1 - x * x - z * z)), z])
+
+
+def forehead_dist(dd, paths=FOREHEAD_PATHS):
+    """Distancia (sobre la esfera unidad) de cada dirección a una grieta dibujada de frente, con un poco de zigzag."""
+    warp = dd + 0.012 * (np.stack([vnoise(dd, 14, o) for o in (3.0, 23.0, 43.0)], axis=1) - 0.5)
+    best = np.full(len(dd), 9.0)
+    for path in paths:
+        pts = [front_dir(*q) for q in path]
+        for a, b in zip(pts, pts[1:]):
+            ab = b - a
+            t = np.clip(((warp - a) @ ab) / (ab @ ab), 0, 1)
+            best = np.minimum(best, np.linalg.norm(warp - (a + t[:, None] * ab), axis=1))
+    return best
+
+
 def planet(p):
     b = body(p)
     d = np.maximum(b, -(b + SHELL))                      # Cáscara hueca
@@ -346,20 +369,26 @@ def surface_nets(F, lo=LO, h=H):
 verts, quads = surface_nets(F)
 del F
 
-# Roca: relieve por ruido y cráteres (los cráteres solo afuera y lejos de la cara)
-dirs = verts / np.linalg.norm(verts, axis=1)[:, None]
-outer_w = np.clip((body(verts) + SHELL) / SHELL, 0, 1)   # 1 en la cara exterior, 0 en la interior
-disp = 0.025 * (fbm(dirs, 3.0, 2, 1.7) - 0.5) + 0.012 * (vnoise(dirs, 9.0, 5.1) - 0.5) \
-    + 0.004 * (vnoise(dirs, 20.0, 9.3) - 0.5)
+# Relieve por ruido y cráteres (los cráteres solo afuera y lejos de la cara). Liso, como cubierto de líquido: solo
+# ondas grandes y suaves. Es una función porque el líquido que se escurre (más abajo) se apoya en esta superficie
 craters = rng.normal(size=(40, 3))
 craters /= np.linalg.norm(craters, axis=1)[:, None]
 craters = craters[(craters[:, 1] > -0.3) & (craters[:, 2] > -0.5)][:12]
-for c in craters:
-    rho = rng.uniform(0.07, 0.15)                        # Radio angular
-    a = np.arccos(np.clip(dirs @ c, -1, 1)) / rho
-    disp += outer_w * np.where(a < 1, -0.2 * rho * (1 - a * a), 0.07 * rho * np.exp(-((a - 1) / 0.3) ** 2))
-disp *= np.clip(holes(verts) / 0.1, 0.15, 1)            # Casi sin ruido en los bordes de las aberturas
-verts = verts + dirs * disp[:, None]
+crater_rho = [rng.uniform(0.07, 0.15) for _ in craters]      # Radio angular de cada uno
+
+
+def relief(pts):
+    dirs_ = pts / np.linalg.norm(pts, axis=1)[:, None]
+    outer_w = np.clip((body(pts) + SHELL) / SHELL, 0, 1)     # 1 en la cara exterior, 0 en la interior
+    d = 0.022 * (fbm(dirs_, 3.0, 2, 1.7) - 0.5) + 0.004 * (vnoise(dirs_, 9.0, 5.1) - 0.5)
+    for c, rho in zip(craters[:0], crater_rho):         # Sin cráteres: la superficie queda lisa, como mojada
+        a_ = np.arccos(np.clip(dirs_ @ c, -1, 1)) / rho
+        d += outer_w * np.where(a_ < 1, -0.2 * rho * (1 - a_ * a_), 0.07 * rho * np.exp(-((a_ - 1) / 0.3) ** 2))
+    return d * np.clip(holes(pts) / 0.1, 0.15, 1)           # Casi sin relieve en los bordes de las aberturas
+
+
+dirs = verts / np.linalg.norm(verts, axis=1)[:, None]
+verts = verts + dirs * relief(verts)[:, None]
 
 me = bpy.data.meshes.new("HW_Planet_Surface")
 me.from_pydata((verts * R).tolist(), [], quads.tolist())
@@ -386,6 +415,36 @@ me = low
 me.name = "HW_Planet_Surface"
 for m in MATS:
     me.materials.append(m)
+
+# Borde liso entre el hueso rojo y las paredes negras de las órbitas y la nariz: la malla se corta justo por la línea
+# donde empieza la pared (si no, cada cara es toda roja o toda negra y el borde sale serruchado)
+def wall_field(q):
+    b_ = body(q)
+    hd = np.maximum(holes(q), np.minimum(b_ + 0.07, q[:, 1] + 0.7))
+    return np.maximum.reduce([np.abs(hd) - 0.025, 0.03 - brow(q), b_ + 0.04])   # Negativo: pared
+
+
+bm_w = bmesh.new()
+bm_w.from_mesh(me)
+wf = wall_field(np.array([tuple(v.co) for v in bm_w.verts]) / R)
+cuts = []
+for e in list(bm_w.edges):
+    va, vb = e.verts
+    fa_, fb_ = wf[va.index], wf[vb.index]
+    if fa_ * fb_ < 0:
+        cuts.append((e, va, vb, fa_ / (fa_ - fb_)))
+new_vs = []
+for e, va, vb, t in cuts:
+    pa, pb = va.co.copy(), vb.co.copy()
+    _, nv = bmesh.utils.edge_split(e, va, t)
+    nv.co = pa.lerp(pb, t)
+    new_vs.append(nv)
+bmesh.ops.connect_verts(bm_w, verts=new_vs)
+bmesh.ops.triangulate(bm_w, faces=[f for f in bm_w.faces if len(f.verts) > 4])
+bm_w.to_mesh(me)
+bm_w.free()
+me.update()
+print("BORDE PAREDES: %d cortes" % len(cuts))
 
 # --- Colores por cara --------------------------------------------------------------------------------------
 nf = len(me.polygons)
@@ -416,25 +475,6 @@ def crack_net(n_cells, seed_off, width, keep_thr):
 # Grieta de la frente: arriba a la izquierda (vista de frente), sube curvándose hacia la coronilla con una rama.
 # Más ancha y más honda que las otras: de ella salen los zombies. Se define vista de frente (x, z) y se lleva a
 # direcciones sobre el cráneo.
-FOREHEAD_PATHS = [[(-0.16, 0.46), (-0.27, 0.56), (-0.23, 0.68), (-0.35, 0.79), (-0.47, 0.85)],
-                  [(-0.27, 0.56), (-0.12, 0.64), (-0.06, 0.76)]]
-
-
-def front_dir(x, z):
-    return np.array([x, -math.sqrt(max(0.0, 1 - x * x - z * z)), z])
-
-
-def forehead_dist(dd):
-    """Distancia (sobre la esfera unidad) de cada dirección a la grieta de la frente, con un poco de zigzag."""
-    warp = dd + 0.012 * (np.stack([vnoise(dd, 14, o) for o in (3.0, 23.0, 43.0)], axis=1) - 0.5)
-    best = np.full(len(dd), 9.0)
-    for path in FOREHEAD_PATHS:
-        pts = [front_dir(*q) for q in path]
-        for a, b in zip(pts, pts[1:]):
-            ab = b - a
-            t = np.clip(((warp - a) @ ab) / (ab @ ab), 0, 1)
-            best = np.minimum(best, np.linalg.norm(warp - (a + t[:, None] * ab), axis=1))
-    return best
 
 
 
@@ -510,6 +550,17 @@ vco[sink] *= ((ln[sink] - 0.3) / ln[sink])[:, None]
 vco[deep] *= ((ln[deep] - 0.15) / ln[deep])[:, None]
 me.vertices.foreach_set("co", vco.ravel())
 me.update()
+# Sombreado suave: la superficie se lee lisa y mojada (las grietas y lo de adentro quedan facetados)
+red = {M[m] for m in STRATA + [RUST_D]}
+me.polygons.foreach_set("use_smooth", np.isin(idx, list(red)))
+me.update()
+
+
+
+def surf(p):
+    """Punto de la superficie más cercano (en unidades de R), su normal y el material de esa cara."""
+    ok, loc, nrm, fi = ob.closest_point_on_mesh(Vector(p * R))
+    return np.array(loc) / R, np.array(nrm), me.polygons[fi].material_index
 
 # --- Versión lejana (LOD) -----------------------------------------------------------------------------------
 # El mismo cráneo, ya pintado, con muchas menos caras; va oculto en LOD_Far y el motor lo usa cuando el planeta está
@@ -742,7 +793,7 @@ for m in bpy.data.materials:
 # gotas pesadas que cuelgan. De las más cargadas cae un hilo que se afina y se cuenta en cuentas, y abajo se curva
 # en una J gorda donde se sientan brujas felices, como en una hamaca. Todo es una sola forma (distancia con signo,
 # unida en suave) para que se lea como líquido y no como piezas pegadas.
-BLOOD = mat("Blood", "#c4001f", emit=0.25, rough=0.08)   # Rojo vivo y brillante: se lee sobre el cráneo oscuro
+BLOOD = mat("Blood", "#0b0709", rough=0.06)              # Sangre negra y brillante: se lee sobre el cráneo rojo
 BLOOD_H = 0.0035                                         # Rejilla de la sangre (más fina que la del cráneo)
 BLOOD_TRIS = 14000
 BLOOD_K = 0.014                                          # Qué tanto se funden las partes entre sí
@@ -994,6 +1045,231 @@ bme.materials.append(BLOOD)
 bme.polygons.foreach_set("use_smooth", np.ones(len(bme.polygons), bool))
 bme.calc_loop_triangles()
 print("TRIS %-18s %6d" % (blood_ob.name, len(bme.loop_triangles)))
+
+# Sangre negra debajo de los ojos, con la misma lógica que la de la boca: desde el borde de abajo de cada órbita la
+# sangre cubre el hueso en una capa cuyo borde de abajo es una fila de arcos de media luna (el borde se engorda, porque
+# ahí se junta). Los arcos son bajos. De donde se juntan dos arcos baja un reguero que sigue la curva de la cara: fino
+# casi todo el largo y abajo se junta en una bola gorda y redonda, como la gota del mentón. Cada ojo con la suya (no en
+# espejo): 4 regueros en uno y 3 en el otro, de largos distintos. Igual en la nariz, hasta los dientes
+UNDER_EYES = [
+    # (x donde empieza y termina la capa, y para cada reguero: x, largo)
+    # Solo del borde de abajo de la órbita, lejos del rincón de adentro (nada corre hacia la nariz)
+    ((-0.44, -0.13), [(-0.365, 0.075), (-0.3, 0.05), (-0.245, 0.085)]),     # Largo, corto, mediano
+    ((0.13, 0.44), [(0.245, 0.06), (0.285, 0.065), (0.37, 0.04)]),         # Corto, el más largo, cortito
+    # La nariz: dos regueros debajo de cada abertura, que llegan casi hasta los dientes de arriba (sin tocarlos)
+    ((-0.105, -0.02), [(-0.085, 0.045), (-0.042, 0.12)]),    # Uno cortito y uno largo
+    ((0.018, 0.105), [(0.045, 0.085), (0.082, 0.11)]),      # Dos medianos, de largos distintos
+]
+UE_H = 0.0035
+down = np.array([0.0, 0.0, -1.0])
+tv, tf = [], []
+
+
+def rim_point(x, z0=-0.1):
+    """El borde de abajo de la órbita en x: rayos de frente, de arriba hacia abajo; el primer hueso rojo que
+    tocan después de pasar por la abertura."""
+    seen_hole = False
+    for z in np.arange(z0, -0.5, -0.004):
+        hit, loc, nrm, fi = ob.ray_cast(Vector((x * R, -2.0 * R, z * R)), Vector((0, 1, 0)))
+        frontal = hit and loc.y / R < -0.77 and me.polygons[fi].material_index in red   # La cara de afuera (no los
+        if not frontal:                                                                     # huesitos de adentro)
+            seen_hole = True
+        elif seen_hole:
+            return np.array(loc) / R
+    return None
+
+
+def on_face(x, z):
+    hit, loc, nrm, fi = ob.ray_cast(Vector((x * R, -2.0 * R, z * R)), Vector((0, 1, 0)))
+    return (np.array(loc) / R, np.array(nrm)) if hit else (None, None)
+
+
+def walk_down(p, n, length, stick=False):
+    """Baja por la cara con la gravedad hasta el largo pedido, o hasta que la cara dobla hacia abajo (ahí cuelga)."""
+    path = [p]
+    run = 0.0
+    while run < length:
+        t = down - n * n.dot(down)
+        if not stick and (n[2] < -0.8 or np.linalg.norm(t) < 0.12):   # Solo se corta en un borde que dobla
+            return np.array(path), True
+        if stick:
+            # Con inercia: donde el pómulo dobla para abajo la gravedad casi no tira sobre la superficie, así que
+            # sigue en la dirección que traía, pegada al hueso (rodea la curva en vez de caerse)
+            prev = (path[-1] - path[-2]) if len(path) > 1 else t
+            dir_ = t + prev / max(np.linalg.norm(prev), 1e-9) * 0.6
+            dir_ = dir_ - n * n.dot(dir_)
+            if np.linalg.norm(dir_) < 1e-6:
+                return np.array(path), True
+            t = dir_
+        q, n, mi = surf(path[-1] + t / np.linalg.norm(t) * 0.008)
+        if mi not in red:                                # Ni dientes ni aberturas: se frena antes
+            return np.array(path), False
+        run += np.linalg.norm(q - path[-1])
+        path.append(q)
+    return np.array(path), False
+
+
+def ss(a_, b_, x):
+    t = np.clip((x - a_) / (b_ - a_), 0, 1)
+    return t * t * (3 - 2 * t)
+
+
+ue_rng = np.random.default_rng(SEED + 31)
+long_rng = np.random.default_rng(SEED + 41)
+for (xa, xb), drips in UNDER_EYES:
+    xs = np.linspace(xa, xb, 24)
+    rims = [rim_point(x, -0.22 if (xb - xa) < 0.12 else -0.1) for x in xs]   # La nariz: debajo de los ojos
+    ok = [r_ is not None for r_ in rims]
+    xs = xs[ok]
+    rim_z = np.array([r_[2] for r_ in rims if r_ is not None])
+    gap = float(np.median([planet(r_[None])[0] - relief(r_[None])[0] for r_ in rims if r_ is not None]))
+    dx = np.array(sorted(d[0] for d in drips))
+    nose = (xb - xa) < 0.12
+    depth = 0.032 if nose else 0.068                     # Cuánto baja la capa (como en el mentón: una capa de verdad)
+    arch_h = ue_rng.uniform(0.012, 0.042, len(dx) + 1) * (0.55 if nose else 1.0)   # Arcos de alturas bien distintas
+
+    def rim_at(x):
+        return np.interp(x, xs, rim_z)
+
+    inner_a = inner_b = False                            # (El rincón de adentro se afina de a poco, ver más abajo)
+
+    def edge_at(x):
+        """Borde de abajo de la capa: baja en cada reguero y sube en un arco de media luna entre uno y otro."""
+        pts_x = np.r_[xa, dx, xb]
+        # Hacia el rincón de adentro (lado de la nariz) la capa sigue llena hasta la pared negra; afuera se afina
+        pts_d = np.r_[depth * (0.75 if inner_a else 0.35), np.full(len(dx), depth), depth * (0.75 if inner_b else 0.35)]
+        i = np.clip(np.searchsorted(pts_x, x) - 1, 0, len(pts_x) - 2)
+        t = np.clip((x - pts_x[i]) / (pts_x[i + 1] - pts_x[i]), 0, 1)
+        d_ = pts_d[i] + (pts_d[i + 1] - pts_d[i]) * t - arch_h[np.minimum(i, len(arch_h) - 1)] * np.sin(math.pi * t) ** 0.8
+        # Tramo del rincón de adentro: el borde sube redondo (un cuarto de círculo) hasta la pared, sin punta
+        last = len(pts_x) - 2
+        if inner_b:
+            d_ = np.where(i == last, depth * np.sqrt(np.clip(1 - t ** 2, 0, 1)), d_)
+        if inner_a:
+            d_ = np.where(i == 0, depth * np.sqrt(np.clip(1 - (1 - t) ** 2, 0, 1)), d_)
+        return rim_at(x) - np.maximum(d_, 0.004)
+
+    # Regueros: arrancan donde se juntan los arcos y siguen la cara para abajo
+    rivs, pend, strands = [], [], []
+    # Además, en la punta de afuera de cada ojo, un reguero mucho más largo que sigue la curva del pómulo casi hasta
+    # los dientes (con su
+    # propio azar, así los demás no cambian)
+    extra = {-0.44: [(-0.425, 0.36)], 0.13: [(0.425, 0.33)]}.get(round(xa, 2), [])
+    # Recorrido de los largos (de frente, x y z): bajan por el frente del pómulo, rodean su borde de abajo hacia
+    # adentro (donde el pómulo se termina no hay hueso) y siguen por la cara hasta casi los dientes
+    # (pasan por fuera y por debajo de los otros regueros, sin tocarlos)
+    GUIDE = {-0.425: [(-0.425, None), (-0.42, -0.31), (-0.405, -0.355), (-0.37, -0.39), (-0.335, -0.415),
+                      (-0.3, -0.45), (-0.276, -0.495), (-0.26, -0.545), (-0.252, -0.585), (-0.248, -0.615)],
+             0.425: [(0.425, None), (0.418, -0.31), (0.402, -0.355), (0.365, -0.39), (0.325, -0.415),
+                     (0.292, -0.45), (0.276, -0.5), (0.262, -0.55), (0.252, -0.6)]}
+    for x0, L in list(drips) + extra:
+        rng_ = ue_rng if (x0, L) in drips else long_rng
+        q, n = on_face(x0, float(edge_at(np.array([x0]))[0]) + 0.02)   # Desde adentro de la capa
+        if q is None:
+            continue
+        if x0 in GUIDE:                                  # Por el recorrido, pegado al hueso
+            g = [(gx, q[2] if gz is None else gz) for gx, gz in GUIDE[x0]]
+            pts_ = []
+            for (ax, az), (bx, bz) in zip(g, g[1:]):
+                n_ = max(2, int(math.hypot(bx - ax, bz - az) / 0.006))
+                for k in range(n_):
+                    t_ = k / n_
+                    hq, _ = on_face(ax + (bx - ax) * t_, az + (bz - az) * t_)
+                    if hq is not None:
+                        pts_.append(hq)
+            path, hangs = np.array(pts_), False
+        else:
+            path, hangs = walk_down(q, n, L, stick=L > 0.2)
+        seg = np.r_[0, np.cumsum(np.linalg.norm(np.diff(path, axis=0), axis=1))]
+        u = seg / max(seg[-1], 1e-6)
+        ph_ = rng_.uniform(0, math.tau)
+        # Igual que los regueros del mentón: el mismo alto y ancho, engordan y se angostan al bajar y abajo se
+        # juntan en la cabeza gorda donde se frenaron
+        wob = 1 + 0.12 * np.sin(seg * 40 + ph_)          # Apenas desparejo (sin estrangularse)
+        k_ = (0.34 if nose else 0.85) * rng_.uniform(0.9, 1.1)   # Cada uno con su grosor; los de la nariz, finos
+        top_k = 0.65 if nose else 1.4                    # La cabeza de abajo (en la nariz, más chica)
+        head = ss(0.7, 1.0, u)
+        hh_ = 0.01 * (k_ + (top_k - k_) * head) * wob
+        ww_ = 0.016 * (k_ + (top_k - k_) * head) * wob
+        rivs.append((path, hh_, ww_))
+    allp = np.vstack([r_[0] for r_ in rivs] + [np.array([[xa, -0.9, rim_z.max()], [xb, -0.9, rim_z.min()]])])
+    low_z = min([allp[:, 2].min()] + [b_[2] for _, b_, _ in strands])
+    lo = np.array([xa - 0.04, -1.05, low_z - 0.07])
+    hi = np.array([xb + 0.04, -0.55, rim_z.max() + 0.04])
+    axes = [np.arange(lo[i], hi[i] + UE_H, UE_H) for i in range(3)]
+    F_ = np.empty([len(x) for x in axes])
+    gy, gz = np.meshgrid(axes[1], axes[2], indexing="ij")
+    for i, x in enumerate(axes[0]):
+        P = np.stack([np.full(gy.size, x), gy.ravel(), gz.ravel()], axis=1)
+        dp = planet(P) - relief(P) - gap
+        z = P[:, 2]
+        xx = np.full(len(P), x)
+        edge = edge_at(xx)
+        fade = min(0.03, (xb - xa) / 5)                  # Las puntas de la capa se afinan (no la del rincón)
+        inner_side = (not nose) and abs(xb) < abs(xa)
+        # Hacia el rincón de adentro (lado de la nariz) la capa se afina de a poco hasta desaparecer: un poco de
+        # líquido sale también de ahí, sin gota y sin cortarse de golpe
+        in_fade = 0.06
+        fa_ = (x - xa) / (in_fade if (not nose and abs(xa) < abs(xb)) else fade)
+        fb_ = (xb - x) / (in_fade if (not nose and abs(xb) < abs(xa)) else fade)
+        side = float(np.clip(min(fa_, fb_), 0, 1))
+        # Capa: chata y fina, con el borde de abajo engordado (tensión) y sin pasar del borde de la órbita
+        # El borde de abajo redondeado como una gota que se junta (sin escalón): sube suave desde cero
+        rim_t = 0.006 + 0.005 * np.exp(-((z - edge - 0.01) / 0.009) ** 2)
+        lip = np.sqrt(np.clip((z - edge) / 0.012, 0, 1))
+        inside_rim = 1.0 if nose else ss(-0.6, -0.7, P[:, 1])   # Sale de adentro de la órbita: sigue por su piso
+        top_ = 0.03 if nose else 0.09
+        th = rim_t * lip * ss(rim_at(xx) + top_, rim_at(xx) + top_ - 0.02, z) * inside_rim * side
+        for path, hh, ww in rivs:                        # Regueros chatos y anchos, con los bordes apoyados
+            best = np.full(len(P), 9.0)
+            hb, wb = np.zeros(len(P)), np.ones(len(P))
+            for j in range(len(path) - 1):
+                a_, b_ = path[j], path[j + 1]
+                ba = b_ - a_
+                h_ = np.clip((P - a_) @ ba / max(ba @ ba, 1e-12), 0, 1)
+                dd = np.linalg.norm(P - a_ - h_[:, None] * ba, axis=1)
+                mk = dd < best
+                best[mk] = dd[mk]
+                hb[mk] = hh[j] + (hh[j + 1] - hh[j]) * h_[mk]
+                wb[mk] = ww[j] + (ww[j + 1] - ww[j]) * h_[mk]
+            th = np.maximum(th, hb * np.sqrt(np.clip(1 - (best / wb) ** 2, 0, 1)))   # Redondo, lleno
+        film = np.where(th > 0.0012, np.maximum(dp - th, -dp - 0.03), 1.0)
+        d_ = np.full(len(P), 9.0)
+        for a_, b_, rs in strands:                       # Hilo que cuelga: se afina al medio, gota pesada abajo
+            ba = b_ - a_
+            h_ = np.clip((P - a_) @ ba / (ba @ ba), 0, 1)
+            rad = rs * (1.0 - 0.35 * np.sin(math.pi * h_))
+            d_ = np.minimum(d_, smin(np.linalg.norm(P - a_ - h_[:, None] * ba, axis=1) - rad,
+                                     np.linalg.norm(((P - b_) / np.array([1, 1, 1.3])), axis=1) - rs * 2.0, rs * 1.5))
+        for c, rp in pend:                               # La bola de abajo del reguero (redonda, un poco chata)
+            q_ = (P - c) / np.array([1.0, 1.0, 1.15])
+            d_ = np.minimum(d_, np.linalg.norm(q_, axis=1) - rp)
+        F_[i] = smin(film, d_, 0.01).reshape(gy.shape)
+    v_, q_ = surface_nets(F_, lo, UE_H)
+    tf.extend((q_ + len(tv)).tolist())
+    tv.extend(v_.tolist())
+    print("SANGRE OJO: %d regueros" % len(rivs))
+tme = bpy.data.meshes.new("HW_Eye_Blood")
+tme.from_pydata((np.array(tv) * R).tolist(), [], tf)
+tme.validate()
+tears_ob = bpy.data.objects.new("HW_Eye_Blood", tme)
+zones.objects.link(tears_ob)
+tears_ob.parent = ROOT
+sm_ = tears_ob.modifiers.new("Smooth", "SMOOTH")
+sm_.factor, sm_.iterations = 0.5, 3              # Poco: si no, los regueros se hunden
+dm_ = tears_ob.modifiers.new("Decimate", "DECIMATE")
+dm_.ratio = min(1.0, 24000 / (2 * max(len(tf), 1)))   # Sin achicar de más: queda liso, no a bloques
+dg_ = bpy.context.evaluated_depsgraph_get()
+low_ = bpy.data.meshes.new_from_object(tears_ob.evaluated_get(dg_))
+tears_ob.modifiers.clear()
+tears_ob.data = low_
+bpy.data.meshes.remove(tme)
+tme = low_
+tme.name = "HW_Eye_Blood"
+tme.materials.append(BLOOD)
+tme.polygons.foreach_set("use_smooth", np.ones(len(tme.polygons), bool))
+tme.calc_loop_triangles()
+print("TRIS %-18s %6d" % (tears_ob.name, len(tme.loop_triangles)))
 # Brujas sentadas en las curvas, felices, mirando hacia adelante (hacia quien mira)
 for seat_pt, twist in seats:
     put("SitHappy", Vector(seat_pt * R) + Vector((0, 0, 0.018 * R)), math.degrees(twist), SWING_WITCH_SCALE)
