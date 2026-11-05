@@ -41,7 +41,7 @@ fn la_proximidad_conserva_la_identidad_y_el_minijuego_en_las_nuevas_orbitas() {
         let reached = &system.planets[index].config;
         assert_eq!(reached.id, id);
         // Each connected planet dispatches by its own identity.
-        let expected = if matches!(id, "southpark" | "smilingfriends" | "minecraft") { Some(id) } else { None };
+        let expected = if matches!(id, "southpark" | "smilingfriends" | "minecraft" | "starwars") { Some(id) } else { None };
         assert_eq!(reached.minigame.as_deref(), expected, "{id}");
         assert!(reached.model.as_deref().unwrap().contains(&format!("/planets/{id}/")));
     }

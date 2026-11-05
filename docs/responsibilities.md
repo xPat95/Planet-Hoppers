@@ -9,7 +9,7 @@
 | Cami | Smiling Friends | Pim y Charlie | Hacer reír a personajes eligiendo chistes | `src/minigames/smilingfriends/` |
 | Cami | Halloween | Ghost Face | Escapar de personajes de terror | `src/minigames/halloween/` |
 | Norman | Un Show Más (Regular Show) | Pendientes de definir | Shooter en primera persona con raycasting: disparar a enemigos y acumular puntos | `src/minigames/regularshow/` |
-| Norman | Star Wars | Baby Yoda | Minijuego estilo Galaga, sin raycasting | `src/minigames/starwars/` |
+| Norman | Star Wars | Baby Yoda | Vuelo libre por el túnel y ataque al reactor, sin raycasting | `src/minigames/starwars/` |
 
 Cada integrante desarrollará las reglas, escenarios y condiciones de resultado de sus dos minijuegos. Sus recursos se ubicarán en las carpetas correspondientes de `assets/`, y cada minijuego comunicará su resultado al sistema compartido de progreso. La nave y los personajes de abducción de Un Show Más están pendientes de definir; no se han decidido enemigos ni modelos.
 

@@ -1,0 +1,57 @@
+[
+  {
+    "path": "audios/cancion_fondo_em.mp3",
+    "bytes": 5312661,
+    "sha256": "7a46da20613491d31a4f516e142ae4f63a17c45f3206fa5c6a750497de16469a"
+  },
+  {
+    "path": "fonts/TitilliumWeb-Bold.ttf",
+    "bytes": 59884,
+    "sha256": "e2e8e1812041e2c5868f1d03ac24994312052c5381cca2e80748f08cb7e13093"
+  },
+  {
+    "path": "fonts/TitilliumWeb-OFL.txt",
+    "bytes": 4523,
+    "sha256": "c0562e066174197902a4a10606673d189f067970ef89c6013943b9cf182aadbc"
+  },
+  {
+    "path": "videos/final.json",
+    "bytes": 225,
+    "sha256": "97b18cf4e6b150f7cd44fb67b181fcc1597dbdc0b04d4f2c20276770c29850aa"
+  },
+  {
+    "path": "videos/final.ogg",
+    "bytes": 794924,
+    "sha256": "5b5a9bb79efe8afd8673b8c65f9cf1ef47dfd0e6db5438cab31a818ab892aaa9"
+  },
+  {
+    "path": "videos/final.sfv",
+    "bytes": 54495122,
+    "sha256": "f6bca612df93e20cadc4ef7ab73a5146fb0b13c9a475536ea244a5b5f7f9db45"
+  },
+  {
+    "path": "videos/final_video1_em.mp4",
+    "bytes": 74050373,
+    "sha256": "1da33d55a3b1dc38473d1d897dd94f4f1c18ac5c157bb07e7c5e4935a174757d"
+  },
+  {
+    "path": "videos/inicio.json",
+    "bytes": 226,
+    "sha256": "eb92f6f3db8b131f6a6a1c21ff790dbdb00f46000a884c1a65f1b7831c72b876"
+  },
+  {
+    "path": "videos/inicio.ogg",
+    "bytes": 338398,
+    "sha256": "95316375d1d6a460da2df2b23ef35e01d89d1032833beec8e3072a358e4ecb1d"
+  },
+  {
+    "path": "videos/inicio.sfv",
+    "bytes": 22290560,
+    "sha256": "54893b042eb63a6a384e77fdc1f84651d00f15478d93634d1447b8c549773621"
+  },
+  {
+    "path": "videos/Inicio_video1_em.mp4",
+    "bytes": 36576418,
+    "sha256": "d4eeca5082222297417c60743478bba01b5b503a02eaab5ddbd34f2f76860bd6"
+  }
+]

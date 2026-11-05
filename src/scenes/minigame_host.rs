@@ -20,6 +20,22 @@ pub fn run(
         "southpark" => southpark_dev::run_visit_with_args(&mut visits.southpark, args),
         "smilingfriends" => smilingfriends_entry::run(args),
         "minecraft" => minecraft_rush::run_visit_with_state(args.collect(), &mut visits.minecraft),
+        "starwars" => Err("Star Wars requiere la nave activa; usar run_with_ship".into()),
         _ => Err(format!("Minijuego no implementado: {id}").into()),
+    }
+}
+
+/// Only CPU metadata crosses the window boundary. Never pass a GPU Model here.
+pub fn run_with_ship(
+    id: &str,
+    visits: &mut MinigameVisits,
+    selected: &crate::ships::ShipModel,
+    root: &std::path::Path,
+    args: impl Iterator<Item = String>,
+) -> Result<MinigameExit, Box<dyn std::error::Error>> {
+    if id == "starwars" {
+        crate::minigames::starwars::run(root, selected, args)
+    } else {
+        run(id, visits, args)
     }
 }

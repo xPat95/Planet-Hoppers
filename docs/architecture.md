@@ -54,7 +54,7 @@ Los directorios de modelos de planetas, naves y personajes usan los mismos ident
 | `src/minigames/smilingfriends/` | Elección de chistes para hacer reír a los personajes. |
 | `src/minigames/halloween/` | Escape de personajes de terror. |
 | `src/minigames/regularshow/` | Shooter en primera persona con raycasting, ambientado en Un Show Más: disparar a enemigos y acumular puntos. |
-| `src/minigames/starwars/` | Minijuego estilo Galaga, sin raycasting. |
+| `src/minigames/starwars/` | Vuelo libre por el túnel y ataque al reactor, sin raycasting. |
 | `src/gameplay/` | Registrar misiones completadas y tokens únicos, coordinar desbloqueos con `src/ships/` sin duplicar recompensas y habilitar el final con seis tokens. Gestionar victoria, derrota y reintentos. |
 | `src/ui/` | Presentar menús, botones, indicadores y HUD; mostrar las seis naves en la estación y sus estados de bloqueo y desbloqueo. Comunicar acciones sin administrar progreso ni nave activa. |
 

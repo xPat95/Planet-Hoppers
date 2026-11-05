@@ -14,7 +14,7 @@ use std::path::Path;
 pub struct ShipModel {
     pub id: String,
     pub name: String,
-    /// GLB relativo a la raíz del repositorio.
+    /// GLB u OBJ relativo a la raíz del repositorio.
     pub model: String,
     /// Largo en el juego (el modelo se escala a esto).
     pub length: f32,

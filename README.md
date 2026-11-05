@@ -15,7 +15,7 @@ Desarrollar una experiencia que integre modelado 3D, navegación, órbitas, rota
 3. **Animación inicial:** la nave elegida abduce mediante un haz de luz a los personajes de su franquicia.
 4. **Sistema solar:** aparición en un entorno 3D con un sol central, seis planetas con órbitas y rotación propia y una estación espacial interactiva.
 5. **Exploración:** pilotaje libre para acercarse a cada planeta o entrar al hangar de la estación espacial. Allí se puede cambiar voluntariamente entre naves desbloqueadas.
-6. **Misiones:** un botón de visita aparece por proximidad y permite iniciar el minijuego del planeta. Predominarán el raycasting y la exploración en primera persona; Star Wars será un minijuego estilo Galaga sin raycasting.
+6. **Misiones:** un botón de visita aparece por proximidad y permite iniciar el minijuego del planeta. Predominarán el raycasting y la exploración en primera persona; Star Wars incluye un recorrido de vuelo libre por el túnel de la Estrella de la Muerte, sin raycasting.
 7. **Recompensas:** la primera victoria de cada minijuego entrega su token y desbloquea la nave de la franquicia si seguía bloqueada. Solo un nuevo desbloqueo activa su animación de abducción. El regreso al sistema solar conserva la nave usada antes de entrar al minijuego. Perder permite regresar y reintentar sin obtener recompensas.
 8. **Final desbloqueable:** reunir los seis tokens habilita terminar el juego independientemente de la nave activa; el sol se transforma en un agujero negro que absorbe los planetas y la nave.
 9. **Animación final:** devolución de los personajes abducidos a su lugar de origen.
@@ -39,7 +39,7 @@ Por ejemplo, al empezar con South Park y ganar Halloween, se recibe el token de 
 | Smiling Friends | Pim y Charlie | Hacer reír a personajes eligiendo chistes | Cami |
 | Halloween | Ghost Face | Escapar de personajes de terror | Cami |
 | Un Show Más (Regular Show) | Mordecai y Rigby | Shooter en primera persona con raycasting: disparar a enemigos y acumular puntos | Norman |
-| Star Wars | Grogu (Baby Yoda) | Minijuego estilo Galaga, sin raycasting | Norman |
+| Star Wars | Grogu (Baby Yoda) | Vuelo libre por el túnel y ataque al reactor, sin raycasting | Norman |
 
 La nave de Un Show Más es el carrito de golf con alas de cartón; sus personajes son Mordecai y Rigby. Los recursos están modelados; los enemigos y la implementación del minijuego siguen pendientes. Su identificador interno es `regularshow` y seguirá las mismas reglas de tokens, desbloqueo y abducción que las demás franquicias.
 
@@ -203,3 +203,12 @@ Los siguientes modelos son naves, independientes de los planetas. Los controles,
 ## Estación espacial disponible como recurso
 
 La [Ciudadela de Mass Effect](assets/models/environment/spaceStation/README.md) es el modelo aprobado de la estación compartida: fuente Blender editable, GLB cercano y lejano, OBJ/MTL y vistas de revisión. Su colocación en el sistema solar, las colisiones, el hangar y la selección de naves siguen pendientes de implementación.
+
+
+## Star Wars integrado: Asalto al núcleo
+
+El planeta Star Wars abre el nivel del túnel usando la **misma nave activa del sistema solar**, con sus materiales y proporciones. Su tamaño se adapta al recorrido y la integridad usa los límites del modelo ajustado, incluida su inclinación. Al terminar el video final se vuelve al sistema solar con la selección conservada. Esc regresa al sistema solar; tras una derrota registra el resultado correspondiente.
+
+El nivel conserva video inicial -> menú -> vuelo, canción de fondo, cuatro ataques desde popa, las seis familias industriales y las dos compuertas finales con tres paneles rompibles por compuerta.
+
+Ejecutar el juego completo: `cargo run --release`. Aproximarse al planeta Star Wars y explorar con E/Enter. Acceso de desarrollo: `cargo run --release --bin starwars -- --ship starwars` (también acepta las otras identidades de selección). Detalles, controles y comprobaciones en [docs/minigames/starwars.md](docs/minigames/starwars.md).

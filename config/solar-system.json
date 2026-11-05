@@ -32,7 +32,7 @@
       "color": "#8a8f98",
       "model": "assets/models/planets/starwars/exports/starwars_death_star_planet_near.glb",
       "model_far": "assets/models/planets/starwars/exports/starwars_death_star_planet_far.glb",
-      "minigame": null
+      "minigame": "starwars"
     },
     {
       "id": "smilingfriends",

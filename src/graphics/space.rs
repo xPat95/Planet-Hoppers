@@ -263,7 +263,21 @@ impl SpaceModel {
         rotation_degrees: [f32; 3],
         fit: Fit,
     ) -> Result<Self, Box<dyn std::error::Error>> {
-        let gltf = glb_document(path)?;
+        // Blender packages include a prepared near GLB beside their authoring OBJ.
+        // Prefer that runtime export: same asset identity/materials, without repeatedly
+        // parsing the large text mesh. The normal GLB path stays unchanged.
+        if path.extension().is_some_and(|e| e.eq_ignore_ascii_case("obj")) {
+            if let Some(stem)=path.file_stem().and_then(|s|s.to_str()) {
+                let prepared=path.with_file_name(format!("{stem}_near.glb"));
+                if prepared.is_file() {
+                    return Self::load(rl,thread,&prepared,shader,rotation_degrees,fit);
+                }
+            }
+        }
+        // Small OBJ files without a prepared export retain Raylib's MTL/texture loader.
+        let gltf = if path.extension().is_some_and(|e| e.eq_ignore_ascii_case("obj")) {
+            serde_json::json!({})
+        } else { glb_document(path)? };
         let bytes = std::fs::read(path)?;
         let mut model = rl
             .load_model(thread, path.to_str().ok_or("Ruta de modelo inválida")?)

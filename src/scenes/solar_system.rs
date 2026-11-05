@@ -104,6 +104,7 @@ struct Session {
     returning_from: Option<usize>,
     return_pose: Option<PlanetReturnPose>,
     minecraft_smoke: bool,
+    starwars_smoke: bool,
     /// Prueba de ida y vuelta a un minijuego (--smoke-visit): cuántas visitas van.
     visit_smoke: Option<u32>,
 }
@@ -183,6 +184,7 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
     let mut smoke = false;
     let mut visit_smoke = false;
     let mut minecraft_smoke = false;
+    let mut starwars_smoke = false;
     let mut return_smoke = false;
     let mut launch_smoke = false;
     let mut station_smoke = false;
@@ -198,6 +200,7 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
             "--debug-collisions" => collision_debug = true,
             "--smoke-docking" => { smoke = true; docking_smoke = true; }
             "--smoke-returns" => { smoke = true; visit_smoke = true; return_smoke = true; }
+            "--smoke-starwars" => { smoke=true;visit_smoke=true;starwars_smoke=true; }
             "--smoke-minecraft" => { smoke = true; visit_smoke = true; minecraft_smoke = true; }
             "--smoke-visit" => {
                 smoke = true;
@@ -212,6 +215,7 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
                 println!("Nave:\n{HELP_SHIP}\nVista general:\n{HELP_OVERVIEW}");
                 println!("--smoke: recorrido automático sin ventana visible; guarda capturas en target/solarsystem/");
                 println!("--smoke-visit: ida y vuelta a South Park (con su prueba de entrada) y captura al volver");
+                println!("--smoke-starwars: visita al túnel con la nave activa y regreso al sistema solar");
                 println!("--smoke-minecraft: dos visitas a la aldea y Diamond Rush, regreso confirmado y misma nave");
                 println!("--smoke-returns: victoria, derrota, pausa/reinicio/abandono y cuatro visitas a South Park");
                 println!("--smoke-station: estación fija, aproximación y controles de ascenso/piloto");
@@ -262,6 +266,7 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
         returning_from: None,
         return_pose: None,
         minecraft_smoke,
+        starwars_smoke,
         visit_smoke: visit_smoke.then_some(0),
     };
     loop {
@@ -311,7 +316,9 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
                 // La ventana del sistema solar ya se cerró: el minijuego abre la suya
                 let planet = &session.system.planets[i].config;
                 let id = planet.minigame.clone().ok_or("El planeta no tiene minijuego")?;
-                let args = if session.minecraft_smoke {
+                let args = if session.starwars_smoke {
+                    vec!["--smoke-hidden".into()]
+                } else if session.minecraft_smoke {
                     vec!["--smoke-host".into(), "--capture-dir".into(), root.join(format!("target/minecraft-host-{}", session.visit_smoke.unwrap())).to_string_lossy().into_owned()]
                 } else if session.return_smoke {
                     let goal = ["victory", "defeat", "abandoned", "abandoned"][session.visit_smoke.unwrap() as usize];
@@ -320,8 +327,9 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
                     session.visit_smoke.map(|_| "--smoke-entry".to_string()).into_iter().collect()
                 };
                 let ship_index = session.ship_index;
+                let selected_ship=session.ships.ships[ship_index].clone();
                 let orbit_angles: Vec<_> = session.system.planets.iter().map(|p| p.orbit_angle).collect();
-                match minigame_host::run(&id, &mut session.minigames, args.into_iter())? {
+                match minigame_host::run_with_ship(&id, &mut session.minigames, &selected_ship, &root, args.into_iter())? {
                     MinigameExit::WindowClosed if session.visit_smoke.is_none() => return Ok(session.game),
                     MinigameExit::Returned(result) => {
                         let completion = MinigameCompletion { planet_id: planet.id.clone(), minigame_id: id, result };
@@ -330,7 +338,7 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
                     }
                     _ => {}
                 }
-                if (session.return_smoke || session.minecraft_smoke) && (session.ship_index != ship_index
+                if (session.return_smoke || session.minecraft_smoke || session.starwars_smoke) && (session.ship_index != ship_index
                     || session.system.planets.iter().map(|p| p.orbit_angle).collect::<Vec<_>>() != orbit_angles) {
                     return Err("La visita alteró la nave o las órbitas del anfitrión".into());
                 }
@@ -657,7 +665,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             }
         } else if let Some(visits) = s.visit_smoke {
             // Ida: estacionar junto a South Park y explorar. Vuelta: capturar la nave junto al planeta y salir
-            let destination = if s.minecraft_smoke { s.system.planets.iter().position(|p| p.config.id == "minecraft").unwrap() } else { southpark };
+            let destination = if s.starwars_smoke { s.system.planets.iter().position(|p|p.config.id=="starwars").unwrap() } else if s.minecraft_smoke { s.system.planets.iter().position(|p| p.config.id == "minecraft").unwrap() } else { southpark };
             let total = if s.minecraft_smoke { 2 } else if s.return_smoke { 4 } else { 1 };
             if s.minecraft_smoke {
                 let event = if visits > 0 && frame == 0 || visits < total && frame == 30 { Some(2) }
@@ -698,6 +706,10 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 (_, 61) if visits == total => {
                     if s.return_smoke && s.last_completion.as_ref().map(|c| c.result) != Some(MinigameResult::Abandoned) {
                         return Err("Falta resultado del último regreso".into());
+                    }
+                    if s.starwars_smoke {
+                        if s.last_completion.as_ref().map(|c|(&*c.minigame_id,c.result)) != Some(("starwars",MinigameResult::Victory)) {return Err("No regresó victoria de Star Wars".into());}
+                        println!("STARWARS_HOST_PASS ship={} model={} result=Victory",s.ships.ships[s.ship_index].id,s.ships.ships[s.ship_index].model);
                     }
                     println!("VISIT_SMOKE_PASS visitas={visits}");
                     return Ok(Exit::Quit);
