@@ -14,7 +14,7 @@ Ejecutar `cargo run --release`, elegir una nave y acercarse al planeta Star Wars
 - F11: pantalla completa. F12: captura en `target/starwars/capturas/`.
 - Cerrar la ventana con X mantiene el contrato general de salida del juego principal.
 
-El video final devuelve directamente al sistema solar con Victory, sin pantalla adicional. La canción se limita al vuelo/explosión y respeta la pausa. Se conservan tres barras de integridad, disparos manuales, cuatro ataques desde popa, obstáculos industriales y tres paneles independientes en cada compuerta final.
+El video final devuelve directamente al sistema solar con Victory, sin pantalla adicional. La canción se limita al vuelo/explosión y respeta la pausa. Se conservan tres barras de integridad, disparos manuales, cuatro ataques desde popa, obstáculos industriales y seis discos blindados completos, cada uno con tres paneles independientes. Dos discos aparecen después de la mitad del recorrido (1350 y 1800 m); los cuatro de la aproximación final están en 2130, 2210, 2275 y 2340 m. Los de 2210 y 2340 m se conservan del recorrido anterior. Las posiciones son irregulares pero repetibles para mantener el equilibrio y poder comprobar la ruta.
 
 ## Nave, tamaño y colisión
 

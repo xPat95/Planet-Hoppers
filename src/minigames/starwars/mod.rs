@@ -29,14 +29,19 @@ fn save_capture(rl: &RaylibHandle, path: &Path) {
 fn capture_scene(g: &mut Game, stage: usize) {
     g.start();
     if stage >= 14 {
-        if stage >= 27 {
+        if stage >= 29 {
+            g.distance = BULKHEADS[[0, 1, 2, 4][stage - 29]].0 - 30.0;
+        } else if stage >= 27 {
             g.distance = if stage == 27 { 2180.0 } else { 2310.0 };
         } else if stage == 26 {
             g.distance = 2185.0;
             g.pos = [-3.0, 2.0];
             g.camera = g.pos;
             for o in &mut g.obstacles {
-                if o.group == 26 && o.material == simulation::Material::Cargo && o.pos[0] == -3.0 {
+                if o.pos[2] == 2210.0
+                    && o.material == simulation::Material::Cargo
+                    && o.pos[0] == -3.0
+                {
                     o.hp = 0;
                 }
             }
@@ -337,6 +342,10 @@ pub fn run(
         "27_compuerta_abierta.png",
         "28_compuerta_tres_paneles.png",
         "29_compuerta_final_tres_paneles.png",
+        "30_disco_1350.png",
+        "31_disco_1800.png",
+        "32_disco_2130.png",
+        "33_disco_2275.png",
     ];
     let mut menu_frames = 0;
     let mut previous_phase = game.phase;

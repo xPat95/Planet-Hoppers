@@ -209,6 +209,6 @@ La [Ciudadela de Mass Effect](assets/models/environment/spaceStation/README.md) 
 
 El planeta Star Wars abre el nivel del túnel usando la **misma nave activa del sistema solar**, con sus materiales y proporciones. Su tamaño se adapta al recorrido y la integridad usa los límites del modelo ajustado, incluida su inclinación. Al terminar el video final se vuelve al sistema solar con la selección conservada. Esc regresa al sistema solar; tras una derrota registra el resultado correspondiente.
 
-El nivel conserva video inicial -> menú -> vuelo, canción de fondo, cuatro ataques desde popa, las seis familias industriales y las dos compuertas finales con tres paneles rompibles por compuerta.
+El nivel conserva video inicial -> menú -> vuelo, canción de fondo, cuatro ataques desde popa, las seis familias industriales y seis discos blindados completos con tres paneles rompibles por disco: dos después de la mitad del recorrido y cuatro en la aproximación final.
 
 Ejecutar el juego completo: `cargo run --release`. Aproximarse al planeta Star Wars y explorar con E/Enter. Acceso de desarrollo: `cargo run --release --bin starwars -- --ship starwars` (también acepta las otras identidades de selección). Detalles, controles y comprobaciones en [docs/minigames/starwars.md](docs/minigames/starwars.md).

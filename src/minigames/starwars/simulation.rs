@@ -6,6 +6,16 @@ pub const SHIP_HALF: [f32; 3] = [1.0, 0.48, 1.5];
 pub const REACTOR_Z: f32 = 2500.0;
 pub const ATTACK_Z: f32 = REACTOR_Z - 66.0;
 pub const CORE_RADIUS: f32 = 2.15;
+// Full steel bulkheads, each with independently breakable passage panels.
+// Irregular but repeatable placement: two after halfway, four in the final approach.
+pub const BULKHEADS: [(f32, f32, f32); 6] = [
+    (1350.0, -3.0, 2.0),
+    (1800.0, 3.0, -2.0),
+    (2130.0, 3.0, 2.0),
+    (2210.0, -3.0, 2.0),
+    (2275.0, -3.0, -2.0),
+    (2340.0, 3.0, -2.0),
+];
 pub const REAR_ENCOUNTERS: [f32; 4] = [420.0, 930.0, 1440.0, 1940.0];
 pub const REAR_WARNING: f32 = 1.65;
 pub const REAR_FLIGHT: f32 = 0.55;
@@ -355,10 +365,7 @@ fn route() -> Vec<Obstacle> {
         }
     }
     // Subtract all three shoot-through openings from each steel bulkhead.
-    for (index, (z, x, y)) in [(2210.0, -3.0, 2.0), (2340.0, 3.0, -2.0)]
-        .into_iter()
-        .enumerate()
-    {
+    for (index, (z, x, y)) in BULKHEADS.into_iter().enumerate() {
         b.group = 26 + index;
         let openings = gate_openings(x, y);
         let mut levels = vec![-11.0, 11.0];
@@ -867,8 +874,76 @@ mod tests {
         assert_eq!(g.phase, Phase::Won);
     }
     #[test]
-    fn each_final_gate_has_three_independent_flyable_breakable_routes() {
-        for group in [26, 27] {
+    fn added_bulkheads_allow_thin_tall_and_wide_hulls_at_both_speeds() {
+        for half in [
+            [0.80, 0.20, 1.435],
+            [0.39, 0.685, 0.85],
+            [0.985, 0.675, 0.64],
+            [0.84, 0.685, 1.01],
+        ] {
+            for boost in [false, true] {
+                let mut g = Game {
+                    ship_half: half,
+                    ..Game::default()
+                };
+                g.start();
+                for _ in 0..120 * 110 {
+                    let mut input = diagnostic_pilot(&g);
+                    input.boost = boost;
+                    let hull = g.hull;
+                    g.update(STEP, input);
+                    if g.hull < hull {
+                        println!(
+                            "DAMAGE half={half:?} boost={boost} z={} pos={:?}",
+                            g.distance, g.pos
+                        );
+                    }
+                    if matches!(g.phase, Phase::Outro | Phase::Lost) {
+                        break;
+                    }
+                }
+                assert_eq!(g.phase, Phase::Outro);
+                assert_eq!(g.hull, 3, "half {half:?} turbo {boost}");
+            }
+        }
+    }
+    #[test]
+    fn six_full_bulkheads_keep_originals_and_add_four_separate_encounters() {
+        let items = route();
+        assert_eq!(BULKHEADS.len(), 6);
+        assert_eq!(
+            BULKHEADS
+                .iter()
+                .filter(|(z, _, _)| *z > REACTOR_Z / 2.0 && *z < 2055.0)
+                .count(),
+            2
+        );
+        for original in [2210.0, 2340.0] {
+            assert!(BULKHEADS.iter().any(|(z, _, _)| *z == original));
+        }
+        for (i, (z, _, _)) in BULKHEADS.iter().enumerate() {
+            let pieces: Vec<_> = items.iter().filter(|o| o.group == 26 + i).collect();
+            assert!(pieces.iter().all(|o| (o.pos[2] - z).abs() < 2.0));
+            // A solid section must still block shots and hull after all panels are broken.
+            let solids: Vec<_> = pieces
+                .iter()
+                .filter(|o| o.material == Material::Armor)
+                .collect();
+            assert!(solids.iter().any(|o| o
+                .hit([7.0, 0.0, z - 5.0], [7.0, 0.0, z + 5.0], [0.06; 3])
+                .is_some()));
+        }
+        assert_eq!(
+            items
+                .iter()
+                .filter(|o| o.group >= 26 && o.material == Material::Cargo)
+                .count(),
+            18
+        );
+    }
+    #[test]
+    fn all_six_bulkheads_have_independent_flyable_breakable_routes() {
+        for group in 26..26 + BULKHEADS.len() {
             let gate: Vec<_> = route().into_iter().filter(|o| o.group == group).collect();
             let panels: Vec<_> = gate
                 .iter()
