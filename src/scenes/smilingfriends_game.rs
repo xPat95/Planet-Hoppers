@@ -599,6 +599,9 @@ pub fn play_with_results(rl: &mut RaylibHandle, thread: &RaylibThread, root: &Pa
         // --- Entrada ---------------------------------------------------------------------------------------
         let mouse = rl.get_mouse_position();
         let click = rl.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_LEFT);
+        if click && exit_button(w, h).check_collision_point_rec(mouse) && !smoke {
+            return Ok(Some(MinigameResult::Abandoned));
+        }
         let next = click || rl.is_key_pressed(KeyboardKey::KEY_ENTER) || rl.is_key_pressed(KeyboardKey::KEY_SPACE);
         if rl.is_key_pressed(KeyboardKey::KEY_ESCAPE) && !smoke {
             return Ok(Some(MinigameResult::Abandoned));
@@ -890,6 +893,7 @@ pub fn play_with_results(rl: &mut RaylibHandle, thread: &RaylibThread, root: &Pa
             d.draw_text_ex(&body, hint, Vector2::new(w * 0.93 - m.x - 40.0, h * 0.96 - 46.0), 24.0, 1.0, ORANGE);
         }
         // Capturas de la prueba automática
+        draw_exit_button(&mut d, &title, exit_button(w, h), mouse);
         if smoke {
             let want = match (game.step, scene) {
                 (Step::Boss { line: 1 }, _) if step_time > 1.0 => Some("boss.png"),
@@ -921,6 +925,25 @@ pub fn play_with_results(rl: &mut RaylibHandle, thread: &RaylibThread, root: &Pa
 }
 
 /// Tarjetas de respuesta, a la derecha.
+fn exit_button_width(w: f32) -> f32 {
+    (w * 0.16).clamp(112.0, 170.0)
+}
+
+fn exit_button(w: f32, h: f32) -> Rectangle {
+    let width = exit_button_width(w);
+    Rectangle::new(w - width - 22.0, (h * 0.027).max(14.0), width, 52.0)
+}
+
+fn draw_exit_button(d: &mut RaylibDrawHandle, title: &Font, r: Rectangle, mouse: Vector2) {
+    let hover = r.check_collision_point_rec(mouse);
+    panel(d, r, if hover { YELLOW } else { PAPER }, if hover { -2.0 } else { -1.0 });
+    let label = "SALIR";
+    let size = 27.0;
+    let m = title.measure_text(label, size, 1.0);
+    d.draw_text_pro(title, label, Vector2::new(r.x + r.width * 0.5, r.y + r.height * 0.5),
+                    m * 0.5, if hover { -2.0 } else { -1.0 }, size, 1.0, INK);
+}
+
 fn choice_cards(w: f32, h: f32, game: &Game) -> Vec<Rectangle> {
     let n = match game.step {
         Step::Prompt { encounter, round } => game.dialogue.encounters[encounter].rounds[round].choices.len(),
@@ -1214,7 +1237,7 @@ fn hud(d: &mut RaylibDrawHandle, title: &Font, body: &Font, game: &Game, meter: 
     // Contador: un círculo por escena; cada escena terminada pone una carita sonriente que cae como un sello
     let n_enc = game.dialogue.encounters.len();
     for k in 0..n_enc {
-        let c = Vector2::new(w - 40.0 - (n_enc - 1 - k) as f32 * 56.0, 46.0);
+        let c = Vector2::new(w - exit_button_width(w) - 58.0 - (n_enc - 1 - k) as f32 * 56.0, 46.0);
         d.draw_circle_v(c + Vector2::new(4.0, 4.0), 22.0, fade(INK, 0.6));
         d.draw_circle_v(c, 22.0, PAPER);
         if smiles[k] > time {
