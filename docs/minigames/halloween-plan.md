@@ -1,0 +1,60 @@
+# Halloween: bruja de guardia — plan de diseño (borrador)
+
+Estado: **diseño acordado; implementación pendiente**. Este documento recoge la nueva dirección solicitada por Cami para el minijuego. Sustituye la idea antigua de “escapar de personajes de terror” descrita en el borrador anterior; no cambia el diseño visual del planeta ni sus modelos. La grabación aprobada de la canción se adjuntará después.
+
+Decisiones confirmadas: referencia de juego **Magic Cat Academy (2016)**; **escena fija en la frente del planeta, cerca de los diablitos**; la bruja **flota en el centro sobre la escoba**; **dos oleadas**; una criatura que alcanza a la bruja le quita uno de **tres puntos de salud** y la partida continúa; partida completa de **tres minutos como máximo**; tres tipos de criaturas (**diablitos, fantasmas y demonios de parálisis del sueño**), con los últimos entrando en la **segunda oleada**; **modelo 3D actual** de la bruja; introducción en **cada visita, saltable**; final con la fiesta más silenciosa y todos presentes. La bruja comienza con humor seco y se vuelve juguetona. Ghost Face no participa en este minijuego: conserva su papel en la abducción. Cami dispone de una grabación aprobada de “Take On Me”, que adjuntará después.
+
+## Premisa y tono
+
+La protagonista es una bruja espacial de guardia que viaja en escoba y atiende llamadas de otros planetas. Un planeta vecino se queja del ruido que viene de Halloween. Al llegar, descubre que diablitos, fantasmas y demonios de parálisis del sueño están disfrutando de una fiesta. Su encargo es bajar el ruido con hechizos, aunque ella misma se divierte durante el trabajo. Al final la fiesta continúa a un volumen aceptable y todos se quedan.
+
+La identidad visual del planeta sigue siendo una calavera roja inquietante. El minijuego puede contrastar esa superficie oscura con magia brillante y criaturas festivas sin convertir el planeta entero en una decoración infantil.
+
+## Bucle jugable propuesto
+
+1. Llega una llamada/queja. La bruja acepta el encargo y aterriza en la zona de la fiesta.
+2. La escena muestra a la bruja y a varias criaturas que se acercan desde los bordes. Cada criatura lleva un glifo claro y visible.
+3. El jugador mantiene pulsado el botón izquierdo y dibuja el glifo con el ratón o panel táctil. El trazo aparece como magia sobre la pantalla.
+4. Al reconocerlo, un hechizo sale de la bruja hacia una criatura con ese glifo. La criatura se calma y permanece en escena bailando silenciosamente, fuera de la cola de amenazas. Si hay varias iguales, se elige la más cercana a la bruja para que el resultado sea predecible.
+5. La primera oleada usa diablitos y fantasmas para enseñar los glifos y el ritmo. La segunda introduce los demonios de parálisis del sueño y combina los tres tipos, sin exigir dibujos más precisos. La partida completa dura tres minutos como máximo; propuesta de balance: 15–20 segundos de intro saltable, 10 segundos de práctica sin daño, 55–65 segundos por oleada y 10–15 segundos de cierre. Los tiempos se ajustarían tras una prueba jugable.
+6. Si una criatura llega a la bruja, desaparece de la cola de amenazas, quita un punto de salud y se mantiene la partida. A cero puntos, aparece derrota con opciones de reintento o regreso. Un breve período de protección evita perder varios puntos por criaturas superpuestas.
+6. Al terminar, aparece una resolución narrativa y el minijuego devuelve victoria al sistema solar. Derrota, reinicio y abandono seguirían el contrato común de minijuegos.
+
+**Propuesta inicial de glifos:** línea horizontal, línea vertical, V y rayo sencillo. Cada uno debe poder hacerse con un solo trazo. La dificultad viene de elegir y dibujar a tiempo, no de reproducir caligrafía exacta. El conjunto final y las velocidades quedan por decidir. Los demonios de parálisis del sueño serán siluetas negras con ojos neón inquietantes; su diseño detallado se hará después.
+
+## Referencia y viabilidad del dibujo
+
+El [Doodle oficial de Halloween 2016 de Google](https://blog.google/products-and-platforms/products/search/saving-magic-cat-academy-catastrophe/) presenta símbolos sobre fantasmas; el jugador los dibuja para expulsarlos. Se toma como referencia de **lectura y respuesta**, no para copiar su arte, personajes, niveles ni código.
+
+La mecánica es viable en el motor actual. Una primera versión puede guardar los puntos entre presionar y soltar el ratón, descartar gestos demasiado cortos, remuestrear el trazo a un número fijo de puntos, normalizar posición y tamaño, y compararlo con plantillas de los cuatro glifos. Se acepta cierta variación de dirección, tamaño y temblor. Para los glifos simples también se puede usar el orden de puntos de giro; así no se confunde una línea con una V. Se muestra un ejemplo animado antes de la primera ronda y se da respuesta inmediata al fallar, sin gastar una vida por un gesto fallido. Un prototipo de reconocimiento con trazos reales de ratón/panel táctil debe validarse antes de producir las rondas completas. Si esa prueba no resulta cómoda, la alternativa sería trazar glifos grandes que aparecen en pantalla conectando sus puntos con el cursor, conservando la fantasía de dibujar hechizos.
+
+**Accesibilidad por decidir:** sensibilidad del reconocedor, pausa, modo de entrada alternativo y si se admite pantalla táctil. El dibujo necesita una zona segura separada de botones de interfaz para evitar activaciones accidentales.
+
+**Regla de reconocimiento propuesta:** un gesto se evalúa al soltar el botón; se acepta cualquier tamaño y posición dentro del área de dibujo, y ambas direcciones de trazo para líneas y V. Un rayo requiere dos cambios de dirección reconocibles. Un gesto equivocado solo borra el trazo con una indicación suave; no consume salud ni elimina tiempo extra. El jugador puede intentarlo de inmediato. Antes de producir los efectos finales, una prueba con ratón y panel táctil debe confirmar que el reconocimiento acierta con gestos normales y rechaza dibujos claramente distintos.
+
+## Introducción y cierre propuestos
+
+- Una llamada entra mientras la bruja cruza el espacio. La queja del vecino interrumpe la música de la fiesta que se oye de lejos.
+- La bruja mira hacia el planeta calavera y responde con humor seco de “otro turno más”, pero se anima al ver la fiesta.
+- Una transición breve baja a la superficie y enseña el primer glifo sin presión de tiempo.
+- El cierre muestra a los mismos invitados disfrutando la fiesta a un volumen más bajo y al vecino retirando la queja. La bruja queda satisfecha y divertida; el diálogo exacto se escribirá durante el guion.
+
+La intro se reproduce en cada visita y se puede saltar. Al reintentar una partida dentro de la misma visita se vuelve directamente a jugar.
+
+## Arte, audio y técnica
+
+- Reutilizar la bruja/escoba 3D ya existentes en `assets/models/ships/halloween/` cuando sea posible. La cámara fija mira hacia la frente del planeta y mantiene a la bruja flotando en el centro, con espacio despejado en los bordes para ver a las criaturas y sus glifos. La fiesta y los diablitos de la zona dan contexto detrás del área jugable.
+- Reutilizar o adaptar diablitos y otros elementos del planeta, pero mantener los glifos, siluetas y trayectorias legibles. Los fantasmas y cualquier criatura nueva necesitan diseño propio.
+- El trazo mágico debe seguir el cursor con poca latencia. Efectos de éxito: destello del glifo, hechizo hacia el objetivo y reacción de retirada; el brillo no debe ocultar el siguiente símbolo.
+- Música solicitada: **“Take On Me”**. Cami indicó que dispone de una grabación aprobada y la adjuntará más adelante; no está en `assets/audio/` actualmente. La música se conectará cuando esté disponible.
+- Integración prevista: `src/minigames/halloween/`, entrada desde `src/scenes/minigame_host.rs`, resultado `Victory / Defeat / Abandoned`, pausa y regreso al sistema solar conforme a `docs/minigames/host-return.md`. Esta es planificación, no una conexión ya implementada.
+- Verificación futura: reconocimiento con trazos dibujados a distintas velocidades/tamaños, selección de objetivo entre símbolos iguales, borde de zona de dibujo, pausa/reinicio, rendimiento con varias criaturas y regreso al sistema solar.
+
+## Antes de integrar y aceptar la versión jugable
+
+- Cami adjuntará la grabación aprobada de “Take On Me”; hasta entonces, no se puede conectar la canción.
+- Probar el reconocedor con ratón y panel táctil reales y ajustar tolerancia y velocidad. Los valores de 55–65 segundos por oleada son objetivos de diseño, no balance verificado.
+- Diseñar la silueta y los ojos neón de los demonios de parálisis del sueño, y comprobar que se distinguen de los fantasmas sobre la frente roja.
+- Escribir el diálogo breve de llamada y cierre de acuerdo con el humor seco y el desenlace acordados.
+
+Estas respuestas cerrarán el diseño antes de empezar la implementación.

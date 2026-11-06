@@ -37,7 +37,7 @@ Por ejemplo, al empezar con South Park y ganar Halloween, se recibe el token de 
 | Minecraft | Steve | Explorar y encontrar un diamante | Pablo |
 | South Park | Stan, Kyle, Kenny y Cartman | Recorrer South Park y resolver un puzzle relacionado con Kenny | Pablo |
 | Smiling Friends | Pim y Charlie | Hacer reír a personajes eligiendo chistes | Cami |
-| Halloween | Ghost Face | Escapar de personajes de terror | Cami |
+| Halloween | Ghost Face | [Bruja de guardia: calmar una fiesta con hechizos dibujados](docs/minigames/halloween-plan.md) (diseño acordado; implementación pendiente) | Cami |
 | Un Show Más (Regular Show) | Mordecai y Rigby | Shooter en primera persona con raycasting: disparar a enemigos y acumular puntos | Norman |
 | Star Wars | Grogu (Baby Yoda) | Vuelo libre por el túnel y ataque al reactor, sin raycasting | Norman |
 

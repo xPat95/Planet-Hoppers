@@ -176,6 +176,8 @@ No quedan decisiones abiertas para el diseño del planeta de Smiling Friends.
 
 ## 2. Halloween / Horror
 
+**Minijuego actualizado:** la dirección jugable acordada es [Bruja de guardia](minigames/halloween-plan.md), con hechizos dibujados contra el ruido de una fiesta. La mención antigua a escapar de personajes de terror en el párrafo siguiente queda sustituida solo para el minijuego; las pautas visuales del planeta de esta sección siguen vigentes.
+
 Personaje abducido: **Ghost Face**. Minijuego: escapar de personajes de terror. Este planeta es **más simple** que el de Smiling Friends: pocas zonas, modelos repetidos y un rasgo central fuerte. **Tiene que dar terror genuino**, no ser "Halloween bonito": nada de calabazas sonrientes ni colores de dulces.
 
 ### 2.1 Concepto del planeta

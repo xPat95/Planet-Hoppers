@@ -264,6 +264,18 @@ struct Marker {
     angle: f32,
 }
 
+fn planet_fill(id: &str) -> Vector3 {
+    match id {
+        "regularshow" => Vector3::new(0.30, 0.34, 0.34),
+        "southpark" => Vector3::new(0.22, 0.24, 0.26),
+        "minecraft" => Vector3::new(0.18, 0.20, 0.21),
+        "smilingfriends" => Vector3::new(0.16, 0.18, 0.20),
+        "starwars" => Vector3::new(0.09, 0.10, 0.12),
+        "halloween" => Vector3::new(0.08, 0.035, 0.025),
+        _ => Vector3::zero(),
+    }
+}
+
 fn planet_glow_color(id: &str) -> Color {
     match id {
         "starwars" => Color::new(150, 170, 255, 30),
@@ -1493,11 +1505,30 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 }
                 let world = p.orientation() * Matrix::translate(pos.x, pos.y, pos.z);
                 let lod = if to.length() > p.config.radius * FAR_LOD { far.as_ref().or(near.as_ref()) } else { near.as_ref() };
+                shader.set_planet_fill(planet_fill(&p.config.id));
+                shader.set_planet_toon(p.config.id == "smilingfriends");
+                let radius = p.config.radius;
+                match p.config.id.as_str() {
+                    "regularshow" => {
+                        let up = Vector3::up().transform_with(p.orientation());
+                        shader.set_planet_key(pos + up * (radius * 0.75),
+                            Vector4::new(0.85, 0.95, 1.0, 0.38), radius * 1.35, false);
+                    }
+                    "halloween" => {
+                        let sunward = (center - pos).normalized();
+                        shader.set_planet_key(pos + (sunward + Vector3::up() * 0.65).normalized() * (radius * 1.6),
+                            Vector4::new(1.0, 0.45, 0.25, 0.38), radius * 2.0, true);
+                    }
+                    _ => shader.set_planet_key(Vector3::zero(), Vector4::new(0.0, 0.0, 0.0, 0.0), 1.0, false),
+                }
                 match lod {
                     Some(model) => model.draw(&mut d3, &mut shader, world),
                     None => d3.draw_model_ex(&placeholder, pos, Vector3::up(), p.spin_angle.to_degrees(), Vector3::one() * p.config.radius, color(&p.config.color)),
                 }
             }
+            shader.set_planet_fill(Vector3::zero());
+            shader.set_planet_toon(false);
+            shader.set_planet_key(Vector3::zero(), Vector4::new(0.0, 0.0, 0.0, 0.0), 1.0, false);
             let sp = &s.ship;
             let fwd = sp.forward();
             let ship_world = Matrix::rotate_z(sp.bank) * Matrix::rotate_x(sp.pitch) * Matrix::rotate_y(sp.yaw)

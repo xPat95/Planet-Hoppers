@@ -17,6 +17,13 @@ pub struct SpaceShader {
     dissolve: i32,
     roughness: i32,
     studio: i32,
+    planet_fill: i32,
+    planet_key_position: i32,
+    planet_key: i32,
+    planet_key_range: i32,
+    planet_wet: i32,
+    wet_surface: i32,
+    planet_toon: i32,
 }
 
 impl SpaceShader {
@@ -46,9 +53,13 @@ impl SpaceShader {
         if !shader.is_shader_valid() || [light, camera, emissive, ambient, outline, transport].contains(&-1) {
             return Err("El shader del espacio no compiló".into());
         }
-        let (roughness, studio) = (loc("roughness"), loc("studio"));   // Solo en space.fs (-1 en el del hangar)
+        let (roughness, studio, planet_fill) = (loc("roughness"), loc("studio"), loc("planetFill"));   // Solo en space.fs (-1 en el del hangar)
+        let (planet_key_position, planet_key, planet_key_range, planet_wet) =
+            (loc("planetKeyPosition"), loc("planetKey"), loc("planetKeyRange"), loc("planetWet"));
+        let planet_toon = loc("planetToon");
+        let wet_surface = loc("wetSurface");
         Ok(Self { shader, camera_position: Vector3::zero(), light, camera, emissive, ambient, outline, transport, dissolve,
-                  roughness, studio })
+                  roughness, studio, planet_fill, planet_key_position, planet_key, planet_key_range, planet_wet, wet_surface, planet_toon })
     }
 
     /// Valores que no cambian en todo el cuadro.
@@ -59,6 +70,9 @@ impl SpaceShader {
         self.shader.set_shader_value(self.ambient, ambient);
         self.shader.set_shader_value(self.transport, 0.0f32);
         if self.dissolve >= 0 { self.shader.set_shader_value(self.dissolve, 0.0f32); }
+        self.set_planet_fill(Vector3::zero());
+        self.set_planet_key(Vector3::zero(), Vector4::new(0.0, 0.0, 0.0, 0.0), 1.0, false);
+        self.set_planet_toon(false);
     }
     pub fn set_transport_glow(&mut self, intensity: f32) {
         self.shader.set_shader_value(self.transport, intensity);
@@ -67,6 +81,18 @@ impl SpaceShader {
     pub fn set_studio(&mut self, on: bool) {
         if self.studio >= 0 { self.shader.set_shader_value(self.studio, if on { 1.0f32 } else { 0.0 }); }
     }
+    pub fn set_planet_fill(&mut self, fill: Vector3) {
+        if self.planet_fill >= 0 { self.shader.set_shader_value(self.planet_fill, fill); }
+    }
+    pub fn set_planet_toon(&mut self, on: bool) {
+        if self.planet_toon >= 0 { self.shader.set_shader_value(self.planet_toon, if on { 1.0f32 } else { 0.0 }); }
+    }
+    pub fn set_planet_key(&mut self, position: Vector3, key: Vector4, range: f32, wet: bool) {
+        if self.planet_key_position >= 0 { self.shader.set_shader_value(self.planet_key_position, position); }
+        if self.planet_key >= 0 { self.shader.set_shader_value(self.planet_key, key); }
+        if self.planet_key_range >= 0 { self.shader.set_shader_value(self.planet_key_range, range); }
+        if self.planet_wet >= 0 { self.shader.set_shader_value(self.planet_wet, if wet { 1.0f32 } else { 0.0 }); }
+    }
     pub fn set_transport_dissolve(&mut self, amount: f32) {
         if self.dissolve >= 0 { self.shader.set_shader_value(self.dissolve, amount); }
     }
@@ -74,15 +100,15 @@ impl SpaceShader {
 
 /// Shader de la superficie del Sol (sin luz: brilla solo).
 // Apariencia solar: no cambia el radio, las colisiones ni la luz de los planetas.
-const SUN_EMISSION: f32 = 2.0;
+const SUN_EMISSION: f32 = 1.7;
 const SUN_DETAIL_SCALE: f32 = 18.0;
 const SUN_ACTIVITY_SPEED: f32 = 0.08;
 const SUN_CONTRAST: f32 = 0.65;
 const SUN_HALO_LAYERS: [(f32, Color); 4] = [
-    (5.0, Color::new(255, 165, 70, 8)),
-    (2.8, Color::new(255, 185, 90, 24)),
-    (1.65, Color::new(255, 215, 140, 72)),
-    (1.18, Color::new(255, 245, 210, 150)),
+    (3.8, Color::new(255, 165, 70, 5)),
+    (2.3, Color::new(255, 185, 90, 17)),
+    (1.5, Color::new(255, 215, 140, 55)),
+    (1.14, Color::new(255, 245, 210, 125)),
 ];
 const SUN_HALO_SCREEN_LIMIT: f32 = 1.6;
 
@@ -139,6 +165,7 @@ struct Part {
     sticker: bool,
     /// Rugosidad del material (glTF `roughnessFactor`, 1 si no tiene): define qué tan chico y fuerte es el brillo.
     roughness: f32,
+    wet_surface: f32,
     /// Malla rearmada que reemplaza a la de raylib (ver `rebuild_large_meshes`).
     rebuilt: Option<Mesh>,
 }
@@ -294,14 +321,33 @@ impl SpaceModel {
             };
             let f = |k: usize| m["emissiveFactor"][k].as_f64().unwrap_or(0.0) as f32;
             let strength = m["extensions"]["KHR_materials_emissive_strength"]["emissiveStrength"].as_f64().unwrap_or(1.0) as f32;
+            let inner_boost = match m["name"].as_str() {
+                Some("HW_InnerLava" | "HW_InnerGlowHot") => 1.55,
+                Some("HW_InnerGlow") => 1.25,
+                _ => 1.0,
+            };
             let outline = m["name"].as_str().is_some_and(|n| n.ends_with("Outline"));
             let sticker = m["name"].as_str().is_some_and(|n| n.ends_with("_Sticker"));
-            (Vector3::new(f(0), f(1), f(2)) * strength, m["alphaMode"].as_str() == Some("BLEND"), outline, sticker)
+            let inner_bounce = match m["name"].as_str() {
+                Some("HW_Inner") => Vector3::new(0.075, 0.010, 0.004),
+                Some("HW_InnerCrust") => Vector3::new(0.045, 0.007, 0.003),
+                _ => Vector3::zero(),
+            };
+            (Vector3::new(f(0), f(1), f(2)) * strength * inner_boost + inner_bounce,
+             m["alphaMode"].as_str() == Some("BLEND"), outline, sticker)
         };
         let roughness = |i: usize| -> f32 {
             i.checked_sub(1).and_then(|k| materials.get(k)).map_or(1.0, |m| {
                 m["pbrMetallicRoughness"]["roughnessFactor"].as_f64().unwrap_or(1.0) as f32
             })
+        };
+        let wet_surface = |i: usize| -> f32 {
+            match i.checked_sub(1).and_then(|k| materials.get(k)).and_then(|m| m["name"].as_str()) {
+                Some("HW_Blood" | "HW_Lava") => 2.0,
+                Some("HW_RustDark") => 1.0,
+                Some(name) if name.starts_with("HW_Strata") => 1.0,
+                _ => 0.0,
+            }
         };
         for material in model.materials_mut() {
             *material.shader_mut() = unsafe { WeakShader::from_raw(*shader.shader.as_ref()) };
@@ -322,6 +368,7 @@ impl SpaceModel {
                 outline,
                 sticker,
                 roughness: roughness(material),
+                wet_surface: wet_surface(material),
                 rebuilt: rebuilt[i].take(),
             });
         }
@@ -371,6 +418,7 @@ impl SpaceModel {
             }
             shader.shader.set_shader_value(shader.emissive, part.emissive);
             if shader.roughness >= 0 { shader.shader.set_shader_value(shader.roughness, part.roughness); }
+            if shader.wet_surface >= 0 { shader.shader.set_shader_value(shader.wet_surface, part.wet_surface); }
             shader.shader.set_shader_value(shader.outline, if part.sticker { 2.0f32 } else if part.outline { 1.0 } else { 0.0 });
             if part.outline {
                 unsafe { ffi::rlEnableBackfaceCulling() };

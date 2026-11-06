@@ -14,11 +14,21 @@ uniform float transportGlow;
 uniform float transportDissolve;
 uniform float roughness; // Del material (glTF): 0 = brilla como vidrio mojado, 1 = mate
 uniform float studio;    // 1 = hangar: luces de estudio (clave cálida, contorno frío y una de abajo); 0 = espacio
+uniform vec3 planetFill; // Relleno suave de cada planeta; cero para naves y estación
+uniform vec3 planetKeyPosition;
+uniform vec4 planetKey; // rgb = color, a = fuerza; cero para naves y estación
+uniform float planetKeyRange;
+uniform float planetWet;
+uniform float wetSurface; // 1 = rojo mojado, 2 = sangre/grietas negras
+uniform float planetToon; // 1 = bandas de luz y borde de tinta para Smiling Friends
 out vec4 finalColor;
 void main() {
     // Las imágenes vienen en sRGB y los factores de glTF son lineales: todo se pasa a lineal antes de iluminar
     vec4 tex = texture(texture0, uv);
     vec4 base = vec4(pow(tex.rgb, vec3(2.2)), tex.a) * colDiffuse;
+    if (planetWet > 0.5 && wetSurface > 0.5 && wetSurface < 1.5) {
+        base.rgb *= vec3(1.10, 0.76, 0.76);
+    }
     // Algunas mallas tienen normales invertidas: se usa la cara que mira a la cámara
     vec3 n = normalize(normal);
     if (!gl_FrontFacing) n = -n;
@@ -35,10 +45,49 @@ void main() {
     float spec = pow(max(dot(n, normalize(l + v)), 0.0), shininess) * specStrength * step(0.0, ndl);
     float rim = pow(1.0 - max(dot(n, v), 0.0), 3.0);
     vec3 sun = vec3(1.0, 0.94, 0.82);
+    float sunDistance = length(lightPosition - worldPosition);
+    float sunReach = 1.0 / (1.0 + pow(max(sunDistance - 45.0, 0.0) / 500.0, 1.6));
+    float spaceReach = mix(sunReach, 1.0, step(0.5, studio));
     vec3 night = vec3(0.30, 0.36, 0.58) * ambient;
-    vec3 lit = base.rgb * (night + sun * day * 0.94) + sun * spec * 0.82 + emissive
-             + rim * day * 0.14 * sun * base.rgb
+    vec3 lit = base.rgb * (night + planetFill + sun * day * 0.90 * spaceReach) + sun * spec * 0.72 * spaceReach + emissive
+             + rim * day * 0.11 * spaceReach * sun * base.rgb
              + rim * (1.0 - day) * 0.025 * vec3(0.38, 0.48, 0.82);
+    if (planetToon > 0.5) {
+        // Mantener los colores dibujados: dos tonos, sin brillo especular ni degradado de borde.
+        float band = 0.72 + 0.28 * smoothstep(0.10, 0.17, ndl);
+        float ink = 1.0 - 0.22 * smoothstep(0.78, 0.92, rim);
+        lit = base.rgb * band * ink + emissive;
+    }
+    if (planetKey.a > 0.0) {
+        vec3 delta = planetKeyPosition - worldPosition;
+        float keyDistance2 = dot(delta, delta);
+        vec3 keyDirection = normalize(delta);
+        float keyDiffuse = max(dot(n, keyDirection), 0.0);
+        float keyFalloff = 1.0 / (1.0 + keyDistance2 / max(planetKeyRange * planetKeyRange, 1.0));
+        lit += base.rgb * planetKey.rgb * planetKey.a * keyDiffuse * keyFalloff;
+        if (planetWet > 0.5 && wetSurface > 0.5) {
+            float facing = max(dot(n, v), 0.0);
+            float fresnel = pow(1.0 - facing, 3.0);
+            float reflection = max(dot(n, normalize(keyDirection + v)), 0.0);
+            float broad = pow(reflection, 45.0);
+            float sharp = pow(reflection, 210.0);
+            float blackLiquid = step(1.5, wetSurface);
+            lit += planetKey.rgb * (broad * mix(0.24, 0.55, blackLiquid)
+                + sharp * mix(2.8, 4.2, blackLiquid)) * keyFalloff;
+            float sunReflection = pow(max(dot(n, normalize(l + v)), 0.0), 90.0);
+            lit += vec3(1.0, 0.87, 0.78) * sunReflection * mix(1.1, 2.2, blackLiquid) * spaceReach;
+            // Reflejo largo de una fuente amplia: visible incluso sobre sangre casi negra.
+            vec3 stripDirection = normalize(vec3(-0.65, 0.85, 0.25));
+            float strip = pow(max(dot(n, normalize(stripDirection + v)), 0.0), 145.0);
+            lit += vec3(0.91, 0.94, 1.0) * strip * mix(0.42, 1.45, blackLiquid);
+            // Dos formas de luz reflejadas sobre el líquido; sin textura, cubemap ni pasada extra.
+            vec3 reflected = reflect(-v, n);
+            float boxA = smoothstep(0.94, 0.985, dot(reflected, normalize(vec3(-0.55, 0.72, 0.42))));
+            float boxB = smoothstep(0.975, 0.995, dot(reflected, normalize(vec3(0.58, 0.62, -0.52))));
+            lit += vec3(0.78, 0.88, 1.0) * (boxA * 0.19 + boxB * 0.13) * mix(1.0, 1.55, blackLiquid);
+            lit += vec3(0.25, 0.35, 0.46) * fresnel * mix(0.18, 0.32, blackLiquid);
+        }
+    }
     if (studio > 0.5) {
         // Luces de estudio del hangar, fijas en el mundo (la nave gira debajo): como en las capturas de Blender
         vec3 keyL = normalize(vec3(0.1, 0.8, 0.9));      // Clave: arriba, del lado de la cámara, cálida
