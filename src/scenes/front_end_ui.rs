@@ -141,28 +141,28 @@ pub(super) fn hangar_title(
     d: &mut RaylibDrawHandle,
     font: &Font,
     name: &str,
-    detail: &str,
-    context: &str,
+    logo: Option<&Texture2D>,
     w: i32,
 ) {
-    text(d, font, context, 38.0, 17.0, 17.0, Color::new(230, 238, 248, 255));
-    let fit = (w as f32 - 280.0) / font.measure_text(name, 100.0, 1.0).x * 100.0;
-    text(
-        d,
-        font,
-        name,
-        38.0,
-        38.0,
-        fit.min(46.0),
-        Color::WHITE,
-    );
-    text(d, font, detail, 39.0, 99.0, 18.0, Color::new(225, 233, 243, 255));
-    d.draw_rectangle_rounded(
-        Rectangle::new(39.0, 128.0, 70.0, 2.0),
-        0.5,
-        8,
-        Color::new(255, 255, 255, 190),
-    );
+    let name = name.to_uppercase();
+    let size = 48.0_f32.min(48.0 * (w as f32 - 265.0) / font.measure_text(&name, 48.0, 1.0).x.max(1.0));
+    let x = (w as f32 - font.measure_text(&name, size, 1.0).x) * 0.5;
+    d.draw_text_ex(font, &name, Vector2::new(x + 2.0, 58.0), size, 1.0, Color::BLACK);
+    d.draw_text_ex(font, &name, Vector2::new(x, 55.0), size, 1.0, Color::WHITE);
+    if let Some(logo) = logo {
+        let max_height = if logo.width < logo.height { 80.0 } else { 66.0 };
+        let scale = (210.0 / logo.width as f32).min(max_height / logo.height as f32);
+        let logo_width = logo.width as f32 * scale;
+        let dest = Rectangle::new((w as f32 - logo_width) * 0.5, 115.0, logo_width, logo.height as f32 * scale);
+        d.draw_texture_pro(
+            logo,
+            Rectangle::new(0.0, 0.0, logo.width as f32, logo.height as f32),
+            dest,
+            Vector2::zero(),
+            0.0,
+            Color::WHITE,
+        );
+    }
 }
 
 pub(super) fn controls(d: &mut RaylibDrawHandle, title: &Font, body: &Font, w: i32, h: i32) {

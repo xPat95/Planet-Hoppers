@@ -14,7 +14,7 @@
     },
     {
       "id": "smilingfriends",
-      "name": "Nave de Smiling Friends",
+      "name": "Nave de Pim y Charlie",
       "model": "assets/models/ships/smilingfriends/exports/smilingfriends_ship.glb",
       "length": 6.0,
       "model_rotation_degrees": [

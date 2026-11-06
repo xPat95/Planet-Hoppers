@@ -21,9 +21,16 @@ void main() {
     float purpleWave = purpleAxis * 3.8 + 0.38 * sin(ray.x * 6.0 - ray.z * 4.0);
     float blue = exp(-blueWave * blueWave);
     float purple = exp(-purpleWave * purpleWave);
-    float wisp = 0.5 + 0.5 * sin(ray.x * 13.0 + ray.y * 8.0 + sin(ray.z * 9.0));
-    vec3 color = vec3(0.010, 0.027, 0.090);
-    color += vec3(0.006, 0.043, 0.100) * blue * (0.72 + 0.28 * wisp);
-    color += vec3(0.031, 0.012, 0.061) * purple * (0.78 + 0.22 * wisp);
+    vec3 warped = ray + 0.09 * vec3(
+        sin(ray.y * 13.0 + ray.z * 8.0),
+        sin(ray.z * 11.0 - ray.x * 9.0),
+        sin(ray.x * 12.0 + ray.y * 7.0));
+    float cloud = 0.5 + 0.5 * sin(warped.x * 17.0 + warped.z * 11.0)
+        * sin(warped.y * 15.0 - warped.z * 9.0);
+    float fine = 0.5 + 0.5 * sin(warped.x * 39.0 + warped.y * 29.0 + sin(warped.z * 23.0));
+    float density = smoothstep(0.32, 0.82, cloud * 0.72 + fine * 0.28);
+    vec3 color = vec3(0.005, 0.013, 0.043);
+    color += vec3(0.007, 0.038, 0.087) * blue * (0.18 + 0.82 * density);
+    color += vec3(0.028, 0.011, 0.060) * purple * (0.17 + 0.83 * density);
     finalColor = vec4(color, 1.0);
 }

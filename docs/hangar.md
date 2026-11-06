@@ -20,16 +20,16 @@ Las escenas se ejecutan secuencialmente en el mismo proceso. El menú y el hanga
 
 ## Catálogo e identidad
 
-`config/ship-selection.json` establece seis opciones en orden orbital y las vincula al catálogo de modelos de `config/ships.json`:
+`config/ship-selection.json` establece seis opciones en orden de presentación en el hangar, con Halloween al final, y las vincula al catálogo de modelos de `config/ships.json`:
 
 | Identidad | Franquicia mostrada | Recurso |
 | --- | --- | --- |
-| `halloween` | Calaca | Placeholder geométrico identificable; modelo de Camila pendiente |
 | `starwars` | Estrella de la Muerte | N-1 del Mandaloriano |
-| `smilingfriends` | Smiling Friends | Nave de Smiling Friends |
+| `smilingfriends` | Smiling Friends | Nave de Pim y Charlie |
 | `minecraft` | Minecraft | Barco del End |
 | `regularshow` | Un Show Más | Carrito de golf |
 | `southpark` | South Park | Nave de Butters |
+| `halloween` | Calaca | Bruja en escoba |
 
 Las seis están disponibles gratuitamente en selección inicial. Star Wars utiliza el N-1 del Mandaloriano; el N-1 de Naboo se conserva en el catálogo de desarrollo. Para incorporar la nave final de Calaca se agrega su modelo a `config/ships.json` y se asigna su identificador a `ship_id`; la identidad `halloween` y el estado de la partida permanecen iguales. El placeholder se muestra tanto en el hangar como en vuelo, con tamaño de nave de 4 unidades.
 

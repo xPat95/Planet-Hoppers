@@ -59,7 +59,7 @@ fn browsing_and_cancelling_do_not_mutate_the_current_adventure() {
     for _ in 0..30 {
         selection.navigate(-1, &catalog);
     }
-    assert_eq!(selection.index, 3);
+    assert_eq!(selection.index, catalog.choices.iter().position(|c| c.id == "minecraft").unwrap());
     assert_eq!(game, before);
     selection.index = 0;
     selection.navigate(-1, &catalog);
@@ -73,7 +73,7 @@ fn change_mode_previews_locked_ships_but_cannot_activate_them() {
     let (catalog, _) = setup();
     let mut game = GameState::new_game("minecraft", &catalog).unwrap();
     let selection = ShipSelection {
-        index: 1,
+        index: catalog.choices.iter().position(|c| c.id == "starwars").unwrap(),
         mode: SelectionMode::Change,
     };
     let original = game.clone();
@@ -101,7 +101,7 @@ fn new_game_discards_old_ownership_only_after_confirmation() {
     let mut previous = GameState::new_game("minecraft", &catalog).unwrap();
     previous.unlock("starwars", &catalog).unwrap();
     let selection = ShipSelection {
-        index: 5,
+        index: catalog.choices.iter().position(|c| c.id == "southpark").unwrap(),
         mode: SelectionMode::Initial,
     };
     let SelectionTransition::StartAdventure(game) =

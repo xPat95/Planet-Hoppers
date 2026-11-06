@@ -109,7 +109,6 @@ pub struct Hangar {
     half_extents: Vector3,
     angle: f32,
     exhibit_yaw_offset: f32,
-    frontal_preview: bool,
 }
 impl Hangar {
     pub fn load(
@@ -148,7 +147,6 @@ impl Hangar {
             half_extents: Vector3::one() * 3.0,
             angle: 0.0,
             exhibit_yaw_offset: 0.0,
-            frontal_preview: false,
         })
     }
     pub fn exhibit(
@@ -201,11 +199,9 @@ impl Hangar {
             // The shared primitive hull is not centered on its asymmetric bounds.
             self.center.y = self.style.platform_top + 0.225 * self.style.display_length / 4.0;
         }
-        self.angle = 0.0;
-        self.frontal_preview = ship.id == "starwars";
-        self.exhibit_yaw_offset = if self.frontal_preview { 0.0 } else {
-            super::ship_presentation::hangar_start_yaw(ship, self.camera.position)
-        };
+        self.exhibit_yaw_offset = super::ship_presentation::hangar_start_yaw(
+            ship, self.close_camera().position,
+        );
     }
     pub fn update(&mut self, dt: f32) {
         self.angle = (self.angle + dt * self.style.rotation_degrees_per_second).rem_euclid(360.0);
@@ -223,16 +219,13 @@ impl Hangar {
         Camera3D::perspective(self.camera.position, self.camera.target, Vector3::up(), self.camera.fov)
     }
     /// Move toward the exhibit while keeping the platform and some of the room in frame.
-    pub fn close_camera(&self, ship_id: &str) -> Camera3D {
-        let (position, target, fov) = match ship_id {
-            // The long N-1 reads more balanced from a slightly more frontal angle.
-            "starwars" => (Vector3::new(0.0, 5.0, 10.0), Vector3::new(0.0, 1.7, 0.0), 50.0),
-            "halloween" => (Vector3::new(6.6, 4.4, 9.2), Vector3::new(0.0, 2.0, 0.0), 52.0),
-            // Leave room above the mast without undoing the larger display size.
-            "minecraft" => (Vector3::new(6.6, 4.4, 9.2), Vector3::new(0.0, 2.0, 0.0), 52.0),
-            _ => (Vector3::new(6.6, 4.4, 8.4), Vector3::new(0.0, 1.7, 0.0), 47.0),
-        };
-        Camera3D::perspective(position, target, Vector3::up(), fov)
+    pub fn close_camera(&self) -> Camera3D {
+        Camera3D::perspective(
+            Vector3::new(6.6, 4.4, 9.2),
+            Vector3::new(0.0, 2.0, 0.0),
+            Vector3::up(),
+            52.0,
+        )
     }
     pub fn ship_center(&self) -> Vector3 {
         self.center
@@ -273,13 +266,7 @@ impl Hangar {
         self.environment_shader.set_transport_glow(pulse * 3.6);
         self.station.draw(d, &mut self.environment_shader, Matrix::identity());
         self.draw_platform(d);
-        let exhibit_angle = if self.frontal_preview {
-            // A broad N-1 looks off-centre when its nearer engine dominates the frame.
-            // A small turn keeps it lively while preserving a balanced frontal silhouette.
-            self.angle.to_radians().sin() * 6.0
-        } else {
-            self.angle + self.exhibit_yaw_offset
-        };
+        let exhibit_angle = self.angle + self.exhibit_yaw_offset;
         let ship_scale = if self.ship.is_some() { 1.0 } else { 1.0 - 0.88 * pulse };
         let world = Matrix::scale(ship_scale, ship_scale, ship_scale)
             * Matrix::translate(self.exhibit_origin_offset.x, self.exhibit_origin_offset.y, self.exhibit_origin_offset.z)

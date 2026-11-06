@@ -26,7 +26,7 @@ void main() {
     vec3 v = normalize(cameraPosition - worldPosition);
     float ndl = dot(n, l);
     // Terminador suave entre el día y la noche
-    float day = clamp((ndl + 0.12) / 1.12, 0.0, 1.0);
+    float day = smoothstep(-0.08, 0.82, ndl);
     // Brillo según el material: lo pulido (estrellas infladas, ojos, sangre) tiene un reflejo chico y fuerte;
     // lo mate, uno ancho y suave
     float gloss = pow(1.0 - clamp(roughness, 0.0, 1.0), 3.0);
@@ -35,10 +35,10 @@ void main() {
     float spec = pow(max(dot(n, normalize(l + v)), 0.0), shininess) * specStrength * step(0.0, ndl);
     float rim = pow(1.0 - max(dot(n, v), 0.0), 3.0);
     vec3 sun = vec3(1.0, 0.94, 0.82);
-    vec3 night = vec3(0.45, 0.52, 0.85) * ambient;
-    vec3 lit = base.rgb * (night + sun * day) + sun * spec + emissive
-             + rim * day * 0.3 * sun * base.rgb      // borde iluminado del lado del Sol
-             + rim * 0.05 * vec3(0.35, 0.45, 1.0);   // contorno azulado tenue del lado oscuro
+    vec3 night = vec3(0.30, 0.36, 0.58) * ambient;
+    vec3 lit = base.rgb * (night + sun * day * 0.94) + sun * spec * 0.82 + emissive
+             + rim * day * 0.14 * sun * base.rgb
+             + rim * (1.0 - day) * 0.025 * vec3(0.38, 0.48, 0.82);
     if (studio > 0.5) {
         // Luces de estudio del hangar, fijas en el mundo (la nave gira debajo): como en las capturas de Blender
         vec3 keyL = normalize(vec3(0.1, 0.8, 0.9));      // Clave: arriba, del lado de la cámara, cálida
@@ -47,10 +47,10 @@ void main() {
         float keyD = max(dot(n, keyL), 0.0);
         float keySpec = pow(max(dot(n, normalize(keyL + v)), 0.0), shininess) * specStrength * step(0.0, dot(n, keyL));
         float rimD = max(dot(n, rimL), 0.0) * pow(1.0 - max(dot(n, v), 0.0), 1.5);
-        lit += base.rgb * keyD * vec3(1.0, 0.88, 0.78) * 0.85
-             + keySpec * vec3(1.0, 0.95, 0.9) * 1.4
-             + rimD * vec3(0.45, 0.55, 1.0) * 0.9
-             + base.rgb * max(dot(n, underL), 0.0) * vec3(1.0, 0.45, 0.2) * 0.3;
+        lit += base.rgb * keyD * vec3(0.84, 0.94, 1.0) * 1.05
+             + keySpec * vec3(0.83, 0.96, 1.0) * 1.25
+             + rimD * vec3(0.63, 0.47, 0.94) * 0.72
+             + base.rgb * max(dot(n, underL), 0.0) * vec3(0.43, 0.70, 1.0) * 0.18;
     }
     // Los colores de glTF son lineales: se pasan a la pantalla (raylib no corrige la gamma)
     finalColor = vec4(pow(max(lit, vec3(0.0)), vec3(1.0 / 2.2)), base.a);

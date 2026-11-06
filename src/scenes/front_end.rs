@@ -12,7 +12,7 @@ use crate::{
 };
 use super::button_style;
 use raylib::{ffi, prelude::*};
-use std::{collections::BTreeSet, path::PathBuf};
+use std::{collections::{BTreeMap, BTreeSet}, path::PathBuf};
 
 #[path = "front_end_ui.rs"]
 mod ui;
@@ -401,6 +401,12 @@ fn view(
     unsafe { ffi::SetTextureFilter(menu_font.texture, ffi::TextureFilter::TEXTURE_FILTER_BILINEAR as i32) };
     let secondary_title = ui::load_font(&root.join("assets/fonts/Bungee-Regular.ttf"))?;
     let body_font = ui::load_font(&root.join("assets/fonts/TitilliumWeb-Bold.ttf"))?;
+    let hangar_name_font = ui::load_font(&root.join("assets/fonts/Orbitron-Bold.ttf"))?;
+    let mut hangar_logos = BTreeMap::new();
+    for id in ["starwars", "smilingfriends", "minecraft", "regularshow", "southpark"] {
+        let path = root.join(format!("assets/ui/logos/{id}.png"));
+        hangar_logos.insert(id.to_owned(), rl.load_texture(&thread, &path.to_string_lossy())?);
+    }
     let mut hangar = Hangar::load(&mut rl, &thread, &root, HangarStyle::default())?;
     let captures = root.join("target/front-end");
     if smoke_goal.is_some() {
@@ -556,7 +562,7 @@ fn view(
         }
         let camera = if screen == Screen::Hangar {
             let approach = ((hangar_elapsed - HANGAR_WIDE_HOLD) / HANGAR_APPROACH).clamp(0.0, 1.0);
-            let destination = hangar.close_camera(&catalog.choices[selection.index].id);
+            let destination = hangar.close_camera();
             let focus = close_focus.get_or_insert(destination);
             let current = *focus;
             let follow = 1.0 - (-dt * 7.0).exp();
@@ -631,12 +637,9 @@ fn view(
                 ui::hangar_shade(&mut d, w, h);
                 let choice = &catalog.choices[selection.index];
                 let model = catalog.model(choice, &ships);
-                let provisional = format!("NAVE PROVISIONAL / {}", choice.name);
                 ui::hangar_title(
-                    &mut d, &body_font, &choice.name,
-                    if hangar.placeholder { &provisional } else { &model.name },
-                    if mode == SelectionMode::Initial { "CIUDADELA / TU PRIMERA NAVE" }
-                    else { "CIUDADELA / HANGAR DEL PRESIDIUM" }, w,
+                    &mut d, &hangar_name_font, &model.name,
+                    hangar_logos.get(&choice.id), w,
                 );
                 ui::action(&mut d, &body_font, back_button(w), "VOLVER", mouse, true);
                 ui::arrow(&mut d, arrow(w, h, false), false, mouse, left_active);
@@ -659,7 +662,6 @@ fn view(
                 );
                 let count = format!("{:02} / {:02}", selection.index + 1, catalog.choices.len());
                 ui::text(&mut d, &body_font, &count, 38.0, h as f32 - 34.0, 18.0, Color::new(230, 238, 248, 255));
-                ui::centered(&mut d, &body_font, "FLECHAS / elegir     ENTER / despegar     ESC / volver", w, h as f32 - 26.0, 16.0, INK);
             }
         }
         if smoke_goal.is_some() {
@@ -686,7 +688,7 @@ fn view(
                 30 | 31 | 32 if !embedded => Some(format!("hangar-{w}x{h}.png")),
                 24 if !embedded => {
                     seen.insert(catalog.choices[selection.index].id.clone());
-                    save_frame(&captures.join("hangar-halloween.png"), w, h)?;
+                    save_frame(&captures.join(format!("hangar-{}.png", catalog.choices[selection.index].id)), w, h)?;
                     Some("hangar-complete.png".into())
                 }
                 70 if !embedded => Some("hangar-approach.png".into()),

@@ -40,7 +40,12 @@ void main() {
         if (!gl_FrontFacing) n=-n;
         float roof=smoothstep(7.5,11.0,worldPosition.y)*(0.2+0.8*max(-n.y,0.0));
         vec3 bounce=pow(max(colDiffuse.rgb*0.06*roof,vec3(0.0)),vec3(1.0/2.2));
-        finalColor=vec4(transportLight(max(tex.rgb,bounce)),tex.a*colDiffuse.a);
+        float platformFocus=1.0-smoothstep(5.0,18.0,length(worldPosition.xz));
+        vec3 balanced=max(tex.rgb,bounce)*mix(0.82,1.0,platformFocus);
+        vec3 portalDelta=(worldPosition-vec3(0.0,6.0,-23.0))*vec3(0.12,0.16,0.20);
+        float portalHalo=exp(-dot(portalDelta,portalDelta))*0.055;
+        balanced+=vec3(0.48,0.28,0.72)*portalHalo;
+        finalColor=vec4(transportLight(balanced),tex.a*colDiffuse.a);
         return;
     }
     vec3 base=pow(tex.rgb,vec3(2.2))*colDiffuse.rgb;

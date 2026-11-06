@@ -12,6 +12,7 @@ use crate::ships::{FlightInput, Ship, ShipsConfig};
 use crate::gameplay::selection::{GameState, ShipCatalog, SelectionTransition};
 use crate::solar_system::{hex_color, Planet, SolarSystem, SolarSystemConfig};
 use raylib::{ffi, prelude::*};
+use std::collections::BTreeMap;
 use std::ffi::CString;
 use std::path::{Path, PathBuf};
 
@@ -124,6 +125,56 @@ fn draw_ui(d: &mut impl RaylibDraw, font: &Font, text: &str, x: i32, y: i32, siz
     d.draw_text_ex(font, text, Vector2::new(x as f32, y as f32), size, 1.0, color);
 }
 
+fn draw_planet_logo(d: &mut impl RaylibDraw, logo: &Texture2D, center_x: f32, top: f32) -> f32 {
+    let max_height = if logo.width < logo.height { 34.0 } else { 29.0 };
+    let scale = (88.0 / logo.width as f32).min(max_height / logo.height as f32);
+    let width = logo.width as f32 * scale;
+    let height = logo.height as f32 * scale;
+    d.draw_texture_pro(
+        logo,
+        Rectangle::new(0.0, 0.0, logo.width as f32, logo.height as f32),
+        Rectangle::new(center_x - width * 0.5, top, width, height),
+        Vector2::zero(),
+        0.0,
+        Color::WHITE,
+    );
+    height
+}
+
+#[derive(Clone, Copy)]
+struct DiskBounds { left: f32, right: f32, top: f32, bottom: f32 }
+
+fn projected_disk_bounds(
+    rl: &RaylibHandle,
+    camera: Camera3D,
+    planet: &Planet,
+    model: &SpaceModel,
+) -> Option<DiskBounds> {
+    let half = model.half_extents;
+    let position = planet.position();
+    let world = planet.orientation() * Matrix::translate(position.x, position.y, position.z);
+    let forward = (camera.target - camera.position).normalized();
+    let mut min_y = f32::INFINITY;
+    let mut max_y = f32::NEG_INFINITY;
+    let mut min_x = f32::INFINITY;
+    let mut max_x = f32::NEG_INFINITY;
+    for sample in 0..32 {
+        let angle = sample as f32 * std::f32::consts::TAU / 32.0;
+        let corner = Vector3::new(
+            half.x * angle.cos(),
+            0.0,
+            half.z * angle.sin(),
+        ).transform_with(world);
+        if (corner - camera.position).dot(forward) <= 0.1 { continue; }
+        let screen = rl.get_world_to_screen(corner, camera);
+        min_x = min_x.min(screen.x);
+        max_x = max_x.max(screen.x);
+        min_y = min_y.min(screen.y);
+        max_y = max_y.max(screen.y);
+    }
+    min_y.is_finite().then_some(DiskBounds { left: min_x, right: max_x, top: min_y, bottom: max_y })
+}
+
 #[derive(Clone, Copy, PartialEq)]
 enum View {
     Ship,
@@ -211,6 +262,50 @@ struct Marker {
     at: Vector2,
     radius: Option<f32>,
     angle: f32,
+}
+
+fn planet_glow_color(id: &str) -> Color {
+    match id {
+        "starwars" => Color::new(150, 170, 255, 30),
+        "smilingfriends" => Color::new(105, 205, 255, 13),
+        "minecraft" => Color::new(110, 225, 180, 27),
+        "regularshow" => Color::new(148, 130, 245, 29),
+        "southpark" => Color::new(155, 205, 255, 27),
+        _ => Color::new(255, 100, 130, 28),
+    }
+}
+
+fn draw_planet_glow(
+    d: &mut impl RaylibDraw,
+    id: &str,
+    marker: &Marker,
+    disk: Option<DiskBounds>,
+    viewport: Vector2,
+) {
+    let Some(radius) = marker.radius else { return };
+    let tint = planet_glow_color(id);
+    let outer = Color::new(tint.r, tint.g, tint.b, 0);
+    let mut glow = d.begin_blend_mode(BlendMode::BLEND_ADDITIVE);
+    if let Some(disk) = disk {
+        let center = Vector2::new((disk.left + disk.right) * 0.5, (disk.top + disk.bottom) * 0.5);
+        let rx = (disk.right - disk.left) * 0.5;
+        let ry = (disk.bottom - disk.top) * 0.5;
+        if rx < 2.0 || ry < 2.0 || rx > viewport.x * 1.5 || ry > viewport.y * 1.5 { return; }
+        let blur = (rx.max(ry) * 0.15).clamp(11.0, 68.0);
+        for i in 0..32 {
+            let angle = i as f32 * std::f32::consts::TAU / 32.0;
+            let x = center.x + rx * angle.cos();
+            let y = center.y + ry * angle.sin();
+            if x + blur < 0.0 || y + blur < 0.0 || x - blur > viewport.x || y - blur > viewport.y { continue; }
+            glow.draw_circle_gradient(x as i32, y as i32, blur, tint, outer);
+        }
+    } else {
+        if radius > viewport.x.max(viewport.y) * 1.2 { return; }
+        let extent = (radius * 1.75 + 10.0).max(14.0);
+        if marker.at.x + extent < 0.0 || marker.at.y + extent < 0.0
+            || marker.at.x - extent > viewport.x || marker.at.y - extent > viewport.y { return; }
+        glow.draw_circle_gradient(marker.at.x as i32, marker.at.y as i32, extent, tint, outer);
+    }
 }
 
 /// Project a fixed POI, falling back to a direction marker inside the HUD margins.
@@ -561,6 +656,8 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
     }
     let departing = std::mem::take(&mut s.departing);
     let mut intro_time = (s.intro_pending && (!smoke || s.intro_smoke)).then_some(0.0_f32);
+    let mut launch_coast = intro_time.is_some();
+    let mut entry_handoff_speed = None;
     s.intro_pending = false;
     let departure = if departing {
         let length = s.ships.ships[s.ship_index].length;
@@ -609,6 +706,11 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
     let mut nebula = NebulaSky::load(&mut rl, &thread)?;
     let ui_regular = load_solar_font(&root.join("assets/fonts/AdventPro-Regular.ttf"))?;
     let ui_bold = load_solar_font(&root.join("assets/fonts/AdventPro-Bold.ttf"))?;
+    let mut planet_logos = BTreeMap::new();
+    for id in ["starwars", "smilingfriends", "minecraft", "regularshow", "southpark"] {
+        let path = root.join(format!("assets/ui/logos/{id}.png"));
+        planet_logos.insert(id, rl.load_texture(&thread, &path.to_string_lossy())?);
+    }
     let outer = outer_orbit(&s.system);
     // Las pruebas siguen a South Park por identidad, aunque cambie de órbita.
     let southpark = s.system.planets.iter().position(|p| p.config.id == "southpark").expect("South Park validado");
@@ -888,9 +990,19 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             if frame == 7 { capture = Some("entry-station.png".into()); }
             if frame == 50 { capture = Some("entry-transition.png".into()); }
             if frame == 100 {
+                if s.ship.speed <= 1.0 || s.ship.bumped {
+                    return Err("La nave se detuvo al terminar la entrada".into());
+                }
+                entry_handoff_speed = Some(s.ship.speed);
                 capture = Some("entry-flight.png".into());
             }
-            if frame == 102 { println!("ENTRY_SMOKE_PASS"); return Ok(Exit::Quit); }
+            if frame == 180 {
+                if s.ship.bumped || entry_handoff_speed.is_none_or(|speed| s.ship.speed < speed - 2.0) {
+                    return Err("La nave perdiÃ³ el impulso despuÃ©s de la entrada".into());
+                }
+                println!("ENTRY_SMOKE_PASS speed={:.1}", s.ship.speed);
+                return Ok(Exit::Quit);
+            }
         } else if s.launch_smoke {
             unsafe { ffi::PlayAutomationEvent(ffi::AutomationEvent {frame:0,type_:1,params:[KeyboardKey::KEY_W as i32,0,0,0]}); }
             if (2..=12).contains(&frame) {
@@ -924,6 +1036,16 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 }
                 f if f == 20 + n * 15 => {
                     s.view = View::Ship;
+                    park_ship(&mut s.ship, &s.system.planets[southpark], 4.0, true);
+                    snap = true;
+                }
+                f if f == 25 + n * 15 => {
+                    let smilingfriends = s.system.planets.iter().position(|p| p.config.id == "smilingfriends").unwrap();
+                    park_ship(&mut s.ship, &s.system.planets[smilingfriends], 4.0, true);
+                    snap = true;
+                }
+                f if f == 27 + n * 15 => capture = Some("flight-smilingfriends-label.png".into()),
+                f if f == 29 + n * 15 => {
                     park_ship(&mut s.ship, &s.system.planets[southpark], 4.0, true);
                     snap = true;
                 }
@@ -1089,12 +1211,22 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                         Destination::Station => s.ship.autopilot_to(s.station.navigation_target(s.ship.position), &s.ships.flight, &s.system),
                     }
                 });
+                let manual_throttle = axis(
+                    key(KeyboardKey::KEY_S) || key(KeyboardKey::KEY_DOWN),
+                    key(KeyboardKey::KEY_W) || key(KeyboardKey::KEY_UP),
+                );
+                if manual_throttle != 0.0 || s.ship.bumped {
+                    launch_coast = false;
+                }
                 let mut input = FlightInput {
                     ascend: key(KeyboardKey::KEY_SPACE),
-                    throttle: axis(
-                        key(KeyboardKey::KEY_S) || key(KeyboardKey::KEY_DOWN),
-                        key(KeyboardKey::KEY_W) || key(KeyboardKey::KEY_UP),
-                    ),
+                    throttle: if intro_time.is_some() && fade <= 0.0 {
+                        0.45
+                    } else if launch_coast && s.ship.speed > 0.0 {
+                        (s.ship.speed / s.ships.flight.cruise_speed).clamp(0.01, 1.0)
+                    } else {
+                        manual_throttle
+                    },
                     boost: key(KeyboardKey::KEY_LEFT_SHIFT) || key(KeyboardKey::KEY_RIGHT_SHIFT),
                     turn: (
                         axis(key(KeyboardKey::KEY_A) || key(KeyboardKey::KEY_LEFT), key(KeyboardKey::KEY_D) || key(KeyboardKey::KEY_RIGHT)),
@@ -1305,6 +1437,13 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 }
             })
             .collect();
+        let visual_bounds: Vec<Option<DiskBounds>> = s.system.planets.iter().zip(&planets)
+            .map(|(planet, (near, _))| {
+                (planet.config.id == "smilingfriends")
+                    .then(|| near.as_ref().and_then(|model| projected_disk_bounds(&rl, camera, planet, model)))
+                    .flatten()
+            })
+            .collect();
         let (width, height) = (rl.get_screen_width(), rl.get_screen_height());
         let draw_mouse = rl.get_mouse_position();
 
@@ -1318,6 +1457,10 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         sky.draw(&mut d, &sky_frame, time);
         if let Some((at, radius)) = sun_glow {
             draw_sun_glow(&mut d, at, radius, Vector2::new(width as f32, height as f32));
+        }
+        for (i, (planet, marker)) in s.system.planets.iter().zip(&markers).enumerate() {
+            draw_planet_glow(&mut d, &planet.config.id, marker, visual_bounds[i],
+                Vector2::new(width as f32, height as f32));
         }
         {
             let mut d3 = d.begin_mode3D(camera);
@@ -1402,12 +1545,22 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 let is_target = s.target == Some(Destination::Planet(i));
                 let c = if is_target { Color::new(255, 214, 90, 255) } else { Color::new(150, 170, 220, 170) };
                 let distance = ((p.position() - s.ship.position).length() - p.config.radius).max(0.0);
-                let label = format!("{}  {:.0}", p.config.name, distance);
+                let logo = planet_logos.get(p.config.id.as_str());
+                let visible_bounds = visual_bounds[i];
                 let on_screen = m.radius.is_some() && at.x > 0.0 && at.y > 0.0 && at.x < width as f32 && at.y < height as f32;
                 if let (true, Some(radius)) = (on_screen, m.radius) {
                     let r = radius.max(14.0) + 6.0;
-                    let w = text_width(&ui_regular, &label, 18.0);
-                    draw_ui(&mut d, &ui_regular, &label, at.x as i32 - w / 2, (at.y + r) as i32 + 4, 18.0, c);
+                    let y = visible_bounds.map_or(at.y + r + 4.0, |bounds| bounds.bottom - 2.0);
+                    if let Some(logo) = logo {
+                        let height = draw_planet_logo(&mut d, logo, at.x, y);
+                        let distance_label = format!("{distance:.0}");
+                        let w = text_width(&ui_regular, &distance_label, 18.0);
+                        draw_ui(&mut d, &ui_regular, &distance_label, at.x as i32 - w / 2, (y + height + 2.0) as i32, 18.0, c);
+                    } else {
+                        let label = format!("{}  {:.0}", p.config.name, distance);
+                        let w = text_width(&ui_regular, &label, 18.0);
+                        draw_ui(&mut d, &ui_regular, &label, at.x as i32 - w / 2, y as i32, 18.0, c);
+                    }
                 } else if is_target {
                     // Flecha en el borde de la pantalla hacia el objetivo
                     let angle = m.angle;
@@ -1418,8 +1571,20 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                     let side = Vector2::new(-angle.sin(), angle.cos()) * 10.0;
                     d.draw_triangle(tip, tip + back - side, tip + back + side, c);
                     d.draw_triangle(tip, tip + back + side, tip + back - side, c);
-                    let w = text_width(&ui_regular, &label, 18.0);
-                    draw_ui(&mut d, &ui_regular, &label, (tip.x + back.x * 2.5) as i32 - w / 2, (tip.y + back.y * 2.5) as i32 - 8, 18.0, c);
+                    let label = format!("{distance:.0}");
+                    let label_x = tip.x + back.x * 2.5;
+                    let label_y = tip.y + back.y * 2.5 - 8.0;
+                    if let Some(logo) = logo {
+                        draw_planet_logo(&mut d, logo, label_x, label_y - 42.0);
+                    } else {
+                        let label = format!("{}  {:.0}", p.config.name, distance);
+                        let w = text_width(&ui_regular, &label, 18.0);
+                        draw_ui(&mut d, &ui_regular, &label, label_x as i32 - w / 2, label_y as i32, 18.0, c);
+                    }
+                    if logo.is_some() {
+                        let w = text_width(&ui_regular, &label, 18.0);
+                        draw_ui(&mut d, &ui_regular, &label, label_x as i32 - w / 2, label_y as i32, 18.0, c);
+                    }
                 }
             }
             let (cx, cy) = (width / 2, height / 2);
@@ -1471,10 +1636,25 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             let focus = s.focus.map_or("Sol", |destination| destination.name(s));
             let status = format!("Vista general   Tiempo x{}{}   Siguiendo: {focus}", s.time_scale, if s.paused { "  (pausa)" } else { "" });
             draw_ui(&mut d, &ui_bold, &status, 16, 14, 23.0, white);
-            for (p, m) in s.system.planets.iter().zip(&markers) {
+            for (i, (p, m)) in s.system.planets.iter().zip(&markers).enumerate() {
                 if let Some(r) = m.radius {
-                    let w = text_width(&ui_bold, &p.config.name, 21.0);
-                    draw_ui(&mut d, &ui_bold, &p.config.name, m.at.x as i32 - w / 2, (m.at.y - r) as i32 - 26, 21.0, white);
+                    if let Some(logo) = planet_logos.get(p.config.id.as_str()) {
+                        let max_height = if logo.width < logo.height { 34.0 } else { 29.0 };
+                        let scale = (88.0 / logo.width as f32).min(max_height / logo.height as f32);
+                        let logo_height = logo.height as f32 * scale;
+                        let top = if p.config.id == "starwars" {
+                            // This innermost planet sits beneath the sun in the entry overview.
+                            m.at.y + r + 6.0
+                        } else if p.config.id == "smilingfriends" {
+                            visual_bounds[i].map_or(m.at.y - r - 5.0, |bounds| bounds.top - 24.0) - logo_height
+                        } else {
+                            m.at.y - r - 5.0 - logo_height
+                        };
+                        draw_planet_logo(&mut d, logo, m.at.x, top);
+                    } else {
+                        let w = text_width(&ui_bold, &p.config.name, 21.0);
+                        draw_ui(&mut d, &ui_bold, &p.config.name, m.at.x as i32 - w / 2, (m.at.y - r) as i32 - 26, 21.0, white);
+                    }
                 }
             }
         }

@@ -5,12 +5,12 @@ use serde::Deserialize;
 use std::{collections::BTreeSet, path::Path};
 
 pub const INITIAL_SHIP_ORDER: [&str; 6] = [
-    "halloween",
     "starwars",
     "smilingfriends",
     "minecraft",
     "regularshow",
     "southpark",
+    "halloween",
 ];
 
 #[derive(Clone, Debug, Deserialize)]
@@ -34,7 +34,7 @@ impl ShipCatalog {
             .collect::<Vec<_>>()
             != INITIAL_SHIP_ORDER
         {
-            return Err("El selector debe contener las seis franquicias en orden orbital".into());
+            return Err("El selector debe contener las seis franquicias en el orden del hangar".into());
         }
         for choice in &catalog.choices {
             if choice.name.is_empty()
