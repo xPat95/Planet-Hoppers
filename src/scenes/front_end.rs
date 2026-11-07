@@ -38,12 +38,14 @@ pub fn run() -> Result<(), Error> {
     let mut docking = false;
     let mut minecraft = false;
     let mut starwars = false;
+    let mut regularshow = false;
     let mut goal = "minecraft".to_string();
     let mut args = std::env::args().skip(1);
     while let Some(arg) = args.next() {
         match arg.as_str() {
             "--smoke" => smoke = true,
             "--smoke-docking" => { smoke = true; docking = true; }
+            "--smoke-regularshow" => { smoke=true; regularshow=true; }
             "--smoke-starwars" => { smoke=true;starwars=true; }
             "--smoke-minecraft" => { smoke = true; minecraft = true; }
             "--smoke-returns" => {
@@ -52,7 +54,7 @@ pub fn run() -> Result<(), Error> {
             }
             "--ship" => goal = args.next().ok_or("--ship necesita un identificador")?,
             "--help" | "-h" => {
-                println!("cargo run --locked -- [--smoke | --smoke-returns | --smoke-docking | --smoke-minecraft | --smoke-starwars] [--ship halloween|starwars|smilingfriends|minecraft|regularshow|southpark]");
+                println!("cargo run --locked -- [--smoke | --smoke-returns | --smoke-docking | --smoke-minecraft | --smoke-starwars | --smoke-regularshow] [--ship halloween|starwars|smilingfriends|minecraft|regularshow|southpark]");
                 println!("Sin opciones: menú principal. Desarrollo: cargo run --bin solarsystem o --bin southpark.");
                 return Ok(());
             }
@@ -70,6 +72,8 @@ pub fn run() -> Result<(), Error> {
         // A future station consumes ChangedShip inside its existing solar Session instead.
         let flags = if docking {
             vec!["--smoke-docking".into()]
+        } else if regularshow {
+            vec!["--smoke-regularshow".into()]
         } else if starwars {
             vec!["--smoke-starwars".into()]
         } else if minecraft {
@@ -83,7 +87,7 @@ pub fn run() -> Result<(), Error> {
         };
         let game = super::solar_system::run_with_game(game, flags.into_iter())?;
         if smoke {
-            let expected_tokens = usize::from(returns || minecraft || starwars);
+            let expected_tokens = usize::from(returns || minecraft || starwars || regularshow);
             let expected_unlocked = 1 + game.progress().completed().filter(|f| f.as_str() != game.first_ship()).count();
             if game.first_ship() != goal || (!docking && (game.active_ship() != goal
                 || game.unlocked_count() != expected_unlocked || game.progress().token_count() != expected_tokens))

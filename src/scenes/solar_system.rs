@@ -253,6 +253,7 @@ struct Session {
     return_pose: Option<PlanetReturnPose>,
     minecraft_smoke: bool,
     starwars_smoke: bool,
+    regularshow_smoke: bool,
     /// Prueba de ida y vuelta a un minijuego (--smoke-visit): cuántas visitas van.
     visit_smoke: Option<u32>,
 }
@@ -389,6 +390,7 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
     let mut visit_smoke = false;
     let mut minecraft_smoke = false;
     let mut starwars_smoke = false;
+    let mut regularshow_smoke = false;
     let mut return_smoke = false;
     let mut launch_smoke = false;
     let mut intro_smoke = false;
@@ -408,6 +410,7 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
             "--debug-collisions" => collision_debug = true,
             "--smoke-docking" => { smoke = true; docking_smoke = true; }
             "--smoke-returns" => { smoke = true; visit_smoke = true; return_smoke = true; }
+            "--smoke-regularshow" => { smoke=true; visit_smoke=true; regularshow_smoke=true; }
             "--smoke-starwars" => { smoke=true;visit_smoke=true;starwars_smoke=true; }
             "--smoke-minecraft" => { smoke = true; visit_smoke = true; minecraft_smoke = true; }
             "--smoke-visit" => {
@@ -423,6 +426,7 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
                 println!("Nave:\n{HELP_SHIP}\nVista general:\n{HELP_OVERVIEW}");
                 println!("--smoke: recorrido automático sin ventana visible; guarda capturas en target/solarsystem/");
                 println!("--smoke-visit: ida y vuelta a South Park (con su prueba de entrada) y captura al volver");
+                println!("--smoke-regularshow: interacción E, tres niveles, videos, derrota, abandono y regreso seguro");
                 println!("--smoke-starwars: visita al túnel con la nave activa y regreso al sistema solar");
                 println!("--smoke-minecraft: dos visitas a la aldea y Diamond Rush, regreso confirmado y misma nave");
                 println!("--smoke-returns: victoria, derrota, pausa/reinicio/abandono y cuatro visitas a South Park");
@@ -485,6 +489,7 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
         return_pose: None,
         minecraft_smoke,
         starwars_smoke,
+        regularshow_smoke,
         visit_smoke: visit_smoke.then_some(0),
     };
     loop {
@@ -534,7 +539,13 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
                 // La ventana del sistema solar ya se cerró: el minijuego abre la suya
                 let planet = &session.system.planets[i].config;
                 let id = planet.minigame.clone().ok_or("El planeta no tiene minijuego")?;
-                let args = if session.starwars_smoke {
+                let args = if session.regularshow_smoke {
+                    match session.visit_smoke.unwrap() {
+                        0 => vec!["--smoke".into()],
+                        1 => vec!["--smoke-return".into(), "defeat".into()],
+                        _ => vec!["--smoke-return".into(), "abandoned".into()],
+                    }
+                } else if session.starwars_smoke {
                     vec!["--smoke-hidden".into()]
                 } else if session.minecraft_smoke {
                     vec!["--smoke-host".into(), "--capture-dir".into(), root.join(format!("target/minecraft-host-{}", session.visit_smoke.unwrap())).to_string_lossy().into_owned()]
@@ -557,13 +568,17 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
                 match minigame_host::run_with_ship_and_results(&id, &mut session.minigames, &selected_ship, &root, args.into_iter(), &mut on_result)? {
                     MinigameExit::WindowClosed if session.visit_smoke.is_none() => return Ok(session.game),
                     MinigameExit::Returned(result) => {
+                        if session.regularshow_smoke {
+                            let expected = [MinigameResult::Victory, MinigameResult::Defeat, MinigameResult::Abandoned][session.visit_smoke.unwrap() as usize];
+                            if result != expected { return Err(format!("Regular Show esperaba {expected:?}, recibió {result:?}").into()); }
+                        }
                         let completion = MinigameCompletion { planet_id: planet.id.clone(), minigame_id: id, result };
                         println!("MINIGAME_RETURN {}", serde_json::to_string(&completion)?);
                         session.last_completion = Some(completion);
                     }
                     _ => {}
                 }
-                if (session.return_smoke || session.minecraft_smoke || session.starwars_smoke) && (session.ship_index != ship_index
+                if (session.return_smoke || session.minecraft_smoke || session.starwars_smoke || session.regularshow_smoke) && (session.ship_index != ship_index
                     || session.system.planets.iter().map(|p| p.orbit_angle).collect::<Vec<_>>() != orbit_angles) {
                     return Err("La visita alteró la nave o las órbitas del anfitrión".into());
                 }
@@ -797,7 +812,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         help_progress = (help_progress + if help_open { dt * 4.0 } else { -dt * 4.0 }).clamp(0.0, 1.0);
         // Sin teclado durante las pruebas ni mientras se sale hacia un minijuego
         let intro_controls_ready = intro_time.is_none_or(|elapsed| elapsed >= ENTRY_STATION_HOLD + ENTRY_CAMERA_MOVE - 0.15);
-        let accepts_input = (!smoke || s.launch_smoke || s.station_smoke || s.minecraft_smoke || s.docking_smoke.is_some()) && !help_open && !toggle_help && !close_help && intro_controls_ready && leaving.is_none() && !entering_station;
+        let accepts_input = (!smoke || s.launch_smoke || s.station_smoke || s.minecraft_smoke || s.regularshow_smoke || s.docking_smoke.is_some()) && !help_open && !toggle_help && !close_help && intro_controls_ready && leaving.is_none() && !entering_station;
         let pressed = |rl: &RaylibHandle, k: KeyboardKey| accepts_input && rl.is_key_pressed(k);
         let down = |rl: &RaylibHandle, k: KeyboardKey| accepts_input && rl.is_key_down(k);
         if pressed(&rl,KeyboardKey::KEY_F3) {s.collision_debug=!s.collision_debug;}
@@ -944,16 +959,16 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             }
         } else if let Some(visits) = s.visit_smoke {
             // Ida: estacionar junto a South Park y explorar. Vuelta: capturar la nave junto al planeta y salir
-            let destination = if s.starwars_smoke { s.system.planets.iter().position(|p|p.config.id=="starwars").unwrap() } else if s.minecraft_smoke { s.system.planets.iter().position(|p| p.config.id == "minecraft").unwrap() } else { southpark };
-            let total = if s.minecraft_smoke { 2 } else if s.return_smoke { 4 } else { 1 };
-            if s.minecraft_smoke {
+            let destination = if s.regularshow_smoke { s.system.planets.iter().position(|p| p.config.id=="regularshow").unwrap() } else if s.starwars_smoke { s.system.planets.iter().position(|p|p.config.id=="starwars").unwrap() } else if s.minecraft_smoke { s.system.planets.iter().position(|p| p.config.id == "minecraft").unwrap() } else { southpark };
+            let total = if s.regularshow_smoke { 3 } else if s.minecraft_smoke { 2 } else if s.return_smoke { 4 } else { 1 };
+            if s.minecraft_smoke || s.regularshow_smoke {
                 let event = if visits > 0 && frame == 0 || visits < total && frame == 30 { Some(2) }
                     else if frame == 10 || frame == 31 { Some(1) } else { None };
                 if let Some(kind) = event { unsafe { ffi::PlayAutomationEvent(ffi::AutomationEvent {
                     frame: 0, type_: kind, params: [KeyboardKey::KEY_E as i32, 0, 0, 0],
                 }); } }
                 if visits > 0 && frame == 12 && leaving.is_some() {
-                    return Err("Held E re-entered Minecraft before a new press".into());
+                    return Err("Held E re-entered a minigame before a new press".into());
                 }
             }
             match (visits, frame) {
@@ -969,7 +984,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                     snap = true;
                 }
                 (_, 1) if visits > 0 && visits < total => {
-                    if s.game.is_none() { s.ship_index = visits as usize % s.ships.ships.len(); }
+                    if s.game.is_none() && !s.regularshow_smoke { s.ship_index = visits as usize % s.ships.ships.len(); }
                     ship_model = load_ship_model(&mut rl, &thread, root, &shader, s);
                     park_ship(&mut s.ship, &s.system.planets[destination], 1.7, true);
                     snap = true;
@@ -979,12 +994,23 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                     if s.system.planet_in_reach(s.ship.position) != Some(destination) {
                         return Err("La nave no quedó al alcance de South Park".into());
                     }
-                    if !s.minecraft_smoke { leaving = Some(destination); }
+                    if !s.minecraft_smoke && !s.regularshow_smoke { leaving = Some(destination); }
                 }
                 (_, 60) if visits == total => capture = Some("after-visit.png".into()),
                 (_, 61) if visits == total => {
                     if s.return_smoke && s.last_completion.as_ref().map(|c| c.result) != Some(MinigameResult::Abandoned) {
                         return Err("Falta resultado del último regreso".into());
+                    }
+                    if s.regularshow_smoke {
+                        if s.last_completion.as_ref().map(|c| (&*c.minigame_id, c.result)) != Some(("regularshow", MinigameResult::Abandoned)) {
+                            return Err("Regular Show no devolvió el abandono confirmado".into());
+                        }
+                        if let Some(game) = &s.game {
+                            if game.progress().token_count() != 1 || !game.is_unlocked("regularshow") {
+                                return Err("La victoria de El Martillo no conservó su recompensa".into());
+                            }
+                        }
+                        println!("REGULARSHOW_HOST_PASS visits=3 victory=true defeat=true abandon=true reward_preserved=true");
                     }
                     if s.starwars_smoke {
                         if s.last_completion.as_ref().map(|c|(&*c.minigame_id,c.result)) != Some(("starwars",MinigameResult::Victory)) {return Err("No regresó victoria de Star Wars".into());}

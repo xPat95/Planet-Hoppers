@@ -32,7 +32,7 @@ La fase 3 mantiene la separación: `src/minigames/southpark/kenny.rs` administra
 | `assets/ui/backgrounds/` | Imágenes de fondo de la interfaz. |
 | `config/` | Parámetros generales y asociaciones entre franquicias, naves, personajes, minijuegos y recursos. |
 
-Los directorios de modelos de planetas, naves y personajes usan los mismos identificadores: `minecraft`, `southpark`, `smilingfriends`, `halloween`, `regularshow` y `starwars`. `regularshow` corresponde a Un Show Más (Regular Show); su nave es el carrito de golf con alas de cartón y sus personajes son Mordecai y Rigby. Sus recursos están modelados; los enemigos y la lógica de juego siguen pendientes.
+Los directorios de modelos de planetas, naves y personajes usan los mismos identificadores: `minecraft`, `southpark`, `smilingfriends`, `halloween`, `regularshow` y `starwars`. `regularshow` corresponde a Un Show Más (Regular Show); su nave es el carrito de golf con alas de cartón y sus personajes son Mordecai y Rigby. El minijuego El Martillo está integrado en `src/minigames/regularshow/`: combate arcade en tres niveles, música, videos y retorno al anfitrión.
 
 ## Módulos del juego
 
@@ -53,7 +53,7 @@ Los directorios de modelos de planetas, naves y personajes usan los mismos ident
 | `src/minigames/southpark/` | Recorrido por South Park y puzzle relacionado con Kenny. |
 | `src/minigames/smilingfriends/` | Elección de chistes para hacer reír a los personajes. |
 | `src/minigames/halloween/` | Escape de personajes de terror. |
-| `src/minigames/regularshow/` | Shooter en primera persona con raycasting, ambientado en Un Show Más: disparar a enemigos y acumular puntos. |
+| `src/minigames/regularshow/` | El Martillo: simulación de combate arcade en tres niveles, individual/cooperativo local, presentación, música y videos. |
 | `src/minigames/starwars/` | Vuelo libre por el túnel y ataque al reactor, sin raycasting. |
 | `src/gameplay/` | Registrar misiones completadas y tokens únicos, coordinar desbloqueos con `src/ships/` sin duplicar recompensas y habilitar el final con seis tokens. Gestionar victoria, derrota y reintentos. |
 | `src/ui/` | Presentar menús, botones, indicadores y HUD; mostrar las seis naves en la estación y sus estados de bloqueo y desbloqueo. Comunicar acciones sin administrar progreso ni nave activa. |

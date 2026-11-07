@@ -205,7 +205,7 @@ fn pending_minigames_and_help_cannot_emit_rewards() {
                 Ok(())
             },
         );
-        if matches!(id, "halloween" | "regularshow") {
+        if id == "halloween" {
             assert!(result.is_err());
         } else {
             assert!(result.is_ok());

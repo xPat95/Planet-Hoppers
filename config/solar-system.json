@@ -58,7 +58,7 @@
       "color": "#3e7cc9",
       "model": "assets/models/planets/regularshow/exports/regularshow_space_dome_planet_near.glb",
       "model_far": "assets/models/planets/regularshow/exports/regularshow_space_dome_planet_far.glb",
-      "minigame": null
+      "minigame": "regularshow"
     },
     {
       "id": "southpark",

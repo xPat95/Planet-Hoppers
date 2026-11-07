@@ -38,10 +38,10 @@ Por ejemplo, al empezar con South Park y ganar Halloween, se recibe el token de 
 | South Park | Stan, Kyle, Kenny y Cartman | Recorrer South Park y resolver un puzzle relacionado con Kenny | Pablo |
 | Smiling Friends | Pim y Charlie | Hacer reír a personajes eligiendo chistes | Cami |
 | Halloween | Ghost Face | [Bruja de guardia: calmar una fiesta con hechizos dibujados](docs/minigames/halloween-plan.md) (diseño acordado; implementación pendiente) | Cami |
-| Un Show Más (Regular Show) | Mordecai y Rigby | Shooter en primera persona con raycasting: disparar a enemigos y acumular puntos | Norman |
+| Un Show Más (Regular Show) | Mordecai y Rigby | El Martillo: combate arcade en tres niveles, individual o cooperativo local | Norman |
 | Star Wars | Grogu (Baby Yoda) | Vuelo libre por el túnel y ataque al reactor, sin raycasting | Norman |
 
-La nave de Un Show Más es el carrito de golf con alas de cartón; sus personajes son Mordecai y Rigby. Los recursos están modelados; los enemigos y la implementación del minijuego siguen pendientes. Su identificador interno es `regularshow` y seguirá las mismas reglas de tokens, desbloqueo y abducción que las demás franquicias.
+La nave de Un Show Más es el carrito de golf con alas de cartón; sus personajes son Mordecai y Rigby. El planeta abre El Martillo al explorar con E/Enter; sus tres niveles, música y videos están integrados en el juego principal. Su identificador interno es `regularshow` y seguirá las mismas reglas de tokens, desbloqueo y abducción que las demás franquicias.
 
 Los sistemas generales son trabajo compartido de los tres integrantes. La estación espacial queda como funcionalidad compartida, pendiente de asignación. Ver [distribución de responsabilidades](docs/responsibilities.md).
 
@@ -171,7 +171,7 @@ Al entrar se reproduce una presentación 3D sincronizada con el audio completo d
 cargo run --locked --bin solarsystem
 ```
 
-Fases 1 a 6: Sol central y los seis planetas de Blender en sus órbitas, con traslación y rotación propia (deltaTime), luz del Sol, fondo de estrellas y una nave para recorrerlos (W/S, mouse, Shift turbo, C vista general). Cerca de un planeta aparece **Explorar planeta**: South Park abre su minijuego y al salir se vuelve al sistema solar; los demás minijuegos siguen en construcción. Ver [sistema solar](docs/solar-system.md).
+Fases 1 a 6: Sol central y los seis planetas de Blender en sus órbitas, con traslación y rotación propia (deltaTime), luz del Sol, fondo de estrellas y una nave para recorrerlos (W/S, mouse, Shift turbo, C vista general). Cerca de un planeta aparece **Explorar planeta**: South Park, Smiling Friends, Minecraft, Star Wars y Regular Show abren sus minijuegos y permiten regresar al sistema solar; Halloween sigue en construcción. Ver [sistema solar](docs/solar-system.md).
 
 ## Planetas disponibles para integración
 
@@ -212,3 +212,11 @@ El planeta Star Wars abre el nivel del túnel usando la **misma nave activa del 
 El nivel conserva video inicial -> menú -> vuelo, canción de fondo, cuatro ataques desde popa, las seis familias industriales y seis discos blindados completos con tres paneles rompibles por disco: dos después de la mitad del recorrido y cuatro en la aproximación final.
 
 Ejecutar el juego completo: `cargo run --release`. Aproximarse al planeta Star Wars y explorar con E/Enter. Acceso de desarrollo: `cargo run --release --bin starwars -- --ship starwars` (también acepta las otras identidades de selección). Detalles, controles y comprobaciones en [docs/minigames/starwars.md](docs/minigames/starwars.md).
+
+## Regular Show integrado: El Martillo
+
+Acercarse al planeta **Un Show Más** y usar **E/Enter** en Explorar planeta abre El Martillo dentro del mismo proceso. Incluye tres niveles, cooperativo local con F2, música continua en menú/niveles 1–2, video de transición, música propia del nivel 3 y celebración final. Retroceso regresa al sistema solar; durante una partida pide confirmación. Se conserva la nave y la primera victoria concede el token y el desbloqueo de Regular Show sin duplicarlos al repetir.
+
+El Martillo usa una portada de recreativa y pantallas de televisión; Asalto al núcleo usa una consola de misión con un esquema orbital. Ambos tienen sus propias pantallas de pausa y derrota.
+
+Detalles y verificación: [El Martillo](docs/minigames/regularshow.md). Acceso de desarrollo: `cargo run --release --bin regularshow`. Prueba completa de interacción, combate y regreso: `cargo run --release -- --smoke-regularshow --ship minecraft`.

@@ -1,6 +1,6 @@
 # Resultados y regreso al sistema solar
 
-El sistema solar y South Park se ejecutan como funciones del mismo proceso. Los dos binarios disponibles son puntos de entrada independientes; el sistema solar no lanza `southpark.exe`. Cada escena libera su ventana, recursos gráficos y audio antes de que se abra la siguiente. No se introduce un gestor global de escenas ni comunicación por archivos de estado.
+El sistema solar y sus minijuegos se ejecutan como funciones del mismo proceso. Los dos binarios disponibles son puntos de entrada independientes; el sistema solar no lanza `southpark.exe`. Cada escena libera su ventana, recursos gráficos y audio antes de que se abra la siguiente. No se introduce un gestor global de escenas ni comunicación por archivos de estado.
 
 ## Contrato compartido
 
@@ -11,7 +11,7 @@ El sistema solar y South Park se ejecutan como funciones del mismo proceso. Los 
 - `MinigameCompletion { planet_id, minigame_id, result }`: resultado estructurado que el anfitrión retiene en memoria para futuros consumidores de progreso. También se imprime como `MINIGAME_RETURN` en JSON.
 - `ReturnConfirmation`: pedir, cancelar y confirmar un abandono; confirmar sin petición pendiente no produce un resultado.
 
-`scenes::minigame_host::run` centraliza el despacho y el estado entre visitas. Registra South Park, Smiling Friends y Minecraft. Cada adaptador devuelve `MinigameExit` y conserva únicamente el contexto entre visitas que corresponda. Minecraft reutiliza el host completo de aldea y Diamond Rush; su salida y recuperación de aproximación se detallan en [la integración Minecraft](minecraft-solar-integration.md). Halloween/Calaca, Regular Show y Star Wars siguen sin minijuego conectado.
+`scenes::minigame_host::run` centraliza el despacho y el estado entre visitas. Registra South Park, Smiling Friends, Minecraft, Star Wars y Regular Show. Cada adaptador devuelve `MinigameExit` y conserva únicamente el contexto entre visitas que corresponda. Minecraft reutiliza el host completo de aldea y Diamond Rush; su salida y recuperación de aproximación se detallan en [la integración Minecraft](minecraft-solar-integration.md). Halloween/Calaca sigue sin minijuego conectado. Regular Show usa El Martillo con el mismo contrato de resultados y `AttemptReporter`; Star Wars recibe además los metadatos de la nave activa.
 
 `SouthParkExit` permanece como alias del contrato compartido para compatibilidad. El único estado de South Park entre visitas es `intro_seen`: no se conserva el progreso del intento. No se entregan tokens, recompensas, desbloqueos ni cinemáticas.
 
