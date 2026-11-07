@@ -6,6 +6,21 @@ const AMBER: Color = Color::new(255, 179, 78, 255);
 const WHITE: Color = Color::new(226, 233, 232, 255);
 const MUTED: Color = Color::new(128, 153, 163, 255);
 const RED: Color = Color::new(255, 83, 54, 255);
+/// Uses the same logical rectangles for rendering and scaled mouse hit testing.
+pub fn victory_buttons(w: f32, h: f32) -> [Rectangle; 2] {
+    let scale = (w / 1280.0).min(h / 800.0);
+    let ox = (w - 1280.0 * scale) * 0.5;
+    let oy = (h - 800.0 * scale) * 0.5;
+    [400.0, 480.0].map(|y| {
+        Rectangle::new(
+            ox + 92.0 * scale,
+            oy + y * scale,
+            618.0 * scale,
+            53.0 * scale,
+        )
+    })
+}
+
 fn v(x: f32, y: f32, z: f32) -> Vector3 {
     Vector3::new(x, y, z)
 }
@@ -915,7 +930,78 @@ impl Presentation {
             accent,
         );
     }
+    fn victory_menu(&self, d: &mut impl RaylibDraw, g: &Game) {
+        let green = Color::new(149, 219, 172, 255);
+        let ink = Color::new(8, 17, 24, 255);
+        d.draw_rectangle(0, 0, 1280, 800, Color::new(3, 9, 15, 224));
+        d.draw_rectangle(64, 181, 676, 438, ink);
+        d.draw_rectangle(64, 181, 676, 4, green);
+        self.text(
+            d,
+            "MANDO DE VUELO / REACTOR DESTRUIDO",
+            92.0,
+            209.0,
+            18.0,
+            green,
+        );
+        self.text(d, "MISIÓN CUMPLIDA", 90.0, 264.0, 47.0, WHITE);
+        self.text(
+            d,
+            &format!("{:06} PUNTOS / {} CARGAS DESTRUIDAS", g.score, g.destroyed),
+            93.0,
+            337.0,
+            19.0,
+            MUTED,
+        );
+        let [replay, leave] = victory_buttons(1280.0, 800.0);
+        d.draw_rectangle_rec(replay, green);
+        self.text(d, "ENTER / R   VOLVER A JUGAR", 112.0, 411.0, 24.0, ink);
+        d.draw_rectangle_lines_ex(leave, 1.0, green);
+        self.text(
+            d,
+            "ESC   REGRESAR AL SISTEMA SOLAR",
+            112.0,
+            493.0,
+            22.0,
+            WHITE,
+        );
+        self.text(
+            d,
+            "Otra misión comienza con la misma nave.",
+            94.0,
+            573.0,
+            18.0,
+            MUTED,
+        );
+        d.draw_circle_lines(988, 348, 99.0, green);
+        d.draw_line_ex(
+            Vector2::new(939.0, 350.0),
+            Vector2::new(975.0, 385.0),
+            5.0,
+            green,
+        );
+        d.draw_line_ex(
+            Vector2::new(975.0, 385.0),
+            Vector2::new(1038.0, 310.0),
+            5.0,
+            green,
+        );
+        self.text(d, "OBJETIVO ELIMINADO", 850.0, 489.0, 25.0, green);
+        self.text(
+            d,
+            &format!("INTEGRIDAD FINAL / {} DE 3", g.hull),
+            851.0,
+            535.0,
+            18.0,
+            WHITE,
+        );
+        self.text(d, "TRANSMISIÓN COMPLETADA", 851.0, 576.0, 16.0, MUTED);
+    }
     fn ui(&self, d: &mut impl RaylibDraw, g: &Game, time: f32) {
+        if g.phase == Phase::Won {
+            self.victory_menu(d, g);
+            return;
+        }
         if g.phase == Phase::Briefing {
             self.briefing(d, time);
             return;

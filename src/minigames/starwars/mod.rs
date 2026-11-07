@@ -304,7 +304,12 @@ pub fn run_with_results(
         std::fs::create_dir_all(&captures)?;
         for (width, height) in [(1280, 800), (960, 600)] {
             rl.set_window_size(width, height);
-            for (name, phase) in [("briefing", Phase::Briefing), ("pause", Phase::Paused), ("defeat", Phase::Lost)] {
+            for (name, phase) in [
+                ("briefing", Phase::Briefing),
+                ("pause", Phase::Paused),
+                ("defeat", Phase::Lost),
+                ("victory", Phase::Won),
+            ] {
                 game.phase = phase;
                 for _ in 0..4 {
                     let mut draw = rl.begin_drawing(&thread);
@@ -375,6 +380,8 @@ pub fn run_with_results(
         "33_disco_2275.png",
     ];
     let mut menu_frames = 0;
+    let mut victory_frames = 0;
+    let mut smoke_replay_verified = false;
     let mut previous_phase = game.phase;
     let (mut intro_saved, mut outro_saved) = (false, false);
     let (mut frames, mut frame_time) = (0u32, 0.0f32);
@@ -389,18 +396,46 @@ pub fn run_with_results(
         while let Some(key) = rl.get_key_pressed() {
             pressed.push(key);
         }
+        if smoke {
+            pressed.retain(|key| *key == KeyboardKey::KEY_ESCAPE);
+            if game.phase == Phase::Won && victory_frames >= 4 {
+                pressed.push(if smoke_replay_verified {
+                    KeyboardKey::KEY_ESCAPE
+                } else {
+                    KeyboardKey::KEY_ENTER
+                });
+            }
+        }
+        // Mouse and keyboard share the final screen's two actions.
+        if game.phase == Phase::Won && rl.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_LEFT) {
+            let buttons = render::victory_buttons(
+                rl.get_screen_width() as f32,
+                rl.get_screen_height() as f32,
+            );
+            if buttons[0].check_collision_point_rec(rl.get_mouse_position()) {
+                pressed.push(KeyboardKey::KEY_ENTER);
+            }
+            if buttons[1].check_collision_point_rec(rl.get_mouse_position()) {
+                pressed.push(KeyboardKey::KEY_ESCAPE);
+            }
+        }
         if pressed.contains(&KeyboardKey::KEY_ESCAPE) {
-            exit = MinigameExit::Returned(if game.phase == Phase::Lost {
-                MinigameResult::Defeat
-            } else {
-                MinigameResult::Abandoned
+            if smoke && game.phase == Phase::Won {
+                println!(
+                    "SMOKE_OK hull={} average_fps={:.1} intro={} outro={} results=true replay={}",
+                    game.hull,
+                    frames as f32 / frame_time,
+                    intro_saved,
+                    outro_saved,
+                    smoke_replay_verified
+                );
+            }
+            exit = MinigameExit::Returned(match game.phase {
+                Phase::Won => MinigameResult::Victory,
+                Phase::Lost => MinigameResult::Defeat,
+                _ => MinigameResult::Abandoned,
             });
             break;
-        }
-        // Keep the automated full-video check independent of keyboard activity.
-        // Escape above remains available to stop it.
-        if smoke {
-            pressed.clear();
         }
         let dt = rl.get_frame_time().clamp(0.0, 0.1);
         ambient += dt;
@@ -427,7 +462,28 @@ pub fn run_with_results(
         } else {
             let enter = pressed.contains(&KeyboardKey::KEY_ENTER);
             let pause = pressed.contains(&KeyboardKey::KEY_P);
-            if pressed.contains(&KeyboardKey::KEY_R) {
+            if game.phase == Phase::Won && (enter || pressed.contains(&KeyboardKey::KEY_R)) {
+                let half = game.ship_half;
+                game.start();
+                clip = None;
+                media_error = None;
+                accumulator = 0.0;
+                if smoke {
+                    if game.distance != 0.0
+                        || game.score != 0
+                        || game.hull != 3
+                        || game.reactor_hp != 6
+                        || game.shots_fired != 0
+                        || game.ship_half != half
+                    {
+                        return Err("La revancha no reinició correctamente la misión".into());
+                    }
+                    smoke_replay_verified = true;
+                    println!(
+                        "REPLAY_AFTER_OUTRO phase=Running distance=0 score=0 hull=3 same_ship=true"
+                    );
+                }
+            } else if pressed.contains(&KeyboardKey::KEY_R) {
                 clip = None;
                 media_error = None;
                 game.intro();
@@ -533,24 +589,6 @@ pub fn run_with_results(
                 Phase::Briefing
             });
         }
-        // Won is a terminal result, never a results screen. Exit before drawing another frame.
-        if game.phase == Phase::Won {
-            if smoke {
-                println!(
-                    "SMOKE_OK hull={} average_fps={:.1} intro={} outro={}",
-                    game.hull,
-                    frames as f32 / frame_time,
-                    intro_saved,
-                    outro_saved
-                );
-            }
-            println!(
-                "RETURN_AFTER_OUTRO ship={} model={}",
-                selected.id, selected.model
-            );
-            exit = MinigameExit::Returned(MinigameResult::Victory);
-            break;
-        }
         let hide_cursor = matches!(
             game.phase,
             Phase::Running | Phase::Intro | Phase::Outro | Phase::Explosion
@@ -626,9 +664,18 @@ pub fn run_with_results(
                 );
                 previous_phase = game.phase;
             }
-            if game.phase == Phase::Lost || media_error.is_some() || ambient > 150.0 {
+            if game.phase == Phase::Lost || media_error.is_some() || ambient > 240.0 {
                 return Err("La prueba integral no completó la misión".into());
             }
+        }
+        if smoke && game.phase == Phase::Won {
+            victory_frames += 1;
+            if victory_frames == 4 {
+                save_capture(&rl, &captures.join("smoke_victory.png"));
+                println!("VICTORY_MENU_AFTER_OUTRO replay_verified={smoke_replay_verified}");
+            }
+        } else {
+            victory_frames = 0;
         }
         // Render a few menu frames before the diagnostic confirms it, so the
         // screenshot reads a presented menu buffer instead of the last video frame.
@@ -646,7 +693,7 @@ pub fn run_with_results(
             menu_frames = 0;
         }
     }
-    if smoke && game.phase != Phase::Won {
+    if smoke && (game.phase != Phase::Won || !smoke_replay_verified) {
         return Err("Prueba integral interrumpida antes del cierre final".into());
     }
     Ok(exit)

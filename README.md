@@ -207,7 +207,7 @@ La [Ciudadela de Mass Effect](assets/models/environment/spaceStation/README.md) 
 
 ## Star Wars integrado: Asalto al núcleo
 
-El planeta Star Wars abre el nivel del túnel usando la **misma nave activa del sistema solar**, con sus materiales y proporciones. Su tamaño se adapta al recorrido y la integridad usa los límites del modelo ajustado, incluida su inclinación. Al terminar el video final se vuelve al sistema solar con la selección conservada. Esc regresa al sistema solar; tras una derrota registra el resultado correspondiente.
+El planeta Star Wars abre el nivel del túnel usando la **misma nave activa del sistema solar**, con sus materiales y proporciones. Su tamaño se adapta al recorrido y la integridad usa los límites del modelo ajustado, incluida su inclinación. Al terminar el video final aparece **Misión cumplida**: Enter/R o el botón Volver a jugar reinicia el vuelo con la misma nave; Esc o Regresar al sistema solar devuelve Victory con la selección conservada. Durante un intento, Esc regresa como abandono o derrota según corresponda.
 
 El nivel conserva video inicial -> menú -> vuelo, canción de fondo, cuatro ataques desde popa, las seis familias industriales y seis discos blindados completos con tres paneles rompibles por disco: dos después de la mitad del recorrido y cuatro en la aproximación final.
 

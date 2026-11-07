@@ -9,12 +9,12 @@ Ejecutar `cargo run --release`, elegir una nave y acercarse al planeta Star Wars
 - WASD/flechas: desplazamiento por el interior del túnel.
 - Espacio: láseres manuales y seis torpedos al llegar al núcleo.
 - Shift: turbo. P: pausa y reanudación. Enter continúa desde pausa.
-- R: reiniciar desde el video inicial y volver al menú.
-- Esc: regresar al sistema solar (abandono; si ya hubo derrota, resultado Defeat).
+- R: reiniciar desde el video inicial y volver al menú. Desde Misión cumplida, Enter/R reinicia directamente el vuelo con la misma nave.
+- Esc: regresar al sistema solar (Victory desde Misión cumplida; Defeat desde derrota; Abandoned durante el intento).
 - F11: pantalla completa. F12: captura en `target/starwars/capturas/`.
 - Cerrar la ventana con X mantiene el contrato general de salida del juego principal.
 
-El video final devuelve directamente al sistema solar con Victory, sin pantalla adicional. La canción se limita al vuelo/explosión y respeta la pausa. Se conservan tres barras de integridad, disparos manuales, cuatro ataques desde popa, obstáculos industriales y seis discos blindados completos, cada uno con tres paneles independientes. Dos discos aparecen después de la mitad del recorrido (1350 y 1800 m); los cuatro de la aproximación final están en 2130, 2210, 2275 y 2340 m. Los de 2210 y 2340 m se conservan del recorrido anterior. Las posiciones son irregulares pero repetibles para mantener el equilibrio y poder comprobar la ruta.
+El video final termina en la pantalla **Misión cumplida** y espera la elección del jugador. Enter/R o clic en **Volver a jugar** inicia una misión nueva con la misma nave, integridad completa, reactor restaurado, disparos y puntuación reiniciados. Esc o clic en **Regresar al sistema solar** devuelve Victory. La victoria ya registrada se conserva aunque se juegue otra vez y después se pierda o abandone; una nueva victoria no duplica el token ni el desbloqueo. La canción se limita al vuelo/explosión y respeta la pausa. Se conservan tres barras de integridad, disparos manuales, cuatro ataques desde popa, obstáculos industriales y seis discos blindados completos, cada uno con tres paneles independientes. Dos discos aparecen después de la mitad del recorrido (1350 y 1800 m); los cuatro de la aproximación final están en 2130, 2210, 2275 y 2340 m. Los de 2210 y 2340 m se conservan del recorrido anterior. Las posiciones son irregulares pero repetibles para mantener el equilibrio y poder comprobar la ruta.
 
 ## Nave, tamaño y colisión
 
@@ -53,4 +53,8 @@ La prueba gráfica del OBJ del Mandaloriano se ejecuta explícitamente con `carg
 
 ## Menús de misión
 
-La portada presenta una consola de la Alianza Rebelde, las tres etapas del vuelo y un esquema orbital de la Estrella de la Muerte con barrido animado. Pausa y derrota usan su propio panel de mando lateral con controles y ruta de misión. `cargo run --release --bin starwars -- --check-menus` guarda las seis capturas de portada/pausa/derrota a 1280×800 y 960×600 en `target/starwars/capturas/`. El prototipo independiente también conserva este diseño.
+La portada presenta una consola de la Alianza Rebelde, las tres etapas del vuelo y un esquema orbital de la Estrella de la Muerte con barrido animado. Pausa y derrota usan su propio panel de mando lateral con controles y ruta de misión. `cargo run --release --bin starwars -- --check-menus` guarda las ocho capturas de portada/pausa/derrota/victoria a 1280×800 y 960×600 en `target/starwars/capturas/`. El prototipo independiente también conserva este diseño.
+
+La prueba `cargo run --release -- --smoke-starwars --ship minecraft` completa dos misiones reales: reproduce las escenas hasta el final, presenta la pantalla de victoria, reinicia mediante Enter y regresa mediante Esc desde la segunda victoria. Comprueba el reinicio y conserva la nave y una sola recompensa. Las capturas incluyen `smoke_victory.png`; el registro de esta comprobación está en `target/starwars-results-host.log`.
+
+Verificación del menú final: 30 pruebas del módulo Star Wars, 18 de recompensas/despacho y las 26 del prototipo independiente aprobadas. La prueba completa terminó con `results=true replay=true`, `STARWARS_HOST_PASS` y `FRONT_END_SMOKE_PASS`: completó dos victorias con la misma nave Minecraft y conservó un solo token/desbloqueo de Star Wars.
