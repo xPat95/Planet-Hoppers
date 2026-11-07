@@ -1556,7 +1556,6 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             shader.set_planet_toon(false);
             shader.set_planet_key(Vector3::zero(), Vector4::new(0.0, 0.0, 0.0, 0.0), 1.0, false);
             let sp = &s.ship;
-            let fwd = sp.forward();
             let ship_world = Matrix::rotate_z(sp.bank) * Matrix::rotate_x(sp.pitch) * Matrix::rotate_y(sp.yaw)
                 * Matrix::translate(sp.position.x, sp.position.y, sp.position.z);
             match &ship_model {
@@ -1566,15 +1565,6 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             }
             if s.collision_debug {
                 crate::graphics::station_debug::draw(&mut d3,&s.station,sp.position,station_ship_radius(s,&ship_model));
-            }
-            if sp.speed > 1.0 {
-                // Compact supplemental exhaust; the GLB's own engine effects remain.
-                let k = (sp.speed / s.ships.flight.boost_speed).min(1.0);
-                let rear = ship_model.as_ref().map_or(ship_len * 0.5, |m| m.half_extents.z);
-                for (offset, radius, alpha) in crate::graphics::ship_presentation::exhaust_spheres(ship_len, rear, k) {
-                    let at = sp.position - fwd * offset;
-                    d3.draw_sphere(at, radius, Color::new(140, 210, 255, alpha));
-                }
             }
         }
 
