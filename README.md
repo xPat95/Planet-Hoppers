@@ -199,24 +199,3 @@ Los siguientes modelos son naves, independientes de los planetas. Los controles,
 | `regularshow` | Carrito de Regular Show | [Fuente y exportaciones](assets/models/ships/regularshow/golfcart/README.md) |
 | `starwars` | Caza Naboo N-1 | [Fuente y exportaciones](assets/models/ships/starwars/naboo/README.md) |
 | `starwars` | N-1 del Mandaloriano | [Fuente y exportaciones](assets/models/ships/starwars/mandalorian/README.md) |
-
-## Estación espacial disponible como recurso
-
-La [Ciudadela de Mass Effect](assets/models/environment/spaceStation/README.md) es el modelo aprobado de la estación compartida: fuente Blender editable, GLB cercano y lejano, OBJ/MTL y vistas de revisión. Su colocación en el sistema solar, las colisiones, el hangar y la selección de naves siguen pendientes de implementación.
-
-
-## Star Wars integrado: Asalto al núcleo
-
-El planeta Star Wars abre el nivel del túnel usando la **misma nave activa del sistema solar**, con sus materiales y proporciones. Su tamaño se adapta al recorrido y la integridad usa los límites del modelo ajustado, incluida su inclinación. Al terminar el video final aparece **Misión cumplida**: Enter/R o el botón Volver a jugar reinicia el vuelo con la misma nave; Esc o Regresar al sistema solar devuelve Victory con la selección conservada. Durante un intento, Esc regresa como abandono o derrota según corresponda.
-
-El nivel conserva video inicial -> menú -> vuelo, canción de fondo, cuatro ataques desde popa, las seis familias industriales y seis discos blindados completos con tres paneles rompibles por disco: dos después de la mitad del recorrido y cuatro en la aproximación final.
-
-Ejecutar el juego completo: `cargo run --release`. Aproximarse al planeta Star Wars y explorar con E/Enter. Acceso de desarrollo: `cargo run --release --bin starwars -- --ship starwars` (también acepta las otras identidades de selección). Detalles, controles y comprobaciones en [docs/minigames/starwars.md](docs/minigames/starwars.md).
-
-## Regular Show integrado: El Martillo
-
-Acercarse al planeta **Un Show Más** y usar **E/Enter** en Explorar planeta abre El Martillo dentro del mismo proceso. Incluye tres niveles, cooperativo local con F2, música continua en menú/niveles 1–2, video de transición, música propia del nivel 3 y celebración final. Retroceso regresa al sistema solar; durante una partida pide confirmación. Se conserva la nave y la primera victoria concede el token y el desbloqueo de Regular Show sin duplicarlos al repetir.
-
-El Martillo usa una portada de recreativa y pantallas de televisión; Asalto al núcleo usa una consola de misión con un esquema orbital. Ambos tienen sus propias pantallas de pausa y derrota.
-
-Detalles y verificación: [El Martillo](docs/minigames/regularshow.md). Acceso de desarrollo: `cargo run --release --bin regularshow`. Prueba completa de interacción, combate y regreso: `cargo run --release -- --smoke-regularshow --ship minecraft`.
