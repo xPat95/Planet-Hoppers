@@ -189,13 +189,3 @@ Los siguientes recursos son **planetas del sistema solar**. Sus archivos Blender
 | Estrella de la Muerte | [Planeta de Star Wars](assets/models/planets/starwars/README.md) | [Revisión](docs/planets/starwars.md) |
 | Domo Espacial | [Planeta de Regular Show](assets/models/planets/regularshow/README.md) | [Revisión](docs/planets/regularshow.md) |
 
-
-## Naves disponibles como recursos
-
-Los siguientes modelos son naves, independientes de los planetas. Los controles, desbloqueos y animaciones de juego siguen pendientes.
-
-| Temática | Nave o variante | Recursos |
-| --- | --- | --- |
-| `regularshow` | Carrito de Regular Show | [Fuente y exportaciones](assets/models/ships/regularshow/golfcart/README.md) |
-| `starwars` | Caza Naboo N-1 | [Fuente y exportaciones](assets/models/ships/starwars/naboo/README.md) |
-| `starwars` | N-1 del Mandaloriano | [Fuente y exportaciones](assets/models/ships/starwars/mandalorian/README.md) |
