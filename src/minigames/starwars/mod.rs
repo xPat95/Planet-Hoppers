@@ -170,6 +170,7 @@ pub fn run_with_results(
     let root = project_root.join("assets/minigames/starwars");
     let check_ships = args.iter().any(|a| a == "--check-ships");
     let check_startup = args.iter().any(|a| a == "--check-startup");
+    let check_menus = args.iter().any(|a| a == "--check-menus");
     let capture = args.iter().any(|a| a == "--capture");
     let smoke_hidden = args.iter().any(|a| a == "--smoke-hidden");
     let smoke = smoke_hidden || args.iter().any(|a| a == "--smoke");
@@ -188,7 +189,7 @@ pub fn run_with_results(
         .resizable()
         .msaa_4x()
         .build();
-    if smoke_hidden || check_startup || check_ships {
+    if smoke_hidden || check_startup || check_ships || check_menus {
         rl.set_window_state(WindowState::default().set_window_hidden(true));
     }
     rl.set_exit_key(None);
@@ -297,6 +298,22 @@ pub fn run_with_results(
             );
         }
         println!("ALL_SHIPS_OK count={}", catalog.choices.len());
+        return Ok(MinigameExit::ReturnedWithoutResult);
+    }
+    if check_menus {
+        std::fs::create_dir_all(&captures)?;
+        for (width, height) in [(1280, 800), (960, 600)] {
+            rl.set_window_size(width, height);
+            for (name, phase) in [("briefing", Phase::Briefing), ("pause", Phase::Paused), ("defeat", Phase::Lost)] {
+                game.phase = phase;
+                for _ in 0..4 {
+                    let mut draw = rl.begin_drawing(&thread);
+                    presentation.draw(&mut draw, &thread, &game, 1.0, width as f32, height as f32);
+                }
+                save_capture(&rl, &captures.join(format!("menu-{name}-{width}.png")));
+            }
+        }
+        println!("STARWARS_MENUS_OK");
         return Ok(MinigameExit::ReturnedWithoutResult);
     }
     if check_startup {

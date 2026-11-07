@@ -751,56 +751,173 @@ impl Presentation {
     fn text(&self, d: &mut impl RaylibDraw, s: &str, x: f32, y: f32, size: f32, c: Color) {
         d.draw_text_ex(&self.font, s, Vector2::new(x, y), size, 1.0, c);
     }
+    fn briefing(&self, d: &mut impl RaylibDraw, time: f32) {
+        let ink = Color::new(8, 15, 21, 255);
+        let green = Color::new(149, 219, 172, 255);
+        d.draw_rectangle(0, 0, 1280, 800, Color::new(4, 10, 16, 222));
+        for x in (0..1280).step_by(40) {
+            d.draw_line(x, 0, x, 800, Color::new(24, 39, 43, 100));
+        }
+        for y in (0..800).step_by(40) {
+            d.draw_line(0, y, 1280, y, Color::new(24, 39, 43, 100));
+        }
+        d.draw_rectangle(0, 0, 1280, 56, ink);
+        d.draw_rectangle(0, 55, 1280, 1, green);
+        self.text(
+            d,
+            "ALIANZA REBELDE   /   MANDO DE VUELO",
+            42.0,
+            16.0,
+            19.0,
+            green,
+        );
+        self.text(d, "OPERACIÓN  //  DS-01", 1018.0, 18.0, 16.0, MUTED);
+        self.text(d, "ESTRELLA DE LA MUERTE", 64.0, 104.0, 22.0, AMBER);
+        self.text(d, "ASALTO", 58.0, 143.0, 90.0, WHITE);
+        self.text(d, "AL NÚCLEO", 58.0, 224.0, 90.0, WHITE);
+        self.text(
+            d,
+            "PLAN DE VUELO / TRANSMISIÓN CIFRADA",
+            65.0,
+            345.0,
+            17.0,
+            green,
+        );
+        for (i, (title, detail)) in [
+            ("INFILTRAR", "Entra al ducto de la estación."),
+            ("ATRAVESAR", "Esquiva estructuras. Abre las compuertas."),
+            ("DESTRUIR", "Alcanza el reactor y dispara seis torpedos."),
+        ]
+        .iter()
+        .enumerate()
+        {
+            let y = 390.0 + i as f32 * 61.0;
+            d.draw_rectangle(65, y as i32, 35, 33, Color::new(31, 51, 48, 255));
+            self.text(d, &format!("{:02}", i + 1), 73.0, y + 5.0, 19.0, green);
+            self.text(d, title, 116.0, y - 2.0, 19.0, WHITE);
+            self.text(d, detail, 116.0, y + 23.0, 17.0, MUTED);
+        }
+        d.draw_rectangle(64, 600, 529, 60, AMBER);
+        self.text(d, "ENTER   /   INICIAR MISIÓN", 89.0, 614.0, 27.0, ink);
+        self.text(
+            d,
+            "WASD / FLECHAS   VOLAR       ESPACIO   DISPARAR",
+            65.0,
+            686.0,
+            16.0,
+            WHITE,
+        );
+        self.text(
+            d,
+            "SHIFT   TURBO       P   PAUSA       R   REINICIAR",
+            65.0,
+            715.0,
+            16.0,
+            MUTED,
+        );
+        self.text(d, "ESC   VOLVER AL SISTEMA SOLAR", 65.0, 756.0, 15.0, green);
+        // Orbital targeting schematic: vector geometry belongs to the mission console.
+        let center = Vector2::new(941.0, 339.0);
+        for radius in [181.0, 187.0, 207.0] {
+            d.draw_circle_lines(center.x as i32, center.y as i32, radius, green);
+        }
+        for offset in [-125.0f32, -72.0, 0.0, 72.0, 125.0] {
+            let half = (181.0f32.powi(2) - offset.powi(2)).sqrt();
+            d.draw_line_ex(
+                Vector2::new(center.x - half, center.y + offset),
+                Vector2::new(center.x + half, center.y + offset),
+                1.0,
+                Color::new(72, 112, 92, 255),
+            );
+        }
+        d.draw_ellipse_lines(941, 339, 79.0, 181.0, Color::new(72, 112, 92, 255));
+        d.draw_rectangle(760, 333, 362, 13, ink);
+        d.draw_line(760, 332, 1122, 332, green);
+        d.draw_line(760, 347, 1122, 347, green);
+        d.draw_circle_lines(893, 252, 42.0, green);
+        d.draw_circle_lines(893, 252, 30.0, green);
+        d.draw_circle(941, 339, 6.0, AMBER);
+        d.draw_line(941, 339, 1162, 525, AMBER);
+        self.text(d, "REACTOR PRINCIPAL", 924.0, 546.0, 17.0, AMBER);
+        self.text(d, "OBJETIVO: 2.500 M", 924.0, 573.0, 15.0, MUTED);
+        let sweep = time * 0.6;
+        d.draw_line_ex(
+            center,
+            center + Vector2::new(sweep.cos(), sweep.sin()) * 181.0,
+            1.0,
+            Color::new(149, 219, 172, 90),
+        );
+        d.draw_rectangle(756, 644, 454, 91, ink);
+        d.draw_rectangle(756, 644, 3, 91, green);
+        self.text(
+            d,
+            "ENLACE ESTABLE / NAVE PREPARADA",
+            778.0,
+            660.0,
+            17.0,
+            green,
+        );
+        self.text(d, "3 BARRAS DE INTEGRIDAD", 778.0, 691.0, 16.0, WHITE);
+    }
+    fn flight_menu(&self, d: &mut impl RaylibDraw, g: &Game) {
+        let green = Color::new(149, 219, 172, 255);
+        let lost = g.phase == Phase::Lost;
+        let accent = if lost { RED } else { green };
+        d.draw_rectangle(0, 0, 1280, 800, Color::new(3, 9, 15, 199));
+        d.draw_rectangle(64, 181, 676, 438, Color::new(8, 17, 24, 248));
+        d.draw_rectangle(64, 181, 676, 4, accent);
+        self.text(d, "MANDO DE VUELO  /  DS-01", 92.0, 209.0, 18.0, accent);
+        self.text(
+            d,
+            if lost {
+                "SEÑAL PERDIDA"
+            } else {
+                "VUELO EN ESPERA"
+            },
+            90.0,
+            264.0,
+            47.0,
+            WHITE,
+        );
+        let detail = if lost {
+            format!("{:06} PUNTOS / {} CARGAS DESTRUIDAS", g.score, g.destroyed)
+        } else {
+            "Nave detenida. La misión puede continuar.".to_owned()
+        };
+        self.text(d, &detail, 93.0, 337.0, 19.0, MUTED);
+        d.draw_rectangle(92, 400, 618, 53, accent);
+        self.text(
+            d,
+            if lost {
+                "ENTER   REINTENTAR MISIÓN"
+            } else {
+                "P / ENTER   REANUDAR VUELO"
+            },
+            112.0,
+            411.0,
+            24.0,
+            Color::new(8, 17, 24, 255),
+        );
+        self.text(d, "R   REINICIAR DESDE LA INTRO", 94.0, 488.0, 18.0, WHITE);
+        self.text(d, "ESC   VOLVER AL SISTEMA SOLAR", 94.0, 535.0, 18.0, MUTED);
+        d.draw_line(850, 254, 850, 544, accent);
+        for (i, label) in ["DUCTO", "COMPUERTAS", "REACTOR"].iter().enumerate() {
+            let y = 273 + i as i32 * 117;
+            d.draw_circle(850, y, 7.0, accent);
+            self.text(d, label, 880.0, y as f32 - 12.0, 22.0, WHITE);
+        }
+        self.text(
+            d,
+            &format!("DISTANCIA / {:04.0} M", g.distance),
+            880.0,
+            582.0,
+            18.0,
+            accent,
+        );
+    }
     fn ui(&self, d: &mut impl RaylibDraw, g: &Game, time: f32) {
         if g.phase == Phase::Briefing {
-            d.draw_rectangle_gradient_h(
-                0,
-                0,
-                1000,
-                800,
-                Color::new(3, 9, 15, 248),
-                Color::new(3, 9, 15, 0),
-            );
-            self.text(d, "P L A N E T   H O P P E R S", 66.0, 66.0, 20.0, MUTED);
-            d.draw_rectangle(68, 165, 48, 3, AMBER);
-            self.text(d, "ESTRELLA DE LA MUERTE", 66.0, 187.0, 22.0, AMBER);
-            self.text(d, "ASALTO", 60.0, 222.0, 94.0, WHITE);
-            self.text(d, "AL NÚCLEO", 60.0, 307.0, 94.0, WHITE);
-            self.text(
-                d,
-                "Un carguero. Un reactor. Una oportunidad.",
-                68.0,
-                423.0,
-                22.0,
-                MUTED,
-            );
-            d.draw_rectangle(68, 511, 332, 54, Color::new(206, 155, 85, 255));
-            self.text(
-                d,
-                "ENTER     INICIAR MISIÓN",
-                91.0,
-                523.0,
-                23.0,
-                Color::new(10, 18, 23, 255),
-            );
-            self.text(d, "W A S D / FLECHAS     VOLAR", 68.0, 605.0, 19.0, WHITE);
-            self.text(
-                d,
-                "ESPACIO  DISPARAR     SHIFT  TURBO",
-                68.0,
-                637.0,
-                19.0,
-                WHITE,
-            );
-            self.text(
-                d,
-                "P  PAUSA     R  REINICIAR     F11  PANTALLA COMPLETA",
-                68.0,
-                700.0,
-                15.0,
-                MUTED,
-            );
-            self.text(d, "ESC  VOLVER AL SISTEMA SOLAR", 68.0, 733.0, 15.0, MUTED);
+            self.briefing(d, time);
             return;
         }
         if matches!(g.phase, Phase::Intro | Phase::Outro) {
@@ -949,28 +1066,7 @@ impl Presentation {
             );
         }
         if matches!(g.phase, Phase::Paused | Phase::Lost) {
-            d.draw_rectangle(0, 0, 1280, 800, Color::new(3, 9, 15, 208));
-            d.draw_rectangle(440, 269, 400, 2, AMBER);
-            let (title, sub) = match g.phase {
-                Phase::Paused => ("EN PAUSA", "P / ENTER     CONTINUAR"),
-                _ => ("MISIÓN FALLIDA", "ENTER     VOLVER A INTENTAR"),
-            };
-            let size = 46.0;
-            let width = self.font.measure_text(title, size, 1.0).x;
-            self.text(d, title, (1280.0 - width) * 0.5, 315.0, size, WHITE);
-            let detail = if g.phase == Phase::Paused {
-                "VUELO SUSPENDIDO".to_owned()
-            } else {
-                format!(
-                    "{:06} PUNTOS    /    {} CARGAS DESTRUIDAS",
-                    g.score, g.destroyed
-                )
-            };
-            let width = self.font.measure_text(&detail, 20.0, 1.0).x;
-            self.text(d, &detail, (1280.0 - width) * 0.5, 388.0, 20.0, MUTED);
-            let width = self.font.measure_text(sub, 22.0, 1.0).x;
-            self.text(d, sub, (1280.0 - width) * 0.5, 478.0, 22.0, AMBER);
-            self.text(d, "ESC  VOLVER AL SISTEMA SOLAR", 593.0, 540.0, 15.0, MUTED);
+            self.flight_menu(d, g);
         }
         if g.phase == Phase::Explosion {
             d.draw_rectangle(

@@ -50,3 +50,7 @@ cargo run --release -- --smoke-starwars --ship starwars
 `--check-ships` carga las seis elecciones reales, completa el recorrido normal y con turbo con cada una, comprueba daño por pared/obstáculo y guarda seis vistas en `target/starwars/ships/`. `--smoke-starwars` verifica selección inicial -> sistema solar -> nivel completo con ambos videos -> regreso con nave, órbitas y selección conservadas.
 
 La prueba gráfica del OBJ del Mandaloriano se ejecuta explícitamente con `cargo test --test starwars_host -- --ignored --exact obj_ship_uses_the_same_loader_and_safe_startup --nocapture`. La suite normal permanece libre de ventanas.
+
+## Menús de misión
+
+La portada presenta una consola de la Alianza Rebelde, las tres etapas del vuelo y un esquema orbital de la Estrella de la Muerte con barrido animado. Pausa y derrota usan su propio panel de mando lateral con controles y ruta de misión. `cargo run --release --bin starwars -- --check-menus` guarda las seis capturas de portada/pausa/derrota a 1280×800 y 960×600 en `target/starwars/capturas/`. El prototipo independiente también conserva este diseño.
