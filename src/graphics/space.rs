@@ -105,10 +105,10 @@ const SUN_DETAIL_SCALE: f32 = 18.0;
 const SUN_ACTIVITY_SPEED: f32 = 0.08;
 const SUN_CONTRAST: f32 = 0.65;
 const SUN_HALO_LAYERS: [(f32, Color); 4] = [
-    (3.8, Color::new(255, 165, 70, 5)),
-    (2.3, Color::new(255, 185, 90, 17)),
-    (1.5, Color::new(255, 215, 140, 55)),
-    (1.14, Color::new(255, 245, 210, 125)),
+    (1.70, Color::new(255, 85, 24, 12)),
+    (1.38, Color::new(255, 110, 32, 48)),
+    (1.20, Color::new(255, 145, 48, 125)),
+    (1.07, Color::new(255, 205, 115, 165)),
 ];
 const SUN_HALO_SCREEN_LIMIT: f32 = 1.6;
 
@@ -609,5 +609,13 @@ pub fn draw_sun_glow(d: &mut impl RaylibDraw, at: Vector2, radius: f32, viewport
         }
         let inner = Color::new(color.r, color.g, color.b, (color.a as f32 * intensity) as u8);
         glow.draw_circle_gradient(x, y, extent, inner, Color::new(color.r, color.g, color.b, 0));
+    }
+    for (inner, outer, alpha) in [
+        (1.00, 1.025, 104), (1.025, 1.05, 94), (1.05, 1.075, 80),
+        (1.075, 1.10, 64), (1.10, 1.135, 46), (1.135, 1.175, 33),
+        (1.175, 1.23, 19), (1.23, 1.30, 9),
+    ] {
+        glow.draw_ring(at, radius * inner, radius * outer, 0.0, 360.0, 96,
+            Color::new(255, 118, 35, (alpha as f32 * intensity) as u8));
     }
 }

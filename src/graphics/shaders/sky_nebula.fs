@@ -32,5 +32,8 @@ void main() {
     vec3 color = vec3(0.005, 0.013, 0.043);
     color += vec3(0.007, 0.038, 0.087) * blue * (0.18 + 0.82 * density);
     color += vec3(0.028, 0.011, 0.060) * purple * (0.17 + 0.83 * density);
+    // Azul mas presente en la parte alta de la pantalla, con una transicion amplia.
+    float upperBlue = smoothstep(0.02, 0.95, screen.y);
+    color += vec3(0.013, 0.050, 0.125) * upperBlue;
     finalColor = vec4(color, 1.0);
 }
