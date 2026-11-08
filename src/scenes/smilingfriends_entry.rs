@@ -151,7 +151,7 @@ pub fn run_with_results(args: impl Iterator<Item = String>, observer: &mut crate
             save_frame(&dir.join("intro-last.png"), w, h)?;
         }
         // El juego completo, jugado solo con las mejores respuestas
-        let result = super::smilingfriends_game::play_with_results(&mut rl, &thread, root, true, observer)?;
+        let result = super::smilingfriends_game::play_with_results(&mut rl, &thread, root, true, None, observer)?;
         if result != Some(MinigameResult::Victory) {
             return Err(format!("La prueba del minijuego terminó en {result:?}").into());
         }
@@ -195,7 +195,7 @@ pub fn run_with_results(args: impl Iterator<Item = String>, observer: &mut crate
                 }
             }
         } else {
-            return Ok(match super::smilingfriends_game::play_with_results(&mut rl, &thread, root, false, observer)? {
+            return Ok(match super::smilingfriends_game::play_with_results(&mut rl, &thread, root, false, device.as_ref(), observer)? {
                 Some(result) => MinigameExit::Returned(result),
                 None => MinigameExit::WindowClosed,
             });

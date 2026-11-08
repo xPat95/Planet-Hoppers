@@ -8,7 +8,7 @@
   "planets": [
     {
       "id": "halloween",
-      "name": "Halloween",
+      "name": "Hexbound",
       "orbit_radius": 150.0,
       "radius": 18.0,
       "orbit_speed_degrees": 0.55,

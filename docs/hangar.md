@@ -89,3 +89,9 @@ Validación completada: compilación de todos los binarios y 116 pruebas aprobad
 La validación automatizada no sustituye una sesión manual con teclado/mouse físicos, una evaluación sostenida de FPS ni la revisión del futuro modelo de estación. Persiste el aviso conocido de raylib sobre los índices del planeta de Star Wars; no se modificó su cargador ni ese recurso.
 
 Verificación del rediseño circular: `cargo build --locked --bins` y la suite completa de `cargo test --locked` pasaron. Se ejecutó `planet-hoppers --smoke --ship minecraft`: menú, Controles, regreso, seis exhibiciones, ambas flechas, cancelación, nueva selección y arranque del sistema solar con Minecraft; los tres informes `SELECTION_SMOKE_PASS`, `LAUNCH_SMOKE_PASS` y `FRONT_END_SMOKE_PASS` resultaron correctos. Se revisaron las capturas de las seis naves, incluida Calaca provisional, comprobando encuadre y legibilidad de UI. Evidencia: `target/front-end/hangar-<id>.png`, `target/front-end/selection-validation.json` y `target/hangar-redesign-smoke.log`. No se hizo una medición sostenida de FPS ni una partida manual en esta revisión.
+
+## Música
+
+La pantalla de inicio, el hangar y el sistema solar comparten "Sky Warriors" (`assets/audio/music/Menu/sky_warriors.mp3`, elegida por Cami; ver `src/scenes/menu_music.rs`). Cada ventana abre su audio y lo cierra antes de un minijuego; la canción recuerda por dónde iba y sigue desde ahí.
+
+Sonidos (`assets/audio/sfx/Menu/`): `ship_switch` al cambiar de nave en el hangar y `solar_riser` mientras carga el sistema solar.

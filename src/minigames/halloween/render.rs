@@ -205,6 +205,20 @@ impl Posed {
         Ok(Self { model: model.unwrap(), scratch: first.clone(), poses, last: None, base: lo, height: hi - lo })
     }
 
+    /// El centro de cada ojo (izquierdo y derecho, en el espacio del archivo) en la última pose dibujada: los vértices
+    /// del material `name`, partidos por el medio.
+    fn eye_centers(&self, name: &str) -> Option<[Vector3; 2]> {
+        let points: Vec<Vector3> = self.model.part_meshes(name).into_iter()
+            .flat_map(|m| self.scratch[m].0.iter().copied()).collect();
+        let (lo, hi) = points.iter().fold((f32::MAX, f32::MIN), |(a, b), p| (a.min(p.x), b.max(p.x)));
+        let mid = (lo + hi) / 2.0;
+        let center = |left: bool| {
+            let side: Vec<&Vector3> = points.iter().filter(|p| (p.x < mid) == left).collect();
+            (!side.is_empty()).then(|| side.iter().fold(Vector3::zero(), |a, p| a + **p) * (1.0 / side.len() as f32))
+        };
+        Some([center(true)?, center(false)?])
+    }
+
     /// Mezcla las poses `a` y `b` (t de 0 a 1) en la malla que se dibuja.
     fn pose(&mut self, a: usize, b: usize, t: f32) {
         let key = (a, b, (t * 200.0).round() / 200.0);
@@ -369,6 +383,8 @@ fn scene_items(art: &Art, fx: &Fx, s: &Session, view: View, camera: Camera3D) ->
         let calm = fx.calm.get(&c.id).copied();
         // Corriendo hacia ella: pasos rápidos
         let phase = t * 7.5 + c.id as f32 * 1.7;
+        // Los ojos del trío final, encendidos
+        let boost = if c.boss { 3.5 } else { 1.0 };
         let (x, y) = shown_pos(c, t);
         let mut at = point(x, y);
         let mut front = -at;
@@ -391,10 +407,9 @@ fn scene_items(art: &Art, fx: &Fx, s: &Session, view: View, camera: Camera3D) ->
             }
             // El fantasma y el diablo, como una película rota: se quedan en un cuadro y saltan al siguiente, y en
             // cada salto la cabeza y el cuerpo quedan torcidos para cualquier lado
-            None if stutters(c.kind) => {
+            None if stutters(c) => {
                 let k = stutter_frame(c, t);
-                let yaw = (noise(k * 1.31 + 2.2) - 0.5) * 0.9;
-                front = Vector3::new(front.x * yaw.cos() - front.z * yaw.sin(), 0.0, front.x * yaw.sin() + front.z * yaw.cos());
+                front = stutter_front(front, k);
                 Shape::Blend(0, 1, noise(k * 0.77 + 5.1))
             }
             None => Shape::Blend(0, 1, 0.5 + 0.5 * phase.sin()),
@@ -405,7 +420,7 @@ fn scene_items(art: &Art, fx: &Fx, s: &Session, view: View, camera: Camera3D) ->
             Kind::Demon => art.demon.base,
         };
         items.push(Item { who: Who::Creature(c.kind), shape, m: place(at, front, creature_scale(c.kind), base),
-                          gone: calm.map_or(0.0, melt_dark), goo, boost: 1.0, hidden: hidden(s, c) });
+                          gone: calm.map_or(0.0, melt_dark), goo, boost, hidden: hidden(s, c) });
     }
     // El susto de mentira: pegada a la cara, mirándola de frente (la cara se tiene que ver bien), con tirones cortos
     // cuadro a cuadro y algún cuadro en que no está
@@ -460,30 +475,43 @@ fn scene_items(art: &Art, fx: &Fx, s: &Session, view: View, camera: Camera3D) ->
     items
 }
 
-/// Los que se mueven a saltos: el fantasma y el diablo (el demonio no).
-fn stutters(kind: Kind) -> bool {
-    matches!(kind, Kind::Ghost | Kind::Devil)
+/// Los que se mueven a saltos: el fantasma, el diablo y los tríos finales (el demonio común no).
+fn stutters(c: &Creature) -> bool {
+    c.boss || matches!(c.kind, Kind::Ghost | Kind::Devil)
 }
 
 /// Cuadros por segundo del fantasma y el diablo: se mueven a saltos, como animación cuadro por cuadro rota.
 const STUTTER_FPS: f32 = 6.0;
 
-/// En qué cuadro de su película rota está una criatura (cada una con su desfase).
+/// El desfase de la película rota de una criatura: cada una el suyo, salvo el trío final, que va en unísono.
+fn stutter_offset(c: &Creature) -> f32 {
+    if c.boss { 0.0 } else { c.id as f32 * 0.37 }
+}
+
+/// En qué cuadro de su película rota está una criatura.
 fn stutter_frame(c: &Creature, t: f32) -> f32 {
-    (t * STUTTER_FPS + c.id as f32 * 0.37).floor()
+    (t * STUTTER_FPS + stutter_offset(c)).floor()
+}
+
+/// Hacia dónde queda torcida una criatura en un cuadro de su película rota.
+fn stutter_front(front: Vector3, k: f32) -> Vector3 {
+    let yaw = (noise(k * 1.31 + 2.2) - 0.5) * 0.9;
+    Vector3::new(front.x * yaw.cos() - front.z * yaw.sin(), 0.0, front.x * yaw.sin() + front.z * yaw.cos())
 }
 
 /// Dónde se ve a una criatura: donde está, salvo los que van a saltos, que se quedan quietos en su cuadro (un poco
 /// atrás de donde ya están) y saltan al siguiente; algunos cuadros los saltean de golpe y llegan más adelante.
 pub fn shown_pos(c: &Creature, t: f32) -> (f32, f32) {
-    if !stutters(c.kind) || c.state != State::Approaching {
+    if !stutters(c) || c.state != State::Approaching {
         return c.pos;
     }
     let k = stutter_frame(c, t);
-    let lag = (t * STUTTER_FPS + c.id as f32 * 0.37 - k) / STUTTER_FPS;
+    let lag = (t * STUTTER_FPS + stutter_offset(c) - k) / STUTTER_FPS;
     let d = c.distance().max(1e-3);
     let back = c.speed * lag * if noise(k * 2.9 + 0.4) > 0.75 { 0.0 } else { 1.0 };
-    (c.pos.0 * (d + back) / d, c.pos.1 * (d + back) / d)
+    // El trío, además, se bambolea de costado a la par, como una sola cosa rara
+    let sway = if c.boss { (k * std::f32::consts::PI / 3.0).sin() * 0.4 } else { 0.0 };
+    (c.pos.0 * (d + back) / d + sway, c.pos.1 * (d + back) / d)
 }
 
 /// Cuánto le falta a una criatura para salir de lo oscuro: vienen sin que se las vea y, al llegar a `reveal_radius`, la
@@ -773,6 +801,8 @@ pub struct Fx {
     hurt: f32,
     scare: Option<(Kind, f32)>,
     lost_heart: Option<(u8, f32)>,
+    /// El corazón recuperado y cuánto le queda a su animación.
+    gained_heart: Option<(u8, f32)>,
     banner: Option<(String, String, f32)>,
     note: Option<(String, f32)>,
     /// Un susto de mentira (sin daño): la criatura y cuánto hace que apareció.
@@ -818,6 +848,10 @@ impl Fx {
             h.1 -= dt;
         }
         self.lost_heart = self.lost_heart.take().filter(|h| h.1 > 0.0);
+        if let Some(h) = &mut self.gained_heart {
+            h.1 -= dt;
+        }
+        self.gained_heart = self.gained_heart.take().filter(|h| h.1 > 0.0);
         for (p, v, life) in &mut self.sparks {
             *p += *v * dt;
             *v = *v * (1.0 - 2.2 * dt).max(0.0) + Vector2::new(0.0, 60.0 * dt);
@@ -871,6 +905,11 @@ impl Fx {
             self.hurt = 0.7;
             self.lost_heart = Some((h, 0.8));
         }
+    }
+
+    /// Se recuperó un corazón (el número `heart`, desde 0): el sombrero salta.
+    pub fn gain(&mut self, heart: u8) {
+        self.gained_heart = Some((heart, 0.9));
     }
 
     pub fn scaring(&self) -> bool {
@@ -1016,8 +1055,27 @@ pub fn draw_game(screen: &mut RaylibDrawHandle, thread: &RaylibThread, art: &mut
     }
     // Lo que va encima se ubica sobre lo que se ve a través de la lente
     let project = |v: Vector3, camera: Camera3D| screen_from_scene(project_in(v, camera, tw, th), tw, w, h);
-    // Glifos: aparecen con la criatura, cuando la agarra la luz
     let fwd = (camera.target - camera.position).normalized();
+    // Los ojos del trío de fantasmas: un brillo chico, pegado a cada ojo, azul y blanco, que late apenas
+    for c in s.creatures.iter().filter(|c| c.boss && c.kind == Kind::Ghost && c.state == State::Approaching) {
+        let Some(eyes) = art.ghost.eye_centers("HW_GameGhostIris") else { continue };
+        let (x, y) = shown_pos(c, t);
+        let at = point(x, y);
+        let m = place(at, stutter_front(-at, stutter_frame(c, t)), creature_scale(c.kind), art.ghost.base);
+        let a = 1.0 - hidden(s, c);
+        let radius = (150.0 / c.distance()).clamp(16.0, 80.0) * (1.0 + 0.08 * (t * 6.0).sin());
+        let mut add = d.begin_blend_mode(BlendMode::BLEND_ADDITIVE);
+        for eye in eyes {
+            let world = eye.transform_with(m);
+            if (world - camera.position).dot(fwd) < 0.2 {
+                continue;
+            }
+            let p = project(world, camera);
+            add.draw_circle_gradient(p.x as i32, p.y as i32, radius, fade(Color::new(70, 150, 255, 255), 0.7 * a), Color::new(70, 150, 255, 0));
+            add.draw_circle_gradient(p.x as i32, p.y as i32, radius * 0.35, fade(Color::WHITE, 0.95 * a), Color::new(255, 255, 255, 0));
+        }
+    }
+    // Glifos: aparecen con la criatura, cuando la agarra la luz
     for c in s.creatures.iter().filter(|c| c.state == State::Approaching) {
         let at = art.head(c.kind, shown_pos(c, fx.time));
         if (at - camera.position).dot(fwd) < 0.2 {
@@ -1085,7 +1143,8 @@ fn draw_hud(d: &mut RaylibDrawHandle, art: &Art, fx: &Fx, s: &Session) {
     for i in 0..s.balance.health {
         let c = Vector2::new(44.0 + i as f32 * 54.0, 42.0);
         let breaking = fx.lost_heart.filter(|(k, _)| *k == i).map(|(_, t)| t / 0.8);
-        let size = 46.0 * (1.0 + breaking.map_or(0.0, |b| 0.35 * b));
+        let gained = fx.gained_heart.filter(|(k, _)| *k == i).map_or(0.0, |(_, t)| t / 0.9);
+        let size = 46.0 * (1.0 + breaking.map_or(0.0, |b| 0.35 * b) + 0.7 * gained);
         if i < s.health {
             let beat = 1.0 + 0.05 * (fx.time * 5.0).sin().max(0.0);
             hat(d, &art.life_full, c, size * beat, Color::WHITE);
@@ -1108,6 +1167,12 @@ fn draw_hud(d: &mut RaylibDrawHandle, art: &Art, fx: &Fx, s: &Session) {
         d.draw_rectangle_rounded(Rectangle::new(r.x, r.y, bw * (s.phase_time / len).clamp(0.0, 1.0), 6.0), 1.0, 6,
                                  Color::new(235, 230, 220, 220));
     }
+    // Cuántas faltan para recuperar un sombrero, a la izquierda de la pausa
+    let meter = format!("{}/{}", s.life_meter, s.balance.life_every);
+    let m = text_size(font, &meter, 32.0);
+    let at = Vector2::new(w - 84.0 - m.x, 42.0 - m.y / 2.0);
+    d.draw_text_ex(font, &meter, at, 32.0, 1.0, Color::new(235, 230, 240, 235));
+    hat(d, &art.life_full, Vector2::new(at.x - 24.0, 42.0), 36.0, Color::WHITE);
     draw_pause_icon(d, w);
     // El cartel de la oleada: enorme y rojo sangre, cae de golpe (más grande, achicándose de un saque), y después se
     // hunde despacio en lo oscuro mientras se apaga

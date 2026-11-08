@@ -1,6 +1,7 @@
 //! Ventana del minijuego de Halloween: dibujar glifos con el mouse, pausa, victoria y derrota, regreso al sistema
 //! solar (contrato de `docs/minigames/host-return.md`) y una prueba automática que juega sola (`--smoke`).
 use super::render::{self as art, Art, Fx, View, FRIGHT};
+use super::sound::{Sounds, Track};
 use super::story::{self, Story, ENDING};
 use super::{recognize, Balance, Cast, Glyph, Kind, Phase, Session, State};
 use crate::minigames::common::host::{AttemptReporter, MinigameExit, MinigameResult, ResultObserver};
@@ -34,6 +35,7 @@ enum Goal {
 pub fn run_visit(root: &Path, args: impl Iterator<Item = String>, observer: &mut ResultObserver<'_>)
     -> Result<MinigameExit, Error> {
     let mut goal = None;
+    let mut mute = false;
     let mut args = args;
     while let Some(arg) = args.next() {
         match arg.as_str() {
@@ -46,7 +48,7 @@ pub fn run_visit(root: &Path, args: impl Iterator<Item = String>, observer: &mut
                     _ => return Err("--smoke-return necesita victory, defeat o abandoned".into()),
                 })
             }
-            "--mute" => {}
+            "--mute" => mute = true,
             "--help" | "-h" => {
                 println!("cargo run --bin halloween -- [--smoke] [--smoke-return victory|defeat|abandoned]");
                 println!("Mantener el botón izquierdo y dibujar el glifo; Esc o P pausa; Retroceso volver al sistema solar.");
@@ -60,7 +62,7 @@ pub fn run_visit(root: &Path, args: impl Iterator<Item = String>, observer: &mut
     if smoke {
         std::fs::create_dir_all(&captures)?;
     }
-    let (mut rl, thread) = raylib::init().size(1280, 720).resizable().title("Halloween: Hexbound").build();
+    let (mut rl, thread) = raylib::init().size(1280, 720).resizable().title("Hexbound").build();
     rl.set_exit_key(None);
     rl.set_trace_log(TraceLogLevel::LOG_WARNING);
     rl.set_window_min_size(960, 540);
@@ -69,6 +71,9 @@ pub fn run_visit(root: &Path, args: impl Iterator<Item = String>, observer: &mut
     }
     rl.set_target_fps(if smoke { 0 } else { 60 });
     let mut art = Art::load(&mut rl, &thread, root)?;
+    // Sin dispositivo de audio, el juego sigue en silencio; la prueba automática va muda
+    let device = RaylibAudio::init_audio_device().ok();
+    let mut sounds = Sounds::load(device.as_ref(), root, mute || smoke);
     let mut fx = Fx::default();
     let mut seed = if smoke { 5 } else {
         std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map_or(7, |d| d.as_nanos() as u64)
@@ -196,6 +201,7 @@ pub fn run_visit(root: &Path, args: impl Iterator<Item = String>, observer: &mut
                     drawing = false;
                     stroke.clear();
                     fx.banner("WAVE 1", "Devils and ghosts are crashing the party");
+                    sounds.crowd();
                 }
             }
             Screen::Play => {
@@ -231,17 +237,25 @@ pub fn run_visit(root: &Path, args: impl Iterator<Item = String>, observer: &mut
                     // La que llegó a la bruja ya no está: se tira encima de la cámara
                     if let Some(&(_, kind)) = coming.iter().find(|(id, _)| !s.creatures.iter().any(|c| c.id == *id)) {
                         fx.scare(kind, (s.health < last.1).then_some(s.health));
+                        sounds.roar(kind, true);
                         frights.scared();
                     }
                     if let Some(kind) = frights.update(dt, &s, &fx) {
                         fx.fright(kind);
+                        sounds.roar(kind, false);
                     }
                     if s.phase != last.0 {
                         match s.phase {
-                            Phase::Wave(2) => fx.banner("WAVE 2", "The sleep paralysis demons woke up"),
+                            Phase::Wave(2) => {
+                                fx.banner("WAVE 2", "The sleep paralysis demons woke up");
+                                sounds.crowd();
+                            }
                             Phase::Victory => fx.calm_all(&s),
                             _ => {}
                         }
+                    }
+                    if s.health > last.1 {
+                        fx.gain(s.health - 1);
                     }
                     last = (s.phase, s.health);
                     reporter.observe(&s, observer)?;
@@ -287,6 +301,7 @@ pub fn run_visit(root: &Path, args: impl Iterator<Item = String>, observer: &mut
                     Some(1) => {
                         seed += 1;
                         restart(&mut s, &mut fx, &mut last, seed);
+                        sounds.crowd();
                         frights = Frights::new(seed);
                         screen = Screen::Play;
                     }
@@ -316,6 +331,7 @@ pub fn run_visit(root: &Path, args: impl Iterator<Item = String>, observer: &mut
                 Some(0) => {
                     seed += 1;
                     restart(&mut s, &mut fx, &mut last, seed);
+                    sounds.crowd();
                     frights = Frights::new(seed);
                     reporter.observe(&s, observer)?;
                     screen = Screen::Play;
@@ -338,6 +354,10 @@ pub fn run_visit(root: &Path, args: impl Iterator<Item = String>, observer: &mut
         }
         // Lo que se ve atrás (pausado: lo que estaba)
         let base = if matches!(screen, Screen::Pause | Screen::Confirm) { paused_from } else { screen };
+        // "Exploring" en la historieta y la práctica; "Conspiracy Theory" desde que empieza el juego
+        let track = if matches!(base, Screen::Story | Screen::Intro) { Track::Intro } else { Track::Game };
+        sounds.update(track, matches!(screen, Screen::Pause | Screen::Confirm), dt);
+        sounds.approach(&s, look.0, dt, screen != Screen::Play);
         let view = match base {
             Screen::Intro => match after {
                 Some(a) if a > TURN_AT => View::Turn((a - TURN_AT) / INTRO_TURN),
@@ -404,22 +424,26 @@ fn warn_amount(after: Option<f32>) -> f32 {
     up.min(down).clamp(0.0, 1.0)
 }
 
-/// Los sustos de mentira: una criatura pegada a la cara un instante, sin daño. Pocos y a destiempo (dos o tres por
-/// oleada), nunca al empezar la oleada ni con el cartel, y solo cuando nada puede llegar a la bruja en el próximo
-/// segundo, así después de cada susto hay por lo menos un segundo sin otro.
+/// Los sustos de mentira: una criatura pegada a la cara un instante, sin daño. Cada oleada tiene por lo menos
+/// `FRIGHTS_MIN` (a veces uno más), repartidos a lo largo de la oleada y a destiempo, nunca al empezar ni con el cartel
+/// ni con el trío final. Esperan a que nada pueda llegar a la bruja en el próximo segundo y medio, pero si un susto ya
+/// se atrasó `FRIGHT_LATE` segundos sale igual (siempre antes de que termine la oleada), respetando un segundo sin
+/// sustos después del anterior.
 struct Frights {
     rng: u64,
-    /// Cuánto falta para intentar el próximo.
-    clock: f32,
+    /// La oleada que se está contando y cuándo toca cada susto que le queda (segundos de oleada; el próximo, primero).
+    wave: u8,
+    due: Vec<f32>,
     /// Cuánto hace del último susto, de mentira o de verdad.
     since: f32,
 }
 
+const FRIGHTS_MIN: usize = 3;
+const FRIGHT_LATE: f32 = 5.0;
+
 impl Frights {
     fn new(seed: u64) -> Self {
-        let mut f = Self { rng: seed.wrapping_mul(0x9E37_79B9_7F4A_7C15) | 1, clock: 0.0, since: 10.0 };
-        f.clock = 9.0 + 6.0 * f.rand();
-        f
+        Self { rng: seed.wrapping_mul(0x9E37_79B9_7F4A_7C15) | 1, wave: 0, due: Vec::new(), since: 10.0 }
     }
 
     fn rand(&mut self) -> f32 {
@@ -433,18 +457,33 @@ impl Frights {
         self.since = 0.0;
     }
 
+    /// Reparte los sustos de una oleada de `len` segundos, para que hasta el último atrasado salga antes del trío.
+    fn schedule(&mut self, len: f32) {
+        let n = FRIGHTS_MIN + usize::from(self.rand() < 0.5);
+        let (first, span) = (8.0, len - 6.0 - 8.0 - FRIGHT_LATE - 2.0);
+        self.due = (0..n).map(|i| first + span * (i as f32 + 0.15 + 0.7 * self.rand()) / n as f32).collect();
+    }
+
     /// Avanza el reloj; devuelve la criatura del susto cuando toca uno.
     fn update(&mut self, dt: f32, s: &Session, fx: &Fx) -> Option<Kind> {
         self.since += dt;
-        self.clock -= dt;
         let Phase::Wave(n) = s.phase else { return None };
-        // Nada llega a la bruja hasta un segundo después de que termine el susto
-        let clear = s.creatures.iter().filter(|c| c.state == State::Approaching)
-            .all(|c| (c.distance() - s.balance.hit_radius) / c.speed > FRIGHT + 1.0);
-        if self.clock > 0.0 || s.phase_time < 6.0 || !fx.quiet() || self.since < 2.5 || !clear {
+        if n != self.wave {
+            self.wave = n;
+            self.schedule(s.balance.wave_time[n as usize - 1]);
+        }
+        let due = *self.due.first()?;
+        if s.phase_time < due || !fx.quiet() || s.creatures.iter().any(|c| c.boss) {
             return None;
         }
-        self.clock = 15.0 + 10.0 * self.rand();
+        // Nada llega a la bruja hasta un segundo después de que termine el susto; o ya se atrasó demasiado
+        let clear = self.since >= 2.5 && s.creatures.iter().filter(|c| c.state == State::Approaching)
+            .all(|c| (c.distance() - s.balance.hit_radius) / c.speed > FRIGHT + 1.0);
+        let late = s.phase_time >= due + FRIGHT_LATE && self.since >= 1.0 + FRIGHT;
+        if !clear && !late {
+            return None;
+        }
+        self.due.remove(0);
         self.since = 0.0;
         let r = self.rand();
         Some(match n {
@@ -686,6 +725,10 @@ impl Auto {
                 if s.creatures.iter().any(|c| c.state == State::Approaching && c.distance() < 2.5) {
                     self.snap("close");
                 }
+                // El trío final de cada oleada
+                if s.creatures.iter().any(|c| c.boss && c.state == State::Approaching && c.distance() < 7.4) {
+                    self.snap(if s.phase == Phase::Wave(1) { "boss1" } else { "boss2" });
+                }
                 // Cómo vienen: el diablo y el fantasma, a saltos
                 for c in s.creatures.iter().filter(|c| c.state == State::Approaching && c.distance() < 6.0) {
                     match c.kind {
@@ -759,5 +802,51 @@ impl Auto {
         }
         self.fed += 4;
         false
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Cuenta los sustos de cada oleada. `kill`: la jugadora las maldice a todas; si no, la llenan de golpes.
+    fn frights_per_wave(seed: u64, kill: bool) -> [u32; 2] {
+        let mut s = Session::new(Balance::default(), seed);
+        let (mut f, mut fx) = (Frights::new(seed), Fx::default());
+        let mut count = [0; 2];
+        while let Phase::Wave(n) = s.phase {
+            if kill {
+                let glyph = s.creatures.iter().filter(|c| c.state == State::Approaching && s.seen(c))
+                    .min_by(|a, b| a.distance().total_cmp(&b.distance())).map(|c| c.glyphs[0]);
+                if let Some(g) = glyph {
+                    s.cast(g);
+                }
+            }
+            s.health = 200;
+            let before = s.creatures.len();
+            s.update(1.0 / 30.0);
+            if !kill && s.creatures.len() < before {
+                f.scared();
+                fx.scare(Kind::Devil, None);
+            }
+            if let Some(kind) = f.update(1.0 / 30.0, &s, &fx) {
+                fx.fright(kind);
+                // Nunca durante el trío final
+                assert!(!s.creatures.iter().any(|c| c.boss));
+                count[n as usize - 1] += 1;
+            }
+            fx.update(1.0 / 30.0);
+        }
+        count
+    }
+
+    #[test]
+    fn cada_oleada_tiene_por_lo_menos_tres_sustos() {
+        for seed in 1..40 {
+            for kill in [true, false] {
+                let count = frights_per_wave(seed, kill);
+                assert!(count.iter().all(|&c| c >= FRIGHTS_MIN as u32), "semilla {seed}, maldice {kill}: {count:?}");
+            }
+        }
     }
 }

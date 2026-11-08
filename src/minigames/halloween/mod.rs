@@ -10,6 +10,7 @@
 pub mod app;
 pub mod glyph;
 mod render;
+mod sound;
 mod story;
 
 pub use app::run_visit;
@@ -61,6 +62,9 @@ pub struct Creature {
     /// Posición en el piso (la bruja está en el origen; +y es hacia el fondo, lejos de la cámara).
     pub pos: (f32, f32),
     pub speed: f32,
+    /// Es parte del trío final de la oleada: ojos encendidos, a saltos y en unísono, y si llega quita un corazón sin
+    /// importar la protección.
+    pub boss: bool,
     pub state: State,
 }
 
@@ -85,6 +89,14 @@ pub struct Balance {
     pub speed: [f32; 2],
     /// El demonio lleva dos glifos: viene a esta fracción de la velocidad de los demás.
     pub demon_pace: f32,
+    /// El trío final de cada oleada: a qué velocidad viene (m/s, despacio porque son seis glifos), cuántos glifos lleva
+    /// cada una, a qué distancia aparece y qué tan separadas (como `spawn_arc`).
+    pub boss_speed: [f32; 2],
+    pub boss_glyphs: usize,
+    pub boss_radius: f32,
+    pub boss_arc: f32,
+    /// Cada cuántas criaturas maldecidas se recupera un corazón.
+    pub life_every: u32,
     /// Cuánto tarda una maldecida en derretirse y hundirse en el piso.
     pub melt: f32,
     pub health: u8,
@@ -97,13 +109,18 @@ impl Default for Balance {
     fn default() -> Self {
         Self {
             wave_time: [60.0, 65.0],
-            spawn_every: [2.3, 1.8],
+            spawn_every: [2.15, 1.7],
             spawn_radius: 18.0,
             spawn_arc: 0.15,
             hit_radius: 0.75,
             reveal_radius: 8.5,
-            speed: [3.2, 3.6],
+            speed: [3.4, 3.8],
             demon_pace: 0.9,
+            boss_speed: [1.15, 1.25],
+            boss_glyphs: 2,
+            boss_radius: 11.0,
+            boss_arc: 0.1,
+            life_every: 15,
             melt: 1.4,
             health: 3,
             protection: 1.2,
@@ -126,6 +143,11 @@ pub struct Session {
     spawn_clock: f32,
     rng: u64,
     calmed: u32,
+    /// Ya salió el trío de esta oleada.
+    boss_out: bool,
+    /// Maldecidas desde el último corazón recuperado (con la salud llena se queda en `life_every`, y el próximo golpe
+    /// se recupera con la próxima que se maldiga).
+    pub life_meter: u32,
 }
 
 /// Resultado de un hechizo.
@@ -152,6 +174,8 @@ impl Session {
             spawn_clock: 0.0,
             rng: seed.max(1),
             calmed: 0,
+            boss_out: false,
+            life_meter: 0,
         }
     }
 
@@ -201,7 +225,11 @@ impl Session {
             _ => return,
         };
         if self.phase_time > phase_len {
-            return; // Al final de cada oleada no salen más: se terminan de resolver las que están
+            // Al final de cada oleada no salen más: se terminan de resolver las que están, y viene el trío
+            if !self.boss_out && !self.creatures.iter().any(|c| c.state == State::Approaching) {
+                self.spawn_boss();
+            }
+            return;
         }
         self.spawn_clock -= dt;
         if self.spawn_clock > 0.0 {
@@ -245,14 +273,38 @@ impl Session {
             glyphs,
             pos: (r * a.cos(), r * a.sin()),
             speed,
+            boss: false,
             state: State::Approaching,
         });
         self.next_id += 1;
     }
 
+    /// El trío final: tres fantasmas (primera oleada) o tres demonios (segunda), de frente y a la par.
+    fn spawn_boss(&mut self) {
+        self.boss_out = true;
+        let wave = self.wave().unwrap_or(0);
+        let kind = if wave == 0 { Kind::Ghost } else { Kind::Demon };
+        let r = self.balance.boss_radius;
+        for side in [-1.0f32, 0.0, 1.0] {
+            let a = std::f32::consts::PI * (0.5 + self.balance.boss_arc * side);
+            let glyphs = (0..self.balance.boss_glyphs).map(|_| Glyph::ALL[(self.rand() * 4.0) as usize % 4]).collect();
+            self.creatures.push(Creature {
+                id: self.next_id,
+                kind,
+                glyphs,
+                pos: (r * a.cos(), r * a.sin()),
+                speed: self.balance.boss_speed[wave],
+                boss: true,
+                state: State::Approaching,
+            });
+            self.next_id += 1;
+        }
+    }
+
     fn advance(&mut self, dt: f32) {
         let hit_r = self.balance.hit_radius;
         let mut hits = 0;
+        let mut boss_hits = 0;
         for c in &mut self.creatures {
             match c.state {
                 State::Approaching => {
@@ -260,7 +312,11 @@ impl Session {
                     if d <= hit_r {
                         // Llegó a su cara
                         c.state = State::Gone;
-                        hits += 1;
+                        if c.boss {
+                            boss_hits += 1;
+                        } else {
+                            hits += 1;
+                        }
                     } else {
                         // Se le viene encima corriendo, sin frenar
                         let step = (c.speed * dt).min(d);
@@ -287,6 +343,10 @@ impl Session {
                 }
             }
         }
+        if boss_hits > 0 {
+            self.health = self.health.saturating_sub(boss_hits);
+            self.protected = self.balance.protection;
+        }
         self.creatures.retain(|c| c.state != State::Gone);
         if self.health == 0 {
             self.phase = Phase::Defeat;
@@ -297,13 +357,13 @@ impl Session {
         if self.finished() {
             return;
         }
-        let threats = self.creatures.iter().any(|c| c.state == State::Approaching);
-        let len = match self.phase {
-            Phase::Wave(n) => self.balance.wave_time[n as usize - 1],
-            _ => return,
-        };
+        if !matches!(self.phase, Phase::Wave(_)) {
+            return;
+        }
+        // La oleada termina cuando el trío ya salió y no queda nadie (ni un charco derritiéndose)
         let out_of_time = self.total_time >= self.balance.max_time;
-        if (self.phase_time >= len && !threats) || out_of_time {
+        if (self.boss_out && self.creatures.is_empty()) || out_of_time {
+            self.boss_out = false;
             self.phase = match self.phase {
                 Phase::Wave(1) if !out_of_time => Phase::Wave(2),
                 _ => Phase::Victory,
@@ -337,6 +397,12 @@ impl Session {
         let calmed = c.glyphs.is_empty();
         if calmed {
             self.calm(id);
+            // Cada tantas maldecidas se recupera un corazón
+            self.life_meter = (self.life_meter + 1).min(self.balance.life_every);
+            if self.life_meter >= self.balance.life_every && self.health < self.balance.health {
+                self.health += 1;
+                self.life_meter = 0;
+            }
         }
         Cast::Hit { id, calmed }
     }

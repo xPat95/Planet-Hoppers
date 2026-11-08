@@ -89,7 +89,7 @@ fn radios_e_identidades_se_conservan_durante_toda_la_simulacion() {
     use planet_hoppers::{gameplay::progress::Franchise, scenes::token_collection::TOKENS};
     let mut system = SolarSystem::new(&config());
     let expected = [
-        ("halloween", "Halloween", 1800.0), ("starwars", "Star Wars", 2760.0),
+        ("halloween", "Hexbound", 1800.0), ("starwars", "Star Wars", 2760.0),
         ("smilingfriends", "Smiling Friends", 3840.0), ("minecraft", "Minecraft", 4920.0),
         ("regularshow", "Un Show Más", 6000.0), ("southpark", "South Park", 7080.0),
     ];

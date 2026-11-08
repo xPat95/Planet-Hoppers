@@ -3,7 +3,7 @@ fn main() {
     match planet_hoppers::minigames::halloween::run_visit(root, std::env::args().skip(1), &mut |_| Ok(())) {
         Ok(result) => println!("HALLOWEEN_RETURN {result:?}"),
         Err(error) => {
-            eprintln!("Halloween: {error}");
+            eprintln!("Hexbound: {error}");
             std::process::exit(1);
         }
     }

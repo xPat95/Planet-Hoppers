@@ -11,7 +11,7 @@ import struct
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[2]
-SOURCE = ROOT / "ScreenRecording_11-01-2026 11-21-15_1.mov"
+SOURCE = ROOT / "assets" / "video" / "smilingfriends" / "source" / "intro.mov"
 DEST = ROOT / "assets" / "video" / "smilingfriends"
 WIDTH, HEIGHT, FPS = 960, 540, 24
 

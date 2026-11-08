@@ -426,6 +426,11 @@ impl SpaceModel {
         self.model.meshes().iter().map(|m| (m.vertices().to_vec(), m.normals().to_vec())).collect()
     }
 
+    /// Las mallas de las partes con este material.
+    pub fn part_meshes(&self, name: &str) -> Vec<usize> {
+        self.parts.iter().filter(|p| p.name == name).map(|p| p.mesh).collect()
+    }
+
     /// Reemplaza vértices y normales de cada malla (con la misma cantidad) y los sube a la GPU.
     pub fn set_mesh_vertices(&mut self, data: &[(Vec<Vector3>, Vec<Vector3>)]) {
         for (mesh, (v, n)) in self.model.meshes_mut().iter_mut().zip(data) {

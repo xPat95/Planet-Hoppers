@@ -71,4 +71,6 @@ En el JSON, cada escena tiene su elenco (`cast`), quién dice cada línea (`spea
 
 Jugable de principio a fin con las tres escenas. Prueba automática: `cargo run --bin smilingfriends -- --smoke --mute` juega con las mejores respuestas y guarda capturas en `target/smilingfriends/`. Pruebas de reglas: `cargo test --test smilingfriends_game`.
 
+Música: después del video de la intro suena "Gameotoon" (`assets/audio/music/Smiling Friends/gameotoon.mp3`, elegida por Cami) en loop durante todo el juego; con el menú de salir abierto baja.
+
 Controles: clic, Enter o Espacio para seguir (y completar el texto); 1, 2 y 3 o clic para elegir; Esc o el botón SALIR abren un menú (el juego queda quieto): seguir jugando, **I give up** (rendirse cuenta como ganado) o volver al sistema solar.

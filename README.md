@@ -1,6 +1,6 @@
 # Planet Hoppers
 
-Proyecto universitario de Gráficas por Computadora: un videojuego 3D de exploración espacial en un sistema solar ficticio con seis planetas inspirados en Minecraft, South Park, Smiling Friends, Halloween, Un Show Más (Regular Show) y Star Wars.
+Proyecto universitario de Gráficas por Computadora: un videojuego 3D de exploración espacial en un sistema solar ficticio con seis planetas inspirados en Minecraft, South Park, Smiling Friends, Hexbound, Un Show Más (Regular Show) y Star Wars.
 
 La estación espacial, el desbloqueo de naves y las demás mecánicas descritas están **planificadas, pero todavía no implementadas**.
 
@@ -28,7 +28,7 @@ Si se completa por primera vez el planeta de la nave inicial, se obtiene su toke
 
 Al acercarse a la estación, el jugador puede interactuar para entrar al hangar. Se muestran las seis naves con su estado de bloqueo; solo las desbloqueadas se pueden seleccionar. Al salir, la exploración continúa con la nave seleccionada. Después de la selección inicial, **los cambios de nave solo ocurren por elección voluntaria en la estación espacial**; completar un minijuego nunca cambia automáticamente la nave activa.
 
-Por ejemplo, al empezar con South Park y ganar Halloween, se recibe el token de Halloween, se desbloquea su nave y se reproduce la abducción de Ghost Face. Se regresa con South Park; la estación permite elegir entre South Park y Halloween, mientras las otras cuatro siguen bloqueadas.
+Por ejemplo, al empezar con South Park y ganar Hexbound, se recibe el token de Hexbound, se desbloquea su nave y se reproduce la abducción de Ghost Face. Se regresa con South Park; la estación permite elegir entre South Park y Halloween, mientras las otras cuatro siguen bloqueadas.
 
 ## Franquicias y responsables
 
@@ -37,7 +37,7 @@ Por ejemplo, al empezar con South Park y ganar Halloween, se recibe el token de 
 | Minecraft | Steve | Explorar y encontrar un diamante | Pablo |
 | South Park | Stan, Kyle, Kenny y Cartman | Recorrer South Park y resolver un puzzle relacionado con Kenny | Pablo |
 | Smiling Friends | Pim y Charlie | Hacer reír a personajes eligiendo chistes | Cami |
-| Halloween | Ghost Face | [Bruja de guardia: calmar una fiesta con hechizos dibujados](docs/minigames/halloween-plan.md) (diseño acordado; implementación pendiente) | Cami |
+| Hexbound | Ghost Face | [Hexbound: maldecir a las criaturas de la fiesta con hechizos dibujados](docs/minigames/halloween-plan.md) | Cami |
 | Un Show Más (Regular Show) | Mordecai y Rigby | El Martillo: combate arcade en tres niveles, individual o cooperativo local | Norman |
 | Star Wars | Grogu (Baby Yoda) | Vuelo libre por el túnel y ataque al reactor, sin raycasting | Norman |
 
@@ -171,7 +171,7 @@ Al entrar se reproduce una presentación 3D sincronizada con el audio completo d
 cargo run --locked --bin solarsystem
 ```
 
-Fases 1 a 6: Sol central y los seis planetas de Blender en sus órbitas, con traslación y rotación propia (deltaTime), luz del Sol, fondo de estrellas y una nave para recorrerlos (W/S, mouse, Shift turbo, C vista general). Cerca de un planeta aparece **Explorar planeta**: South Park, Smiling Friends, Minecraft, Star Wars y Regular Show abren sus minijuegos y permiten regresar al sistema solar; Halloween sigue en construcción. Ver [sistema solar](docs/solar-system.md).
+Fases 1 a 6: Sol central y los seis planetas de Blender en sus órbitas, con traslación y rotación propia (deltaTime), luz del Sol, fondo de estrellas y una nave para recorrerlos (W/S, mouse, Shift turbo, C vista general). Cerca de un planeta aparece **Explorar planeta**: South Park, Smiling Friends, Minecraft, Star Wars y Regular Show abren sus minijuegos y permiten regresar al sistema solar. Ver [sistema solar](docs/solar-system.md).
 
 ## Planetas disponibles para integración
 

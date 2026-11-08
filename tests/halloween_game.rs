@@ -186,3 +186,88 @@ fn los_demonios_necesitan_dos_glifos() {
     let d = s.creatures.iter().find(|c| c.kind == Kind::Demon).unwrap().clone();
     assert_eq!(d.glyphs.len(), 2);
 }
+
+/// Maldice a la más cercana de las que ya se ven.
+fn maldecir(s: &mut Session) {
+    let glifo = s.creatures.iter().filter(|c| c.state == State::Approaching && s.seen(c))
+        .min_by(|a, b| a.distance().total_cmp(&b.distance())).map(|c| c.glyphs[0]);
+    if let Some(g) = glifo {
+        s.cast(g);
+    }
+}
+
+/// Juega maldiciendo todo hasta que aparece el trío de la oleada.
+fn hasta_el_trio(s: &mut Session) {
+    for _ in 0..4000 {
+        if s.creatures.iter().any(|c| c.boss) {
+            return;
+        }
+        maldecir(s);
+        s.update(0.05);
+    }
+    panic!("nunca salió el trío");
+}
+
+#[test]
+fn cada_oleada_termina_con_su_trio() {
+    let mut s = Session::new(Balance::default(), 11);
+    hasta_el_trio(&mut s);
+    let trio: Vec<_> = s.creatures.iter().filter(|c| c.boss).collect();
+    assert_eq!(trio.len(), 3);
+    assert!(trio.iter().all(|c| c.kind == Kind::Ghost && c.glyphs.len() == 2));
+    assert_eq!(s.phase, Phase::Wave(1));
+    // Maldecido el trío, sigue la segunda oleada, que termina con tres demonios
+    for _ in 0..400 {
+        maldecir(&mut s);
+        s.update(0.05);
+        if s.phase == Phase::Wave(2) {
+            break;
+        }
+    }
+    assert_eq!(s.phase, Phase::Wave(2));
+    hasta_el_trio(&mut s);
+    assert!(s.creatures.iter().filter(|c| c.boss).all(|c| c.kind == Kind::Demon));
+}
+
+#[test]
+fn cada_integrante_del_trio_que_llega_quita_un_corazon() {
+    let mut s = Session::new(Balance::default(), 11);
+    hasta_el_trio(&mut s);
+    s.health = 3;
+    for _ in 0..600 {
+        s.update(0.05);
+    }
+    assert_eq!(s.phase, Phase::Defeat);
+}
+
+#[test]
+fn maldecir_suficientes_devuelve_un_corazon() {
+    let mut s = Session::new(Balance::default(), 5);
+    s.health = 2;
+    let meta = s.balance.life_every;
+    for _ in 0..2000 {
+        maldecir(&mut s);
+        s.update(0.05);
+        if s.health == 3 {
+            break;
+        }
+        assert!(s.health > 0);
+    }
+    assert_eq!(s.health, 3);
+    assert_eq!(s.life_meter, 0);
+    assert!(s.calmed_count() >= meta);
+}
+
+#[test]
+fn con_la_salud_llena_el_contador_espera_lleno() {
+    let mut s = Session::new(Balance::default(), 5);
+    for _ in 0..2000 {
+        maldecir(&mut s);
+        s.update(0.05);
+        if s.calmed_count() > s.balance.life_every {
+            break;
+        }
+    }
+    assert_eq!(s.health, 3);
+    assert_eq!(s.life_meter, s.balance.life_every);
+}

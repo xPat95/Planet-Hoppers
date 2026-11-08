@@ -1,6 +1,6 @@
 # Smiling Friends opening video
 
-The first screen shown when entering the Smiling Friends planet is the video the user placed at the repository root: `ScreenRecording_11-01-2026 11-21-15_1.mov`. It plays once with its original audio, then shows a temporary **En construcción** screen. Enter or Esc returns to the solar system; Space, Enter, or Esc skips the video.
+The first screen shown when entering the Smiling Friends planet is the video in `source/intro.mov` (packed by `tools/video/prepare_smilingfriends_intro.py`). It plays once with its original audio, then shows a temporary **En construcción** screen. Enter or Esc returns to the solar system; Space, Enter, or Esc skips the video.
 
 Raylib does not decode MOV during gameplay. The generated `intro.sfv` contains 851 JPEG frames at 960×540 and 24 fps; `intro.ogg` contains the audio. The player reads one frame at a time and reuses a single GPU texture. No external video program is needed to run the game.
 

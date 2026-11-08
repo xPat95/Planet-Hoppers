@@ -31,7 +31,7 @@ pub const TOKENS: [TokenArt; 6] = [
     },
     TokenArt {
         franchise: Franchise::Halloween,
-        name: "Halloween",
+        name: "Hexbound",
         png: "assets/ui/tokens/halloween.png",
     },
     TokenArt {

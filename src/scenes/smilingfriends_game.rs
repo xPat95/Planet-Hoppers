@@ -16,7 +16,9 @@ const ART: &str = "assets/textures/minigames/smilingfriends";
 const DESMOND_STREET_BACKGROUND: &str = "desmond_end_street.png";
 /// Letras que tiene que traer cada fuente (español incluido).
 const CHARSET: &str = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~áéíóúÁÉÍÓÚñÑüÜ¿¡…“”—";
-const TYPE_SPEED: f32 = 48.0;                            // Letras por segundo
+const TYPE_SPEED: f32 = 48.0;
+const MUSIC: &str = "assets/audio/music/Smiling Friends/gameotoon.mp3";
+const MUSIC_VOLUME: f32 = 0.3;                            // Letras por segundo
 const CUTOUT_BORDER: i32 = 11;                           // Borde blanco del recorte, en píxeles de la imagen
 /// Píxeles de los recortes por alto de pantalla: todos se arman a esta escala, así el borde se ve igual en todos.
 const CUTOUT_SCALE: f32 = 1000.0;
@@ -509,10 +511,19 @@ fn draw_scene_card(d: &mut RaylibDrawHandle, title: &Font, text: &str, backdrop:
 
 /// Juega el minijuego en una ventana ya abierta. `None` si se cerró la ventana.
 pub fn play(rl: &mut RaylibHandle, thread: &RaylibThread, root: &Path, smoke: bool) -> Result<Option<MinigameResult>, Box<dyn std::error::Error>> {
-    play_with_results(rl, thread, root, smoke, &mut |_| Ok(()))
+    play_with_results(rl, thread, root, smoke, None, &mut |_| Ok(()))
 }
 
-pub fn play_with_results(rl: &mut RaylibHandle, thread: &RaylibThread, root: &Path, smoke: bool, observer: &mut crate::minigames::common::host::ResultObserver<'_>) -> Result<Option<MinigameResult>, Box<dyn std::error::Error>> {
+/// `audio`: el dispositivo de sonido de la entrada (sin él, el juego va en silencio).
+pub fn play_with_results(rl: &mut RaylibHandle, thread: &RaylibThread, root: &Path, smoke: bool, audio: Option<&RaylibAudio>,
+                         observer: &mut crate::minigames::common::host::ResultObserver<'_>) -> Result<Option<MinigameResult>, Box<dyn std::error::Error>> {
+    // La música del juego ("Gameotoon"), en loop, desde que termina el video de la intro
+    let music = audio.and_then(|d| d.new_music(&root.join(MUSIC).to_string_lossy()).ok()).map(|mut m| {
+        m.looping = true;
+        m.set_volume(MUSIC_VOLUME);
+        m.play_stream();
+        m
+    });
     let mut reporter = crate::minigames::common::host::AttemptReporter::default();
     let dialogue = Dialogue::load(&root.join(DIALOGUE))?;
     let title = rl.load_font_ex(thread, &root.join("assets/fonts/Bungee-Regular.ttf").to_string_lossy(), 72, Some(CHARSET))?;
@@ -584,6 +595,11 @@ pub fn play_with_results(rl: &mut RaylibHandle, thread: &RaylibThread, root: &Pa
     loop {
         if rl.window_should_close() {
             return Ok(None);
+        }
+        if let Some(m) = &music {
+            // Con el menú de salir abierto, más bajita
+            m.set_volume(if leaving.is_some() { MUSIC_VOLUME * 0.4 } else { MUSIC_VOLUME });
+            m.update_stream();
         }
         let dt = if smoke { 1.0 / 60.0 } else if leaving.is_some() { 0.0 } else { rl.get_frame_time().min(0.05) };
         time += dt;

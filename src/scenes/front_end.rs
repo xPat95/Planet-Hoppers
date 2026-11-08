@@ -422,7 +422,13 @@ fn view(
     let mut frame = 0u32;
     // Segundos en el menú principal (la entrada se ve una vez, al abrir el juego). En las pruebas ya terminó.
     let mut intro = if smoke_goal.is_some() { 10.0f32 } else { 0.0 };
+    // La música de la pantalla de inicio y del hangar (las pruebas automáticas van en silencio)
+    let audio = if smoke_goal.is_none() { RaylibAudio::init_audio_device().ok() } else { None };
+    let music = super::menu_music::MenuMusic::start(audio.as_ref(), &root);
+    let ship_switch = super::menu_music::ship_switch(audio.as_ref(), &root);
+
     loop {
+        music.update();
         if rl.window_should_close()
             || ((rl.is_key_down(KeyboardKey::KEY_LEFT_CONTROL)
                 || rl.is_key_down(KeyboardKey::KEY_RIGHT_CONTROL))
@@ -535,6 +541,9 @@ fn view(
                 shown = Some(selection.index);
             } else if morph.is_none() && shown != Some(selection.index) {
                 morph = Some(0.0);
+                if let Some(sound) = &ship_switch {
+                    sound.play();
+                }
             }
             if let Some(progress) = morph {
                 let next = progress + dt / MORPH_DURATION;

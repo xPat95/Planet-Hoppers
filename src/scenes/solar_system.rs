@@ -667,6 +667,13 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         rl.set_window_state(WindowState::default().set_window_hidden(true));
     }
     rl.set_target_fps(60);
+    // El audio del sistema solar: se cierra al salir de esta ventana (los minijuegos abren el suyo). El crescendo suena
+    // mientras se carga todo
+    let audio = if smoke { None } else { RaylibAudio::init_audio_device().ok() };
+    let riser = super::menu_music::riser(audio.as_ref(), root);
+    if let Some(r) = &riser {
+        r.play();
+    }
     let far_plane = outer_orbit(&s.system) * (2.0 * MAX_ZOOM_OUT + 2.0);
     {
         let mut d = rl.begin_drawing(&thread);
@@ -792,8 +799,10 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
     let mut collection_progress = 0.0_f32;
     let mut token_was_blocking = false;
     let mut token_restore_cursor = false;
+    let music = super::menu_music::MenuMusic::start(audio.as_ref(), root);
 
     loop {
+        music.update();
         if rl.window_should_close() {
             return Ok(Exit::Quit);
         }
