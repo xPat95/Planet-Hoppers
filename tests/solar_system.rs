@@ -10,14 +10,13 @@ fn config() -> SolarSystemConfig {
 fn el_orden_orbital_es_el_definitivo_con_la_escala_comun() {
     let config = config();
     let actual: Vec<_> = config.planets.iter().map(|p| p.id.as_str()).collect();
-    assert_eq!(actual, ["starwars", "smilingfriends", "minecraft", "regularshow", "southpark", "halloween"]);
+    assert_eq!(actual, ["halloween", "starwars", "smilingfriends", "minecraft", "regularshow", "southpark"]);
     let radii: Vec<_> = config.planets.iter().map(|p| p.orbit_radius).collect();
-    assert_eq!(radii, [1320.0, 1896.0, 2472.0, 3048.0, 3624.0, 4200.0]);
-    assert!(config.planets.windows(2).all(|pair| pair[1].orbit_radius - pair[0].orbit_radius == 576.0));
+    assert_eq!(radii, [1800.0, 2760.0, 3840.0, 4920.0, 6000.0, 7080.0]);
+    assert!(config.planets.windows(2).all(|pair| pair[0].orbit_radius < pair[1].orbit_radius));
     let angles: Vec<_> = config.planets.iter().map(|p| p.start_angle_degrees).collect();
-    assert_eq!(angles, [300.0, 240.0, 180.0, 120.0, 60.0, 0.0]);
-    // The six starting positions occupy the full circle instead of forming a row.
-    assert!(angles.windows(2).all(|pair| pair[0] - pair[1] == 60.0));
+    // Preserve current angles by identity: angular placement is not orbital order.
+    assert_eq!(angles, [0.0, 300.0, 240.0, 180.0, 120.0, 60.0]);
 }
 
 #[test]
@@ -26,7 +25,7 @@ fn la_escala_conserva_proporciones_y_un_punto_de_partida_seguro() {
     let system = SolarSystem::new(&config);
     assert_eq!(config.sun.radius, 540.0);
     let radii: Vec<_> = config.planets.iter().map(|p| p.radius).collect();
-    assert_eq!(radii, [264.0, 264.0, 192.0, 240.0, 216.0, 216.0]);
+    assert_eq!(radii, [216.0, 264.0, 264.0, 192.0, 240.0, 216.0]);
     let start = system.departure_position();
     assert!(start.length() > config.sun.radius + 100.0);
     for p in &system.planets {
@@ -72,11 +71,55 @@ fn hay_seis_planetas_en_orbitas_separadas_alrededor_del_sol() {
 }
 
 #[test]
-fn los_de_afuera_tardan_mas_en_dar_la_vuelta() {
+fn conserva_las_velocidades_actuales_por_franquicia() {
     let system = SolarSystem::new(&config());
-    for pair in system.planets.windows(2) {
-        assert!(pair[0].config.orbit_speed_degrees.abs() > pair[1].config.orbit_speed_degrees.abs());
+    // Reordering the orbits must not reassign speeds to a different franchise.
+    for (id, orbital, spin) in [
+        ("halloween", 0.55, -7.0), ("starwars", 2.2, 5.0),
+        ("smilingfriends", 1.5, 6.0), ("minecraft", 1.1, 10.0),
+        ("regularshow", 0.85, 9.0), ("southpark", 0.7, 8.0),
+    ] {
+        let p = system.planet(id).unwrap();
+        assert_eq!(p.config.orbit_speed_degrees, orbital / planet_hoppers::solar_system::scale::travel_scale());
+        assert_eq!(p.config.rotation_speed_degrees, spin);
     }
+}
+
+#[test]
+fn radios_e_identidades_se_conservan_durante_toda_la_simulacion() {
+    use planet_hoppers::{gameplay::progress::Franchise, scenes::token_collection::TOKENS};
+    let mut system = SolarSystem::new(&config());
+    let expected = [
+        ("halloween", "Halloween", 1800.0), ("starwars", "Star Wars", 2760.0),
+        ("smilingfriends", "Smiling Friends", 3840.0), ("minecraft", "Minecraft", 4920.0),
+        ("regularshow", "Un Show Más", 6000.0), ("southpark", "South Park", 7080.0),
+    ];
+    for step in 0..3600 {
+        system.update([1.0 / 144.0, 1.0 / 30.0, 0.1, 1.0, 60.0][step % 5]);
+        for (planet, (id, name, radius)) in system.planets.iter().zip(expected) {
+            assert_eq!(planet.config.id, id);
+            assert_eq!(planet.config.name, name);
+            assert_eq!(planet.config.orbit_radius, radius);
+            assert!((planet.position().length() - radius).abs() < 0.002, "{id}: step={step}");
+            assert!(planet.config.model.as_deref().unwrap().contains(&format!("/planets/{id}/")));
+            if let Some(far) = &planet.config.model_far { assert!(far.contains(&format!("/planets/{id}/"))); }
+            assert_eq!(planet.config.minigame.as_deref(), if id == "halloween" { None } else { Some(id) });
+            let franchise = Franchise::from_id(id).unwrap();
+            let art = TOKENS.iter().find(|art| art.franchise == franchise).unwrap();
+            assert_eq!(art.png, format!("assets/ui/tokens/{id}.png"));
+        }
+    }
+}
+
+#[test]
+fn rechaza_reasignar_franquicias_a_otras_orbitas_aunque_no_haya_colisiones() {
+    let mut bad = config();
+    // Exchange whole planet configs but leave the radii sorted and collision-free.
+    let radii: Vec<_> = bad.planets.iter().map(|p| p.orbit_radius).collect();
+    bad.planets.rotate_left(1);
+    for (planet, radius) in bad.planets.iter_mut().zip(radii) { planet.orbit_radius = radius; }
+    let error = bad.validate().unwrap_err();
+    assert!(error.contains("Orden orbital"), "{error}");
 }
 
 #[test]
