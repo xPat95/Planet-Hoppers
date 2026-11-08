@@ -1,9 +1,10 @@
 //! Música y sonidos del minijuego de Halloween. "Exploring" (Jeremy Korpas) suena en la historieta, la práctica y la
-//! advertencia; "Conspiracy Theory" (Rod Kim), en el juego y hasta el final. Mientras una criatura se acerca se la
-//! oye: cada una con su propia voz (de las de su tipo, que se turnan), más fuerte cuanto más cerca y del lado de donde
-//! viene, aunque todavía no se la vea. Cada criatura grita cuando se tira a la cara (de verdad, con un alarido encima; de mentira, con una
-//! voz enojada) y el grito se apaga apenas termina el susto; la gente grita cuando cae el cartel de cada oleada y se
-//! apaga con el cartel. Si no hay dispositivo de audio o falta un archivo, el juego sigue sin sonido.
+//! advertencia, y otra vez en el baile del final; "Conspiracy Theory" (Rod Kim), en el juego. Mientras una criatura se
+//! acerca se la oye: cada una con su propia voz (de las de su tipo, que se turnan), más fuerte cuanto más cerca y del
+//! lado de donde viene, aunque todavía no se la vea. Cada criatura grita cuando se tira a la cara (de verdad, con un
+//! alarido encima; de mentira, con una voz enojada) y el grito se apaga apenas termina el susto; la gente grita cuando
+//! cae el cartel de cada oleada y se apaga con el cartel. Si no hay dispositivo de audio o falta un archivo, el juego
+//! sigue sin sonido.
 use super::{Kind, Session, State};
 use raylib::prelude::*;
 use std::path::Path;
@@ -35,6 +36,9 @@ const PITCH_APART: f32 = 0.1;
 const VOICE_FADE: f32 = 6.0;
 /// El grito de cada criatura (en el orden de `Kind`), con su volumen.
 const ROARS: [(&str, f32); 3] = [("alien_roar.mp3", 0.8), ("zombie_roar.mp3", 0.8), ("alien_grunt_hiss.mp3", 0.85)];
+/// Los tonos con que se turna el grito de cada criatura (más grave, normal, más agudo), para que no suene igual dos
+/// veces seguidas.
+const ROAR_PITCHES: [f32; 3] = [0.82, 1.0, 1.2];
 /// Volumen del alarido o la voz de encima, cuánto dura el susto y cuánto tarda en apagarse después.
 const SCREAM_VOLUME: f32 = 0.7;
 const ANNOYED_VOLUME: f32 = 0.75;
@@ -74,6 +78,8 @@ pub struct Sounds<'a> {
     scream: Option<Sound<'a>>,
     annoyed: Option<Sound<'a>>,
     sting: Option<Sting>,
+    /// Qué tono de `ROAR_PITCHES` le toca al próximo grito de cada criatura.
+    next_roar: [usize; 3],
     /// Las voces de cada tipo de criatura, cuál toca después y el último tono de cada tipo.
     voices: [Vec<Voice<'a>>; 3],
     next_voice: [usize; 3],
@@ -120,6 +126,7 @@ impl<'a> Sounds<'a> {
             scream: sound("scare_scream.mp3", SCREAM_VOLUME),
             annoyed: sound("fright_annoyed.mp3", ANNOYED_VOLUME),
             sting: None,
+            next_roar: [1, 0, 2],
             voices: [voices(0), voices(1), voices(2)],
             next_voice: [0, 1, 1],
             last_pitch: [1.0; 3],
@@ -275,7 +282,9 @@ impl<'a> Sounds<'a> {
         }
         if let Some(s) = &self.roars[roar] {
             s.set_volume(ROARS[roar].1 * hush);
+            s.set_pitch(ROAR_PITCHES[self.next_roar[roar]]);
             s.play();
+            self.next_roar[roar] = (self.next_roar[roar] + 1) % ROAR_PITCHES.len();
         }
         self.sting = Some(Sting { roar, real, age: 0.0 });
     }

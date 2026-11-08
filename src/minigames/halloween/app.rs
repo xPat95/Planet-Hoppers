@@ -354,8 +354,10 @@ pub fn run_visit(root: &Path, args: impl Iterator<Item = String>, observer: &mut
         }
         // Lo que se ve atrás (pausado: lo que estaba)
         let base = if matches!(screen, Screen::Pause | Screen::Confirm) { paused_from } else { screen };
-        // "Exploring" en la historieta y la práctica; "Conspiracy Theory" desde que empieza el juego
-        let track = if matches!(base, Screen::Story | Screen::Intro) { Track::Intro } else { Track::Game };
+        // "Exploring" en la historieta, la práctica y el baile del final (con la victoria encima); "Conspiracy Theory"
+        // en el juego
+        let dancing = matches!(base, Screen::Ending | Screen::Over) && s.phase == Phase::Victory;
+        let track = if matches!(base, Screen::Story | Screen::Intro) || dancing { Track::Intro } else { Track::Game };
         sounds.update(track, matches!(screen, Screen::Pause | Screen::Confirm), dt);
         sounds.approach(&s, look.0, dt, screen != Screen::Play);
         let view = match base {
