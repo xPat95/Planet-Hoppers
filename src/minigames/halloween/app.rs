@@ -270,10 +270,11 @@ pub fn run_visit(root: &Path, args: impl Iterator<Item = String>, observer: &mut
                 }
                 match choice {
                     Some(0) => screen = paused_from,
-                    Some(_) => {
+                    Some(1) => {
                         screen = Screen::Confirm;
                         selected = 1;
                     }
+                    Some(_) => return give_up(observer),
                     None => {}
                 }
             }
@@ -289,10 +290,11 @@ pub fn run_visit(root: &Path, args: impl Iterator<Item = String>, observer: &mut
                         frights = Frights::new(seed);
                         screen = Screen::Play;
                     }
-                    Some(_) => {
+                    Some(2) => {
                         screen = Screen::Confirm;
                         selected = 1;
                     }
+                    Some(_) => return give_up(observer),
                     None => {}
                 }
             }
@@ -363,9 +365,9 @@ pub fn run_visit(root: &Path, args: impl Iterator<Item = String>, observer: &mut
         buttons = match screen {
             Screen::Story | Screen::Intro | Screen::Play | Screen::Ending => Vec::new(),
             Screen::Pause if paused_from != Screen::Play => art::draw_menu(&mut d, font, "Paused", "The party can wait a moment.",
-                &["Continue", "Return to the solar system"], selected),
+                &["Continue", "Return to the solar system", "I give up :("], selected),
             Screen::Pause => art::draw_menu(&mut d, font, "Paused", "The party can wait a moment.",
-                &["Continue", "Restart", "Return to the solar system"], selected),
+                &["Continue", "Restart", "Return to the solar system", "I give up :("], selected),
             Screen::Confirm => art::draw_menu(&mut d, font, "Leave the party?",
                 "Going back to the solar system ends this attempt.", &["Return", "Cancel"], selected),
             Screen::Over if s.phase == Phase::Victory => art::draw_menu(&mut d, font, "Quiet at last",
@@ -484,6 +486,12 @@ fn turn_head(rl: &RaylibHandle, (mut yaw, mut pitch): (f32, f32), dt: f32) -> (f
     (yaw.clamp(-75.0, 75.0), pitch.clamp(-25.0, 55.0))
 }
 
+/// "I give up": cuenta como si hubiera ganado (así lo pidió Cami), y vuelve al sistema solar.
+fn give_up(observer: &mut ResultObserver<'_>) -> Result<MinigameExit, Error> {
+    observer(MinigameResult::Victory)?;
+    Ok(MinigameExit::Returned(MinigameResult::Victory))
+}
+
 fn restart(s: &mut Session, fx: &mut Fx, last: &mut (Phase, u8), seed: u64) {
     *s = Session::new(Balance::default(), seed);
     fx.clear();
@@ -591,9 +599,6 @@ impl Auto {
         match screen {
             Screen::Story => {
                 // Cada viñeta con su texto completo, y un clic cada tanto
-                if frame == 0 && !typed && self.t > 0.6 {
-                    self.snap("title_glitch");
-                }
                 if typed {
                     self.snap(["story1", "story2", "story3", "story4"][frame]);
                 }

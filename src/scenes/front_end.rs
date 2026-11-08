@@ -407,7 +407,7 @@ fn view(
     let body_font = ui::load_font(&root.join("assets/fonts/TitilliumWeb-Bold.ttf"))?;
     let hangar_name_font = ui::load_font(&root.join("assets/fonts/Orbitron-Bold.ttf"))?;
     let mut hangar_logos = BTreeMap::new();
-    for id in ["starwars", "smilingfriends", "minecraft", "regularshow", "southpark"] {
+    for id in ["halloween", "starwars", "smilingfriends", "minecraft", "regularshow", "southpark"] {
         let path = root.join(format!("assets/ui/logos/{id}.png"));
         hangar_logos.insert(id.to_owned(), rl.load_texture(&thread, &path.to_string_lossy())?);
     }

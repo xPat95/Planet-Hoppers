@@ -3,7 +3,7 @@
   "ships": [
     {
       "id": "halloween",
-      "name": "Bruja en escoba",
+      "name": "La Hechicera",
       "model": "assets/models/ships/halloween/exports/witch_broom.glb",
       "length": 7.0,
       "model_rotation_degrees": [

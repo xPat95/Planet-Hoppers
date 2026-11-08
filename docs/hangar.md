@@ -29,7 +29,7 @@ Las escenas se ejecutan secuencialmente en el mismo proceso. El menú y el hanga
 | `minecraft` | Minecraft | Barco del End |
 | `regularshow` | Un Show Más | Carrito de golf |
 | `southpark` | South Park | Nave de Butters |
-| `halloween` | Calaca | Bruja en escoba |
+| `halloween` | Calaca | La Hechicera |
 
 Las seis están disponibles gratuitamente en selección inicial. Star Wars utiliza el N-1 del Mandaloriano; el N-1 de Naboo se conserva en el catálogo de desarrollo. Para incorporar la nave final de Calaca se agrega su modelo a `config/ships.json` y se asigna su identificador a `ship_id`; la identidad `halloween` y el estado de la partida permanecen iguales. El placeholder se muestra tanto en el hangar como en vuelo, con tamaño de nave de 4 unidades.
 

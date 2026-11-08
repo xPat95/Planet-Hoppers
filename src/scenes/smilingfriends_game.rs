@@ -578,12 +578,14 @@ pub fn play_with_results(rl: &mut RaylibHandle, thread: &RaylibThread, root: &Pa
     let mut frame = 0u32;
     let captures = root.join("target/smilingfriends");
     let mut shots: HashSet<&'static str> = HashSet::new();
+    // El menú de SALIR (o Esc): con el botón elegido; mientras está abierto, el juego queda quieto
+    let mut leaving: Option<usize> = None;
 
     loop {
         if rl.window_should_close() {
             return Ok(None);
         }
-        let dt = if smoke { 1.0 / 60.0 } else { rl.get_frame_time().min(0.05) };
+        let dt = if smoke { 1.0 / 60.0 } else if leaving.is_some() { 0.0 } else { rl.get_frame_time().min(0.05) };
         time += dt;
         step_time += dt;
         let (w, h) = (rl.get_screen_width() as f32, rl.get_screen_height() as f32);
@@ -598,14 +600,40 @@ pub fn play_with_results(rl: &mut RaylibHandle, thread: &RaylibThread, root: &Pa
 
         // --- Entrada ---------------------------------------------------------------------------------------
         let mouse = rl.get_mouse_position();
-        let click = rl.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_LEFT);
-        if click && exit_button(w, h).check_collision_point_rec(mouse) && !smoke {
-            return Ok(Some(MinigameResult::Abandoned));
+        let mut click = rl.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_LEFT);
+        let esc = rl.is_key_pressed(KeyboardKey::KEY_ESCAPE);
+        let enter = rl.is_key_pressed(KeyboardKey::KEY_ENTER) || rl.is_key_pressed(KeyboardKey::KEY_SPACE);
+        if let Some(sel) = leaving {
+            // Menú de salir: seguir jugando, rendirse (cuenta como ganado) o volver al sistema solar
+            let rects = leave_buttons(w, h);
+            let mut sel = sel;
+            if rl.is_key_pressed(KeyboardKey::KEY_UP) {
+                sel = (sel + LEAVE.len() - 1) % LEAVE.len();
+            }
+            if rl.is_key_pressed(KeyboardKey::KEY_DOWN) {
+                sel = (sel + 1) % LEAVE.len();
+            }
+            if let Some(k) = rects.iter().position(|r| r.check_collision_point_rec(mouse)) {
+                sel = k;
+            }
+            let chosen = if click && rects[sel].check_collision_point_rec(mouse) || enter { Some(sel) } else { None };
+            leaving = Some(sel);
+            match chosen {
+                _ if esc => leaving = None,
+                Some(0) => leaving = None,
+                Some(1) => {
+                    observer(MinigameResult::Victory)?;
+                    return Ok(Some(MinigameResult::Victory));
+                }
+                Some(_) => return Ok(Some(MinigameResult::Abandoned)),
+                None => {}
+            }
+            click = false;
+        } else if !smoke && (esc || click && exit_button(w, h).check_collision_point_rec(mouse)) {
+            leaving = Some(0);
+            click = false;
         }
-        let next = click || rl.is_key_pressed(KeyboardKey::KEY_ENTER) || rl.is_key_pressed(KeyboardKey::KEY_SPACE);
-        if rl.is_key_pressed(KeyboardKey::KEY_ESCAPE) && !smoke {
-            return Ok(Some(MinigameResult::Abandoned));
-        }
+        let next = leaving.is_none() && (click || enter);
         let cards = choice_cards(w, h, &game);
         let mut picked: Option<usize> = None;
         if let Step::Prompt { .. } = game.step {
@@ -894,6 +922,9 @@ pub fn play_with_results(rl: &mut RaylibHandle, thread: &RaylibThread, root: &Pa
         }
         // Capturas de la prueba automática
         draw_exit_button(&mut d, &title, exit_button(w, h), mouse);
+        if let Some(sel) = leaving {
+            draw_leave_menu(&mut d, &title, &body, w, h, sel);
+        }
         if smoke {
             let want = match (game.step, scene) {
                 (Step::Boss { line: 1 }, _) if step_time > 1.0 => Some("boss.png"),
@@ -932,6 +963,35 @@ fn exit_button_width(w: f32) -> f32 {
 fn exit_button(w: f32, h: f32) -> Rectangle {
     let width = exit_button_width(w);
     Rectangle::new(w - width - 22.0, (h * 0.027).max(14.0), width, 52.0)
+}
+
+/// Los botones del menú de salir.
+const LEAVE: [&str; 3] = ["KEEP PLAYING", "I GIVE UP :(", "BACK TO THE SOLAR SYSTEM"];
+
+fn leave_buttons(w: f32, h: f32) -> Vec<Rectangle> {
+    let (bw, bh) = ((w * 0.36).clamp(300.0, 460.0), 56.0);
+    (0..LEAVE.len()).map(|i| Rectangle::new(w / 2.0 - bw / 2.0, h * 0.5 - 40.0 + i as f32 * (bh + 22.0), bw, bh)).collect()
+}
+
+/// El menú de salir: un panel de historieta con el título y tres botones (el elegido, amarillo).
+fn draw_leave_menu(d: &mut RaylibDrawHandle, title: &Font, body: &Font, w: f32, h: f32, sel: usize) {
+    d.draw_rectangle(0, 0, w as i32, h as i32, fade(INK, 0.55));
+    let rects = leave_buttons(w, h);
+    let top = rects[0].y - 150.0;
+    let bottom = rects[rects.len() - 1].y + rects[0].height + 40.0;
+    let pw = rects[0].width + 120.0;
+    panel(d, Rectangle::new(w / 2.0 - pw / 2.0, top, pw, bottom - top), PAPER, -1.0);
+    let head = "LEAVING ALREADY?";
+    let m = title.measure_text(head, 44.0, 1.0);
+    d.draw_text_ex(title, head, Vector2::new(w / 2.0 - m.x / 2.0, top + 34.0), 44.0, 1.0, INK);
+    let sub = "Giving up counts as a win.";
+    let m = body.measure_text(sub, 26.0, 1.0);
+    d.draw_text_ex(body, sub, Vector2::new(w / 2.0 - m.x / 2.0, top + 92.0), 26.0, 1.0, INK);
+    for (i, (r, label)) in rects.iter().zip(LEAVE).enumerate() {
+        panel(d, *r, if i == sel { YELLOW } else { PAPER }, 0.0);
+        let m = title.measure_text(label, 24.0, 1.0);
+        d.draw_text_ex(title, label, Vector2::new(r.x + r.width / 2.0 - m.x / 2.0, r.y + r.height / 2.0 - m.y / 2.0), 24.0, 1.0, INK);
+    }
 }
 
 fn draw_exit_button(d: &mut RaylibDrawHandle, title: &Font, r: Rectangle, mouse: Vector2) {

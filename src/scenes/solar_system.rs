@@ -744,7 +744,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
     let token_textures = super::token_collection_ui::TokenTextures::load(&mut rl, &thread, root)?;
     let empty_progress = crate::gameplay::progress::ProgressState::default();
     let mut planet_logos = BTreeMap::new();
-    for id in ["starwars", "smilingfriends", "minecraft", "regularshow", "southpark"] {
+    for id in ["halloween", "starwars", "smilingfriends", "minecraft", "regularshow", "southpark"] {
         let path = root.join(format!("assets/ui/logos/{id}.png"));
         planet_logos.insert(id, rl.load_texture(&thread, &path.to_string_lossy())?);
     }

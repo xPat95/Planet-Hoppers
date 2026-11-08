@@ -12,16 +12,16 @@ use super::render::{
 };
 use raylib::prelude::*;
 
-/// Lo que dice un cuadro: el título, o lo que se le cuenta a quien juega.
+/// Lo que dice un cuadro: el título (el logo), o lo que se le cuenta a quien juega.
 #[derive(Clone, Copy)]
 enum Line {
-    Title(&'static str),
+    Title,
     Tell(&'static str),
 }
 
 /// Los cuadros de la intro.
 const FRAMES: [Line; 4] = [
-    Line::Title("Hexbound"),
+    Line::Title,
     Line::Tell("The witches of the skull planet invited you to their party... but something feels wrong."),
     Line::Tell("The party went silent an hour ago. Something is out there in the dark."),
     Line::Tell("Light your lantern. Draw their glyphs. Curse them all back into the dark."),
@@ -51,7 +51,7 @@ impl Story {
 
     fn typed(&self) -> bool {
         match FRAMES[self.frame] {
-            Line::Title(_) => self.t > 1.5,
+            Line::Title => self.t > FADE_IN,
             Line::Tell(s) => self.t * TYPE_SPEED >= s.len() as f32,
         }
     }
@@ -87,8 +87,14 @@ pub fn draw_story(d: &mut RaylibDrawHandle, thread: &RaylibThread, art: &mut Art
     d.clear_background(Color::BLACK);
     let screen = Rectangle::new(0.0, 0.0, w, h);
     let shot = shot(art, story, time);
+    // En el título, atrás de todo, las estrellas y el logo enorme; la bruja y el planeta van encima
+    let title = matches!(FRAMES[story.frame], Line::Title);
+    if title {
+        draw_stars(d, w, h, time);
+        draw_title(d, art, w, h);
+    }
     render_view(d, thread, art, &shot.items, &[], shot.camera, shot.light, FRAME_HALF, screen, time, 0.0,
-                Backdrop { stars: shot.stars, halo: false });
+                Backdrop { stars: shot.stars, halo: false, see_through: title });
     // Aparece desde el negro (el texto, encima, ya se ve)
     let dark = 1.0 - smooth(story.t / FADE_IN);
     if dark > 0.0 {
@@ -96,38 +102,7 @@ pub fn draw_story(d: &mut RaylibDrawHandle, thread: &RaylibThread, art: &mut Art
     }
     let red = Color::new(205, 14, 24, 255);
     match FRAMES[story.frame] {
-        Line::Title(s) => {
-            // Como película rota: al aparecer salta, se parte en copias roja y azul corridas y le faltan cuadros;
-            // después se calma, pero cada tanto vuelve a fallar un instante
-            let size = h * 0.2;
-            let p = Vector2::new(w * 0.07, h * 0.08);
-            let frame = (time * 14.0).floor();
-            let r = |i: f32| noise(frame * 3.71 + i * 1.618);
-            let settling = 1.0 - smooth((story.t - 0.3) / 1.2);
-            let glitch = settling.max(if r(9.0) > 0.93 { 0.6 } else { 0.0 });
-            let missing = story.t < 1.2 && r(1.0) < 0.35 * settling;
-            if story.t > 0.05 && !missing {
-                let jump = Vector2::new((r(2.0) - 0.5) * size * 0.3, (r(3.0) - 0.5) * size * 0.12) * glitch;
-                let split = Vector2::new(size * 0.06 * glitch * (0.5 + r(4.0)), 0.0);
-                let at = p + jump;
-                let big = &art.font_big;
-                d.draw_text_ex(big, s, at + Vector2::new(0.0, size * 0.04), size, 2.0, Color::new(20, 18, 24, 230));
-                if glitch > 0.02 {
-                    d.draw_text_ex(big, s, at - split, size, 2.0, fade(Color::new(255, 30, 50, 255), 0.75 * glitch));
-                    d.draw_text_ex(big, s, at + split, size, 2.0, fade(Color::new(40, 140, 255, 255), 0.75 * glitch));
-                }
-                d.draw_text_ex(big, s, at, size, 2.0, Color::new(245, 242, 236, 255));
-                // Una franja corrida, como una línea de la cinta que se salió de lugar
-                if glitch > 0.3 && r(5.0) > 0.4 {
-                    let m = text_size(big, s, size);
-                    let y = at.y + m.y * (0.2 + 0.6 * r(6.0));
-                    let band = m.y * 0.12;
-                    d.draw_rectangle_v(Vector2::new(at.x - 10.0, y), Vector2::new(m.x + 20.0, band), Color::BLACK);
-                    d.draw_rectangle_v(Vector2::new(at.x + (r(7.0) - 0.5) * size * 0.4, y), Vector2::new(m.x, band * 0.5),
-                                       fade(Color::new(245, 242, 236, 255), 0.8));
-                }
-            }
-        }
+        Line::Title => {}
         Line::Tell(s) => {
             // Abajo, centrado, en una o dos líneas, escribiéndose de a poco
             let size = (h * 0.06).max(30.0);
@@ -153,6 +128,25 @@ pub fn draw_story(d: &mut RaylibDrawHandle, thread: &RaylibThread, art: &mut Art
         let a = 0.45 + 0.35 * (time * 3.0).sin();
         text_center(d, &art.font, "Click to continue", Vector2::new(w / 2.0, h - 36.0), 24.0, fade(Color::new(210, 205, 215, 255), a));
     }
+}
+
+/// Estrellas finitas en la pantalla, quietas y algunas titilando (atrás del logo del título).
+fn draw_stars(d: &mut RaylibDrawHandle, w: f32, h: f32, t: f32) {
+    for i in 0..260 {
+        let k = i as f32;
+        let p = Vector2::new(noise(k * 1.31 + 0.2) * w, noise(k * 2.17 + 5.1) * h);
+        let a = 0.25 + 0.6 * noise(k * 0.71 + 9.0) * (0.7 + 0.3 * (t * (1.0 + noise(k) * 3.0) + k).sin());
+        d.draw_circle_v(p, 0.8 + 1.4 * noise(k * 3.3), fade(Color::new(220, 225, 255, 255), a));
+    }
+}
+
+/// El logo de Hexbound, enorme y centrado (aparece desde el negro con el resto del cuadro).
+fn draw_title(d: &mut RaylibDrawHandle, art: &Art, w: f32, h: f32) {
+    let logo = &art.title;
+    let lh = h * 0.9;
+    let lw = lh * logo.width as f32 / logo.height as f32;
+    d.draw_texture_pro(logo, Rectangle::new(0.0, 0.0, logo.width as f32, logo.height as f32),
+                       Rectangle::new((w - lw) / 2.0, (h - lh) / 2.0, lw, lh), Vector2::zero(), 0.0, Color::WHITE);
 }
 
 /// Parte el texto en líneas que entren en `width` (según el texto completo, así las palabras no saltan de línea
@@ -198,10 +192,10 @@ fn shot(art: &Art, story: &Story, time: f32) -> Shot {
         0 => {
             let drift = (time * 1.3).sin() * 0.02;
             let m = Matrix::rotate_y(-std::f32::consts::FRAC_PI_2 * 0.85) * Matrix::translate(0.0, drift, 0.0);
-            let planet = Matrix::scale(1.5, 1.5, 1.5) * Matrix::rotate_y(time * 0.05) * Matrix::translate(-11.5, -5.5, -14.0);
+            let planet = Matrix::scale(1.5, 1.5, 1.5) * Matrix::rotate_y(time * 0.05) * Matrix::translate(-4.8, -2.3, -8.0);
             Shot {
                 items: vec![Item::plain(Who::Broom, Shape::Still, m), Item::plain(Who::Planet, Shape::Still, planet)],
-                camera: Camera3D::perspective(Vector3::new(0.3, 0.2, 2.0 - push * 0.25), Vector3::new(-0.35, 0.05, 0.0), UP, fov),
+                camera: Camera3D::perspective(Vector3::new(0.12, 0.08, 1.7 - push * 0.15), Vector3::new(-0.24, 0.0, 0.0), UP, fov),
                 light: Light { lamp: Vector3::new(0.4, 1.2, 1.4), power: 3.2, tint: Vector3::zero(), range: 3.0, fog: 0.0 },
                 stars: true,
             }
@@ -266,7 +260,7 @@ pub fn draw_ending(d: &mut RaylibDrawHandle, thread: &RaylibThread, art: &mut Ar
     let ball = UP * 1.95 + FORWARD * 0.1;
     let extras = [Extra::Glow(ball, 0.11, Color::new(205, 210, 225, 255))];
     render_view(d, thread, art, &items, &extras, camera, Light { lamp, power: 30.0, tint: Vector3::new(r, g, b), range: 2.0, fog: 0.0 },
-                FISH_HALF, Rectangle::new(0.0, 0.0, w, h), t, 0.0, Backdrop { stars: false, halo: false });
+                FISH_HALF, Rectangle::new(0.0, 0.0, w, h), t, 0.0, Backdrop { stars: false, halo: false, see_through: false });
     // Focos de colores que barren desde arriba
     {
         let mut add = d.begin_blend_mode(BlendMode::BLEND_ADDITIVE);

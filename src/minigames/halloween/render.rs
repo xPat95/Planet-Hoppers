@@ -100,8 +100,8 @@ pub(super) fn render_view(screen: &mut RaylibDrawHandle, thread: &RaylibThread, 
     let mut target = art.target.take().expect("Art::prepare antes de dibujar");
     let (tw, th) = (target.texture.width as f32, target.texture.height as f32);
     let mut d = screen.begin_texture_mode(thread, &mut target);
-    d.clear_background(FOG_COLOR);
-    if back.stars {
+    d.clear_background(if back.see_through { Color::BLANK } else { FOG_COLOR });
+    if back.stars && !back.see_through {
         // Estrellas finitas, quietas y algunas titilando
         for i in 0..420 {
             let k = i as f32;
@@ -145,6 +145,7 @@ pub(super) fn render_view(screen: &mut RaylibDrawHandle, thread: &RaylibThread, 
     art.lens.set_shader_value(art.lens_half, half.to_radians());
     art.lens.set_shader_value(art.lens_time, t);
     art.lens.set_shader_value(art.lens_hit, hit);
+    art.lens.set_shader_value(art.lens_see, if back.see_through { 1.0f32 } else { 0.0 });
     {
         let mut l = screen.begin_shader_mode(&mut art.lens);
         l.draw_texture_pro(target.texture(), Rectangle::new(0.0, 0.0, tw, -th), dest, Vector2::zero(), 0.0, Color::WHITE);
@@ -324,9 +325,12 @@ pub(super) struct Light {
 }
 
 /// Lo que va atrás de los modelos: estrellas (en el espacio) y el resplandor del farol (cuando se lo ve de afuera).
+/// Con `see_through`, lo que no tiene modelos queda transparente: se ve lo que ya estaba dibujado en la pantalla
+/// (el logo del título, atrás de la bruja).
 pub(super) struct Backdrop {
     pub stars: bool,
     pub halo: bool,
+    pub see_through: bool,
 }
 
 /// Cosas que brillan solas, sin luz (la bola de espejos del final).
@@ -598,11 +602,14 @@ pub struct Art {
     lens_half: i32,
     lens_time: i32,
     lens_hit: i32,
+    lens_see: i32,
     /// La escena se dibuja acá y después pasa por la lente.
     target: Option<RenderTexture2D>,
     /// Las vidas: el sombrero de bruja violeta (la que queda) y gris (la que se perdió), dibujos de Cami.
     life_full: Texture2D,
     life_empty: Texture2D,
+    /// El logo de Hexbound (dibujo de Cami), para el título de la historieta.
+    pub(super) title: Texture2D,
 }
 
 impl Art {
@@ -644,6 +651,7 @@ impl Art {
         let lens_aspect = lens.get_shader_location("aspect");
         let lens_half = lens.get_shader_location("fovHalf");
         let (lens_time, lens_hit) = (lens.get_shader_location("time"), lens.get_shader_location("hit"));
+        let lens_see = lens.get_shader_location("seeThrough");
         let shadow = Some(load_shadow_map(SHADOW_SIZE));
         let mut life = |name: &str| -> Result<Texture2D, Error> {
             let t = rl.load_texture(thread, &root.join("assets/ui/halloween").join(name).to_string_lossy())?;
@@ -651,11 +659,12 @@ impl Art {
             Ok(t)
         };
         let (life_full, life_empty) = (life("life_full.png")?, life("life_empty.png")?);
+        let title = life("title.png")?;
         let font_big = rl.load_font_ex(thread, &root.join("assets/fonts/JollyLodger-Regular.ttf").to_string_lossy(), 256, None)?;
         font_big.texture().set_texture_filter(thread, TextureFilter::TEXTURE_FILTER_BILINEAR);
         Ok(Self { shader, lamp_range, goo, hidden, lamp_power, fog_density, shadow_on, light_vp, shadow, witch, witch_happy,
                   broom, planet, lamp_tint, devil, ghost, demon, font, lens, lens_aspect, lens_half,
-                  lens_time, lens_hit, target: None, life_full, life_empty, font_big })
+                  lens_time, lens_hit, lens_see, target: None, life_full, life_empty, font_big, title })
     }
 
     /// La cámara de cada momento. Desde los ojos (a la altura real de los de la bruja, con un campo de visión
@@ -997,7 +1006,7 @@ pub fn draw_game(screen: &mut RaylibDrawHandle, thread: &RaylibThread, art: &mut
     let hit = fx.scare.map_or(0.0, |(_, k)| 1.0 - (k / SCARE).min(1.0)).max(slam);
     let light = Light { lamp, power, tint: Vector3::zero(), range: LAMP_RANGE, fog: FOG_DENSITY };
     let (tw, th) = render_view(screen, thread, art, &items, &[], camera, light, FISH_HALF, Rectangle::new(0.0, 0.0, w, h),
-                               t, hit, Backdrop { stars: false, halo: view != View::Pov });
+                               t, hit, Backdrop { stars: false, halo: view != View::Pov, see_through: false });
     let d = screen;
     if fx.scare.is_some_and(|(_, k)| k < 0.09) {
         d.draw_rectangle(0, 0, w as i32, h as i32, Color::new(255, 255, 255, 230));
@@ -1220,23 +1229,38 @@ pub fn pause_button(w: f32) -> Vector2 {
     Vector2::new(w - 44.0, 42.0)
 }
 
-/// Un menú centrado: título, texto y botones (el elegido, resaltado). Devuelve los rectángulos de los botones.
+/// Un menú centrado, con el estilo del logo de Hexbound: caja rosa con degradé (fucsia arriba, rojo abajo), borde
+/// negro grueso y sombra dura; título y texto negros, sin sombras; botones negros simples con texto blanco (el
+/// elegido, blanco con texto negro). Devuelve los rectángulos de los botones.
 pub fn draw_menu(d: &mut RaylibDrawHandle, font: &Font, title: &str, sub: &str, buttons: &[&str], selected: usize)
     -> Vec<Rectangle> {
     let (w, h) = (d.get_screen_width() as f32, d.get_screen_height() as f32);
+    let ink = Color::new(10, 6, 12, 255);
     d.draw_rectangle(0, 0, w as i32, h as i32, Color::new(0, 0, 0, 150));
-    let panel = Rectangle::new(w / 2.0 - 280.0, h / 2.0 - 170.0, 560.0, 300.0 + buttons.len() as f32 * 10.0);
-    d.draw_rectangle_rounded(panel, 0.12, 10, Color::new(10, 9, 13, 235));
-    d.draw_rectangle_rounded_lines(panel, 0.12, 10, Color::new(220, 215, 230, 90));
-    text_center(d, font, title, Vector2::new(w / 2.0, panel.y + 52.0), 52.0, Color::new(240, 235, 225, 255));
-    text_center(d, font, sub, Vector2::new(w / 2.0, panel.y + 104.0), 24.0, Color::new(200, 195, 210, 255));
+    let ph = 170.0 + buttons.len() as f32 * 62.0;
+    let panel = Rectangle::new(w / 2.0 - 280.0, h / 2.0 - ph / 2.0, 560.0, ph);
+    let grow = |r: Rectangle, k: f32| Rectangle::new(r.x - k, r.y - k, r.width + 2.0 * k, r.height + 2.0 * k);
+    d.draw_rectangle_rounded(Rectangle::new(panel.x + 12.0, panel.y + 14.0, panel.width, panel.height), 0.1, 10, ink);
+    d.draw_rectangle_rounded(grow(panel, 6.0), 0.1, 10, ink);
+    // Degradé de arriba a abajo, recortado con las esquinas redondeadas
+    let (top, bottom) = (Color::new(255, 0, 200, 255), Color::new(255, 12, 40, 255));
+    let round = panel.width.min(panel.height) * 0.05;
+    d.draw_rectangle_gradient_v(panel.x as i32, (panel.y + round) as i32, panel.width as i32, (panel.height - 2.0 * round) as i32,
+                                top, bottom);
+    d.draw_rectangle_rounded(Rectangle::new(panel.x, panel.y, panel.width, round * 3.0), 0.5, 10, top);
+    d.draw_rectangle_rounded(Rectangle::new(panel.x, panel.y + panel.height - round * 3.0, panel.width, round * 3.0), 0.5, 10, bottom);
+    let plain = |d: &mut RaylibDrawHandle, text: &str, c: Vector2, size: f32, color: Color| {
+        let m = text_size(font, text, size);
+        d.draw_text_ex(font, text, c - m * 0.5, size, 1.0, color);
+    };
+    plain(d, title, Vector2::new(w / 2.0, panel.y + 52.0), 56.0, ink);
+    plain(d, sub, Vector2::new(w / 2.0, panel.y + 102.0), 26.0, ink);
     let mut rects = Vec::new();
     for (i, b) in buttons.iter().enumerate() {
         let r = Rectangle::new(w / 2.0 - 190.0, panel.y + 140.0 + i as f32 * 62.0, 380.0, 50.0);
         let on = i == selected;
-        d.draw_rectangle_rounded(r, 0.4, 8, if on { Color::new(235, 230, 220, 255) } else { Color::new(34, 32, 40, 255) });
-        text_center(d, font, b, Vector2::new(r.x + r.width / 2.0, r.y + r.height / 2.0), 28.0,
-                    if on { Color::new(12, 10, 16, 255) } else { Color::new(225, 220, 235, 255) });
+        d.draw_rectangle_rounded(r, 0.45, 8, if on { Color::WHITE } else { ink });
+        plain(d, b, Vector2::new(r.x + r.width / 2.0, r.y + r.height / 2.0), 30.0, if on { ink } else { Color::WHITE });
         rects.push(r);
     }
     rects

@@ -12,6 +12,7 @@ uniform float aspect;    // Ancho / alto de la pantalla
 uniform float fovHalf;   // Ángulo en las esquinas de la pantalla (radianes); la textura cubre lo mismo de lado a lado
 uniform float time;
 uniform float hit;       // 0 a 1: el susto
+uniform float seeThrough; // 1: lo que no tiene nada queda transparente (se ve lo que hay atrás en la pantalla)
 out vec4 finalColor;
 
 // Ruido sin patrones (el de seno dibuja rayas en diagonal)
@@ -42,5 +43,6 @@ void main() {
     col += (grain - 0.5) * 0.045 * smoothstep(0.0, 0.08, max(col.r, max(col.g, col.b)));
     col = mix(col, vec3(grain), hit * 0.4 * step(0.45, hash(vec2(floor(time * 30.0), 3.0))));
     float vignette = smoothstep(1.0, 0.4, r);
-    finalColor = vec4(max(col, vec3(0.0)) * mix(0.15, 1.0, vignette), 1.0);
+    float alpha = mix(1.0, texture(texture0, lens(st, 1.0)).a, seeThrough);
+    finalColor = vec4(max(col, vec3(0.0)) * mix(mix(0.15, 1.0, vignette), 1.0, seeThrough), alpha);
 }
