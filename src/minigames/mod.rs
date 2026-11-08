@@ -6,3 +6,5 @@ pub mod southpark;
 pub mod starwars;
 
 pub mod regularshow;
+
+pub mod halloween;

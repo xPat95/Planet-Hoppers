@@ -42,6 +42,22 @@ EXPORTS = {
     "minecraft_ship": ("assets/models/ships/minecraft/end_ship.blend", "EndShip_ROOT",
                        "assets/models/ships/minecraft/exports/end_ship.glb", "near"),
 }
+# Bruja del minijuego de Halloween: una pose por archivo (el juego las mezcla)
+for _pose in ("solo_a", "solo_b", "solo_c", "hop", "sway", "spin", "cast", "warn", "stand"):
+    EXPORTS["halloween_game_witch_" + _pose] = (
+        "assets/models/characters/halloween/witch.blend", "Halloween_GameWitch_%s_ROOT" % _pose,
+        "assets/models/minigames/halloween/witch_%s.glb" % _pose, "near")
+for _pose in ("solo_a", "solo_b", "solo_c", "hop", "sway", "spin"):
+    EXPORTS["halloween_game_witchhappy_" + _pose] = (
+        "assets/models/characters/halloween/witch.blend", "Halloween_GameWitchHappy_%s_ROOT" % _pose,
+        "assets/models/minigames/halloween/witch_happy_%s.glb" % _pose, "near")
+# Criaturas del minijuego: una pose por archivo
+for _c, _poses in (("Devil", ("walk_a", "walk_b", "dance_a", "dance_b")), ("Ghost", ("float_a", "float_b", "dance_a", "dance_b")),
+                   ("Demon", ("walk_a", "walk_b", "dance_a", "dance_b"))):
+    for _pose in _poses:
+        EXPORTS["halloween_game_%s_%s" % (_c.lower(), _pose)] = (
+            "assets/models/minigames/halloween/creatures.blend", "Halloween_Game_%s_%s_ROOT" % (_c, _pose),
+            "assets/models/minigames/halloween/%s_%s.glb" % (_c.lower(), _pose), "near")
 
 
 def under(ob, root):
@@ -95,6 +111,10 @@ def export(key):
     keep_outline = bool(flags and flags[0])
     bpy.ops.wm.open_mainfile(filepath=os.path.join(REPO, blend))
     root = bpy.data.objects[root_name]
+    if key.startswith("halloween_game"):
+        # Poses del minijuego: cada raíz está corrida para verlas lado a lado en el .blend; en el juego todas las
+        # poses tienen que compartir el origen (en el piso) para poder mezclarse
+        root.location = (0.0, 0.0, 0.0)
     # Algunos archivos traen otra escena con el cubo por defecto: se borra (el .blend no se guarda) para que el
     # exportador solo vea la escena del modelo
     home = next(sc for sc in bpy.data.scenes if root.name in sc.objects)

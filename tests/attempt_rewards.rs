@@ -205,11 +205,7 @@ fn pending_minigames_and_help_cannot_emit_rewards() {
                 Ok(())
             },
         );
-        if id == "halloween" {
-            assert!(result.is_err());
-        } else {
-            assert!(result.is_ok());
-        }
+        assert!(result.is_ok(), "{id}");
         assert_eq!(game, before);
     }
 }

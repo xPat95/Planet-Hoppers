@@ -39,6 +39,12 @@ impl SpaceShader {
         Ok(shader)
     }
 
+    /// Con un shader de fragmentos propio (por ejemplo, la luz de una escena de minijuego). Tiene que declarar y usar
+    /// `lightPosition`, `cameraPosition`, `emissive`, `ambient`, `outline` y `transportGlow`.
+    pub fn load_custom(rl: &mut RaylibHandle, thread: &RaylibThread, fragment: &str) -> Result<Self, Box<dyn std::error::Error>> {
+        Self::load_fragment(rl, thread, fragment)
+    }
+
     fn load_fragment(rl: &mut RaylibHandle, thread: &RaylibThread, fragment: &str) -> Result<Self, Box<dyn std::error::Error>> {
         let shader = rl.load_shader_from_memory(
             thread,
@@ -155,6 +161,8 @@ pub enum Fit {
 
 struct Part {
     mesh: usize,
+    /// Nombre del material en el GLB (para ocultar piezas o cambiar su brillo).
+    name: String,
     material: usize,
     emissive: Vector3,
     transparent: bool,
@@ -360,8 +368,11 @@ impl SpaceModel {
             let (emissive, blend, outline, sticker) = emission(material);
             let alpha = model.materials().get(material).map_or(255, |m| m.maps()[0].color.a);
             triangles += model.meshes()[i].as_ref().triangleCount.max(0) as usize;
+            let name = material.checked_sub(1).and_then(|k| materials.get(k))
+                .and_then(|m| m["name"].as_str()).unwrap_or_default().to_string();
             parts.push(Part {
                 mesh: i,
+                name,
                 material,
                 emissive,
                 transparent: blend || alpha < 250,
@@ -405,9 +416,47 @@ impl SpaceModel {
         Ok(Self { parts, model, fit, half_extents, triangles })
     }
 
+    /// Deja de dibujar las piezas cuyo material empieza con alguno de estos nombres.
+    pub fn hide_materials(&mut self, prefixes: &[&str]) {
+        self.parts.retain(|p| !prefixes.iter().any(|x| p.name.starts_with(x)));
+    }
+
+    /// Vértices y normales de cada malla, en el orden del archivo (para mezclar poses de la misma malla).
+    pub fn mesh_vertices(&self) -> Vec<(Vec<Vector3>, Vec<Vector3>)> {
+        self.model.meshes().iter().map(|m| (m.vertices().to_vec(), m.normals().to_vec())).collect()
+    }
+
+    /// Reemplaza vértices y normales de cada malla (con la misma cantidad) y los sube a la GPU.
+    pub fn set_mesh_vertices(&mut self, data: &[(Vec<Vector3>, Vec<Vector3>)]) {
+        for (mesh, (v, n)) in self.model.meshes_mut().iter_mut().zip(data) {
+            mesh.vertices_mut().copy_from_slice(v);
+            mesh.normals_mut().copy_from_slice(n);
+            unsafe {
+                ffi::UpdateMeshBuffer(*mesh.as_ref(), 0, v.as_ptr().cast(), (v.len() * 12) as i32, 0);
+                ffi::UpdateMeshBuffer(*mesh.as_ref(), 2, n.as_ptr().cast(), (n.len() * 12) as i32, 0);
+            }
+        }
+    }
+
+    /// Punto donde un rayo (en el mundo) toca el modelo dibujado con `world`.
+    pub fn ray_hit(&self, ray: Ray, world: Matrix) -> Option<Vector3> {
+        let transform = self.fit * world;
+        self.parts.iter()
+            .map(|p| unsafe { ffi::GetRayCollisionMesh(ray.into(), *self.model.meshes()[p.mesh].as_ref(), transform.into()) })
+            .filter(|c| c.hit)
+            .min_by(|a, b| a.distance.total_cmp(&b.distance))
+            .map(|c| c.point.into())
+    }
+
     /// Dibuja con `world` (del espacio del planeta o nave al mundo). Sin descartar caras traseras: algunas mallas
     /// vienen con normales invertidas y el shader las corrige.
     pub fn draw(&self, d: &mut impl RaylibDraw3D, shader: &mut SpaceShader, world: Matrix) {
+        self.draw_with(d, shader, world, &|_, e| e);
+    }
+
+    /// Como `draw`, pero `glow` puede cambiar la emisión de cada material (por su nombre) en este dibujo.
+    pub fn draw_with(&self, d: &mut impl RaylibDraw3D, shader: &mut SpaceShader, world: Matrix,
+                     glow: &dyn Fn(&str, Vector3) -> Vector3) {
         let transform = self.fit * world;
         unsafe { ffi::rlDisableBackfaceCulling() };
         let mut depth_writes = true;
@@ -416,7 +465,7 @@ impl SpaceModel {
                 unsafe { ffi::rlDisableDepthMask() };
                 depth_writes = false;
             }
-            shader.shader.set_shader_value(shader.emissive, part.emissive);
+            shader.shader.set_shader_value(shader.emissive, glow(&part.name, part.emissive));
             if shader.roughness >= 0 { shader.shader.set_shader_value(shader.roughness, part.roughness); }
             if shader.wet_surface >= 0 { shader.shader.set_shader_value(shader.wet_surface, part.wet_surface); }
             shader.shader.set_shader_value(shader.outline, if part.sticker { 2.0f32 } else if part.outline { 1.0 } else { 0.0 });

@@ -22,6 +22,8 @@ pub fn run(
         "minecraft" => minecraft_rush::run_visit_with_state(args.collect(), &mut visits.minecraft),
         "regularshow" => crate::minigames::regularshow::run_visit(
             std::path::Path::new(env!("CARGO_MANIFEST_DIR")), args, &mut |_| Ok(())),
+        "halloween" => crate::minigames::halloween::run_visit(
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR")), args, &mut |_| Ok(())),
         "starwars" => Err("Star Wars requiere la nave activa; usar run_with_ship".into()),
         _ => Err(format!("Minijuego no implementado: {id}").into()),
     }
@@ -53,6 +55,7 @@ pub fn run_with_ship_and_results(
         "minecraft" => minecraft_rush::run_visit_with_results(args.collect(), &mut visits.minecraft, observer),
         "regularshow" => crate::minigames::regularshow::run_visit(root, args, observer),
         "starwars" => crate::minigames::starwars::run_with_results(root, selected, args, observer),
+        "halloween" => crate::minigames::halloween::run_visit(root, args, observer),
         _ => Err(format!("Minijuego no implementado: {id}").into()),
     }
 }

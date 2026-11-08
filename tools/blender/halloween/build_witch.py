@@ -201,14 +201,16 @@ def skirt_long(B, pose, pel, Rp, waist):
 
 
 def build_witch(pose, happy=False, smooth=False, nose=False, beads=False, long_skirt=False, blush=False,
-                flowy_hair=False, hair_mat=None, bead_mat=None, ride_detail=False):
+                flowy_hair=False, hair_mat=None, bead_mat=None, ride_detail=False, finger=False):
     """happy: ojos cerrados de felicidad (arcos ∩) y una sonrisa grande, en vez de los ojitos verdes. smooth: el
     cuerpo (torso, cuello, cabeza, brazos, manos y piernas) de una sola pieza, con las uniones redondeadas en vez de
     tubos que se cruzan; más triángulos, para la bruja que se ve de cerca (la de la escoba). nose: naricita en punta.
     beads: ojos de cuenta negros y brillantes (en vez de los ojitos o los arcos). blush: dos círculos rosados en los
     cachetes. hair_mat: material del pelo (si no, el de siempre). bead_mat: material de los ojos de cuenta (con un
     brillito blanco). flowy_hair: pelo más largo, con ondas grandes, que el viento lleva hacia atrás. long_skirt: falda larga de tela, con
-    pliegues y el borde ondulado, que el viento lleva hacia atrás y que cae sobre los muslos."""
+    pliegues y el borde ondulado, que el viento lleva hacia atrás y que cae sobre los muslos. finger: un dedo índice
+    en cada mano, doblado adentro de la mano salvo en la mano que diga la pose con "point_R" / "point_L" (de 0, doblado,
+    a 1, estirado: levantando el dedo)."""
     B = Builder(MATS)
     SB = SmoothBody() if smooth else None
     hair_m = hair_mat or HAIR
@@ -477,6 +479,14 @@ def build_witch(pose, happy=False, smooth=False, nose=False, beads=False, long_s
         else:
             B.tube(arm, [0.024, 0.024, 0.021, 0.016, 0.015, 0.011], 8, SKIN, cap0=True)
             B.ellipsoid(wr + Rf @ Vector((0, 0, -0.03)), Rf, (0.012, 0.018, 0.032), SKIN, seg=8, rings=5)
+            if finger:
+                # Dedo índice: sale de la punta de la mano, del lado de adelante; estirado sigue derecho, doblado se
+                # mete adentro de la mano
+                u = pose.get("point_" + key[-1], 0.0)
+                base = wr + Rf @ Vector((0, -0.006, -0.05))
+                mid = base + Rf @ Vector((0, -0.006 * (1 - u), -0.022 * u - 0.004 * (1 - u)))
+                tip = mid + Rf @ Vector((0, 0.006 * (1 - u), -0.022 * u + 0.012 * (1 - u)))
+                B.tube([base, mid, tip], [0.0062, 0.0056, 0.0048], 6, SKIN, cap1=True)
         B.hands.append(wr + Rf @ Vector((0, 0, -0.062)))
 
     # Piernas (piel) y tacones de aguja negros
@@ -661,6 +671,78 @@ ride_ob.data["skirt_range"] = ride.skirt_range
 ride_ob.data["grip"] = tuple(ride.hands[0] - ride.seat)
 ride_ob.data["broom_dir"] = tuple(broom_dir)              # build_witch_broom.py pone el palo en esta dirección
 ride_ob.data["stick_at"] = tuple(stick_at)                # ...pasando por acá (justo bajo la cola)
+
+# --- Bruja del minijuego --------------------------------------------------------------------------------------
+# La misma bruja de la escoba (pelo azul azabache, flequillo, nariz, ojos de cuenta rojos) pero a pie y bailando. El
+# juego mezcla las poses de a dos, así que todas tienen que tener la misma malla (mismos vértices en el mismo orden):
+# por eso va con el cuerpo de tubos (el de una pieza cambia de malla con cada pose). Cada pose es un modelo aparte,
+# con el origen en el piso entre los pies, en la colección "Game"; se exportan con export_solar_models.py
+# (halloween_game_witch_<pose>)
+GAME_POSES = {
+    "solo_a": POSES["solo_a"], "solo_b": POSES["solo_b"], "solo_c": POSES["solo_c"],
+    # Saltito con los brazos arriba en V y una pierna pateando atrás
+    "hop": {"pelvis": (0, 6, -10), "torso": (-4, -6, 6), "head": (-10, 6, 0),
+            "leg_R": (-4, 6, 8), "leg_L": (25, -6, 70),
+            "arm_R": (160, -10, -15, 0), "arm_L": (155, 5, -20, 0)},
+    # Meneo: cadera al costado, una mano en la cintura y la otra arriba girando
+    "sway": {"pelvis": (0, -16, 12), "torso": (2, 20, -10), "head": (-6, -12, 12),
+             "leg_R": (-8, 4, 14), "leg_L": (-2, -10, 6),
+             "arm_R": (150, -15, -60, 40), "arm_L": (40, 10, -110, -70)},
+    # Brazos abiertos, girando
+    "spin": {"pelvis": (0, 4, 30), "torso": (-2, -4, 18), "head": (-12, 8, 10),
+             "leg_R": (-30, 8, 60), "leg_L": (-4, -6, 6),
+             "arm_R": (95, -10, -20, 0), "arm_L": (100, 10, -25, 0)},
+    # Advirtiendo: parada, la mano derecha levantada al lado de la cara con el dedo índice para arriba, la otra en la
+    # cintura y la cabeza ladeada
+    "warn": {"pelvis": (0, 6, 0), "torso": (2, -6, 0), "head": (-6, 10, 6),
+             "leg_R": (-6, 4, 10), "leg_L": (-14, -4, 24),
+             "arm_R": (62, -12, -118, 90), "arm_L": (40, 10, -110, -70), "point_R": 1.0},
+    # Parada, quieta y derecha, con los brazos sueltos al costado (el primer plano de la historieta)
+    "stand": {"pelvis": (0, 2, 0), "torso": (2, -2, 0), "head": (-4, 3, 0),
+              "leg_R": (-2, 5, 4), "leg_L": (-4, -5, 6),
+              "arm_R": (6, 2, -8, 0), "arm_L": (6, 2, -8, 0)},
+    # Lanzando un hechizo: un brazo estirado hacia adelante, la otra mano arriba
+    "cast": {"pelvis": (4, 4, 0), "torso": (10, -4, 0), "head": (-14, 4, 0),
+             "leg_R": (-20, 6, 20), "leg_L": (12, -6, 8),
+             "arm_R": (70, -80, -5, 0), "arm_L": (130, 10, -70, 30)},
+}
+GAME_KW = dict(nose=True, beads=True, hair_mat=HAIR_JET, bead_mat=BEAD_RED, ride_detail=True, finger=True)
+game_col = bpy.data.collections.new("Game")
+scene.collection.children.link(game_col)
+game_counts = set()
+for i, (key, pose) in enumerate(GAME_POSES.items()):
+    gB = build_witch(pose, **GAME_KW)
+    lo = min(v.z for v in gB.v)
+    groot = bpy.data.objects.new("Halloween_GameWitch_%s_ROOT" % key, None)
+    game_col.objects.link(groot)
+    groot.location = (6.0 + i * 0.9, 0, 0)
+    gme = make_mesh("HWG_Witch_%s" % key, gB, MATS, Vector((0, 0, lo)))
+    gob = bpy.data.objects.new("HWG_Witch_%s" % key, gme)
+    game_col.objects.link(gob)
+    gob.parent = groot
+    gme.calc_loop_triangles()
+    game_counts.add((len(gme.vertices), len(gme.polygons)))
+    print("TRIS %-18s %d" % (gob.name, len(gme.loop_triangles)))
+assert len(game_counts) == 1, "Las poses del juego no tienen la misma malla: %s" % game_counts
+print("GAME_WITCH misma malla en todas las poses:", game_counts)
+
+# La bruja feliz del final del minijuego: los mismos bailes, con los ojos cerrados de felicidad (arcos) y la sonrisa
+# en vez de los ojos de cuenta rojos. Otra malla (otra cara), así que va aparte: Halloween_GameWitchHappy_<pose>_ROOT
+HAPPY_POSES = ("solo_a", "solo_b", "solo_c", "hop", "sway", "spin")
+happy_counts = set()
+for i, key in enumerate(HAPPY_POSES):
+    gB = build_witch(GAME_POSES[key], happy=True, **dict(GAME_KW, beads=False))
+    lo = min(v.z for v in gB.v)
+    groot = bpy.data.objects.new("Halloween_GameWitchHappy_%s_ROOT" % key, None)
+    game_col.objects.link(groot)
+    groot.location = (6.0 + i * 0.9, 1.2, 0)
+    gme = make_mesh("HWG_WitchHappy_%s" % key, gB, MATS, Vector((0, 0, lo)))
+    gob = bpy.data.objects.new("HWG_WitchHappy_%s" % key, gme)
+    game_col.objects.link(gob)
+    gob.parent = groot
+    happy_counts.add((len(gme.vertices), len(gme.polygons)))
+assert len(happy_counts) == 1, "Las poses de la bruja feliz no tienen la misma malla: %s" % happy_counts
+print("GAME_WITCH_HAPPY misma malla en todas las poses:", happy_counts)
 
 # --- Presentación ------------------------------------------------------------------------------------------
 pres = bpy.data.collections.new("Presentation")

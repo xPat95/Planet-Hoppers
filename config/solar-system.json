@@ -85,7 +85,7 @@
       "color": "#8b1a1a",
       "model": "assets/models/planets/halloween/exports/halloween_planet.glb",
       "model_far": "assets/models/planets/halloween/exports/halloween_planet_far.glb",
-      "minigame": null
+      "minigame": "halloween"
     }
   ]
 }

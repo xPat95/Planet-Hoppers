@@ -7,6 +7,8 @@ Los scripts construyen su escena desde cero, guardan el `.blend` y renderizan ca
 | `build_witch.py` | `assets/models/characters/halloween/witch.blend` (un modelo por pose: `HW_Witch_Solo_A`, `Solo_B`, `Solo_C`, `Pair`, `Crawl`, `Climb`, `Peek`, `Sit`, `SitHappy`, `Ride`) y `docs/references/halloween/witches_*.png`. |
 | `build_devil.py` | `assets/models/characters/halloween/devil.blend` (`HW_Devil_ArmsUp`, `Cactus`, `Point`, `Sway`) y `docs/references/halloween/devils_*.png`. |
 | `build_halloween_planet.py` | `assets/models/planets/halloween/halloween_planet.blend` y `docs/references/halloween/halloween_v01_*.png`. Importa las brujas y los diablitos, así que se ejecuta después. |
+| `build_game_creatures.py` | `assets/models/minigames/halloween/creatures.blend` (diablito con cuernos y patas de cabra, fantasma y demonio de parálisis del sueño del minijuego, con poses de igual malla) y `docs/references/halloween/game_creatures.png`. La bruja del minijuego (a pie, bailando) sale de `build_witch.py` (colección `Game`). |
+| `weld.py` | Lo usa `build_game_creatures.py` para las tres criaturas: piezas que se sueldan con una unión suave en una pose neutra (rejilla y surface nets), se simplifican y se doblan con huesos (skinning), así que todas las poses tienen la misma malla. `carve` talla o recorta con un booleano exacto (la cara del diablito, los agujeros de la sábana del fantasma). |
 | `build_witch_broom.py` | `assets/models/ships/halloween/witch_broom.blend` (la nave: la bruja `Ride` en su escoba, con la estela de estrellas) y `docs/references/halloween/broom_*.png`. Importa la bruja, así que va después de `build_witch.py`; luego se exporta con `export_solar_models.py -- halloween_ship`. |
 
 Desde la raíz del repositorio, en PowerShell:
