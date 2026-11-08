@@ -649,13 +649,18 @@ fn view(
                 ui::arrow(&mut d, arrow(w, h, false), false, mouse, left_active);
                 ui::arrow(&mut d, arrow(w, h, true), true, mouse, right_active);
                 let status = if mode == SelectionMode::Initial {
-                    "Elige libremente tu nave inicial"
+                    "Elige libremente tu nave inicial".to_owned()
                 } else if selection.can_confirm(&catalog, game.as_ref()) {
-                    "Nave desbloqueada"
+                    "NAVE DISPONIBLE · Puedes seleccionarla".to_owned()
                 } else {
-                    "Nave bloqueada"
+                    let planet_name = super::token_collection::TOKENS.iter()
+                        .find(|art| art.franchise.as_str() == choice.id)
+                        .map_or(choice.name.as_str(), |art| art.name);
+                    format!("BLOQUEADA · Gana el minijuego de {planet_name} para desbloquearla")
                 };
-                ui::centered(&mut d, &body_font, status, w, h as f32 - 123.0, 18.0, INK);
+                let status_size = 18.0_f32.min(18.0 * (w as f32 - 48.0) / body_font.measure_text(&status, 18.0, 1.0).x.max(1.0));
+                ui::centered(&mut d, &body_font, &status, w, h as f32 - 123.0, status_size,
+                    if selection.can_confirm(&catalog, game.as_ref()) { CYAN } else { MUTED });
                 let enabled = selection.can_confirm(&catalog, game.as_ref());
                 ui::action(
                     &mut d, &body_font, launch_button(w, h),

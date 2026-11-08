@@ -19,6 +19,11 @@ pub const PLANET_IDS: [&str; 6] = [
     "starwars",
 ];
 
+/// Mandatory inner-to-outer order, independent of asset, ship and token catalogs.
+pub const ORBITAL_ORDER: [&str; 6] = [
+    "halloween", "starwars", "smilingfriends", "minecraft", "regularshow", "southpark",
+];
+
 #[derive(Debug, Clone, Deserialize)]
 pub struct SunConfig {
     pub radius: f32,
@@ -94,6 +99,11 @@ impl SolarSystemConfig {
         let ids: HashSet<&str> = self.planets.iter().map(|p| p.id.as_str()).collect();
         if self.planets.len() != PLANET_IDS.len() || PLANET_IDS.iter().any(|id| !ids.contains(id)) {
             return Err(format!("Tienen que estar los seis planetas: {}", PLANET_IDS.join(", ")));
+        }
+        // The scene loads models from this same Vec; never derive orbital identity
+        // from a set/map iteration or from the ship-selection catalog's order.
+        if self.planets.iter().map(|p| p.id.as_str()).ne(ORBITAL_ORDER) {
+            return Err(format!("Orden orbital inválido, del Sol hacia afuera: {}", ORBITAL_ORDER.join(", ")));
         }
         let mut inner_edge = self.sun.radius;
         for p in &self.planets {
