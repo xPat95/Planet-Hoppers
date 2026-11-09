@@ -1,5 +1,6 @@
 # Rust / Cargo
 /target/
+/saves/
 
 # Archivos temporales del sistema operativo
 .DS_Store

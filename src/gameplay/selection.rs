@@ -1,7 +1,7 @@
-//! Session-only adventure state, ship ownership and shared selection rules.
+//! Adventure state, ship ownership and shared selection rules.
 use super::progress::ProgressState;
 use crate::ships::{ShipModel, ShipsConfig};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::{collections::BTreeSet, path::Path};
 
 pub const INITIAL_SHIP_ORDER: [&str; 6] = [
@@ -90,7 +90,7 @@ impl ShipCatalog {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct GameState {
     first_ship: String,
     active_ship: String,
@@ -98,6 +98,14 @@ pub struct GameState {
     pub(super) progress: ProgressState,
 }
 impl GameState {
+    pub fn validate(&self, catalog: &ShipCatalog) -> Result<(), String> {
+        if !self.is_unlocked(&self.first_ship) || !self.is_unlocked(&self.active_ship)
+            || self.unlocked.iter().any(|id| catalog.choice(id).is_none())
+            || self.progress.completed().any(|f| !self.is_unlocked(f.as_str())) {
+            return Err("Progreso guardado inválido".into());
+        }
+        Ok(())
+    }
     pub fn new_game(id: &str, catalog: &ShipCatalog) -> Result<Self, String> {
         if catalog.choice(id).is_none() {
             return Err("Nave inicial desconocida".into());
@@ -153,6 +161,7 @@ pub enum SelectionMode {
 #[derive(Debug)]
 pub enum SelectionTransition {
     StartAdventure(GameState),
+    ContinueAdventure(super::save::AdventureSave),
     ChangedShip(GameState),
     Quit,
 }
