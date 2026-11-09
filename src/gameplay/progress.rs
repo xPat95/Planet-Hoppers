@@ -1,8 +1,9 @@
 //! Session progress. Each completed franchise represents exactly one token.
 use std::collections::BTreeSet;
+use serde::{Serialize, Deserialize};
 
 /// Canonical gameplay identities, independent of individual ship model IDs.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub enum Franchise {
     Minecraft,
     SouthPark,
@@ -42,7 +43,7 @@ impl Franchise {
     }
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ProgressState {
     completed: BTreeSet<Franchise>,
 }

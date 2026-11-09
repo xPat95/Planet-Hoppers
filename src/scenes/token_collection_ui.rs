@@ -124,13 +124,23 @@ impl TokenTextures {
         centered(d, bold, "¡TOKEN OBTENIDO!", center.x, center.y - large * 0.5 - 84.0, 38.0 * l.scale, fade(GOLD, text_opacity));
         centered(d, regular, &format!("Has conseguido el token de {}", art.name), center.x,
             center.y + large * 0.5 + 19.0, 25.0 * l.scale, fade(INK, text_opacity));
-        if let Some(name) = &notice.ship_name {
-            let label = format!("Nave desbloqueada: {name}");
-            let max_size = 22.0 * l.scale;
-            let size = max_size.min(max_size * (width as f32 - 48.0) / regular.measure_text(&label, max_size, 1.0).x.max(1.0));
-            centered(d, regular, &label, center.x, center.y + large * 0.5 + 54.0, size, fade(CYAN, text_opacity));
-        }
         centered(d, bold, &format!("{}/6 TOKENS", progress.token_count()), center.x,
             center.y - large * 0.5 - 38.0, 23.0 * l.scale, fade(INK, text_opacity));
+    }
+
+    pub fn draw_ship_notice(&self, d: &mut impl RaylibDraw, font: &Font,
+        presentation: &TokenPresentation, width: i32, height: i32) {
+        let Some(notice) = presentation.toast() else { return; };
+        let t = presentation.elapsed();
+        let alpha = smooth(t / 0.3) * (1.0 - smooth((t - 3.5) / 0.5));
+        let w = (width as f32 - 24.0).min(360.0);
+        let rect = Rectangle::new(width as f32 - w - 12.0 + (1.0-alpha)*w, height as f32 - 158.0, w, 76.0);
+        d.draw_rectangle_rounded(rect, 0.12, 8, fade(Color::new(8,23,43,245), alpha));
+        d.draw_rectangle_lines_ex(rect, 1.0, fade(CYAN, alpha));
+        d.draw_rectangle_rec(Rectangle::new(rect.x,rect.y,4.0,rect.height), fade(GOLD,alpha));
+        d.draw_text_ex(font, "NUEVA NAVE DISPONIBLE", Vector2::new(rect.x+18.0,rect.y+12.0), 20.0,1.0,fade(GOLD,alpha));
+        let name = notice.ship_name.as_deref().unwrap_or("");
+        let size = 19.0f32.min(19.0 * (w-36.0) / font.measure_text(name,19.0,1.0).x.max(1.0));
+        d.draw_text_ex(font, name, Vector2::new(rect.x+18.0,rect.y+42.0),size,1.0,fade(INK,alpha));
     }
 }

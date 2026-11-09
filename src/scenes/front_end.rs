@@ -67,9 +67,12 @@ pub fn run() -> Result<(), Error> {
         None,
         smoke.then_some(goal.clone()),
     )?;
-    if let Some(SelectionTransition::StartAdventure(game)) = selected {
-        // Initial abduction cinematic goes HERE, before solar_system::run_with_game.
-        // A future station consumes ChangedShip inside its existing solar Session instead.
+    if matches!(&selected, Some(SelectionTransition::StartAdventure(_) | SelectionTransition::ContinueAdventure(_))) {
+        let (game, presentation) = match selected.unwrap() {
+            SelectionTransition::StartAdventure(game) => (game, super::token_collection::TokenPresentation::default()),
+            SelectionTransition::ContinueAdventure(save) => (save.game, save.presentation),
+            _ => unreachable!(),
+        };
         let flags = if docking {
             vec!["--smoke-docking".into()]
         } else if regularshow {
@@ -85,7 +88,7 @@ pub fn run() -> Result<(), Error> {
         } else {
             vec![]
         };
-        let game = super::solar_system::run_with_game(game, flags.into_iter())?;
+        let game = super::solar_system::run_with_progress(game, presentation, flags.into_iter())?;
         if smoke {
             let expected_tokens = usize::from(returns || minecraft || starwars || regularshow);
             let expected_unlocked = 1 + game.progress().completed().filter(|f| f.as_str() != game.first_ship()).count();
@@ -351,6 +354,9 @@ fn arrow(w: i32, h: i32, right: bool) -> Rectangle {
 fn launch_button(w: i32, h: i32) -> Rectangle {
     Rectangle::new(w as f32 * 0.5 - 170.0, h as f32 - 92.0, 340.0, 52.0)
 }
+fn continue_button(w: i32, h: i32) -> Rectangle {
+    Rectangle::new(w as f32*0.5-150.0, h as f32*0.73, 300.0, 46.0)
+}
 
 fn view(
     mut screen: Screen,
@@ -361,6 +367,9 @@ fn view(
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let ships = ShipsConfig::load(&root.join("config/ships.json"))?;
     let catalog = ShipCatalog::load(&root.join("config/ship-selection.json"), &ships)?;
+    let saved = if smoke_goal.is_none() && screen == Screen::Main {
+        crate::gameplay::save::load(&crate::gameplay::save::path(&root), &catalog)?
+    } else { None };
     let goal_index = smoke_goal
         .as_ref()
         .filter(|id| id.as_str() != "@cancel")
@@ -472,7 +481,9 @@ fn view(
         let enter = rl.is_key_pressed(KeyboardKey::KEY_ENTER);
         match screen {
             Screen::Main => {
-                if enter || hit(menu_button(w, h, 0)) {
+                if saved.is_some() && (rl.is_key_pressed(KeyboardKey::KEY_R) || hit(continue_button(w,h))) {
+                    return Ok(Some(SelectionTransition::ContinueAdventure(saved.unwrap())));
+                } else if enter || hit(menu_button(w, h, 0)) {
                     screen = Screen::Hangar;
                     selection = ShipSelection::new(mode, game.as_ref(), &catalog);
                     shown = None;
@@ -633,6 +644,9 @@ fn view(
                     let mut rect = menu_button(w, h, i);
                     rect.y += (1.0 - bt).powi(3) * h as f32 * 0.45;
                     draw_intro_button(&mut d, &menu_font, rect, label, mouse, true);
+                }
+                if saved.is_some() {
+                    draw_intro_button(&mut d, &menu_font, continue_button(w,h), "[R] CONTINUAR", mouse, true);
                 }
             }
             Screen::Controls => {

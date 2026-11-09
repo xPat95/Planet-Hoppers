@@ -1,6 +1,7 @@
-//! Presentation metadata and deferred ceremonies. Progress remains owned by GameState.
+//! Presentation metadata and serialized reward sequences. Progress remains owned by GameState.
 use crate::gameplay::{progress::Franchise, rewards::RewardOutcome};
 use std::collections::{BTreeSet, VecDeque};
+use serde::{Serialize, Deserialize};
 
 pub struct TokenArt {
     pub franchise: Franchise,
@@ -48,7 +49,7 @@ pub fn slot_index(franchise: Franchise) -> usize {
         .expect("six canonical tokens")
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RewardNotice {
     pub franchise: Franchise,
     pub ship_name: Option<String>,
@@ -56,15 +57,36 @@ pub struct RewardNotice {
 
 pub const CEREMONY_SECONDS: f32 = 3.6;
 
-#[derive(Default)]
+pub const ABDUCTION_SECONDS: f32 = 4.8;
+pub const TOAST_SECONDS: f32 = 4.0;
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum RewardPhase { Abduction, Token, Toast }
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+struct Sequence { notice: RewardNotice, initial: bool, phase: RewardPhase }
+
+#[derive(Clone, Default, Debug, Serialize, Deserialize)]
 pub struct TokenPresentation {
-    pending: VecDeque<RewardNotice>,
+    pending: VecDeque<Sequence>,
     announced: BTreeSet<Franchise>,
-    active: Option<RewardNotice>,
+    active: Option<Sequence>,
     elapsed: f32,
+    initial_scheduled: bool,
+    revision: u64,
 }
 
 impl TokenPresentation {
+    pub fn enqueue_initial(&mut self, franchise: Franchise) -> bool {
+        if self.initial_scheduled { return false; }
+        self.initial_scheduled = true;
+        self.pending.push_back(Sequence {
+            notice: RewardNotice { franchise, ship_name: None },
+            initial: true, phase: RewardPhase::Abduction,
+        });
+        self.revision += 1;
+        true
+    }
     /// No synthetic progress: only a new-token outcome can schedule a notice.
     /// The defensive set deduplicates redelivery, independently of queue consumption.
     pub fn enqueue(
@@ -76,10 +98,12 @@ impl TokenPresentation {
         if !outcome.token_obtained || !self.announced.insert(franchise) {
             return false;
         }
-        self.pending.push_back(RewardNotice {
-            franchise,
-            ship_name: outcome.ship_unlocked.then(|| ship_name.to_owned()),
+        self.pending.push_back(Sequence {
+            notice: RewardNotice { franchise, ship_name: outcome.ship_unlocked.then(|| ship_name.to_owned()) },
+            initial: false,
+            phase: if outcome.ship_unlocked { RewardPhase::Abduction } else { RewardPhase::Token },
         });
+        self.revision += 1;
         true
     }
 
@@ -91,18 +115,43 @@ impl TokenPresentation {
         if self.active.is_none() {
             self.active = self.pending.pop_front();
             self.elapsed = 0.0;
+            if self.active.is_some() { self.revision += 1; }
         }
-        if self.active.is_some() {
+        if let Some(sequence) = &mut self.active {
             self.elapsed += if dt.is_finite() { dt.max(0.0) } else { 0.0 };
-            if self.elapsed >= CEREMONY_SECONDS {
-                self.active = None;
+            let duration = match sequence.phase {
+                RewardPhase::Abduction => ABDUCTION_SECONDS,
+                RewardPhase::Token => CEREMONY_SECONDS,
+                RewardPhase::Toast => TOAST_SECONDS,
+            };
+            if self.elapsed >= duration {
+                match sequence.phase {
+                    RewardPhase::Abduction if !sequence.initial => sequence.phase = RewardPhase::Token,
+                    RewardPhase::Token if sequence.notice.ship_name.is_some() => sequence.phase = RewardPhase::Toast,
+                    _ => self.active = None,
+                }
                 self.elapsed = 0.0;
+                self.revision += 1;
             }
         }
     }
 
     pub fn active(&self) -> Option<&RewardNotice> {
-        self.active.as_ref()
+        (self.phase() == Some(RewardPhase::Token)).then(|| self.notice()).flatten()
+    }
+    pub fn phase(&self) -> Option<RewardPhase> { self.active.as_ref().map(|s| s.phase) }
+    pub fn notice(&self) -> Option<&RewardNotice> { self.active.as_ref().map(|s| &s.notice) }
+    pub fn abduction(&self) -> Option<Franchise> {
+        (self.phase() == Some(RewardPhase::Abduction)).then(|| self.notice().unwrap().franchise)
+    }
+    pub fn toast(&self) -> Option<&RewardNotice> {
+        (self.phase() == Some(RewardPhase::Toast)).then(|| self.notice()).flatten()
+    }
+    pub fn revision(&self) -> u64 { self.revision }
+    pub fn required_abductions(&self) -> Vec<Franchise> {
+        self.pending.iter().chain(self.active.iter())
+            .filter(|s| s.phase == RewardPhase::Abduction)
+            .map(|s| s.notice.franchise).collect()
     }
     pub fn elapsed(&self) -> f32 {
         self.elapsed
@@ -111,7 +160,7 @@ impl TokenPresentation {
         self.pending.len()
     }
     pub fn is_busy(&self) -> bool {
-        self.active.is_some()
+        matches!(self.phase(), Some(RewardPhase::Abduction | RewardPhase::Token))
     }
 }
 

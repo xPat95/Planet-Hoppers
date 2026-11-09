@@ -1,7 +1,7 @@
 use planet_hoppers::{
     gameplay::{progress::Franchise, rewards::{record_result, RewardOutcome}, selection::{GameState, ShipCatalog}},
     minigames::common::host::MinigameResult,
-    scenes::token_collection::{CollectionLayout, TokenPresentation, CEREMONY_SECONDS, TOKENS, slot_index},
+    scenes::token_collection::{CollectionLayout, TokenPresentation, ABDUCTION_SECONDS, TOAST_SECONDS, CEREMONY_SECONDS, TOKENS, slot_index},
     ships::ShipsConfig,
 };
 use std::path::Path;
@@ -58,6 +58,9 @@ fn notice_is_queued_once_and_survives_replay_loss_and_abandonment() {
     assert!(!ui.is_busy());
     assert_eq!(ui.pending_count(), 1);
     ui.advance(0.1, true);
+    assert_eq!(ui.abduction(), Some(Franchise::SouthPark));
+    assert!(ui.active().is_none());
+    ui.advance(ABDUCTION_SECONDS, true);
     assert_eq!(ui.active().unwrap().ship_name.as_deref(), Some("Butters"));
     let before = ui.elapsed();
     ui.advance(1000.0, false);
@@ -80,8 +83,17 @@ fn fifo_notices_never_own_a_separate_token_counter() {
     assert_eq!(ui.pending_count(), 6);
     for art in &TOKENS {
         ui.advance(0.0, true);
+        if art.franchise != Franchise::Minecraft {
+            assert_eq!(ui.abduction(), Some(art.franchise));
+            ui.advance(ABDUCTION_SECONDS, true);
+        }
         assert_eq!(ui.active().unwrap().franchise, art.franchise);
         ui.advance(CEREMONY_SECONDS, true);
+        if art.franchise != Franchise::Minecraft {
+            assert!(!ui.is_busy());
+            assert_eq!(ui.toast().unwrap().franchise, art.franchise);
+            ui.advance(TOAST_SECONDS, true);
+        }
         assert!(game.progress().is_complete());
         assert_eq!(game.progress().token_count(), 6);
     }
@@ -150,7 +162,16 @@ fn token_visual_smoke() {
                 let reward = if step == 2 { record_result(&mut game,"southpark",MinigameResult::Victory,&catalog).unwrap() }
                     else { RewardOutcome {token_obtained:true,ship_unlocked:true,progress_completed:false} };
                 presentation.enqueue(Franchise::SouthPark,reward,"Butters / nave de South Park");
+                presentation.advance(ABDUCTION_SECONDS,true);
                 presentation.advance(elapsed,true);
+            }
+            if step == 6 {
+                presentation.enqueue(Franchise::SouthPark,
+                    RewardOutcome { token_obtained:true, ship_unlocked:true, progress_completed:false },
+                    "Butters / nave de South Park");
+                presentation.advance(ABDUCTION_SECONDS,true);
+                presentation.advance(CEREMONY_SECONDS,true);
+                presentation.advance(0.5,true);
             }
             for frame in 0..3 {
                 let mut d = rl.begin_drawing(&thread);
@@ -158,6 +179,7 @@ fn token_visual_smoke() {
                 textures.draw_hud(&mut d,&bold,game.progress(),width,height);
                 if presentation.is_busy() { textures.draw_ceremony(&mut d,&regular,&bold,game.progress(),&presentation,width,height); }
                 else if step != 6 { textures.draw_collection(&mut d,&regular,&bold,game.progress(),width,height,1.0,None); }
+                textures.draw_ship_notice(&mut d,&bold,&presentation,width,height);
                 if frame == 2 { save_frame(&output.join(format!("{width}x{height}-{step}.png")),width,height).unwrap(); }
             }
         }

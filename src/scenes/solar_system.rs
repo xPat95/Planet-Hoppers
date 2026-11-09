@@ -379,10 +379,20 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 pub fn run_with_game(game: GameState, args: impl Iterator<Item = String>) -> Result<GameState, Box<dyn std::error::Error>> {
-    run_session(args, Some(game))?.ok_or_else(|| "Se perdió el estado de la aventura".into())
+    run_with_progress(game, super::token_collection::TokenPresentation::default(), args)
+}
+
+pub fn run_with_progress(game: GameState, presentation: super::token_collection::TokenPresentation,
+    args: impl Iterator<Item = String>) -> Result<GameState, Box<dyn std::error::Error>> {
+    run_session_with_progress(args, Some(game), presentation)?.ok_or_else(|| "Se perdió el estado de la aventura".into())
 }
 
 fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> Result<Option<GameState>, Box<dyn std::error::Error>> {
+    run_session_with_progress(args, game, super::token_collection::TokenPresentation::default())
+}
+
+fn run_session_with_progress(args: impl Iterator<Item = String>, game: Option<GameState>,
+    mut presentation: super::token_collection::TokenPresentation) -> Result<Option<GameState>, Box<dyn std::error::Error>> {
     let mut game = game;
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let mut config_path = root.join("config/solar-system.json");
@@ -457,6 +467,12 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
         catalog.configure_active(game, &mut ships)?;
     }
     let system = SolarSystem::new(&config);
+    if !smoke {
+        if let Some(game) = &game {
+            presentation.enqueue_initial(crate::gameplay::progress::Franchise::from_id(game.first_ship())?);
+            crate::gameplay::save::store(&crate::gameplay::save::path(&root), game, &presentation)?;
+        }
+    }
     let outer = outer_orbit(&system);
     let station = Station::load(&root)?;
     // The actual departure is resolved after loading the fitted visual bounds.
@@ -475,7 +491,7 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
         time_scale: 1.0,
         target: Some(Destination::Planet(0)),
         minigames: MinigameVisits::default(),
-        token_presentation: super::token_collection::TokenPresentation::default(),
+        token_presentation: presentation,
         last_completion: None,
         return_smoke,
         launch_smoke,
@@ -514,6 +530,7 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
                     catalog.configure_active(&next,&mut session.ships)?;
                     session.ship_index=session.ships.ships.iter().position(|s| s.id==next.active_ship()).ok_or("Modelo activo no resuelto")?;
                     session.game=Some(next);
+                    if !smoke { crate::gameplay::save::store(&crate::gameplay::save::path(&root), session.game.as_ref().unwrap(), &session.token_presentation)?; }
                 }
                 if session.system.planets.iter().map(|p|(p.orbit_angle,p.spin_angle)).collect::<Vec<_>>()!=angles || session.last_completion!=completion {
                     return Err("El hangar alteró el estado de la sesión solar".into());
@@ -569,6 +586,7 @@ fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> R
                         if outcome.token_obtained {
                             let franchise = crate::gameplay::progress::Franchise::from_id(&id)?;
                             session.token_presentation.enqueue(franchise, outcome, &reward_ship_name);
+                            if !smoke { crate::gameplay::save::store(&crate::gameplay::save::path(&root), game, &session.token_presentation).map_err(|e| e.to_string())?; }
                         }
                     }
                     Ok(())
@@ -749,6 +767,8 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
     let ui_regular = load_solar_font(&root.join("assets/fonts/AdventPro-Regular.ttf"))?;
     let ui_bold = load_solar_font(&root.join("assets/fonts/AdventPro-Bold.ttf"))?;
     let token_textures = super::token_collection_ui::TokenTextures::load(&mut rl, &thread, root)?;
+    let mut abductions = super::abduction::AbductionRenderer::load(&mut rl, &thread, root,
+        &s.token_presentation.required_abductions())?;
     let empty_progress = crate::gameplay::progress::ProgressState::default();
     let mut planet_logos = BTreeMap::new();
     for id in ["halloween", "starwars", "smilingfriends", "minecraft", "regularshow", "southpark"] {
@@ -819,7 +839,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         let panel_y = (rl.get_screen_height() as f32 - panel_h) * 0.5;
         let panel_hit = Rectangle::new(panel_x, panel_y, panel_w, panel_h).check_collision_point_rec(rl.get_mouse_position());
         let close_hit = Rectangle::new(panel_x + panel_w - 86.0, panel_y + 22.0, 55.0, 55.0).check_collision_point_rec(rl.get_mouse_position());
-        let toggle_help = !smoke && !token_was_blocking && (rl.is_key_pressed(KeyboardKey::KEY_H) || (help_click && help_icon_hit));
+        let toggle_help = !smoke && !token_was_blocking && !s.token_presentation.is_busy() && s.token_presentation.pending_count() == 0 && (rl.is_key_pressed(KeyboardKey::KEY_H) || (help_click && help_icon_hit));
         let close_help = help_open && !smoke && (rl.is_key_pressed(KeyboardKey::KEY_ESCAPE)
             || (help_click && (close_hit || !panel_hit)));
         if toggle_help || close_help {
@@ -835,15 +855,23 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         help_progress = (help_progress + if help_open { dt * 4.0 } else { -dt * 4.0 }).clamp(0.0, 1.0);
         let token_hud_hit = super::token_collection_ui::TokenTextures::hud_button(rl.get_screen_width(), rl.get_screen_height())
             .check_collision_point_rec(rl.get_mouse_position());
-        let token_toggle = !smoke && !help_open && !s.token_presentation.is_busy()
+        let token_toggle = !smoke && !help_open && !s.token_presentation.is_busy() && s.token_presentation.pending_count() == 0
             && (rl.is_key_pressed(KeyboardKey::KEY_T) || (help_click && token_hud_hit));
         let token_close = collection_open && rl.is_key_pressed(KeyboardKey::KEY_ESCAPE);
         if token_toggle || token_close { collection_open = !collection_open; }
         collection_progress = (collection_progress + if collection_open { dt * 5.0 } else { -dt * 5.0 }).clamp(0.0, 1.0);
+        let cinematic_was_blocking = s.token_presentation.is_busy();
+        let reward_revision = s.token_presentation.revision();
         s.token_presentation.advance(dt, !smoke && fade <= 0.0 && intro_time.is_none()
             && !help_open && help_progress <= 0.0 && collection_progress <= 0.0
             && leaving.is_none() && !entering_station);
-        let tokens_blocking = collection_open || collection_progress > 0.0 || s.token_presentation.is_busy();
+        if reward_revision != s.token_presentation.revision() {
+            if let Some(game) = &s.game {
+                crate::gameplay::save::store(&crate::gameplay::save::path(root), game, &s.token_presentation)?;
+            }
+        }
+        let tokens_blocking = collection_open || collection_progress > 0.0 || s.token_presentation.is_busy()
+            || (!smoke && s.token_presentation.phase().is_none() && s.token_presentation.pending_count() > 0);
         if tokens_blocking && !token_was_blocking {
             token_restore_cursor = rl.is_cursor_hidden();
             rl.enable_cursor();
@@ -854,7 +882,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         token_was_blocking = tokens_blocking;
         // Sin teclado durante las pruebas ni mientras se sale hacia un minijuego
         let intro_controls_ready = intro_time.is_none_or(|elapsed| elapsed >= ENTRY_STATION_HOLD + ENTRY_CAMERA_MOVE - 0.15);
-        let accepts_input = (!smoke || s.launch_smoke || s.station_smoke || s.minecraft_smoke || s.regularshow_smoke || s.docking_smoke.is_some()) && !tokens_blocking && !token_toggle && !token_close && !help_open && !toggle_help && !close_help && intro_controls_ready && leaving.is_none() && !entering_station;
+        let accepts_input = (!smoke || s.launch_smoke || s.station_smoke || s.minecraft_smoke || s.regularshow_smoke || s.docking_smoke.is_some()) && !tokens_blocking && !cinematic_was_blocking && !token_toggle && !token_close && !help_open && !toggle_help && !close_help && intro_controls_ready && leaving.is_none() && !entering_station;
         let pressed = |rl: &RaylibHandle, k: KeyboardKey| accepts_input && rl.is_key_pressed(k);
         let down = |rl: &RaylibHandle, k: KeyboardKey| accepts_input && rl.is_key_down(k);
         if pressed(&rl,KeyboardKey::KEY_F3) {s.collision_debug=!s.collision_debug;}
@@ -1219,7 +1247,10 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             let next = (1..=s.ships.ships.len()).map(|step| (s.ship_index + step) % s.ships.ships.len())
                 .find(|i| s.game.as_ref().is_none_or(|game| game.is_unlocked(&s.ships.ships[*i].id))).unwrap_or(s.ship_index);
             if next != s.ship_index {
-                if let Some(game) = &mut s.game { game.activate(&s.ships.ships[next].id)?; }
+                if let Some(game) = &mut s.game {
+                    game.activate(&s.ships.ships[next].id)?;
+                    if !smoke { crate::gameplay::save::store(&crate::gameplay::save::path(root), game, &s.token_presentation)?; }
+                }
                 s.ship_index = next;
                 s.ships.active_ship = s.ships.ships[next].id.clone();
                 ship_model = load_ship_model(&mut rl, &thread, root, &shader, s);
@@ -1247,12 +1278,12 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                         None => OVERVIEW * outer,
                     };
                 }
-                if !smoke && !help_open && !tokens_blocking && !help_icon_hit && !token_hud_hit && rl.is_mouse_button_down(MouseButton::MOUSE_BUTTON_LEFT) {
+                if !smoke && !help_open && !tokens_blocking && !cinematic_was_blocking && !help_icon_hit && !token_hud_hit && rl.is_mouse_button_down(MouseButton::MOUSE_BUTTON_LEFT) {
                     let delta = rl.get_mouse_delta();
                     s.orbit.yaw += delta.x * 0.005;
                     s.orbit.pitch = (s.orbit.pitch + delta.y * 0.005).clamp(-1.45, 1.45);
                 }
-                let wheel = if smoke || tokens_blocking { 0.0 } else { rl.get_mouse_wheel_move() };
+                let wheel = if smoke || tokens_blocking || cinematic_was_blocking { 0.0 } else { rl.get_mouse_wheel_move() };
                 if wheel != 0.0 {
                     let nearest = s.focus.map_or(s.system.sun.radius, |destination| destination.radius(s)) * 1.6;
                     s.orbit.distance = (s.orbit.distance * (1.0 - wheel * 0.1)).clamp(nearest, outer * MAX_ZOOM_OUT);
@@ -1759,8 +1790,12 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         }
         token_textures.draw_ceremony(&mut d, &ui_regular, &ui_bold, token_progress, &s.token_presentation, width, height);
         draw_help_overlay(&mut d, &ui_regular, &ui_bold, width, height, help_progress, help_open);
-        d.draw_fps(width - 96, 14);
-        if s.collision_debug {
+        if let Some(franchise) = s.token_presentation.abduction() {
+            abductions.draw(&mut d, franchise, s.token_presentation.elapsed(), width, height);
+        }
+        token_textures.draw_ship_notice(&mut d, &ui_bold, &s.token_presentation, width, height);
+        if !s.token_presentation.is_busy() { d.draw_fps(width - 96, 14); }
+        if s.collision_debug && !s.token_presentation.is_busy() {
             crate::graphics::station_debug::hud(&mut d,&s.station,s.ship.position,station_ship_radius(s,&ship_model),&debug_last,debug_camera);
         }
         if fade > 0.0 {

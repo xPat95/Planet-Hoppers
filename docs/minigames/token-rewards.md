@@ -25,8 +25,8 @@ recompensas deduplica además por franquicia durante toda la aventura.
   esperando `Won`. Las escenas sintéticas de `--capture` no notifican recompensas.
 
 `MinigameExit` sigue describiendo navegación. Un retorno con derrota o abandono
-no borra una victoria anterior. Halloween y Regular Show no tienen adaptadores
-funcionales y no emiten resultados.
+no borra una victoria anterior. Los seis adaptadores notifican resultados al
+observador compartido.
 
 El hangar permite recorrer todo el catálogo, pero `Docked` solo confirma naves
 que `GameState` posee. La confirmación activa la nave sin desbloquearla. Al volver
@@ -40,4 +40,5 @@ El smoke de hangar prepara dos naves poseídas al crear su fixture, sin simular
 victorias ni conceder tokens. Esto solo sucede en ese modo de prueba; las pruebas
 de recompensas comprueban por separado que las victorias desbloquean la nave.
 
-No se añaden persistencia, interfaz de tokens ni escena final.
+La persistencia y presentación de recompensas se describen en
+[Abducciones, tokens y naves](abduction-rewards.md). No se añade escena final.

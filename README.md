@@ -2,7 +2,10 @@
 
 Proyecto universitario de Gráficas por Computadora: un videojuego 3D de exploración espacial en un sistema solar ficticio con seis planetas inspirados en Minecraft, South Park, Smiling Friends, Hexbound, Un Show Más (Regular Show) y Star Wars.
 
-La estación espacial, el desbloqueo de naves y las demás mecánicas descritas están **planificadas, pero todavía no implementadas**.
+El ciclo de estación y hangar, los tokens, el desbloqueo de naves y las abducciones están integrados.
+El progreso se guarda automáticamente y el menú permite continuar la partida.
+Ver [abducciones y persistencia](docs/minigames/abduction-rewards.md) para los flujos y verificaciones.
+El final descrito más abajo sigue planificado.
 
 ## Objetivo general
 
