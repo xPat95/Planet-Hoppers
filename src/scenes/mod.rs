@@ -1,5 +1,6 @@
 mod button_style;
 pub mod abduction;
+pub mod sfv;
 pub mod token_collection;
 pub mod token_collection_ui;
 pub mod front_end;

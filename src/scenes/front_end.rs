@@ -69,6 +69,8 @@ pub fn run() -> Result<(), Error> {
     )?;
     if matches!(&selected, Some(SelectionTransition::StartAdventure(_) | SelectionTransition::ContinueAdventure(_))) {
         let (game, presentation) = match selected.unwrap() {
+            // Fuera de las pruebas, la abducción inicial ya se vio en el hangar
+            SelectionTransition::StartAdventure(game) if !smoke => (game, super::token_collection::TokenPresentation::initial_shown()),
             SelectionTransition::StartAdventure(game) => (game, super::token_collection::TokenPresentation::default()),
             SelectionTransition::ContinueAdventure(save) => (save.game, save.presentation),
             _ => unreachable!(),
@@ -534,6 +536,13 @@ fn view(
                             )?;
                             println!("{}_SMOKE_PASS {report}",if embedded {"DOCK_SELECTION"} else {"SELECTION"});
                         }
+                        // La abducción de la nave elegida, apenas se confirma (antes de cargar el sistema solar)
+                        if let (SelectionTransition::StartAdventure(game), None) = (&transition, &smoke_goal) {
+                            let franchise = crate::gameplay::progress::Franchise::from_id(game.first_ship())?;
+                            if !play_abduction(&mut rl, &thread, &root, franchise, &music, audio.as_ref())? {
+                                return Ok(None);
+                            }
+                        }
                         return Ok(Some(transition));
                     }
                 }
@@ -831,4 +840,46 @@ fn inject_smoke(frame: u32, w: i32, h: i32, goal: usize) {
         510 => click(launch_button(w, h)),
         _ => {}
     }
+}
+
+/// Muestra la abducción inicial de `franchise` en la ventana del hangar. La de Smiling Friends es un video con su
+/// sonido (la música del menú se calla mientras tanto) que se puede saltear; las demás, la animación con la música del
+/// menú. Devuelve `false` si se cerró la ventana mientras tanto.
+fn play_abduction<'a>(rl: &mut RaylibHandle, thread: &RaylibThread, root: &std::path::Path,
+    franchise: crate::gameplay::progress::Franchise, music: &super::menu_music::MenuMusic<'_>,
+    device: Option<&'a RaylibAudio>) -> Result<bool, Error> {
+    // Un cuadro negro mientras carga (la animación empieza saliendo del negro)
+    rl.begin_drawing(thread).clear_background(Color::BLACK);
+    if franchise == crate::gameplay::progress::Franchise::SmilingFriends {
+        let mut video = super::abduction::AbductionVideo::load(rl, thread, root, device)?;
+        music.set_paused(true);
+        let mut t = 0.0;
+        while t < super::token_collection::SMILINGFRIENDS_ABDUCTION_SECONDS && !video.skip_requested(rl) {
+            if rl.window_should_close() {
+                return Ok(false);
+            }
+            video.update(t)?;
+            t += rl.get_frame_time().min(0.1);
+            let (w, h) = (rl.get_screen_width(), rl.get_screen_height());
+            let mut d = rl.begin_drawing(thread);
+            video.draw(&mut d, w, h);
+        }
+        video.stop();
+        music.set_paused(false);
+        return Ok(true);
+    }
+    let mut abduction = super::abduction::AbductionRenderer::load(rl, thread, root, &[franchise])?;
+    let mut t = 0.0;
+    while t < super::token_collection::ABDUCTION_SECONDS {
+        music.update();
+        if rl.window_should_close() {
+            return Ok(false);
+        }
+        t += rl.get_frame_time().min(0.1);
+        let (w, h) = (rl.get_screen_width(), rl.get_screen_height());
+        let mut d = rl.begin_drawing(thread);
+        d.clear_background(Color::BLACK);
+        abduction.draw(&mut d, franchise, t, w, h);
+    }
+    Ok(true)
 }

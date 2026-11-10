@@ -126,3 +126,77 @@ impl AbductionRenderer {
         d.draw_rectangle(0,0,width,height,alpha(Color::BLACK,fade));
     }
 }
+
+const SMILINGFRIENDS_VIDEO: &str = "assets/video/smilingfriends/abduction.sfv";
+const SMILINGFRIENDS_AUDIO: &str = "assets/video/smilingfriends/abduction.ogg";
+
+/// La abducción de Smiling Friends: un video a pantalla completa, sin marco, con su sonido y el botón SKIP de la
+/// intro del minijuego (o Espacio, Enter o Esc).
+pub struct AbductionVideo<'a> {
+    frames: super::sfv::Frames,
+    texture: Texture2D,
+    current: usize,
+    sound: Option<Music<'a>>,
+    playing: bool,
+    font: Font,
+}
+
+impl<'a> AbductionVideo<'a> {
+    pub fn load(rl: &mut RaylibHandle, thread: &RaylibThread, root: &Path, device: Option<&'a RaylibAudio>)
+        -> Result<Self, Box<dyn std::error::Error>> {
+        let frames = super::sfv::Frames::load(&root.join(SMILINGFRIENDS_VIDEO))?;
+        let texture = rl.load_texture_from_image(thread, &frames.image(0)?)?;
+        texture.set_texture_filter(thread, TextureFilter::TEXTURE_FILTER_BILINEAR);
+        let font = rl.load_font_ex(thread, &root.join("assets/fonts/Bungee-Regular.ttf").to_string_lossy(), 64, None)?;
+        let sound = device.and_then(|d| d.new_music(&root.join(SMILINGFRIENDS_AUDIO).to_string_lossy()).ok()).map(|mut m| {
+            m.looping = false;
+            m
+        });
+        Ok(Self { frames, texture, current: 0, sound, playing: false, font })
+    }
+
+    /// Si se pidió saltear el video este cuadro.
+    pub fn skip_requested(&self, rl: &RaylibHandle) -> bool {
+        let (w, h) = (rl.get_screen_width() as f32, rl.get_screen_height() as f32);
+        (rl.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_LEFT)
+            && super::smilingfriends_game::skip_button(w, h).check_collision_point_rec(rl.get_mouse_position()))
+            || [KeyboardKey::KEY_ESCAPE, KeyboardKey::KEY_SPACE, KeyboardKey::KEY_ENTER].iter().any(|&k| rl.is_key_pressed(k))
+    }
+
+    /// Lleva el video al segundo `t` (el sonido arranca con el primer cuadro).
+    pub fn update(&mut self, t: f32) -> Result<(), Box<dyn std::error::Error>> {
+        if let Some(m) = &mut self.sound {
+            if !self.playing {
+                m.seek_stream(0.0);
+                m.play_stream();
+            }
+            m.update_stream();
+        }
+        self.playing = true;
+        let frame = ((t * self.frames.fps() as f32) as usize).min(self.frames.len() - 1);
+        if frame != self.current {
+            super::sfv::update_frame(&mut self.texture, &self.frames, frame)?;
+            self.current = frame;
+        }
+        Ok(())
+    }
+
+    /// Corta el sonido; la próxima vez empieza de nuevo.
+    pub fn stop(&mut self) {
+        if let Some(m) = &self.sound {
+            m.stop_stream();
+        }
+        self.playing = false;
+        self.current = usize::MAX;
+    }
+
+    /// El cuadro actual llenando toda la ventana (recortado al centro, sin estirar) y el botón SKIP.
+    pub fn draw(&self, d: &mut RaylibDrawHandle, width: i32, height: i32) {
+        let (w, h) = (width as f32, height as f32);
+        d.clear_background(Color::BLACK);
+        let source = cover_source([self.texture.width as f32, self.texture.height as f32], [w, h]);
+        d.draw_texture_pro(&self.texture, source, Rectangle::new(0.0, 0.0, w, h), Vector2::zero(), 0.0, Color::WHITE);
+        let mouse = d.get_mouse_position();
+        super::smilingfriends_game::draw_skip(d, &self.font, w, h, mouse);
+    }
+}

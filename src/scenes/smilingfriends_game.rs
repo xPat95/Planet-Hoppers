@@ -1556,7 +1556,11 @@ pub fn draw_intro(d: &mut RaylibDrawHandle, video: &Texture2D, title: &Font, tim
         let tape = Rectangle::new(*cx, *cy, 90.0, 30.0);
         d.draw_rectangle_pro(tape, Vector2::new(45.0, 15.0), *ang + k as f32 * 3.0, Color::new(255, 238, 150, 200));
     }
-    // Botón SKIP: tarjeta blanca con brillo, que se levanta al pasar el mouse
+    draw_skip(d, title, w, h, mouse);
+}
+
+/// Botón SKIP: tarjeta blanca con brillo, que se levanta al pasar el mouse.
+pub fn draw_skip(d: &mut RaylibDrawHandle, title: &Font, w: f32, h: f32, mouse: Vector2) {
     let b = skip_button(w, h);
     let hover = b.check_collision_point_rec(mouse);
     let r = Rectangle::new(b.x, b.y - if hover { 6.0 } else { 0.0 }, b.width, b.height);

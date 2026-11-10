@@ -6,7 +6,10 @@ entrada para las recompensas de los seis minijuegos. No se modificaron sus regla
 
 `TokenPresentation` coordina una cola FIFO:
 
-- Selección inicial: abducción de 4,8 segundos, sin token ni aviso de nave.
+- Selección inicial: abducción de 4,8 segundos, sin token ni aviso de nave. Se ve en
+  el hangar apenas se confirma la nave, antes de cargar el sistema solar (la partida
+  llega al sistema solar con esa abducción ya marcada como vista). Solo el binario de
+  desarrollo `solarsystem`, que no pasa por el hangar, la muestra en el sistema solar.
 - Primera victoria con nave bloqueada: abducción → ceremonia existente de token
   (3,6 segundos) → aviso de nave (4 segundos).
 - Primera victoria con nave ya poseída: únicamente ceremonia de token.
@@ -24,6 +27,16 @@ Cada grupo usa su PNG de `assets/images/abductions/`, recortado al centro con
 escala de cobertura, sin estirar. La animación combina levitación, giro,
 convergencia del grupo, reducción hacia el haz, partículas y salida de la nave.
 Los colores del haz y la cadencia del grupo distinguen las franquicias.
+
+La abducción de **Smiling Friends** es distinta: un video a pantalla completa, sin
+marco ni franjas (recortado al centro, sin estirar), con su propio sonido
+(`assets/video/smilingfriends/abduction.sfv` y `abduction.ogg`, de
+`source/abduction.mov`). Dura lo que el video (311 cuadros a 24 por segundo, unos
+13 segundos; `abduction_seconds` da la duración de cada franquicia) y se puede
+saltear con el mismo botón **SKIP** de la intro del minijuego, o con Espacio, Enter
+o Esc. Mientras suena, la música del menú se calla y después sigue desde donde
+quedó. Vale para la abducción inicial (en el hangar) y para la de desbloqueo (en el
+sistema solar).
 
 Los OBJ de personajes referencian MTL que no están en el repositorio. Por eso se
 exportaron los `.blend` originales a `assets/models/characters/abductions/*.glb`,

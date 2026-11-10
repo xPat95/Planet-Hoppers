@@ -34,6 +34,13 @@ impl<'a> MenuMusic<'a> {
         Self { music }
     }
 
+    /// Calla la canción (mientras suena el video de una abducción) o la sigue desde donde quedó.
+    pub fn set_paused(&self, paused: bool) {
+        if let Some(m) = &self.music {
+            if paused { m.pause_stream() } else { m.resume_stream() }
+        }
+    }
+
     /// Cada cuadro: le da más audio al dispositivo y anota por dónde va.
     pub fn update(&self) {
         if let Some(m) = &self.music {

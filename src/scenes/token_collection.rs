@@ -58,6 +58,13 @@ pub struct RewardNotice {
 pub const CEREMONY_SECONDS: f32 = 3.6;
 
 pub const ABDUCTION_SECONDS: f32 = 4.8;
+/// La de Smiling Friends es un video (`assets/video/smilingfriends/abduction.sfv`: 311 cuadros a 24 por segundo).
+pub const SMILINGFRIENDS_ABDUCTION_SECONDS: f32 = 311.0 / 24.0;
+
+/// Cuánto dura la abducción de cada franquicia.
+pub fn abduction_seconds(franchise: Franchise) -> f32 {
+    if franchise == Franchise::SmilingFriends { SMILINGFRIENDS_ABDUCTION_SECONDS } else { ABDUCTION_SECONDS }
+}
 pub const TOAST_SECONDS: f32 = 4.0;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -87,6 +94,11 @@ impl TokenPresentation {
         self.revision += 1;
         true
     }
+    /// La abducción inicial ya se vio en el hangar, al confirmar la nave: el sistema solar no la repite.
+    pub fn initial_shown() -> Self {
+        Self { initial_scheduled: true, ..Self::default() }
+    }
+
     /// No synthetic progress: only a new-token outcome can schedule a notice.
     /// The defensive set deduplicates redelivery, independently of queue consumption.
     pub fn enqueue(
@@ -120,7 +132,7 @@ impl TokenPresentation {
         if let Some(sequence) = &mut self.active {
             self.elapsed += if dt.is_finite() { dt.max(0.0) } else { 0.0 };
             let duration = match sequence.phase {
-                RewardPhase::Abduction => ABDUCTION_SECONDS,
+                RewardPhase::Abduction => abduction_seconds(sequence.notice.franchise),
                 RewardPhase::Token => CEREMONY_SECONDS,
                 RewardPhase::Toast => TOAST_SECONDS,
             };
@@ -133,6 +145,13 @@ impl TokenPresentation {
                 self.elapsed = 0.0;
                 self.revision += 1;
             }
+        }
+    }
+
+    /// Termina la abducción que se está viendo (el botón SKIP del video); el próximo `advance` pasa a la etapa siguiente.
+    pub fn skip_abduction(&mut self) {
+        if let Some(franchise) = self.abduction() {
+            self.elapsed = self.elapsed.max(abduction_seconds(franchise));
         }
     }
 

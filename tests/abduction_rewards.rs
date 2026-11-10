@@ -1,7 +1,7 @@
 use planet_hoppers::{
     gameplay::{progress::Franchise, rewards::record_result, selection::{GameState, ShipCatalog, ShipSelection, SelectionMode}, save},
     minigames::common::host::MinigameResult,
-    scenes::{abduction::{ART, cover_source}, token_collection::{TokenPresentation, RewardPhase, ABDUCTION_SECONDS, CEREMONY_SECONDS, TOAST_SECONDS}},
+    scenes::{abduction::{ART, cover_source}, token_collection::{TokenPresentation, RewardPhase, abduction_seconds, ABDUCTION_SECONDS, CEREMONY_SECONDS, TOAST_SECONDS}},
     ships::ShipsConfig,
 };
 use std::path::Path;
@@ -24,7 +24,7 @@ fn all_initial_ships_abduct_once_without_rewards_even_after_reload() {
         assert_eq!(ui.abduction(),Some(initial));
         assert!(ui.is_busy());
         assert!(ui.active().is_none());
-        ui.advance(ABDUCTION_SECONDS,true);
+        ui.advance(abduction_seconds(initial),true);
         assert!(!ui.is_busy());
         assert!(ui.toast().is_none());
         let mut restored: TokenPresentation = serde_json::from_str(&serde_json::to_string(&ui).unwrap()).unwrap();
@@ -55,7 +55,7 @@ fn every_pair_of_initial_ship_and_planet_obeys_strict_stage_order() {
                 assert_eq!(ui.phase(),Some(RewardPhase::Abduction));
                 assert!(ui.active().is_none());
                 assert!(ui.toast().is_none());
-                ui.advance(ABDUCTION_SECONDS,true);
+                ui.advance(abduction_seconds(planet),true);
             }
             assert_eq!(ui.phase(),Some(RewardPhase::Token));
             assert!(ui.is_busy());
@@ -155,4 +155,19 @@ fn abduction_visual_smoke() {
         }
     }
     println!("ABDUCTION_SMOKE_PASS franchises=6 sizes=3 stages=4");
+}
+
+#[test]
+fn smiling_friends_video_lasts_its_frames_and_can_be_skipped() {
+    // La duración coincide con el video empaquetado
+    let frames = planet_hoppers::scenes::sfv::Frames::load(&root().join("assets/video/smilingfriends/abduction.sfv")).unwrap();
+    assert!((frames.duration() - abduction_seconds(Franchise::SmilingFriends)).abs() < 1e-3);
+    let mut ui = TokenPresentation::default();
+    assert!(ui.enqueue_initial(Franchise::SmilingFriends));
+    ui.advance(0.0,true);
+    ui.advance(ABDUCTION_SECONDS,true);
+    assert_eq!(ui.abduction(),Some(Franchise::SmilingFriends));
+    ui.skip_abduction();
+    ui.advance(0.0,true);
+    assert!(ui.phase().is_none());
 }

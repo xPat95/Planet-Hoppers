@@ -3,91 +3,12 @@ use crate::graphics::resources::save_frame;
 use super::smilingfriends_game::{draw_intro, skip_button};
 use crate::minigames::common::host::{MinigameExit, MinigameResult};
 use raylib::prelude::*;
+use super::sfv::{update_frame, Frames};
 use std::path::Path;
 use std::time::Instant;
 
 const VIDEO: &str = "assets/video/smilingfriends/intro.sfv";
 const AUDIO: &str = "assets/video/smilingfriends/intro.ogg";
-
-struct Frames {
-    bytes: Vec<u8>,
-    spans: Vec<(usize, usize)>,
-    width: i32,
-    height: i32,
-    fps: u32,
-}
-
-impl Frames {
-    fn load(path: &Path) -> Result<Self, Box<dyn std::error::Error>> {
-        let bytes = std::fs::read(path)?;
-        if bytes.len() < 20 || &bytes[..4] != b"SFV1" {
-            return Err(format!("Invalid Smiling Friends video: {}", path.display()).into());
-        }
-        let field = |at: usize| u32::from_le_bytes(bytes[at..at + 4].try_into().unwrap());
-        let (width, height, fps, count) = (field(4), field(8), field(12), field(16));
-        if !(1..=4096).contains(&width)
-            || !(1..=4096).contains(&height)
-            || !(1..=120).contains(&fps)
-            || !(1..=10_000).contains(&count)
-        {
-            return Err("Invalid Smiling Friends video metadata".into());
-        }
-        let mut spans = Vec::with_capacity(count as usize);
-        let mut offset = 20usize;
-        for _ in 0..count {
-            let length_end = offset
-                .checked_add(4)
-                .filter(|v| *v <= bytes.len())
-                .ok_or("Truncated Smiling Friends video")?;
-            let len = u32::from_le_bytes(bytes[offset..length_end].try_into().unwrap()) as usize;
-            offset = length_end;
-            let end = offset
-                .checked_add(len)
-                .filter(|v| *v <= bytes.len())
-                .ok_or("Truncated Smiling Friends frame")?;
-            spans.push((offset, end));
-            offset = end;
-        }
-        if offset != bytes.len() {
-            return Err("Unexpected data after Smiling Friends video".into());
-        }
-        Ok(Self {
-            bytes,
-            spans,
-            width: width as i32,
-            height: height as i32,
-            fps,
-        })
-    }
-
-    fn image(&self, frame: usize) -> Result<Image, Box<dyn std::error::Error>> {
-        let (start, end) = self.spans[frame];
-        let image = Image::load_image_from_mem(".jpg", &self.bytes[start..end])?;
-        if image.width != self.width || image.height != self.height {
-            return Err(format!("Smiling Friends frame {frame} has an unexpected size").into());
-        }
-        Ok(image)
-    }
-
-    fn duration(&self) -> f32 {
-        self.spans.len() as f32 / self.fps as f32
-    }
-}
-
-fn update_frame(
-    texture: &mut Texture2D,
-    frames: &Frames,
-    frame: usize,
-) -> Result<(), Box<dyn std::error::Error>> {
-    let image = frames.image(frame)?;
-    if image.format != texture.format {
-        return Err("Smiling Friends frames have inconsistent pixel formats".into());
-    }
-    let pixels =
-        unsafe { std::slice::from_raw_parts(image.data.cast::<u8>(), image.get_pixel_data_size()) };
-    texture.update_texture(pixels)?;
-    Ok(())
-}
 
 pub fn run(args: impl Iterator<Item = String>) -> Result<MinigameExit, Box<dyn std::error::Error>> {
     run_with_results(args, &mut |_| Ok(()))
@@ -142,7 +63,7 @@ pub fn run_with_results(args: impl Iterator<Item = String>, observer: &mut crate
             draw_intro(&mut d, &texture, &font, 1.0, Vector2::zero());
             save_frame(&dir.join("intro-first.png"), w, h)?;
         }
-        for frame in 1..frames.spans.len() {
+        for frame in 1..frames.len() {
             update_frame(&mut texture, &frames, frame)?;
         }
         {
@@ -157,7 +78,7 @@ pub fn run_with_results(args: impl Iterator<Item = String>, observer: &mut crate
         }
         println!(
             "SMILINGFRIENDS_ENTRY_SMOKE_PASS frames={} duration={:.2}s audio={audio_length:?}",
-            frames.spans.len(),
+            frames.len(),
             frames.duration()
         );
         return Ok(MinigameExit::Returned(MinigameResult::Abandoned));
@@ -183,8 +104,8 @@ pub fn run_with_results(args: impl Iterator<Item = String>, observer: &mut crate
                     track.stop_stream();
                 }
             } else {
-                let frame = (started.elapsed().as_secs_f32() * frames.fps as f32) as usize;
-                if frame >= frames.spans.len() {
+                let frame = (started.elapsed().as_secs_f32() * frames.fps() as f32) as usize;
+                if frame >= frames.len() {
                     construction = true;
                     if let Some(track) = music.as_mut() {
                         track.stop_stream();

@@ -769,6 +769,13 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
     let token_textures = super::token_collection_ui::TokenTextures::load(&mut rl, &thread, root)?;
     let mut abductions = super::abduction::AbductionRenderer::load(&mut rl, &thread, root,
         &s.token_presentation.required_abductions())?;
+    // La de Smiling Friends es un video, que solo se carga si va a hacer falta
+    let mut abduction_video = if s.token_presentation.required_abductions().contains(&crate::gameplay::progress::Franchise::SmilingFriends) {
+        Some(super::abduction::AbductionVideo::load(&mut rl, &thread, root, audio.as_ref())?)
+    } else {
+        None
+    };
+    let mut video_playing = false;
     let empty_progress = crate::gameplay::progress::ProgressState::default();
     let mut planet_logos = BTreeMap::new();
     for id in ["halloween", "starwars", "smilingfriends", "minecraft", "regularshow", "southpark"] {
@@ -862,9 +869,28 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         collection_progress = (collection_progress + if collection_open { dt * 5.0 } else { -dt * 5.0 }).clamp(0.0, 1.0);
         let cinematic_was_blocking = s.token_presentation.is_busy();
         let reward_revision = s.token_presentation.revision();
+        let video_abduction = abduction_video.as_mut()
+            .filter(|_| s.token_presentation.abduction() == Some(crate::gameplay::progress::Franchise::SmilingFriends));
+        if video_abduction.is_some_and(|v| v.skip_requested(&rl)) {
+            s.token_presentation.skip_abduction();
+        }
         s.token_presentation.advance(dt, !smoke && fade <= 0.0 && intro_time.is_none()
             && !help_open && help_progress <= 0.0 && collection_progress <= 0.0
             && leaving.is_none() && !entering_station);
+        // El video sigue al reloj de la abducción; mientras suena, la música del menú se calla
+        let video_now = abduction_video.is_some()
+            && s.token_presentation.abduction() == Some(crate::gameplay::progress::Franchise::SmilingFriends);
+        if let Some(video) = abduction_video.as_mut() {
+            if video_now {
+                video.update(s.token_presentation.elapsed())?;
+            } else if video_playing {
+                video.stop();
+            }
+        }
+        if video_now != video_playing {
+            music.set_paused(video_now);
+            video_playing = video_now;
+        }
         if reward_revision != s.token_presentation.revision() {
             if let Some(game) = &s.game {
                 crate::gameplay::save::store(&crate::gameplay::save::path(root), game, &s.token_presentation)?;
@@ -1790,7 +1816,9 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         }
         token_textures.draw_ceremony(&mut d, &ui_regular, &ui_bold, token_progress, &s.token_presentation, width, height);
         draw_help_overlay(&mut d, &ui_regular, &ui_bold, width, height, help_progress, help_open);
-        if let Some(franchise) = s.token_presentation.abduction() {
+        if let Some(video) = abduction_video.as_ref().filter(|_| video_playing) {
+            video.draw(&mut d, width, height);
+        } else if let Some(franchise) = s.token_presentation.abduction() {
             abductions.draw(&mut d, franchise, s.token_presentation.elapsed(), width, height);
         }
         token_textures.draw_ship_notice(&mut d, &ui_bold, &s.token_presentation, width, height);

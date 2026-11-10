@@ -17,3 +17,13 @@ cargo run --locked --bin smilingfriends -- --smoke
 ```
 
 The test saves screenshots under `target/smilingfriends/`.
+
+## Abduction video
+
+`source/abduction.mov` is the Smiling Friends abduction, shown full screen when the Smiling Friends ship is picked in the hangar or unlocked in the solar system (see `docs/minigames/abduction-rewards.md`). It is packed the same way, at 1280×720 and 24 fps (311 frames), into `abduction.sfv` and `abduction.ogg`:
+
+```powershell
+python tools/video/prepare_smilingfriends_intro.py abduction
+```
+
+If the clip changes length, update `SMILINGFRIENDS_ABDUCTION_SECONDS` in `src/scenes/token_collection.rs` (a test checks that they match).
