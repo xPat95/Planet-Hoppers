@@ -6,19 +6,44 @@ const AMBER: Color = Color::new(255, 179, 78, 255);
 const WHITE: Color = Color::new(226, 233, 232, 255);
 const MUTED: Color = Color::new(128, 153, 163, 255);
 const RED: Color = Color::new(255, 83, 54, 255);
+const GOLD: Color = Color::new(255, 218, 52, 255);
+const MENU_BLUE: Color = Color::new(74, 159, 255, 255);
+const MENU_CYAN: Color = Color::new(132, 239, 255, 255);
 /// Uses the same logical rectangles for rendering and scaled mouse hit testing.
 pub fn victory_buttons(w: f32, h: f32) -> [Rectangle; 2] {
     let scale = (w / 1280.0).min(h / 800.0);
     let ox = (w - 1280.0 * scale) * 0.5;
     let oy = (h - 800.0 * scale) * 0.5;
-    [400.0, 480.0].map(|y| {
+    [460.0, 540.0].map(|y| {
         Rectangle::new(
-            ox + 92.0 * scale,
+            ox + 280.0 * scale,
             oy + y * scale,
-            618.0 * scale,
-            53.0 * scale,
+            720.0 * scale,
+            60.0 * scale,
         )
     })
+}
+
+pub fn menu_buttons(phase: Phase, w: f32, h: f32) -> Vec<Rectangle> {
+    if matches!(phase, Phase::Briefing | Phase::Won) {
+        return victory_buttons(w, h).to_vec();
+    }
+    if !matches!(phase, Phase::Paused | Phase::Lost) {
+        return vec![];
+    }
+    let scale = (w / 1280.0).min(h / 800.0);
+    let ox = (w - 1280.0 * scale) * 0.5;
+    let oy = (h - 800.0 * scale) * 0.5;
+    [414.0, 486.0, 558.0]
+        .map(|y| {
+            Rectangle::new(
+                ox + 280.0 * scale,
+                oy + y * scale,
+                720.0 * scale,
+                60.0 * scale,
+            )
+        })
+        .to_vec()
 }
 
 fn v(x: f32, y: f32, z: f32) -> Vector3 {
@@ -154,10 +179,11 @@ fn tunnel(d: &mut impl RaylibDraw3D, g: &Game, time: f32) {
     for ring in (0..19).rev() {
         let z = ring as f32 * 14.0 - offset - 16.0;
         for side in 0..8 {
-            let base = if side < 4 {
-                Color::new(49, 65, 74, 255)
-            } else {
-                Color::new(38, 52, 61, 255)
+            let base = match side {
+                0 | 3 => Color::new(25, 68, 96, 255),
+                1 | 2 => Color::new(43, 56, 100, 255),
+                4 | 7 => Color::new(20, 75, 78, 255),
+                _ => Color::new(18, 37, 60, 255),
             };
             wall_panel(d, side, [-4.35, 4.35], [z, z + 14.0], 0.0, base);
             // Recessed panels, raised ribs and service plates; details stay anchored to the world.
@@ -169,7 +195,7 @@ fn tunnel(d: &mut impl RaylibDraw3D, g: &Game, time: f32) {
                     [t, t + 2.45],
                     [z + 0.6, z + 12.8],
                     0.045,
-                    Color::new(17, 29, 38, 255),
+                    Color::new(5, 15, 28, 255),
                 );
                 wall_panel(
                     d,
@@ -193,7 +219,7 @@ fn tunnel(d: &mut impl RaylibDraw3D, g: &Game, time: f32) {
                     [t + 0.2, t + 2.2],
                     [z + 1.15, z + 1.27],
                     0.09,
-                    Color::new(95, 113, 121, 255),
+                    Color::new(63, 137, 166, 255),
                 );
                 for j in 0..5 {
                     wall_panel(
@@ -213,7 +239,7 @@ fn tunnel(d: &mut impl RaylibDraw3D, g: &Game, time: f32) {
                 polar(10.12, a, z),
                 polar(10.12, b, z),
                 0.22,
-                fog(Color::new(94, 111, 120, 255), z),
+                fog(Color::new(79, 139, 172, 255), z),
             );
             beam(
                 d,
@@ -228,7 +254,7 @@ fn tunnel(d: &mut impl RaylibDraw3D, g: &Game, time: f32) {
                     wall_point(side, t, z, 0.25),
                     wall_point(side, t, z + 14.0, 0.25),
                     0.11,
-                    fog(Color::new(91, 99, 101, 255), z),
+                    fog(Color::new(30, 176, 198, 255), z),
                 );
             }
             if side % 2 == 0 {
@@ -250,7 +276,7 @@ fn tunnel(d: &mut impl RaylibDraw3D, g: &Game, time: f32) {
                         if side == 0 || side == 4 {
                             ICE
                         } else {
-                            Color::new(246, 202, 133, 255)
+                            Color::new(183, 200, 255, 255)
                         },
                     );
                 }
@@ -336,12 +362,17 @@ fn obstacle(d: &mut impl RaylibDraw3D, o: &Obstacle, g: &Game) {
             WHITE
         } else {
             let variation = (o.seed % 4) as u8 * 5;
-            Color::new(117 + variation, 125 + variation, 128 + variation, 255)
+            match o.shape {
+                Shape::Girder => Color::new(153 + variation, 175 + variation, 193 + variation, 255),
+                Shape::Pipe => Color::new(71 + variation, 157 + variation, 142 + variation, 255),
+                Shape::Duct => Color::new(105 + variation, 124 + variation, 164 + variation, 255),
+                Shape::Panel => Color::new(213 + variation, 132 + variation, 48 + variation, 255),
+            }
         },
         z,
     );
     let dark = fog(Color::new(44, 52, 56, 255), z);
-    let edge = fog(Color::new(157, 161, 156, 255), z);
+    let edge = fog(Color::new(191, 215, 230, 255), z);
     unsafe {
         ffi::rlPushMatrix();
         ffi::rlTranslatef(o.pos[0], o.pos[1], z);
@@ -426,7 +457,7 @@ fn obstacle(d: &mut impl RaylibDraw3D, o: &Obstacle, g: &Game) {
                 if o.flash > 0.2 {
                     WHITE
                 } else {
-                    Color::new(162, 115, 61, 255)
+                    Color::new(255, 183, 58, 255)
                 },
                 z,
             );
@@ -658,6 +689,9 @@ fn world(d: &mut impl RaylibDraw, g: &Game, time: f32, ship: &mut super::ship::T
 }
 fn load_ui_font(_thread: &RaylibThread, root: &std::path::Path) -> Result<Font, String> {
     let path = root.join("fonts/TitilliumWeb-Bold.ttf");
+    load_font_file(&path)
+}
+fn load_font_file(path: &std::path::Path) -> Result<Font, String> {
     if !path.is_file() {
         return Err(format!("No se encontró la fuente: {}", path.display()));
     }
@@ -692,6 +726,8 @@ pub struct Presentation {
     pub target: RenderTexture2D,
     pub shader: Shader,
     pub font: Font,
+    pub title_font: Font,
+    pub menu_selection: usize,
 }
 impl Presentation {
     pub fn load(
@@ -711,6 +747,10 @@ impl Presentation {
         let font = load_ui_font(t, root)?;
         font.texture()
             .set_texture_filter(t, TextureFilter::TEXTURE_FILTER_BILINEAR);
+        let title_font = load_font_file(&project_root.join("assets/fonts/Bungee-Regular.ttf"))?;
+        title_font
+            .texture()
+            .set_texture_filter(t, TextureFilter::TEXTURE_FILTER_BILINEAR);
         let ship = super::ship::TunnelShip::load(rl, t, project_root, selected)
             .map_err(|e| e.to_string())?;
         Ok(Self {
@@ -718,6 +758,8 @@ impl Presentation {
             target,
             shader,
             font,
+            title_font,
+            menu_selection: 0,
         })
     }
     pub fn draw(
@@ -766,240 +808,240 @@ impl Presentation {
     fn text(&self, d: &mut impl RaylibDraw, s: &str, x: f32, y: f32, size: f32, c: Color) {
         d.draw_text_ex(&self.font, s, Vector2::new(x, y), size, 1.0, c);
     }
-    fn briefing(&self, d: &mut impl RaylibDraw, time: f32) {
-        let ink = Color::new(8, 15, 21, 255);
-        let green = Color::new(149, 219, 172, 255);
-        d.draw_rectangle(0, 0, 1280, 800, Color::new(4, 10, 16, 222));
-        for x in (0..1280).step_by(40) {
-            d.draw_line(x, 0, x, 800, Color::new(24, 39, 43, 100));
+    fn centered(&self, d: &mut impl RaylibDraw, s: &str, y: f32, size: f32, color: Color) {
+        let x = (1280.0 - self.font.measure_text(s, size, 1.0).x) * 0.5;
+        for (dx, dy) in [(-2.0, 0.0), (2.0, 0.0), (0.0, -2.0), (0.0, 3.0)] {
+            self.text(d, s, x + dx, y + dy, size, Color::BLACK);
         }
-        for y in (0..800).step_by(40) {
-            d.draw_line(0, y, 1280, y, Color::new(24, 39, 43, 100));
-        }
-        d.draw_rectangle(0, 0, 1280, 56, ink);
-        d.draw_rectangle(0, 55, 1280, 1, green);
-        self.text(
-            d,
-            "ALIANZA REBELDE   /   MANDO DE VUELO",
-            42.0,
-            16.0,
-            19.0,
-            green,
-        );
-        self.text(d, "OPERACIÓN  //  DS-01", 1018.0, 18.0, 16.0, MUTED);
-        self.text(d, "ESTRELLA DE LA MUERTE", 64.0, 104.0, 22.0, AMBER);
-        self.text(d, "ASALTO", 58.0, 143.0, 90.0, WHITE);
-        self.text(d, "AL NÚCLEO", 58.0, 224.0, 90.0, WHITE);
-        self.text(
-            d,
-            "PLAN DE VUELO / TRANSMISIÓN CIFRADA",
-            65.0,
-            345.0,
-            17.0,
-            green,
-        );
-        for (i, (title, detail)) in [
-            ("INFILTRAR", "Entra al ducto de la estación."),
-            ("ATRAVESAR", "Esquiva estructuras. Abre las compuertas."),
-            ("DESTRUIR", "Alcanza el reactor y dispara seis torpedos."),
-        ]
-        .iter()
-        .enumerate()
-        {
-            let y = 390.0 + i as f32 * 61.0;
-            d.draw_rectangle(65, y as i32, 35, 33, Color::new(31, 51, 48, 255));
-            self.text(d, &format!("{:02}", i + 1), 73.0, y + 5.0, 19.0, green);
-            self.text(d, title, 116.0, y - 2.0, 19.0, WHITE);
-            self.text(d, detail, 116.0, y + 23.0, 17.0, MUTED);
-        }
-        d.draw_rectangle(64, 600, 529, 60, AMBER);
-        self.text(d, "ENTER   /   INICIAR MISIÓN", 89.0, 614.0, 27.0, ink);
-        self.text(
-            d,
-            "WASD / FLECHAS   VOLAR       ESPACIO   DISPARAR",
-            65.0,
-            686.0,
-            16.0,
-            WHITE,
-        );
-        self.text(
-            d,
-            "SHIFT   TURBO       P   PAUSA       R   REINICIAR",
-            65.0,
-            715.0,
-            16.0,
-            MUTED,
-        );
-        self.text(d, "ESC   VOLVER AL SISTEMA SOLAR", 65.0, 756.0, 15.0, green);
-        // Orbital targeting schematic: vector geometry belongs to the mission console.
-        let center = Vector2::new(941.0, 339.0);
-        for radius in [181.0, 187.0, 207.0] {
-            d.draw_circle_lines(center.x as i32, center.y as i32, radius, green);
-        }
-        for offset in [-125.0f32, -72.0, 0.0, 72.0, 125.0] {
-            let half = (181.0f32.powi(2) - offset.powi(2)).sqrt();
-            d.draw_line_ex(
-                Vector2::new(center.x - half, center.y + offset),
-                Vector2::new(center.x + half, center.y + offset),
-                1.0,
-                Color::new(72, 112, 92, 255),
+        self.text(d, s, x, y, size, color);
+    }
+    fn stud(d: &mut impl RaylibDraw, x: i32, y: i32, r: f32, color: Color) {
+        d.draw_circle(x + 2, y + 4, r + 2.0, Color::new(0, 0, 0, 160));
+        d.draw_circle(x, y, r, shade(color, 0.55));
+        d.draw_circle(x, y - 3, r * 0.84, color);
+        d.draw_circle_lines(x, y - 3, r * 0.57, shade(color, 1.25));
+    }
+    fn wordmark(&self, d: &mut impl RaylibDraw, word: &str, y: f32) {
+        let size = 102.0;
+        let x = (1280.0 - self.title_font.measure_text(word, size, 2.0).x) * 0.5;
+        for (dx, dy) in [(-3.0, 0.0), (3.0, 0.0), (0.0, -3.0), (0.0, 5.0)] {
+            d.draw_text_ex(
+                &self.title_font,
+                word,
+                Vector2::new(x + dx, y + dy),
+                size,
+                2.0,
+                Color::BLACK,
             );
         }
-        d.draw_ellipse_lines(941, 339, 79.0, 181.0, Color::new(72, 112, 92, 255));
-        d.draw_rectangle(760, 333, 362, 13, ink);
-        d.draw_line(760, 332, 1122, 332, green);
-        d.draw_line(760, 347, 1122, 347, green);
-        d.draw_circle_lines(893, 252, 42.0, green);
-        d.draw_circle_lines(893, 252, 30.0, green);
-        d.draw_circle(941, 339, 6.0, AMBER);
-        d.draw_line(941, 339, 1162, 525, AMBER);
-        self.text(d, "REACTOR PRINCIPAL", 924.0, 546.0, 17.0, AMBER);
-        self.text(d, "OBJETIVO: 2.500 M", 924.0, 573.0, 15.0, MUTED);
-        let sweep = time * 0.6;
-        d.draw_line_ex(
-            center,
-            center + Vector2::new(sweep.cos(), sweep.sin()) * 181.0,
-            1.0,
-            Color::new(149, 219, 172, 90),
-        );
-        d.draw_rectangle(756, 644, 454, 91, ink);
-        d.draw_rectangle(756, 644, 3, 91, green);
-        self.text(
-            d,
-            "ENLACE ESTABLE / NAVE PREPARADA",
-            778.0,
-            660.0,
-            17.0,
-            green,
-        );
-        self.text(d, "3 BARRAS DE INTEGRIDAD", 778.0, 691.0, 16.0, WHITE);
+        d.draw_text_ex(&self.title_font, word, Vector2::new(x, y), size, 2.0, GOLD);
     }
-    fn flight_menu(&self, d: &mut impl RaylibDraw, g: &Game) {
-        let green = Color::new(149, 219, 172, 255);
-        let lost = g.phase == Phase::Lost;
-        let accent = if lost { RED } else { green };
-        d.draw_rectangle(0, 0, 1280, 800, Color::new(3, 9, 15, 199));
-        d.draw_rectangle(64, 181, 676, 438, Color::new(8, 17, 24, 248));
-        d.draw_rectangle(64, 181, 676, 4, accent);
-        self.text(d, "MANDO DE VUELO  /  DS-01", 92.0, 209.0, 18.0, accent);
-        self.text(
-            d,
-            if lost {
-                "SEÑAL PERDIDA"
-            } else {
-                "VUELO EN ESPERA"
-            },
-            90.0,
-            264.0,
-            47.0,
-            WHITE,
+    fn menu_backdrop(&self, d: &mut impl RaylibDraw, time: f32, title: &str) {
+        d.draw_rectangle(0, 0, 1280, 800, Color::new(2, 6, 20, 242));
+        d.draw_rectangle_gradient_v(
+            0,
+            0,
+            1280,
+            800,
+            Color::new(13, 23, 58, 160),
+            Color::new(1, 3, 12, 240),
         );
-        let detail = if lost {
-            format!("{:06} PUNTOS / {} CARGAS DESTRUIDAS", g.score, g.destroyed)
-        } else {
-            "Nave detenida. La misión puede continuar.".to_owned()
-        };
-        self.text(d, &detail, 93.0, 337.0, 19.0, MUTED);
-        d.draw_rectangle(92, 400, 618, 53, accent);
-        self.text(
-            d,
-            if lost {
-                "ENTER   REINTENTAR MISIÓN"
-            } else {
-                "P / ENTER   REANUDAR VUELO"
-            },
-            112.0,
-            411.0,
-            24.0,
-            Color::new(8, 17, 24, 255),
-        );
-        self.text(d, "R   REINICIAR DESDE LA INTRO", 94.0, 488.0, 18.0, WHITE);
-        self.text(d, "ESC   VOLVER AL SISTEMA SOLAR", 94.0, 535.0, 18.0, MUTED);
-        d.draw_line(850, 254, 850, 544, accent);
-        for (i, label) in ["DUCTO", "COMPUERTAS", "REACTOR"].iter().enumerate() {
-            let y = 273 + i as i32 * 117;
-            d.draw_circle(850, y, 7.0, accent);
-            self.text(d, label, 880.0, y as f32 - 12.0, 22.0, WHITE);
+        for i in 0..145 {
+            let x = ((i * 197 + 31) % 1280) as i32;
+            let y = ((i * 113 + 17) % 800) as i32;
+            let alpha = (125.0 + (time * 0.7 + i as f32).sin() * 65.0) as u8;
+            d.draw_circle(
+                x,
+                y,
+                if i % 9 == 0 { 1.7 } else { 0.8 },
+                Color::new(183, 213, 255, alpha),
+            );
         }
-        self.text(
+        // A solid station silhouette replaces the old tactical grid.
+        d.draw_circle(1100, 302, 162.0, Color::new(24, 37, 62, 255));
+        d.draw_circle_lines(1100, 302, 162.0, Color::new(51, 76, 112, 255));
+        for y in [-115.0_f32, -65.0, 0.0, 65.0, 115.0] {
+            let half = (162.0_f32.powi(2) - y.powi(2)).sqrt() as i32;
+            d.draw_line(
+                1100 - half,
+                302 + y as i32,
+                1100 + half,
+                302 + y as i32,
+                Color::new(44, 63, 90, 255),
+            );
+        }
+        d.draw_ellipse_lines(1100, 302, 65.0, 162.0, Color::new(44, 63, 90, 255));
+        d.draw_rectangle(940, 302, 320, 7, Color::new(6, 12, 28, 255));
+        d.draw_circle(1050, 235, 36.0, Color::new(8, 17, 33, 255));
+        d.draw_circle_lines(1050, 235, 36.0, Color::new(66, 93, 120, 255));
+        self.centered(d, "PLANET HOPPERS", 40.0, 20.0, WHITE);
+        self.wordmark(d, "STAR", 64.0);
+        self.wordmark(d, "WARS", 153.0);
+        d.draw_line(436, 270, 844, 270, GOLD);
+        self.centered(d, title, 283.0, 24.0, WHITE);
+        for (i, x) in [92, 134, 176, 1104, 1146, 1188].iter().enumerate() {
+            Self::stud(d, *x, 735, 12.0, if i % 3 == 1 { WHITE } else { GOLD });
+        }
+        self.centered(
             d,
-            &format!("DISTANCIA / {:04.0} M", g.distance),
-            880.0,
-            582.0,
-            18.0,
-            accent,
+            "ASALTO AL NÚCLEO  /  ESTRELLA DE LA MUERTE",
+            748.0,
+            16.0,
+            MUTED,
         );
     }
-    fn victory_menu(&self, d: &mut impl RaylibDraw, g: &Game) {
-        let green = Color::new(149, 219, 172, 255);
-        let ink = Color::new(8, 17, 24, 255);
-        d.draw_rectangle(0, 0, 1280, 800, Color::new(3, 9, 15, 224));
-        d.draw_rectangle(64, 181, 676, 438, ink);
-        d.draw_rectangle(64, 181, 676, 4, green);
-        self.text(
+    fn menu_option(&self, d: &mut impl RaylibDraw, label: &str, index: usize, y: f32) {
+        let active = self.menu_selection == index;
+        if active {
+            d.draw_rectangle_gradient_h(
+                280,
+                y as i32,
+                360,
+                60,
+                Color::new(12, 39, 71, 0),
+                Color::new(28, 94, 145, 125),
+            );
+            d.draw_rectangle_gradient_h(
+                640,
+                y as i32,
+                360,
+                60,
+                Color::new(28, 94, 145, 125),
+                Color::new(12, 39, 71, 0),
+            );
+            self.text(d, ">", 300.0, y + 6.0, 36.0, GOLD);
+            self.text(d, "<", 958.0, y + 6.0, 36.0, GOLD);
+        }
+        self.centered(
             d,
-            "MANDO DE VUELO / REACTOR DESTRUIDO",
-            92.0,
-            209.0,
-            18.0,
-            green,
+            label,
+            y + 8.0,
+            32.0,
+            if active { MENU_CYAN } else { MENU_BLUE },
         );
-        self.text(d, "MISIÓN CUMPLIDA", 90.0, 264.0, 47.0, WHITE);
-        self.text(
+    }
+    fn briefing(&self, d: &mut impl RaylibDraw, time: f32) {
+        self.menu_backdrop(d, time, "UNA NUEVA MISIÓN");
+        self.centered(
             d,
-            &format!("{:06} PUNTOS / {} CARGAS DESTRUIDAS", g.score, g.destroyed),
-            93.0,
-            337.0,
+            "Pilota por el túnel. Abre las compuertas.",
+            354.0,
+            23.0,
+            WHITE,
+        );
+        self.centered(
+            d,
+            "Destruye el reactor con seis torpedos.",
+            385.0,
+            23.0,
+            WHITE,
+        );
+        self.menu_option(d, "INICIAR MISIÓN", 0, 460.0);
+        self.menu_option(d, "VOLVER AL SISTEMA SOLAR", 1, 540.0);
+        self.centered(
+            d,
+            "WASD / FLECHAS  Volar     ESPACIO  Disparar     SHIFT  Turbo",
+            641.0,
             19.0,
-            MUTED,
-        );
-        let [replay, leave] = victory_buttons(1280.0, 800.0);
-        d.draw_rectangle_rec(replay, green);
-        self.text(d, "ENTER / R   VOLVER A JUGAR", 112.0, 411.0, 24.0, ink);
-        d.draw_rectangle_lines_ex(leave, 1.0, green);
-        self.text(
-            d,
-            "ESC   REGRESAR AL SISTEMA SOLAR",
-            112.0,
-            493.0,
-            22.0,
             WHITE,
         );
-        self.text(
+        self.centered(
             d,
-            "Otra misión comienza con la misma nave.",
-            94.0,
-            573.0,
+            "ENTER  Seleccionar     ARRIBA / ABAJO  Elegir     ESC  Volver",
+            679.0,
             18.0,
+            GOLD,
+        );
+        self.centered(
+            d,
+            &format!(
+                "OBJETIVO: {:.0} M     /     3 BARRAS DE INTEGRIDAD",
+                REACTOR_Z
+            ),
+            712.0,
+            16.0,
             MUTED,
         );
-        d.draw_circle_lines(988, 348, 99.0, green);
-        d.draw_line_ex(
-            Vector2::new(939.0, 350.0),
-            Vector2::new(975.0, 385.0),
-            5.0,
-            green,
-        );
-        d.draw_line_ex(
-            Vector2::new(975.0, 385.0),
-            Vector2::new(1038.0, 310.0),
-            5.0,
-            green,
-        );
-        self.text(d, "OBJETIVO ELIMINADO", 850.0, 489.0, 25.0, green);
-        self.text(
+    }
+    fn flight_menu(&self, d: &mut impl RaylibDraw, g: &Game, time: f32) {
+        let lost = g.phase == Phase::Lost;
+        self.menu_backdrop(d, time, if lost { "MISIÓN FALLIDA" } else { "PAUSA" });
+        self.centered(
             d,
-            &format!("INTEGRIDAD FINAL / {} DE 3", g.hull),
-            851.0,
-            535.0,
-            18.0,
+            if lost {
+                "¡La galaxia necesita otro intento!"
+            } else {
+                "Que la Fuerza te acompañe."
+            },
+            354.0,
+            28.0,
+            if lost { RED } else { GOLD },
+        );
+        self.menu_option(
+            d,
+            if lost {
+                "REINTENTAR MISIÓN"
+            } else {
+                "CONTINUAR"
+            },
+            0,
+            414.0,
+        );
+        self.menu_option(d, "REINICIAR DESDE LA INTRO", 1, 486.0);
+        self.menu_option(d, "VOLVER AL SISTEMA SOLAR", 2, 558.0);
+        self.centered(
+            d,
+            &format!(
+                "{:06} PUNTOS     /     {:.0} M RECORRIDOS",
+                g.score, g.distance
+            ),
+            648.0,
+            20.0,
             WHITE,
         );
-        self.text(d, "TRANSMISIÓN COMPLETADA", 851.0, 576.0, 16.0, MUTED);
+        self.centered(
+            d,
+            "ENTER  Seleccionar     ARRIBA / ABAJO  Elegir     R  Reiniciar     ESC  Volver",
+            690.0,
+            17.0,
+            GOLD,
+        );
+    }
+    fn victory_menu(&self, d: &mut impl RaylibDraw, g: &Game, time: f32) {
+        self.menu_backdrop(d, time, "MISIÓN CUMPLIDA");
+        self.centered(d, "¡REACTOR DESTRUIDO!", 344.0, 34.0, GOLD);
+        Self::stud(d, 475, 416, 13.0, GOLD);
+        self.centered(d, &format!("{:06} PUNTOS", g.score), 398.0, 28.0, WHITE);
+        self.menu_option(d, "VOLVER A JUGAR", 0, 460.0);
+        self.menu_option(d, "REGRESAR AL SISTEMA SOLAR", 1, 540.0);
+        self.centered(
+            d,
+            &format!(
+                "{} CARGAS DESTRUIDAS     /     INTEGRIDAD: {} DE 3",
+                g.destroyed, g.hull
+            ),
+            639.0,
+            20.0,
+            WHITE,
+        );
+        self.centered(
+            d,
+            "ENTER  Seleccionar     ARRIBA / ABAJO  Elegir     ESC  Volver",
+            679.0,
+            18.0,
+            GOLD,
+        );
+        self.centered(
+            d,
+            "Una nueva aventura te espera con tu misma nave.",
+            714.0,
+            17.0,
+            MUTED,
+        );
     }
     fn ui(&self, d: &mut impl RaylibDraw, g: &Game, time: f32) {
         if g.phase == Phase::Won {
-            self.victory_menu(d, g);
+            self.victory_menu(d, g, time);
             return;
         }
         if g.phase == Phase::Briefing {
@@ -1101,7 +1143,7 @@ impl Presentation {
         self.text(d, "ASALTO AL NÚCLEO", 40.0, 27.0, 21.0, WHITE);
         let sector = if g.attacking() {
             "03 / REACTOR PRINCIPAL"
-        } else if g.distance > 1700.0 {
+        } else if g.distance > BULKHEADS[2].0 - 100.0 {
             "02 / ACCESO AL REACTOR"
         } else {
             "01 / DUCTO DE SERVICIO"
@@ -1152,7 +1194,7 @@ impl Presentation {
             );
         }
         if matches!(g.phase, Phase::Paused | Phase::Lost) {
-            self.flight_menu(d, g);
+            self.flight_menu(d, g, time);
         }
         if g.phase == Phase::Explosion {
             d.draw_rectangle(
