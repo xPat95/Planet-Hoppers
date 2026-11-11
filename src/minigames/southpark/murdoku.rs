@@ -124,7 +124,7 @@ pub struct Case {
     pub selected: Option<usize>,
     pub accused: Option<usize>,
     pub candidates: [u8;36],
-    pub excluded: [bool;36],
+    pub excluded: [bool;36], // Manual marks only; automatic marks are derived.
     pub cross_mode: bool,
 }
 impl Default for Case {
@@ -132,9 +132,22 @@ impl Default for Case {
 }
 impl Case {
     pub fn annotate(&mut self,cell:usize) {
-        if cell>=36 {return;}
+        if !valid_cell(cell) || self.positions.contains(&Some(cell)) {return;}
         if self.cross_mode {self.excluded[cell]=!self.excluded[cell];}
-        else if valid_cell(cell) {if let Some(piece)=self.selected {self.candidates[cell]^=1<<piece;}}
+        else if !self.automatically_excluded(cell) {if let Some(piece)=self.selected {self.candidates[cell]^=1<<piece;}}
+    }
+    pub fn automatically_excluded(&self, cell: usize) -> bool {
+        valid_cell(cell) && !self.positions.contains(&Some(cell))
+            && self.positions.iter().flatten().any(|c| c / SIZE == cell / SIZE || c % SIZE == cell % SIZE)
+    }
+    pub fn is_excluded(&self, cell: usize) -> bool {
+        valid_cell(cell) && !self.positions.contains(&Some(cell))
+            && (self.excluded[cell] || self.automatically_excluded(cell))
+    }
+    pub fn can_place(&self, piece: usize, cell: usize) -> bool {
+        piece < 6 && valid_cell(cell) && self.positions.iter().enumerate().all(|(i, c)| {
+            i == piece || c.is_none_or(|c| c / SIZE != cell / SIZE && c % SIZE != cell % SIZE)
+        })
     }
     pub fn toggle_mode(&mut self) {self.cross_mode=!self.cross_mode;}
     pub fn select(&mut self, piece: usize) {
@@ -146,14 +159,14 @@ impl Case {
         let Some(piece) = self.selected else {
             return;
         };
-        if valid_cell(cell)
-            && !self
-                .positions
-                .iter()
-                .enumerate()
-                .any(|(i, c)| i != piece && *c == Some(cell))
-        {
+        if self.can_place(piece, cell) {
             self.positions[piece] = Some(cell);
+            for c in 0..36 {
+                self.candidates[c] &= !(1 << piece);
+                if self.automatically_excluded(c) || self.positions.contains(&Some(c)) {
+                    self.candidates[c] = 0;
+                }
+            }
         }
     }
     pub fn remove(&mut self) {
@@ -167,7 +180,8 @@ impl Case {
         }
     }
     pub fn ready(&self) -> bool {
-        self.positions.iter().all(Option::is_some) && self.accused.is_some()
+        self.accused.is_some_and(|p| (1..6).contains(&p))
+            && self.positions.iter().enumerate().all(|(i, c)| c.is_some_and(|c| self.can_place(i, c)))
     }
     pub fn correct(&self) -> bool {
         self.ready() && culprit(&self.positions.map(|c| c.unwrap())) == self.accused

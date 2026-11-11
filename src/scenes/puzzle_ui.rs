@@ -326,7 +326,7 @@ impl PuzzleUi {
                 if cell!=Some(c) || bus.selected!=Some(piece) || (!released && !rl.is_mouse_button_down(MouseButton::MOUSE_BUTTON_LEFT)) {self.bus_press=None;}
                 else if m::is_long_press(start.elapsed().as_secs_f32()) {
                     self.bus_press=None;
-                    if !bus.positions.iter().enumerate().any(|(i,p)|i!=piece && *p==Some(c)) {
+                    if bus.can_place(piece,c) {
                         self.bus_fixed=Some((c,std::time::Instant::now()));return Action::PlaceBus(c);
                     }
                 } else if released {self.bus_press=None;return Action::AnnotateBus(c);}
@@ -1041,7 +1041,7 @@ impl PuzzleUi {
                 d.draw_circle_lines(c.x as i32,c.y as i32,radius,INK);
                 self.text(d,["K","A","B","C","D","E"][piece],c-Vector2::new(radius*0.55,radius*0.9),(radius*1.65).max(12.),INK);
             }}
-            if bus.excluded[cell] {
+            if bus.is_excluded(cell) {
                 let inset=size*0.17;
                 d.draw_line_ex(Vector2::new(r.x+inset,r.y+inset),Vector2::new(r.x+size-inset,r.y+size-inset),3.,INK.alpha(0.8));
                 d.draw_line_ex(Vector2::new(r.x+size-inset,r.y+inset),Vector2::new(r.x+inset,r.y+size-inset),3.,INK.alpha(0.8));

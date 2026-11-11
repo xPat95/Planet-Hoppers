@@ -86,11 +86,21 @@ fn main() {
     }
     // Correct accusation cannot rescue an incorrect full distribution.
     let mut p = run();
-    fill(&mut p);
-    p.select_bus_piece(0);
-    p.place_bus_piece(12);
+    let mut wrong = SOLUTION;
+    wrong.swap(0, 1);
+    for (i, cell) in wrong.into_iter().enumerate() {
+        p.select_bus_piece(i);
+        p.place_bus_piece(cell);
+    }
     p.accuse_bus_driver(DANGEROUS);
+    let puzzles::Board::Bus(case) = &p.board else { panic!() };
+    assert!(case.ready());
+    assert!(!case.correct());
     p.confirm_bus();
+    assert_eq!(p.result, Some(false));
+    assert!(!p.interactive());
+    p.confirm_bus();
+    p.clear_bus();
     assert_eq!(p.result, Some(false));
     assert!(!is_long_press(0.449));assert!(is_long_press(0.450));
     let mut notes=Case::default();notes.select(1);notes.annotate(6);notes.annotate(12);
@@ -104,5 +114,33 @@ fn main() {
     notes.candidates=[63;36];notes.excluded=[true;36];assert!(notes.correct());
     notes.positions[0]=Some(12);assert!(!notes.correct());
     notes.clear();assert_eq!(notes.candidates,[0;36]);assert_eq!(notes.excluded,[false;36]);
-    println!("MURDOKU_OK unique_solution final_positions_only independent_candidates_and_X 450ms_hold single_confirmation");
+    notes.select(1);
+    notes.annotate(6); notes.annotate(12);
+    notes.select(2); notes.annotate(19); notes.annotate(29);
+    notes.cross_mode=true; notes.annotate(9); notes.cross_mode=false;
+    notes.select(1); notes.place(6);
+    assert!(notes.candidates.iter().all(|mask| mask & 2 == 0));
+    assert_eq!(notes.candidates[19],4); assert_eq!(notes.candidates[29],4);
+    for cell in 0..36 {
+        assert_eq!(notes.automatically_excluded(cell), valid_cell(cell) && cell != 6 && (cell / 6 == 1 || cell % 6 == 0));
+    }
+    notes.select(2); notes.place(9); notes.place(12);
+    assert_eq!(notes.positions[2],None); // Row and column collisions rejected.
+    notes.select(1); notes.place(13);
+    assert!(!notes.automatically_excluded(9)); assert!(notes.is_excluded(9));
+    assert!(!notes.is_excluded(6)); assert!(notes.is_excluded(19));
+    assert_eq!(notes.candidates[19],0); assert_eq!(notes.candidates[29],4);
+    notes.select(2); notes.place(24);
+    notes.select(1); notes.remove();
+    assert!(!notes.automatically_excluded(19)); assert!(notes.automatically_excluded(6));
+    assert!(notes.excluded[9]); assert_eq!(notes.candidates[19],0);
+    for cell in BLOCKED.into_iter().chain([36]) {
+        notes.cross_mode=true; notes.annotate(cell);
+        notes.cross_mode=false; notes.annotate(cell); notes.place(cell);
+        if cell < 36 {assert!(!notes.excluded[cell]);assert_eq!(notes.candidates[cell],0);assert!(!notes.is_excluded(cell));}
+    }
+    notes.positions=SOLUTION.map(Some); notes.accused=Some(1);
+    assert!(notes.ready()); assert!(!notes.correct());
+    notes.positions[0]=Some(12); assert!(!notes.ready());
+    println!("MURDOKU_OK unique_solution derived_X manual_X_preserved candidate_cleanup blocked_cells incorrect_answer_single_result");
 }
