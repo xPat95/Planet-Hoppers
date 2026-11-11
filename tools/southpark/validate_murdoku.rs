@@ -92,5 +92,17 @@ fn main() {
     p.accuse_bus_driver(DANGEROUS);
     p.confirm_bus();
     assert_eq!(p.result, Some(false));
-    println!("MURDOKU_OK exact_6x6_geometry one_solution six_positions_and_driver single_confirmation editing_and_blocked_cells");
+    assert!(!is_long_press(0.449));assert!(is_long_press(0.450));
+    let mut notes=Case::default();notes.select(1);notes.annotate(6);notes.annotate(12);
+    assert_eq!(notes.candidates[6],2);assert_eq!(notes.candidates[12],2);
+    notes.select(2);notes.annotate(6);assert_eq!(notes.candidates[6],6);
+    assert!(notes.positions.iter().all(Option::is_none));assert!(!notes.ready());
+    notes.toggle_mode();notes.annotate(6);assert!(notes.excluded[6]);assert_eq!(notes.candidates[6],6);
+    notes.annotate(6);assert!(!notes.excluded[6]);notes.toggle_mode();
+    notes.annotate(6);assert_eq!(notes.candidates[6],2);
+    notes.positions=SOLUTION.map(Some);notes.accused=Some(DANGEROUS);
+    notes.candidates=[63;36];notes.excluded=[true;36];assert!(notes.correct());
+    notes.positions[0]=Some(12);assert!(!notes.correct());
+    notes.clear();assert_eq!(notes.candidates,[0;36]);assert_eq!(notes.excluded,[false;36]);
+    println!("MURDOKU_OK unique_solution final_positions_only independent_candidates_and_X 450ms_hold single_confirmation");
 }

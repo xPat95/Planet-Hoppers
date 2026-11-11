@@ -368,7 +368,7 @@ pub fn run_visit_with_results(
             audio.stop_effects();
             if let Some(ui)=&encounters {ui.stop();}
             let es=&mut session.adventure.as_mut().unwrap().spanish;
-            let volume=if puzzle_ui.as_ref().is_some_and(|ui|ui.muted){0.}else{ike_volume};
+            let volume=ike_volume;
             if !super::chef_intro::play(&mut rl,&thread,&root,device.as_ref(),volume,es,0)? {break;}
             visits.chef_intro_seen=true;
             cursor.apply(&mut rl);
@@ -621,7 +621,7 @@ pub fn run_visit_with_results(
                         println!("ORIGINAL_BEFORE_CHEF_OK elapsed={} duration={}",entry.elapsed,entry.duration);
                     }
                     let es=&mut session.adventure.as_mut().unwrap().spanish;
-                    let volume=if puzzle_ui.as_ref().is_some_and(|ui|ui.muted){0.}else{ike_volume};
+                    let volume=ike_volume;
                     if !super::chef_intro::play(&mut rl,&thread,&root,device.as_ref(),volume,es,u8::from(chef_smoke))? {return Ok(SouthParkExit::WindowClosed);}
                     visits.chef_intro_seen=true;
                     if chef_smoke {
@@ -681,6 +681,8 @@ pub fn run_visit_with_results(
                     Action::Back=>session.leave_puzzle(),
                     Action::Mute=>ui.toggle_mute(),
                     Action::SelectBus(i)=>session.puzzle.as_mut().unwrap().select_bus_piece(i),
+                    Action::AnnotateBus(cell)=>session.puzzle.as_mut().unwrap().annotate_bus_cell(cell),
+                    Action::ToggleBusMode=>session.puzzle.as_mut().unwrap().toggle_bus_mode(),
                     Action::PlaceBus(cell)=>session.puzzle.as_mut().unwrap().place_bus_piece(cell),
                     Action::AccuseBus(i)=>session.puzzle.as_mut().unwrap().accuse_bus_driver(i),
                     Action::RemoveBus=>session.puzzle.as_mut().unwrap().remove_bus_piece(),

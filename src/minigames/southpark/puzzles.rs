@@ -495,6 +495,8 @@ impl PuzzleRun {
             }
         }
     }
+    pub fn annotate_bus_cell(&mut self,cell:usize) {if self.interactive() {if let Board::Bus(b)=&mut self.board {b.annotate(cell);}}}
+    pub fn toggle_bus_mode(&mut self) {if self.interactive() {if let Board::Bus(b)=&mut self.board {b.toggle_mode();}}}
     pub fn place_bus_piece(&mut self, cell: usize) {
         if self.interactive() {
             if let Board::Bus(b) = &mut self.board {

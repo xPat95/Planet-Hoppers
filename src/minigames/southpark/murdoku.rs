@@ -116,13 +116,27 @@ pub fn culprit(positions: &[usize; 6]) -> Option<usize> {
         None
     }
 }
-#[derive(Clone, Debug, Default)]
+pub const HOLD_SECONDS:f32=0.45;
+pub fn is_long_press(seconds:f32)->bool {seconds>=HOLD_SECONDS}
+#[derive(Clone, Debug)]
 pub struct Case {
     pub positions: [Option<usize>; 6],
     pub selected: Option<usize>,
     pub accused: Option<usize>,
+    pub candidates: [u8;36],
+    pub excluded: [bool;36],
+    pub cross_mode: bool,
+}
+impl Default for Case {
+    fn default()->Self {Self{positions:[None;6],selected:None,accused:None,candidates:[0;36],excluded:[false;36],cross_mode:false}}
 }
 impl Case {
+    pub fn annotate(&mut self,cell:usize) {
+        if cell>=36 {return;}
+        if self.cross_mode {self.excluded[cell]=!self.excluded[cell];}
+        else if valid_cell(cell) {if let Some(piece)=self.selected {self.candidates[cell]^=1<<piece;}}
+    }
+    pub fn toggle_mode(&mut self) {self.cross_mode=!self.cross_mode;}
     pub fn select(&mut self, piece: usize) {
         if piece < 6 {
             self.selected = Some(piece);

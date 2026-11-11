@@ -90,7 +90,7 @@ pub struct AudioController<'a> {
     piano_lit: Option<usize>,
     config: AudioConfig,
     mode: MusicMode,
-    background_muted: bool,
+    cartman_muted: bool,
     music_started: [bool; 3],
     voice_started: Option<Instant>,
     intro_started: Option<Instant>,
@@ -178,7 +178,7 @@ impl<'a> AudioController<'a> {
             piano_lit: None,
             config,
             mode: MusicMode::Silent,
-            background_muted: false,
+            cartman_muted: false,
             music_started: [false; 3],
             voice_started: None,
             intro_started: None,
@@ -191,7 +191,7 @@ impl<'a> AudioController<'a> {
         *self.audit.plays.entry(name.into()).or_default() += 1;
     }
     pub fn set_music(&mut self, mode: MusicMode) {
-        let mode=if self.background_muted && matches!(mode,MusicMode::Exploration|MusicMode::Challenge) {MusicMode::Silent} else {mode};
+        let mode=if self.cartman_muted && mode==MusicMode::Challenge {MusicMode::Silent} else {mode};
         if mode == self.mode {
             return;
         }
@@ -264,10 +264,10 @@ impl<'a> AudioController<'a> {
             }
         }
     }
-    /// Save Kenny's puzzle preference affects music, never functional effects/voices.
+    /// Persisted Music ON/OFF controls only Cartman's challenge song.
     pub fn set_background_muted(&mut self,muted:bool) {
-        self.background_muted=muted;
-        if muted && matches!(self.mode,MusicMode::Exploration|MusicMode::Challenge) {self.set_music(MusicMode::Silent);}
+        self.cartman_muted=muted;
+        if muted && self.mode==MusicMode::Challenge {self.set_music(MusicMode::Silent);}
     }
     /// One restart for a newly opened puzzle, not one for every frame or Start click.
     pub fn restart_challenge_music(&mut self) {
@@ -304,7 +304,7 @@ impl<'a> AudioController<'a> {
     /// Temporary multiplier; the configured user volume remains unchanged.
     pub fn duck_exploration(&self, active: bool) {
         if let Some(music) = &self.exploration {
-            music.set_volume(self.config.music_volume * if self.background_muted {0.0} else if active { 0.2 } else { 1.0 });
+            music.set_volume(self.config.music_volume * if active { 0.2 } else { 1.0 });
         }
     }
     pub fn voice_duration(&self) -> Option<f32> {
@@ -352,7 +352,7 @@ impl<'a> AudioController<'a> {
         }
     }
     pub fn play_piano_key(&self,index:usize) {
-        if self.background_muted || index>=5 {return;}
+        if index>=5 {return;}
         let sound=self.piano_keys.iter().skip(index).step_by(5).find(|s|!s.is_playing()).or_else(||self.piano_keys.get(index));
         if let Some(sound)=sound {sound.play();}
     }
@@ -360,8 +360,8 @@ impl<'a> AudioController<'a> {
         use crate::minigames::southpark::puzzles::Board;
         // Let the final pressed note finish its short envelope; pause, mute and
         // leaving still stop it immediately, and no new notes start on results.
-        if run.is_some_and(|r|matches!(r.board,Board::Piano(_)) && r.result.is_some() && r.result_time<0.45 && !r.paused && !r.leaving && !self.background_muted) {return;}
-        let piano=run.filter(|r|r.interactive() && !self.background_muted).and_then(|r|if let Board::Piano(p)=&r.board {Some(p)}else{None});
+        if run.is_some_and(|r|matches!(r.board,Board::Piano(_)) && r.result.is_some() && r.result_time<0.45 && !r.paused && !r.leaving) {return;}
+        let piano=run.filter(|r|r.interactive()).and_then(|r|if let Board::Piano(p)=&r.board {Some(p)}else{None});
         let Some(p)=piano else {for sound in &self.piano_keys {sound.stop();}self.piano_lit=None;return;};
         let next=p.lit();
         if next!=self.piano_lit {

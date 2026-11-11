@@ -112,7 +112,7 @@ impl Layout {
         self.point(p.0, p.1)
     }
     pub fn case_grid(&self)->Rectangle {
-        let side=(self.scene.height*0.72).min(self.scene.width*0.62);
+        let side=(self.scene.height*0.72).min(self.scene.width*0.48);
         Rectangle::new(self.scene.x+self.scene.width*0.035,self.scene.y+self.scene.height*0.16,side,side)
     }
     pub fn case_cell(&self,cell:usize)->Rectangle {
@@ -121,16 +121,18 @@ impl Layout {
     }
     pub fn case_panel(&self)->Rectangle {
         let g=self.case_grid();let x=g.x+g.width+20.;
-        Rectangle::new(x,self.scene.y+self.scene.height*0.16,self.scene.x+self.scene.width-x-12.,self.scene.height*0.70)
+        Rectangle::new(x,self.scene.y+self.scene.height*0.14,self.scene.x+self.scene.width-x-12.,self.scene.height*0.70)
     }
     pub fn case_card(&self,piece:usize)->Rectangle {
-        let r=self.case_panel();let w=r.width/2.;let h=self.scene.height*0.09;
-        Rectangle::new(r.x+(piece%2) as f32*w,r.y+(piece/2) as f32*(h+5.),w-5.,h)
+        let r=self.case_panel();let weights=[1.6,0.8,0.8,0.8,1.2,1.6];
+        let unit=self.scene.height*0.66/6.8;
+        Rectangle::new(r.x,r.y+weights[..piece].iter().sum::<f32>()*unit,r.width,weights[piece]*unit-1.)
     }
     pub fn case_accusation(&self,piece:usize)->Rectangle {
         let r=self.case_panel();let w=r.width/5.;
-        Rectangle::new(r.x+(piece-1) as f32*w,self.scene.y+self.scene.height*0.80,w-3.,34.)
+        Rectangle::new(r.x+(piece-1) as f32*w,self.scene.y+self.scene.height*0.86,w-3.,32.)
     }
+    pub fn case_mode(&self)->Rectangle {let g=self.case_grid();Rectangle::new(g.x,self.scene.y+self.scene.height*0.895,g.width,24.)}
     pub fn bus_remove(&self)->Rectangle {let p=self.point(0.31,0.94);Rectangle::new(p.x,p.y,self.scene.width*0.23,30.)}
     pub fn bus_clear(&self)->Rectangle {let p=self.point(0.06,0.94);Rectangle::new(p.x,p.y,self.scene.width*0.21,30.)}
     pub fn bus_confirm(&self)->Rectangle {let p=self.point(0.69,0.94);Rectangle::new(p.x,p.y,self.scene.width*0.25,30.)}
@@ -156,6 +158,8 @@ pub enum Action {
     Back,
     Mute,
     SelectBus(usize),
+    AnnotateBus(usize),
+    ToggleBusMode,
     PlaceBus(usize),
     AccuseBus(usize),
     RemoveBus,
@@ -163,6 +167,8 @@ pub enum Action {
     ConfirmBus,
 }
 pub struct PuzzleUi {
+    bus_press: Option<(usize,usize,std::time::Instant)>,
+    bus_fixed: Option<(usize,std::time::Instant)>,
     title: Font,
     body: Font,
     kenny: Texture2D,
@@ -207,6 +213,8 @@ impl PuzzleUi {
         let preference = root.join("saves/save-kenny-music.txt");
         let muted = std::fs::read_to_string(&preference).is_ok_and(|s| s.trim() == "muted");
         Ok(Self {
+            bus_press: None,
+            bus_fixed: None,
             title,
             body,
             kenny,
@@ -224,6 +232,7 @@ impl PuzzleUi {
         }
     }
     pub fn input(&mut self, rl: &RaylibHandle, s: &SaveKennySession) -> Action {
+        if !s.puzzle.as_ref().is_some_and(|p|p.interactive()) {self.bus_press=None;self.bus_fixed=None;}
         let Some(run) = &s.puzzle else {
             return Action::None;
         };
@@ -296,16 +305,31 @@ impl PuzzleUi {
             return Action::None;
         }
         if let Board::Bus(bus)=&run.board {
-            if clicked && l.bus_clear().check_collision_point_rec(mouse) {return Action::ClearBus;}
-            if rl.is_key_pressed(KeyboardKey::KEY_DELETE) || clicked && l.bus_remove().check_collision_point_rec(mouse) {return Action::RemoveBus;}
-            if bus.ready() && (rl.is_key_pressed(KeyboardKey::KEY_ENTER) || clicked && l.bus_confirm().check_collision_point_rec(mouse)) {return Action::ConfirmBus;}
+            use crate::minigames::southpark::murdoku as m;
+            if clicked && l.case_mode().check_collision_point_rec(mouse) {self.bus_press=None;return Action::ToggleBusMode;}
+            if clicked && l.bus_clear().check_collision_point_rec(mouse) {self.bus_press=None;return Action::ClearBus;}
+            if rl.is_key_pressed(KeyboardKey::KEY_DELETE) || clicked && l.bus_remove().check_collision_point_rec(mouse) {self.bus_press=None;return Action::RemoveBus;}
+            if bus.ready() && (rl.is_key_pressed(KeyboardKey::KEY_ENTER) || clicked && l.bus_confirm().check_collision_point_rec(mouse)) {self.bus_press=None;return Action::ConfirmBus;}
+            let cell=(0..36).find(|i|l.case_cell(*i).check_collision_point_rec(mouse));
             if clicked {
+                self.bus_press=None;
                 if let Some(i)=(0..6).find(|i|l.case_card(*i).check_collision_point_rec(mouse)) {return Action::SelectBus(i);}
                 if let Some(i)=(1..6).find(|i|l.case_accusation(*i).check_collision_point_rec(mouse)) {return Action::AccuseBus(i);}
-                if let Some(cell)=(0..36).find(|i|l.case_cell(*i).check_collision_point_rec(mouse)) {
-                    if let Some(piece)=bus.positions.iter().position(|c|*c==Some(cell)) {return Action::SelectBus(piece);}
-                    return Action::PlaceBus(cell);
+                if let Some(c)=cell {
+                    if bus.cross_mode {return Action::AnnotateBus(c);}
+                    if let Some(piece)=bus.selected {if m::valid_cell(c) {self.bus_press=Some((c,piece,std::time::Instant::now()));}}
+                    else if let Some(piece)=bus.positions.iter().position(|p|*p==Some(c)) {return Action::SelectBus(piece);}
                 }
+            }
+            if let Some((c,piece,start))=self.bus_press {
+                let released=rl.is_mouse_button_released(MouseButton::MOUSE_BUTTON_LEFT);
+                if cell!=Some(c) || bus.selected!=Some(piece) || (!released && !rl.is_mouse_button_down(MouseButton::MOUSE_BUTTON_LEFT)) {self.bus_press=None;}
+                else if m::is_long_press(start.elapsed().as_secs_f32()) {
+                    self.bus_press=None;
+                    if !bus.positions.iter().enumerate().any(|(i,p)|i!=piece && *p==Some(c)) {
+                        self.bus_fixed=Some((c,std::time::Instant::now()));return Action::PlaceBus(c);
+                    }
+                } else if released {self.bus_press=None;return Action::AnnotateBus(c);}
             }
             return Action::None;
         }
@@ -1008,16 +1032,46 @@ impl PuzzleUi {
         }
         d.draw_rectangle_lines_ex(grid,4.,INK);
         for (piece,cell) in bus.positions.iter().enumerate() {if let Some(cell)=cell {let r=l.case_cell(*cell);self.case_token(d,piece,Rectangle::new(r.x+4.,r.y+4.,size-8.,size-8.),bus.selected==Some(piece));}}
-        for piece in 0..6 {
-            let r=l.case_card(piece);paper(d,r,if bus.selected==Some(piece){GOLD}else{PAPER},INK);
-            self.case_token(d,piece,Rectangle::new(r.x+2.,r.y+2.,r.height-4.,r.height-4.),false);
-            self.wrap(d,m::name(piece,es),Vector2::new(r.x+r.height,r.y+5.),r.width-r.height-4.,17.,INK);
+        // Pencil marks are smaller outlined letters, never full-size final tokens.
+        for cell in 0..36 {
+            let r=l.case_cell(cell);
+            for piece in 0..6 {if bus.candidates[cell]&(1<<piece)!=0 {
+                let c=Vector2::new(r.x+size*(0.18+(piece%3) as f32*0.30),r.y+size*(0.58+(piece/3) as f32*0.28));
+                let radius=(size*0.12).max(7.);d.draw_circle_v(c,radius,PAPER.alpha(0.9));
+                d.draw_circle_lines(c.x as i32,c.y as i32,radius,INK);
+                self.text(d,["K","A","B","C","D","E"][piece],c-Vector2::new(radius*0.55,radius*0.9),(radius*1.65).max(12.),INK);
+            }}
+            if bus.excluded[cell] {
+                let inset=size*0.17;
+                d.draw_line_ex(Vector2::new(r.x+inset,r.y+inset),Vector2::new(r.x+size-inset,r.y+size-inset),3.,INK.alpha(0.8));
+                d.draw_line_ex(Vector2::new(r.x+size-inset,r.y+inset),Vector2::new(r.x+inset,r.y+size-inset),3.,INK.alpha(0.8));
+            }
         }
-        let panel=l.case_panel();let clue=Rectangle::new(panel.x,b.y+b.height*0.48,panel.width,b.height*0.245);
-        paper(d,clue,PAPER,BROWN);
-        let explanation=bus.selected.map_or(if es{"Elige una ficha para leer su pista. Pulsa una casilla para colocarla."}else{"Select a token to read its clue. Click a cell to place it."},|i|m::clue(i,es));
-        self.wrap(d,explanation,Vector2::new(clue.x+8.,clue.y+8.),clue.width-16.,if l.width<1100. {19.}else{21.},INK);
-        self.text(d,&tr(es,"Dangerous driver?","¿Chofer peligroso?"),Vector2::new(panel.x,b.y+b.height*0.75),20.,INK);
+        if run.interactive() {
+            if let Some((cell,_,start))=self.bus_press {
+                let r=l.case_cell(cell);let t=(start.elapsed().as_secs_f32()/m::HOLD_SECONDS).min(1.);
+                d.draw_ring(Vector2::new(r.x+size*0.5,r.y+size*0.5),size*0.39,size*0.44,-90.,-90.+360.*t,40,GOLD);
+            }
+            if let Some((cell,at))=self.bus_fixed {if at.elapsed().as_secs_f32()<0.35 {d.draw_rectangle_lines_ex(l.case_cell(cell),4.,GOLD);}}
+        }
+        for piece in 0..6 {
+            let r=l.case_card(piece);paper(d,r,if bus.selected==Some(piece){Color::new(250,236,193,255)}else{PAPER},if bus.selected==Some(piece){GOLD}else{BROWN});
+            self.case_token(d,piece,Rectangle::new(r.x+3.,r.y+1.,18.,18.),false);
+            self.text(d,m::name(piece,es),Vector2::new(r.x+25.,r.y+1.),16.,INK);
+            let mut font=if l.width<1100. {18.0}else{20.0};
+            loop {
+                let mut lines=1;let mut row=String::new();
+                for word in m::clue(piece,es).split_whitespace() {
+                    let next=if row.is_empty(){word.into()}else{format!("{row} {word}")};
+                    if self.body.measure_text(&next,font,0.4).x>r.width-12. && !row.is_empty() {lines+=1;row=word.into();}else{row=next;}
+                }
+                if lines as f32*font*1.22<=r.height-21. || font<=16. {break;}font-=0.5;
+            }
+            self.wrap(d,m::clue(piece,es),Vector2::new(r.x+6.,r.y+19.),r.width-12.,font,INK);
+        }
+        let panel=l.case_panel();
+        self.button(d,l.case_mode(),&tr(es,if bus.cross_mode {"Mode: X (click to mark)"}else{"Mode: pencil / hold to fix"},if bus.cross_mode {"Modo: X (clic para marcar)"}else{"Modo: lápiz / mantén para fijar"}),mouse,false,if bus.cross_mode {GOLD}else{PAPER},run.interactive());
+        self.text(d,&tr(es,"Dangerous driver?","¿Chofer peligroso?"),Vector2::new(panel.x,b.y+b.height*0.815),19.,INK);
         for piece in 1..6 {let r=l.case_accusation(piece);paper(d,r,if bus.accused==Some(piece){GOLD}else{PAPER},INK);self.case_token(d,piece,Rectangle::new(r.x+(r.width-r.height)*0.5,r.y,r.height,r.height),false);}
         for (r,label,enabled) in [(l.bus_clear(),tr(es,"Clear board","Vaciar tablero"),true),(l.bus_remove(),tr(es,"Remove token","Retirar ficha"),bus.selected.is_some()),(l.bus_confirm(),tr(es,"Confirm","Confirmar"),bus.ready())] {
             self.button(d,r,&label,mouse,false,if enabled{PAPER}else{Color::new(205,202,191,255)},run.interactive()&&enabled);
@@ -1881,7 +1935,7 @@ fn instructions(k: ThreatKind, es: bool) -> String {
     match k {
     ThreatKind::Snowman=>tr(es,"Click to rotate each cable. Connect the + source to all 3 heaters before Kenny freezes.\nYou have 30 seconds.","Gira los cables con un clic. Conecta la fuente + a los 3 calefactores antes de que Kenny se congele.\nTienes 30 segundos."),
     ThreatKind::Ufo=>tr(es,"Press A, S or D as the shrinking ring meets its circle.\n20 targets. PERFECT: 100 points; GOOD: 60. Keep the beam below 100%.","Pulsa A, S o D cuando el anillo coincida con su círculo.\n20 objetivos. PERFECTO: 100 puntos; BIEN: 60. Evita que el rayo llegue al 100%."),
-    ThreatKind::Bus=>tr(es,"One token per row and column. Read all six clues. Buildings, kiosks and planter block cells. Choose the dangerous driver; confirm once.","Una ficha por fila y columna. Lee las seis pistas. Edificios, quioscos y jardinera bloquean casillas. Elige al chofer peligroso; confirma una vez."),
+    ThreatKind::Bus=>tr(es,"One final token per row and column. Click: candidate. Hold 0.45 s: fix. X: discard. Buildings, kiosks and planter block cells. Confirm once.","Una ficha fija por fila y columna. Clic: candidato. Mantén 0,45 s: fijar. X: descarte. Edificios, quioscos y jardinera bloquean. Confirma una vez."),
     ThreatKind::Piano=>tr(es,"Watch and listen, then repeat the notes. Eight rounds at a steady tempo.\nOne mistake per round is allowed. A second drops the piano.","Observa y escucha, luego repite las notas. Ocho rondas al mismo ritmo.\nPuedes fallar una vez por ronda. Al segundo error cae el piano."),
     ThreatKind::Sewer=>tr(es,"Click each lid when its shrinking ring meets the rim.\n12 lids, three faster stages. Early clicks bounce open. Save Kenny before he steps in!","Pulsa cada tapa cuando el anillo coincida con su borde.\n12 tapas, tres tramos cada vez más rápidos. Si te adelantas, rebota y se abre."),
 }
@@ -1898,7 +1952,7 @@ fn short_instructions(k: ThreatKind, es: bool) -> String {
             "A / S / D when rings meet.\n20 targets. Keep beam below 100%.",
             "A / S / D al coincidir los anillos.\n20 objetivos. Rayo por debajo del 100%.",
         ),
-        ThreatKind::Bus => tr(es,"One token per row and column. Read all six clues. Buildings, kiosks and planter are blocked. Choose a driver; confirm once.","Una ficha por fila y columna. Lee las seis pistas. Edificios, quioscos y jardinera bloquean. Elige un chofer; confirma una vez."),
+        ThreatKind::Bus => tr(es,"One final token per row/column. Click: note. Hold 0.45 s: fix. X: discard. Buildings, kiosks, planter: blocked.","Una ficha fija por fila/columna. Clic: nota. Mantén 0,45 s: fijar. X: descarte. Edificios, quioscos y jardinera: bloqueados."),
         ThreatKind::Piano => tr(
             es,
             "Watch, listen, repeat.\n8 rounds, same tempo.\nSecond error in a round: defeat.",
