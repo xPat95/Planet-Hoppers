@@ -70,8 +70,10 @@ pub fn run_visit_with_results(
     let mut dev_threats = false;
     let mut muted = false;
     let mut ike_smoke = false;
+    let mut encounter_smoke = false;
     while let Some(arg) = args.next() {
         match arg.as_str() {
+            "--smoke-encounters" => { encounter_smoke = true; no_probes = true; }
             "--smoke-ike" => { ike_smoke = true; no_probes = true; }
             "--smoke-return" => {
                 return_smoke_goal = Some(match args.next().as_deref() {
@@ -165,7 +167,7 @@ pub fn run_visit_with_results(
         .build();
     rl.set_exit_key(None);
     rl.set_window_min_size(640, 480);
-    if smoke || session_smoke || entry_smoke || ike_smoke || return_smoke_goal.is_some() {
+    if smoke || session_smoke || entry_smoke || ike_smoke || encounter_smoke || return_smoke_goal.is_some() {
         rl.set_window_state(WindowState::default().set_window_hidden(true));
     }
     // The session smoke uses the real audio clock, so do not exhaust its frame
@@ -209,6 +211,12 @@ pub fn run_visit_with_results(
         session.enable_world(locations, seed);
         session.place_kenny_near_player(&mut scene)?;
     }
+    let mut encounters = if dynamic_mode && !session_smoke && !ike_smoke && !entry_smoke && return_smoke_goal.is_none() {
+        let mut adventure = crate::minigames::southpark::encounters::Adventure::build(&scene, &session.locations.as_ref().unwrap().sites)?;
+        let ui = super::encounter_ui::EncounterUi::load(&mut rl, &thread, &root, device.as_ref(), ike_volume, &mut adventure)?;
+        session.adventure = Some(adventure);
+        Some(ui)
+    } else { None };
     let mut world_map = WorldMap::load(&mut rl, &thread, &root, &scene)?;
     unsafe {
         ffi::rlSetClipPlanes(0.05, 1500.0);
@@ -265,6 +273,7 @@ pub fn run_visit_with_results(
         SouthParkEntry::new(visits, entry_config.clone(), audio.intro_duration(), &scene)?;
     entry.active = !smoke && !session_smoke && !dev_threats;
     if ike_smoke { entry.active = false; }
+    if encounter_smoke { entry.active = false; }
     let mut video = if entry.active && entry.full_intro {
         Some(VideoIntro::load(&mut rl, &thread, &root)?)
     } else { None };
@@ -350,6 +359,50 @@ pub fn run_visit_with_results(
             if frame == 575 { session.start(&mut scene, seed)?; }
         }
         audio.update();
+        if encounter_smoke {
+            if frame < 10 {
+                let a = session.adventure.as_mut().ok_or("Encounter smoke requires adventure")?;
+                let group = (frame / 2) as usize;
+                scene.player.feet = a.groups[group].positions[0] + Vector3::new(-3.0,0.0,0.0);
+                scene.player.yaw = 0.0;
+                scene.player.pitch = 0.0;
+                a.spanish = frame % 2 == 1;
+                a.dialogue = Some((group, if frame % 2 == 1 && group != 0 && group != 2 { if group == 4 { 2 } else { 1 } } else { 0 }));
+            }
+            if frame == 10 {
+                session.adventure.as_mut().unwrap().dialogue = None;
+                session.open_map();
+            }
+            if frame == 12 {
+                session.continue_match(&mut scene)?;
+                scene.player.feet = session.adventure.as_ref().unwrap().groups[0].positions[0] + Vector3::new(-3.0,0.0,0.0);
+                cursor.captured = true;
+                cursor.apply(&mut rl);
+            }
+            if frame == 14 || frame == 16 {
+                let a = session.adventure.as_ref().unwrap();
+                if a.dialogue != Some((0,if frame == 14 {0} else {1})) {
+                    return Err("Encounter E input skipped or failed a line".into());
+                }
+                let start = a.groups[0].positions[0] + Vector3::new(-3.0,0.0,0.0);
+                if (scene.player.feet-start).length()>0.001 { return Err("Encounter failed to freeze movement".into()); }
+            }
+            for (key,down) in match frame {
+                13 | 15 => vec![(KeyboardKey::KEY_E,true)],
+                14 => vec![(KeyboardKey::KEY_E,false),(KeyboardKey::KEY_W,true)],
+                16 => vec![(KeyboardKey::KEY_E,false),(KeyboardKey::KEY_W,false)],
+                19 => vec![(KeyboardKey::KEY_ESCAPE,true)],
+                20 => vec![(KeyboardKey::KEY_ESCAPE,false)],
+                _ => vec![],
+            } {
+                unsafe { ffi::PlayAutomationEvent(ffi::AutomationEvent { frame:0,type_:if down {2} else {1},params:[key as i32,0,0,0] }); }
+            }
+            if frame == 17 || frame == 18 {
+                unsafe { ffi::PlayAutomationEvent(ffi::AutomationEvent { frame:0,type_:if frame==17 {6} else {5},params:[0,0,0,0] }); }
+            }
+            if frame == 18 && session.adventure.as_ref().unwrap().dialogue != Some((0,2)) { return Err("Encounter click did not advance".into()); }
+            if frame == 21 && (session.state != SessionState::Exploring || session.adventure.as_ref().unwrap().dialogue.is_some()) { return Err("Encounter close did not restore exploration".into()); }
+        }
         if let Some(test) = &mut return_test {
             test.before_frame(&rl, &mut scene, &session, &return_confirmation, entry.active)?;
         }
@@ -469,6 +522,7 @@ pub fn run_visit_with_results(
             && session.state == SessionState::Exploring
             && scene.dialogue == KennyDialogue::Closed
             && rl.is_key_pressed(KeyboardKey::KEY_BACKSPACE)
+            && !session.blocks_controls()
         {
             session.pause();
             return_confirmation.request();
@@ -477,8 +531,12 @@ pub fn run_visit_with_results(
         let session_was_modal = session.blocks_controls();
         let was_paused = session.state == SessionState::Paused;
         let had_dialogue = scene.dialogue != KennyDialogue::Closed;
+        let encounter_was_open = session.adventure.as_ref().is_some_and(|a| a.dialogue.is_some());
+        if !intro_was_active {
+            if let Some(ui) = &mut encounters { ui.update(&rl, &mut scene, &mut session); }
+        }
         let map_was_open = session.state == SessionState::MapOpen;
-        if !smoke && !intro_was_active && !had_dialogue {
+        if !smoke && !intro_was_active && !had_dialogue && !encounter_was_open {
             if map_was_open {
                 world_map.input(&rl, scene.player.feet);
                 if rl.is_key_pressed(KeyboardKey::KEY_M)
@@ -493,7 +551,7 @@ pub fn run_visit_with_results(
         reporter.observe(&session, observer)?;
         let map_consumed = map_was_open || session.state == SessionState::MapOpen;
         let mut restarted = false;
-        if !smoke && !intro_was_active && !map_consumed && !had_dialogue {
+        if !smoke && !intro_was_active && !map_consumed && !had_dialogue && !encounter_was_open {
             let action = session_ui::input(&rl, &session, &return_confirmation);
             let result = match action {
                 SessionAction::Continue => session.continue_match(&mut scene),
@@ -609,7 +667,7 @@ pub fn run_visit_with_results(
             running_read |= input.forward > 0.0 && input.sprint;
         }
         let old_yaw = scene.player.yaw;
-        let focused = smoke || session_smoke || ike_smoke || return_test.is_some() || rl.is_window_focused();
+        let focused = smoke || session_smoke || ike_smoke || encounter_smoke || return_test.is_some() || rl.is_window_focused();
         let active = !modal_at_start && cursor.update(&mut rl, &mut input, focused);
         let previous_feet = scene.player.feet;
         if active {
@@ -630,7 +688,7 @@ pub fn run_visit_with_results(
             0.0
         };
         audio.set_paused(session.state == SessionState::Paused);
-        if intro_was_active || restarted || (was_paused && session.state != SessionState::Paused) {
+        if intro_was_active || encounter_was_open || restarted || (was_paused && session.state != SessionState::Paused) {
             // Freeze world simulation until the FPS handoff, including Kenny.
         } else if smoke {
             scene.update_kenny(dt);
@@ -796,7 +854,13 @@ pub fn run_visit_with_results(
         } else {
             None
         };
-        if active && input.interact {
+        let nearby_encounter = if !ike.playing && session.state == SessionState::Exploring && scene.dialogue == KennyDialogue::Closed {
+            session.adventure.as_ref().and_then(|a| a.nearby(&scene))
+        } else { None };
+        if active && input.interact && nearby_encounter.is_some() && !(ike_index.is_some() && selected == ike_index) {
+            session.adventure.as_mut().unwrap().dialogue = Some((nearby_encounter.unwrap(), 0));
+            if let Some(ui) = &mut encounters { ui.sync_audio(&session); }
+        } else if active && input.interact {
             if let Some(index) = selected {
                 if Some(index) == ike_index {
                     if ike.begin() {
@@ -805,6 +869,9 @@ pub fn run_visit_with_results(
                             Err(error) => { eprintln!("IKE_VIDEO_WARNING {error}"); ike.finish(); }
                         }
                     }
+                } else if index == kenny_index && session.adventure.is_some() {
+                    let a = session.adventure.as_ref().unwrap();
+                    scene.confirmation = Some((a.text("Find the ! markers to help Kenny.","Busca los marcadores ! para ayudar a Kenny.").into(),3.0));
                 } else { scene.interact(index); }
             }
         }
@@ -915,6 +982,7 @@ pub fn run_visit_with_results(
                         }
                     }
                     threat_models.draw(&mut view, camera.position, &scene.threats);
+                    if let (Some(ui), Some(a)) = (&encounters, &session.adventure) { ui.world(&mut view, camera, a); }
                     if scene.threats.visible_kenny() {
                         sprite.draw(&mut view, &pose);
                     }
@@ -932,6 +1000,7 @@ pub fn run_visit_with_results(
                     && !dev_threats
                     && session.state == SessionState::Exploring
                     && scene.dialogue == KennyDialogue::Closed
+                    && session.adventure.is_none()
                 {
                     d.draw_text(
                         "E: hablar | M: mapa | Retroceso: salir de South Park",
@@ -958,7 +1027,10 @@ pub fn run_visit_with_results(
                     d.draw_line(width / 2 - 7, height / 2, width / 2 + 7, height / 2, color);
                     d.draw_line(width / 2, height / 2 - 7, width / 2, height / 2 + 7, color);
                     if let Some(index) = selected {
-                        let text = if Some(index) == ike_index {
+                        let text = if let Some(a) = session.adventure.as_ref().filter(|_| Some(index) != ike_index) {
+                            if index == kenny_index { a.text("[E] Talk to Kenny","[E] Hablar con Kenny").into() }
+                            else { a.text("[E] Use","[E] Usar").into() }
+                        } else if Some(index) == ike_index {
                             "[E] Hablar con Ike".into()
                         } else if index == kenny_index {
                             "[E] Hablar con Kenny".into()
@@ -984,7 +1056,7 @@ pub fn run_visit_with_results(
                 {
                     d.draw_rectangle(0, height / 2 - 30, width, 60, Color::new(20, 30, 40, 210));
                     d.draw_text(
-                        "Cursor libre - pulsa ESC para retomar",
+                        if session.adventure.as_ref().is_some_and(|a| !a.spanish) { "Cursor free - press ESC to resume" } else { "Cursor libre - pulsa ESC para retomar" },
                         (width - 480) / 2,
                         height / 2 - 10,
                         24,
@@ -1008,6 +1080,8 @@ pub fn run_visit_with_results(
                     d.draw_text(
                         if smoke {
                             "WASD caminar | Shift correr | Mouse mirar | E interactuar | ESC cursor"
+                        } else if session.adventure.as_ref().is_some_and(|a| !a.spanish) {
+                            "WASD: move | Mouse: look | E: use"
                         } else {
                             "WASD: mover | Mouse: mirar | E: usar"
                         },
@@ -1019,6 +1093,8 @@ pub fn run_visit_with_results(
                     d.draw_text(
                         if smoke {
                             "F1 ayuda | F2 colisiones | F3 Kenny | F12 captura | Ctrl+Q salir"
+                        } else if session.adventure.as_ref().is_some_and(|a| !a.spanish) {
+                            "Shift: run | M: map | Esc/P: pause"
                         } else {
                             "Shift: correr | M: mapa | Esc/P: pausa"
                         },
@@ -1058,6 +1134,10 @@ pub fn run_visit_with_results(
                 }
                 if !entry.active && scene.dialogue == KennyDialogue::Closed {
                     world_map.draw(&mut d, &scene, &session, width, height);
+                }
+                if !entry.active { if let Some(ui) = &encounters { ui.draw(&mut d, &scene, &session, width, height); } }
+                if encounter_smoke && [0,3,7,9,10].contains(&frame) {
+                    save_frame(&root.join(format!("target/encounter-{frame}.png")),width,height)?;
                 }
                 if help && scene.confirmation.is_none() && (dev_threats || smoke) && !session.in_match()
                 {
@@ -1162,6 +1242,7 @@ pub fn run_visit_with_results(
             scene.player.pitch = 0.0;
         }
         frame += 1;
+        if encounter_smoke && frame >= 22 { println!("ENCOUNTERS_SMOKE_OK eight_portraits bilingual_dialogues world_render E_first_line click_advance movement_frozen close"); break; }
         if ike_smoke && frame >= 600 {
             println!("IKE_SMOKE_OK raycast playback movement completion repeat challenge_cleanup");
             break;

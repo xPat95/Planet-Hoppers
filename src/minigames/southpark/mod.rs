@@ -7,6 +7,7 @@ use crate::minigames::common::{
 use raylib::prelude::Vector3;
 use serde::Deserialize;
 use std::path::Path;
+pub mod encounters;
 pub mod kenny;
 pub mod ike;
 pub mod locations;

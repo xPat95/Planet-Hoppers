@@ -121,7 +121,11 @@ impl SpriteBillboard {
     }
     fn load_image(rl: &mut RaylibHandle, thread: &RaylibThread, path: &Path, height: f32, trim: bool)
         -> Result<Self, Box<dyn std::error::Error>> {
-        let mut image = Image::load_image(path.to_str().ok_or("Invalid sprite PNG path")?)?;
+        let image = Image::load_image(path.to_str().ok_or("Invalid sprite PNG path")?)?;
+        Self::from_image(rl, thread, image, height, trim)
+    }
+    pub fn from_image(rl: &mut RaylibHandle, thread: &RaylibThread, mut image: Image, height: f32, trim: bool)
+        -> Result<Self, Box<dyn std::error::Error>> {
         if trim { image.alpha_crop(0.125); }
         let (pixel_width, pixel_height) = (image.width() as usize, image.height() as usize);
         let alpha: Vec<_> = image.get_image_data().iter().map(|p| p.a).collect();
