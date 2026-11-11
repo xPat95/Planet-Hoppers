@@ -48,17 +48,16 @@ pub(super) fn run_with_args(mut args: impl Iterator<Item = String>) -> Result<()
     }
     let manifest_path = root.join("assets/models/minigames/minecraft/minecraft_village.scene.json");
     let mut scene = MinecraftScene::load(&manifest_path, MinecraftConfig::load(&config_path)?)?;
-    let (mut rl, thread) = raylib::init()
-        .size(1280, 800)
-        .resizable()
-        .title("Planet-Hoppers | Minecraft | DIAMOND RUSH")
-        .build();
+    let (mut rl, thread) = crate::graphics::window::build(
+        raylib::init()
+            .size(1280, 800)
+            .resizable()
+            .title("Planet-Hoppers | Minecraft | DIAMOND RUSH"),
+        test,
+    );
     rl.set_exit_key(None);
     rl.set_window_min_size(800, 600);
     rl.set_target_fps(if test { 0 } else { 120 });
-    if test {
-        rl.set_window_state(WindowState::default().set_window_hidden(true));
-    }
     unsafe {
         ffi::rlSetClipPlanes(0.05, 220.0);
     }

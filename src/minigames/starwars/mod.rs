@@ -187,15 +187,14 @@ pub fn run_with_results(
     if capture || smoke {
         std::fs::create_dir_all(&captures)?;
     }
-    let (mut rl, thread) = raylib::init()
-        .size(1280, 800)
-        .title("Planet Hoppers | Asalto al nucleo - Vuelo libre")
-        .resizable()
-        .msaa_4x()
-        .build();
-    if smoke_hidden || capture || check_startup || check_ships || check_menus {
-        rl.set_window_state(WindowState::default().set_window_hidden(true));
-    }
+    let (mut rl, thread) = crate::graphics::window::build(
+        raylib::init()
+            .size(1280, 800)
+            .title("Planet Hoppers | Asalto al nucleo - Vuelo libre")
+            .resizable()
+            .msaa_4x(),
+        smoke_hidden || capture || check_startup || check_ships || check_menus,
+    );
     rl.set_exit_key(None);
     rl.set_window_min_size(960, 600);
     rl.set_target_fps(60);
@@ -470,9 +469,6 @@ pub fn run_with_results(
         }
         let dt = rl.get_frame_time().clamp(0.0, 0.1);
         ambient += dt;
-        if pressed.contains(&KeyboardKey::KEY_F11) {
-            rl.toggle_borderless_windowed();
-        }
         if capture {
             if capture_frame == 0 {
                 if !(8..10).contains(&capture_stage) {

@@ -63,18 +63,17 @@ pub fn run_visit(
     let root = project_root.join("assets/minigames/regularshow");
     let captures = project_root.join("target/regularshow");
     std::fs::create_dir_all(&captures)?;
-    let (mut rl, thread) = raylib::init()
-        .size(1280, 720)
-        .resizable()
-        .title("Regular Show: El Martillo")
-        .build();
+    let (mut rl, thread) = crate::graphics::window::build(
+        raylib::init()
+            .size(1280, 720)
+            .resizable()
+            .title("Regular Show: El Martillo"),
+        smoke,
+    );
     rl.set_exit_key(None);
     // JPEG decoding happens continuously during cinematics.
     rl.set_trace_log(TraceLogLevel::LOG_WARNING);
     rl.set_window_min_size(960, 540);
-    if smoke {
-        rl.set_window_state(WindowState::default().set_window_hidden(true));
-    }
     rl.set_target_fps(if smoke { 0 } else { 60 });
     let mut canvas = rl.load_render_texture(&thread, WIDTH as u32, HEIGHT as u32)?;
     canvas

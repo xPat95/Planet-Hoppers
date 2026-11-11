@@ -390,19 +390,18 @@ fn view(
     let mut hangar_elapsed = 0.0f32;
     let mut morph: Option<f32> = None;
     let mut close_focus: Option<Camera3D> = None;
-    let (mut rl, thread) = raylib::init()
-        .size(1280, 800)
-        .resizable()
-        .msaa_4x()
-        .title("Planet Hoppers")
-        .build();
+    let (mut rl, thread) = crate::graphics::window::build(
+        raylib::init()
+            .size(1280, 800)
+            .resizable()
+            .msaa_4x()
+            .title("Planet Hoppers"),
+        smoke_goal.is_some(),
+    );
     rl.set_exit_key(None);
     rl.set_window_min_size(960, 640);
     rl.enable_cursor();
     rl.set_target_fps(if smoke_goal.is_some() { 0 } else { 60 });
-    if smoke_goal.is_some() {
-        rl.set_window_state(WindowState::default().set_window_hidden(true));
-    }
     let sky = Sky::new();
     let intro_backdrop = rl.load_texture(
         &thread,

@@ -27,17 +27,16 @@ pub fn run_with_results(args: impl Iterator<Item = String>, observer: &mut crate
     let root = Path::new(env!("CARGO_MANIFEST_DIR"));
     let frames = Frames::load(&root.join(VIDEO))?;
     let first = frames.image(0)?;
-    let (mut rl, thread) = raylib::init()
-        .size(1280, 800)
-        .resizable()
-        .title("Planet-Hoppers | Smiling Friends")
-        .build();
+    let (mut rl, thread) = crate::graphics::window::build(
+        raylib::init()
+            .size(1280, 800)
+            .resizable()
+            .title("Planet-Hoppers | Smiling Friends"),
+        smoke,
+    );
     rl.set_exit_key(None);
     rl.set_window_min_size(640, 360);
     rl.set_target_fps(60);
-    if smoke {
-        rl.set_window_state(WindowState::default().set_window_hidden(true));
-    }
     let mut texture = rl.load_texture_from_image(&thread, &first)?;
     texture.set_texture_filter(&thread, TextureFilter::TEXTURE_FILTER_BILINEAR);
     let font = rl.load_font_ex(&thread, &root.join("assets/fonts/Bungee-Regular.ttf").to_string_lossy(), 64, None)?;

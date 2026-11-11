@@ -11,3 +11,4 @@ pub mod ship_placeholder;
 pub mod ship_presentation;
 pub mod space;
 pub mod threats;
+pub mod window;

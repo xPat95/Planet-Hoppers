@@ -169,17 +169,16 @@ fn run_inner(args: Vec<String>, visits: &mut MinecraftVisits, observer: &mut cra
         &path,
         MinecraftConfig::load(&root.join("config/minecraft-dev.json"))?,
     )?;
-    let (mut rl, thread) = raylib::init()
-        .size(1280, 800)
-        .resizable()
-        .title("Planet-Hoppers | Minecraft | DIAMOND RUSH")
-        .build();
+    let (mut rl, thread) = crate::graphics::window::build(
+        raylib::init()
+            .size(1280, 800)
+            .resizable()
+            .title("Planet-Hoppers | Minecraft | DIAMOND RUSH"),
+        test,
+    );
     rl.set_exit_key(None);
     rl.set_window_min_size(800, 600);
     rl.set_target_fps(if test { 0 } else { 120 });
-    if test {
-        rl.set_window_state(WindowState::default().set_window_hidden(true));
-    }
     unsafe {
         ffi::rlSetClipPlanes(0.05, 240.0);
     }

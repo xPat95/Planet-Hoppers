@@ -157,17 +157,16 @@ pub fn run_visit_with_results(
     if dynamic_mode {
         scene.kenny_hint = false;
     }
-    let (mut rl, thread) = raylib::init()
-        .size(1280, 800)
-        .resizable()
-        .msaa_4x()
-        .title("Planet-Hoppers | South Park | SAVE KENNY!")
-        .build();
+    let (mut rl, thread) = crate::graphics::window::build(
+        raylib::init()
+            .size(1280, 800)
+            .resizable()
+            .msaa_4x()
+            .title("Planet-Hoppers | South Park | SAVE KENNY!"),
+        smoke || session_smoke || entry_smoke || ike_smoke || return_smoke_goal.is_some(),
+    );
     rl.set_exit_key(None);
     rl.set_window_min_size(640, 480);
-    if smoke || session_smoke || entry_smoke || ike_smoke || return_smoke_goal.is_some() {
-        rl.set_window_state(WindowState::default().set_window_hidden(true));
-    }
     // The session smoke uses the real audio clock, so do not exhaust its frame
     // budget faster than the combined voice file can physically play.
     rl.set_target_fps(if session_smoke || entry_smoke || return_smoke_goal.is_some() {

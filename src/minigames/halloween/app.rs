@@ -62,13 +62,16 @@ pub fn run_visit(root: &Path, args: impl Iterator<Item = String>, observer: &mut
     if smoke {
         std::fs::create_dir_all(&captures)?;
     }
-    let (mut rl, thread) = raylib::init().size(1280, 720).resizable().title("Hexbound").build();
+    let (mut rl, thread) = crate::graphics::window::build(
+        raylib::init()
+            .size(1280, 720)
+            .resizable()
+            .title("Hexbound"),
+        smoke,
+    );
     rl.set_exit_key(None);
     rl.set_trace_log(TraceLogLevel::LOG_WARNING);
     rl.set_window_min_size(960, 540);
-    if smoke {
-        rl.set_window_state(WindowState::default().set_window_hidden(true));
-    }
     rl.set_target_fps(if smoke { 0 } else { 60 });
     let mut art = Art::load(&mut rl, &thread, root)?;
     // Sin dispositivo de audio, el juego sigue en silencio; la prueba automática va muda

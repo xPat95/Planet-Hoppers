@@ -709,17 +709,16 @@ fn station_ship_radius(s: &Session, model: &Option<SpaceModel>) -> f32 {
 
 /// Una ventana del sistema solar, hasta salir del juego o ir a un minijuego.
 fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::error::Error>> {
-    let (mut rl, thread) = raylib::init()
-        .size(1280, 800)
-        .resizable()
-        .msaa_4x()
-        .title("Planet-Hoppers | Sistema solar")
-        .build();
+    let (mut rl, thread) = crate::graphics::window::build(
+        raylib::init()
+            .size(1280, 800)
+            .resizable()
+            .msaa_4x()
+            .title("Planet-Hoppers | Sistema solar"),
+        smoke,
+    );
     rl.set_exit_key(None);
     rl.set_window_min_size(640, 480);
-    if smoke {
-        rl.set_window_state(WindowState::default().set_window_hidden(true));
-    }
     rl.set_target_fps(60);
     // El audio del sistema solar: se cierra al salir de esta ventana (los minijuegos abren el suyo). El crescendo suena
     // mientras se carga todo

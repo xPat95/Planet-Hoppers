@@ -11,7 +11,7 @@ Ejecutar `cargo run --release`, elegir una nave y acercarse al planeta Star Wars
 - Shift: turbo. P: pausa y reanudación. Enter continúa desde pausa.
 - R: reiniciar desde el video inicial y volver al menú. Desde Misión cumplida, Enter/R reinicia directamente el vuelo con la misma nave.
 - Esc: regresar al sistema solar (Victory desde Misión cumplida; Defeat desde derrota; Abandoned durante el intento).
-- F11: pantalla completa. F12: captura en `target/starwars/capturas/`.
+- El juego se mantiene a pantalla completa. F12: captura en `target/starwars/capturas/`.
 - Cerrar la ventana con X mantiene el contrato general de salida del juego principal.
 
 El video final termina en la pantalla **Misión cumplida** y espera la elección del jugador. Enter/R o clic en **Volver a jugar** inicia una misión nueva con la misma nave, integridad completa, reactor restaurado, disparos y puntuación reiniciados. Esc o clic en **Regresar al sistema solar** devuelve Victory. La victoria ya registrada se conserva aunque se juegue otra vez y después se pierda o abandone; una nueva victoria no duplica el token ni el desbloqueo. La canción se limita al vuelo/explosión y respeta la pausa. Se conservan tres barras de integridad, disparos manuales, cuatro ataques desde popa, obstáculos industriales y seis discos blindados completos, cada uno con tres paneles independientes. La ruta se acorta de 2500 a 2060 m (18 %), con 20 tandas industriales en lugar de 26 y la misma velocidad de vuelo. Dos discos aparecen después de la mitad del recorrido (1100 y 1420 m); los cuatro de la aproximación final están en 1690, 1770, 1835 y 1900 m. Las posiciones son irregulares pero repetibles para mantener el equilibrio y poder comprobar la ruta.
