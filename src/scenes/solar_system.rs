@@ -862,6 +862,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
     let mut help_restore_cursor = false;
     let mut show_orbits = true;
     let mut collection_open = false;
+    let mut presentation_shortcut = crate::minigames::common::shortcuts::PresentationShortcut::default();
     let mut collection_progress = 0.0_f32;
     let mut token_was_blocking = false;
     let mut token_restore_cursor = false;
@@ -873,6 +874,27 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             return Ok(Exit::Quit);
         }
         let ctrl = rl.is_key_down(KeyboardKey::KEY_LEFT_CONTROL) || rl.is_key_down(KeyboardKey::KEY_RIGHT_CONTROL);
+        if presentation_shortcut.poll(&rl) {
+            let catalog = ShipCatalog::load(&root.join("config/ship-selection.json"), &s.ships)?;
+            if s.game.is_none() {
+                let active = &s.ships.ships[s.ship_index];
+                let choice = catalog.choices.iter().find(|c| c.id == active.id || c.ship_id.as_deref() == Some(active.id.as_str()))
+                    .ok_or("Nave de desarrollo sin identidad de selección")?;
+                s.game = Some(GameState::new_game(&choice.id, &catalog)?);
+            }
+            let game = s.game.as_mut().unwrap();
+            let granted = crate::gameplay::rewards::complete_for_presentation(game, &catalog)?;
+            s.token_presentation.finish_for_presentation();
+            if !smoke {
+                crate::gameplay::save::store(&crate::gameplay::save::path(root), game, &s.token_presentation)?;
+            }
+            collection_open = true;
+            token_restore_cursor |= rl.is_cursor_hidden() || (help_open && help_restore_cursor);
+            token_was_blocking = true;
+            rl.enable_cursor();
+            help_open = false;
+            notice = Some((format!("CNP: {granted} tokens obtenidos | Coleccion completa: 6/6"), 5.0));
+        }
         if ctrl && rl.is_key_pressed(KeyboardKey::KEY_Q) {
             return Ok(Exit::Quit);
         }
@@ -967,7 +989,9 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         // Sin teclado durante las pruebas ni mientras se sale hacia un minijuego
         let intro_controls_ready = intro_time.is_none_or(|elapsed| elapsed >= ENTRY_STATION_HOLD + ENTRY_CAMERA_MOVE - 0.15);
         let accepts_input = (!smoke || s.launch_smoke || s.station_smoke || s.minecraft_smoke || s.regularshow_smoke || s.docking_smoke.is_some()) && !tokens_blocking && !cinematic_was_blocking && !token_toggle && !token_close && !help_open && !toggle_help && !close_help && intro_controls_ready && leaving.is_none() && !entering_station;
-        let pressed = |rl: &RaylibHandle, k: KeyboardKey| accepts_input && rl.is_key_pressed(k);
+        let pressed = |rl: &RaylibHandle, k: KeyboardKey| accepts_input
+            && !(ctrl && matches!(k, KeyboardKey::KEY_C | KeyboardKey::KEY_N | KeyboardKey::KEY_P))
+            && rl.is_key_pressed(k);
         let down = |rl: &RaylibHandle, k: KeyboardKey| accepts_input && rl.is_key_down(k);
         if pressed(&rl,KeyboardKey::KEY_F3) {s.collision_debug=!s.collision_debug;}
         if pressed(&rl,KeyboardKey::KEY_O) { show_orbits = !show_orbits; }

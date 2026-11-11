@@ -108,6 +108,17 @@ pub struct TokenPresentation {
 }
 
 impl TokenPresentation {
+    /// The CNP presentation code reveals the completed collection immediately,
+    /// including when a previous reward cinematic is still pending.
+    pub fn finish_for_presentation(&mut self) {
+        self.pending.clear();
+        self.active = None;
+        self.elapsed = 0.0;
+        self.initial_scheduled = true;
+        self.announced.extend(Franchise::ALL);
+        self.revision += 1;
+    }
+
     pub fn enqueue_initial(&mut self, franchise: Franchise) -> bool {
         if self.initial_scheduled { return false; }
         self.initial_scheduled = true;

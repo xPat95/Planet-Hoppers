@@ -47,3 +47,18 @@ pub fn record_result(
         progress_completed: game.progress.is_complete(),
     })
 }
+
+/// Presentation cheat: grant only missing tokens and their ships, atomically.
+/// Active/initial ship selection and existing progress remain unchanged.
+pub fn complete_for_presentation(game: &mut GameState, catalog: &ShipCatalog) -> Result<usize, String> {
+    let mut completed = game.clone();
+    let mut granted = 0;
+    for franchise in Franchise::ALL {
+        if !completed.progress().is_completed(franchise) {
+            record_result(&mut completed, franchise.as_str(), MinigameResult::Victory, catalog)?;
+            granted += 1;
+        }
+    }
+    *game = completed;
+    Ok(granted)
+}
