@@ -61,9 +61,33 @@ pub const ABDUCTION_SECONDS: f32 = 4.8;
 /// La de Smiling Friends es un video (`assets/video/smilingfriends/abduction.sfv`: 311 cuadros a 24 por segundo).
 pub const SMILINGFRIENDS_ABDUCTION_SECONDS: f32 = 311.0 / 24.0;
 
-/// Cuánto dura la abducción de cada franquicia.
+/// La de Hexbound: la carta de invitación y la bruja que se sube a la escoba y se va volando.
+pub const HEXBOUND_ABDUCTION_SECONDS: f32 = crate::minigames::halloween::INVITATION;
+
+/// Si al ganar su minijuego (con la nave todavía bloqueada) se ve la abducción al volver al sistema solar. La de
+/// Smiling Friends no (pedido de Cami): solo se ve al elegir esa nave en el hangar. La de Hexbound sí, pero con la carta
+/// de agradecimiento en vez de la invitación.
+pub fn returns_abducted(franchise: Franchise) -> bool {
+    franchise != Franchise::SmilingFriends
+}
+
+/// La escena de Hexbound al ganar el minijuego: la carta de agradecimiento con corazones (más corta que la invitación,
+/// sin la bruja).
+pub const HEXBOUND_THANKS_SECONDS: f32 = crate::minigames::halloween::THANKS;
+
+/// Cuánto dura la abducción de una franquicia: la de la nave elegida al empezar (`initial`) o la de ganar su
+/// minijuego (para Hexbound es otra escena).
+pub fn abduction_length(franchise: Franchise, initial: bool) -> f32 {
+    if franchise == Franchise::Halloween && !initial { HEXBOUND_THANKS_SECONDS } else { abduction_seconds(franchise) }
+}
+
+/// Cuánto dura la abducción de cada franquicia (la de la nave elegida al empezar).
 pub fn abduction_seconds(franchise: Franchise) -> f32 {
-    if franchise == Franchise::SmilingFriends { SMILINGFRIENDS_ABDUCTION_SECONDS } else { ABDUCTION_SECONDS }
+    match franchise {
+        Franchise::SmilingFriends => SMILINGFRIENDS_ABDUCTION_SECONDS,
+        Franchise::Halloween => HEXBOUND_ABDUCTION_SECONDS,
+        _ => ABDUCTION_SECONDS,
+    }
 }
 pub const TOAST_SECONDS: f32 = 4.0;
 
@@ -113,7 +137,7 @@ impl TokenPresentation {
         self.pending.push_back(Sequence {
             notice: RewardNotice { franchise, ship_name: outcome.ship_unlocked.then(|| ship_name.to_owned()) },
             initial: false,
-            phase: if outcome.ship_unlocked { RewardPhase::Abduction } else { RewardPhase::Token },
+            phase: if outcome.ship_unlocked && returns_abducted(franchise) { RewardPhase::Abduction } else { RewardPhase::Token },
         });
         self.revision += 1;
         true
@@ -132,7 +156,7 @@ impl TokenPresentation {
         if let Some(sequence) = &mut self.active {
             self.elapsed += if dt.is_finite() { dt.max(0.0) } else { 0.0 };
             let duration = match sequence.phase {
-                RewardPhase::Abduction => abduction_seconds(sequence.notice.franchise),
+                RewardPhase::Abduction => abduction_length(sequence.notice.franchise, sequence.initial),
                 RewardPhase::Token => CEREMONY_SECONDS,
                 RewardPhase::Toast => TOAST_SECONDS,
             };
@@ -151,7 +175,7 @@ impl TokenPresentation {
     /// Termina la abducción que se está viendo (el botón SKIP del video); el próximo `advance` pasa a la etapa siguiente.
     pub fn skip_abduction(&mut self) {
         if let Some(franchise) = self.abduction() {
-            self.elapsed = self.elapsed.max(abduction_seconds(franchise));
+            self.elapsed = self.elapsed.max(abduction_length(franchise, self.abduction_is_initial()));
         }
     }
 
@@ -160,6 +184,11 @@ impl TokenPresentation {
     }
     pub fn phase(&self) -> Option<RewardPhase> { self.active.as_ref().map(|s| s.phase) }
     pub fn notice(&self) -> Option<&RewardNotice> { self.active.as_ref().map(|s| &s.notice) }
+    /// Si la abducción que se está viendo es la de la nave elegida al empezar (no la de ganar un minijuego).
+    pub fn abduction_is_initial(&self) -> bool {
+        self.active.as_ref().is_some_and(|s| s.initial)
+    }
+
     pub fn abduction(&self) -> Option<Franchise> {
         (self.phase() == Some(RewardPhase::Abduction)).then(|| self.notice().unwrap().franchise)
     }

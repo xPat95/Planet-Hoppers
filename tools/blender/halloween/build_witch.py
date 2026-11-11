@@ -726,6 +726,44 @@ for i, (key, pose) in enumerate(GAME_POSES.items()):
 assert len(game_counts) == 1, "Las poses del juego no tienen la misma malla: %s" % game_counts
 print("GAME_WITCH misma malla en todas las poses:", game_counts)
 
+# El papelito de la invitación (la abducción de Hexbound: la bruja de la nave lo tiene en la mano que saluda y se le
+# vuela), en blanco: una hoja doblada al medio a lo ancho, con la mitad de arriba abierta hacia atrás y apenas combada,
+# con dos caras (se ve de los dos lados). Mira hacia -Y, como la bruja; el origen va en el medio del borde de abajo,
+# que es por donde la tiene agarrada. Hoja: NOTE_W x NOTE_H
+NOTE = mat("WitchNote", "#efe5cf", rough=0.85)
+NOTE_W, NOTE_H, NOTE_OPEN = 0.075, 0.1, 28
+nB = Builder([NOTE])
+
+
+def note_point(i, j, nx, ny):
+    x = (i / nx - 0.5) * NOTE_W
+    s = j / ny * NOTE_H
+    cup = 0.004 * math.sin(math.pi * i / nx)              # Combada: los costados apenas hacia adelante
+    if s <= NOTE_H / 2:
+        return Vector((x, -cup, s))
+    r, a = s - NOTE_H / 2, math.radians(NOTE_OPEN)
+    return Vector((x, -cup + r * math.sin(a), NOTE_H / 2 + r * math.cos(a)))
+
+
+NX, NY = 6, 8
+for side, off in ((0, -0.0006), (1, 0.0006)):
+    start = len(nB.v)
+    for j in range(NY + 1):
+        for i in range(NX + 1):
+            nB.v.append(note_point(i, j, NX, NY) + Vector((0, off, 0)))
+    for j in range(NY):
+        for i in range(NX):
+            a = start + j * (NX + 1) + i
+            quad = (a, a + 1, a + NX + 2, a + NX + 1)
+            nB.add(quad if side == 0 else quad[::-1], NOTE)
+nroot = bpy.data.objects.new("Halloween_GameNote_ROOT", None)
+game_col.objects.link(nroot)
+nroot.location = (6.0, -1.2, 0)
+nme = make_mesh("HWG_Note", nB, [NOTE], smooth=False)
+nob = bpy.data.objects.new("HWG_Note", nme)
+game_col.objects.link(nob)
+nob.parent = nroot
+
 # La bruja feliz del final del minijuego: los mismos bailes, con los ojos cerrados de felicidad (arcos) y la sonrisa
 # en vez de los ojos de cuenta rojos. Otra malla (otra cara), así que va aparte: Halloween_GameWitchHappy_<pose>_ROOT
 HAPPY_POSES = ("solo_a", "solo_b", "solo_c", "hop", "sway", "spin")

@@ -646,16 +646,17 @@ fn view(
         match screen {
             Screen::Main => {
                 draw_intro_backdrop(&mut d, &intro_backdrop, w, h);
-                for (i, label) in ["JUGAR", "CONTROLES", "SALIR"].iter().enumerate() {
-                    let bt = ((intro - BUTTONS_DELAY - i as f32 * BUTTON_STAGGER)
-                        / BUTTON_INTRO)
-                        .clamp(0.0, 1.0);
-                    let mut rect = menu_button(w, h, i);
+                // Los botones suben desde abajo, uno detrás del otro (CONTINUAR, si hay partida guardada, el último)
+                let rise = |i: usize, mut rect: Rectangle| {
+                    let bt = ((intro - BUTTONS_DELAY - i as f32 * BUTTON_STAGGER) / BUTTON_INTRO).clamp(0.0, 1.0);
                     rect.y += (1.0 - bt).powi(3) * h as f32 * 0.45;
-                    draw_intro_button(&mut d, &menu_font, rect, label, mouse, true);
+                    rect
+                };
+                for (i, label) in ["JUGAR", "CONTROLES", "SALIR"].iter().enumerate() {
+                    draw_intro_button(&mut d, &menu_font, rise(i, menu_button(w, h, i)), label, mouse, true);
                 }
                 if saved.is_some() {
-                    draw_intro_button(&mut d, &menu_font, continue_button(w,h), "[R] CONTINUAR", mouse, true);
+                    draw_intro_button(&mut d, &menu_font, rise(3, continue_button(w, h)), "[R] CONTINUAR", mouse, true);
                 }
             }
             Screen::Controls => {
@@ -869,17 +870,33 @@ fn play_abduction<'a>(rl: &mut RaylibHandle, thread: &RaylibThread, root: &std::
         return Ok(true);
     }
     let mut abduction = super::abduction::AbductionRenderer::load(rl, thread, root, &[franchise])?;
+    // La de Hexbound trae su música (la de la intro del minijuego) en vez de la del menú
+    let own = super::abduction::abduction_music(device, root, franchise);
+    if let Some(m) = &own {
+        music.set_paused(true);
+        m.play_stream();
+    }
+    let length = super::token_collection::abduction_seconds(franchise);
     let mut t = 0.0;
-    while t < super::token_collection::ABDUCTION_SECONDS {
+    while t < length {
         music.update();
+        if let Some(m) = &own {
+            m.set_volume(super::abduction::abduction_music_volume(t, length));
+            m.update_stream();
+        }
         if rl.window_should_close() {
             return Ok(false);
         }
         t += rl.get_frame_time().min(0.1);
+        abduction.prepare(rl, thread)?;
         let (w, h) = (rl.get_screen_width(), rl.get_screen_height());
         let mut d = rl.begin_drawing(thread);
         d.clear_background(Color::BLACK);
-        abduction.draw(&mut d, franchise, t, w, h);
+        abduction.draw(&mut d, thread, franchise, t, w, h);
+    }
+    if let Some(m) = &own {
+        m.stop_stream();
+        music.set_paused(false);
     }
     Ok(true)
 }

@@ -1,7 +1,7 @@
 use planet_hoppers::{
     gameplay::{progress::Franchise, rewards::record_result, selection::{GameState, ShipCatalog, ShipSelection, SelectionMode}, save},
     minigames::common::host::MinigameResult,
-    scenes::{abduction::{ART, cover_source}, token_collection::{TokenPresentation, RewardPhase, abduction_seconds, ABDUCTION_SECONDS, CEREMONY_SECONDS, TOAST_SECONDS}},
+    scenes::{abduction::{ART, cover_source}, token_collection::{TokenPresentation, RewardPhase, abduction_length, abduction_seconds, returns_abducted, ABDUCTION_SECONDS, CEREMONY_SECONDS, TOAST_SECONDS}},
     ships::ShipsConfig,
 };
 use std::path::Path;
@@ -51,11 +51,11 @@ fn every_pair_of_initial_ship_and_planet_obeys_strict_stage_order() {
             ui.advance(100.0,false);
             assert!(ui.phase().is_none());
             ui.advance(0.0,true);
-            if initial != planet {
+            if initial != planet && returns_abducted(planet) {
                 assert_eq!(ui.phase(),Some(RewardPhase::Abduction));
                 assert!(ui.active().is_none());
                 assert!(ui.toast().is_none());
-                ui.advance(abduction_seconds(planet),true);
+                ui.advance(abduction_length(planet,false),true);
             }
             assert_eq!(ui.phase(),Some(RewardPhase::Token));
             assert!(ui.is_busy());
@@ -84,7 +84,7 @@ fn save_roundtrip_keeps_ownership_tokens_and_unfinished_stage_independent() {
     ui.advance(ABDUCTION_SECONDS,true);
     let outcome=record_result(&mut game,"halloween",MinigameResult::Victory,&catalog).unwrap();
     ui.enqueue(Franchise::Halloween,outcome,"Escoba");
-    ui.advance(ABDUCTION_SECONDS,true);
+    ui.advance(abduction_length(Franchise::Halloween,false),true);
     assert_eq!(ui.phase(),Some(RewardPhase::Token));
     let dir=root().join(format!("target/reward-save-{}",std::process::id()));
     let path=dir.join("adventure.json");
@@ -146,9 +146,10 @@ fn abduction_visual_smoke() {
         for franchise in Franchise::ALL {
             for (stage,t) in [0.45,1.8,3.0,4.1].into_iter().enumerate() {
                 for frame in 0..2 {
+                    renderer.prepare(&mut rl,&thread).unwrap();
                     let mut d=rl.begin_drawing(&thread);
                     d.clear_background(Color::BLACK);
-                    renderer.draw(&mut d,franchise,t,w,h);
+                    renderer.draw(&mut d,&thread,franchise,t,w,h);
                     if frame==1 { save_frame(&output.join(format!("{}-{w}-{stage}.png",franchise.as_str())),w,h).unwrap(); }
                 }
             }
