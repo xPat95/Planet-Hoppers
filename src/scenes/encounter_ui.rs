@@ -11,7 +11,7 @@ use std::path::{Path, PathBuf};
 
 pub struct EncounterUi<'a> {
     sprites: Vec<SpriteBillboard>,
-    portraits: Vec<Texture2D>,
+    pub(super) portraits: Vec<Texture2D>,
     voices: Vec<Option<Music<'a>>>,
     spoken: Option<(usize, usize)>,
     preference: PathBuf,

@@ -129,6 +129,9 @@ pub struct SessionUi {
     pub loaded_portraits: usize,
 }
 impl SessionUi {
+    pub(super) fn death_portrait(&self,name:&str)->Option<&Texture2D> {
+        if name=="Stan" {self.stan.as_ref()} else {self.kyle.as_ref()}
+    }
     pub fn load(rl: &mut RaylibHandle, thread: &RaylibThread, root: &Path) -> Self {
         let mut load = |name: &str| {
             let path = root.join("assets/textures/minigames/South Park").join(name);

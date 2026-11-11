@@ -1,5 +1,7 @@
 # Save Kenny — rediseño, fase 1
 
+> Documento histórico de fase 1. El gameplay actual está descrito en [fase 2](save-kenny-redesign-phase2.md).
+
 La partida normal ofrece cinco encuentros desde el inicio. Se explora sin reloj global, se conversa con E o clic y se completa cada misión una vez, en cualquier orden. Esc cierra la conversación; L alterna English/Español y guarda la preferencia en `saves/save-kenny-language.txt`. M conserva el mapa existente.
 
 ## Implementación

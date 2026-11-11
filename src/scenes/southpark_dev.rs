@@ -71,8 +71,12 @@ pub fn run_visit_with_results(
     let mut muted = false;
     let mut ike_smoke = false;
     let mut encounter_smoke = false;
+    let mut puzzle_smoke = false;
+    let mut puzzle_results = false;
     while let Some(arg) = args.next() {
         match arg.as_str() {
+            "--smoke-puzzles" => {puzzle_smoke=true;no_probes=true;}
+            "--smoke-puzzle-results" => {puzzle_smoke=true;puzzle_results=true;no_probes=true;}
             "--smoke-encounters" => { encounter_smoke = true; no_probes = true; }
             "--smoke-ike" => { ike_smoke = true; no_probes = true; }
             "--smoke-return" => {
@@ -167,7 +171,7 @@ pub fn run_visit_with_results(
         .build();
     rl.set_exit_key(None);
     rl.set_window_min_size(640, 480);
-    if smoke || session_smoke || entry_smoke || ike_smoke || encounter_smoke || return_smoke_goal.is_some() {
+    if smoke || session_smoke || entry_smoke || ike_smoke || encounter_smoke || puzzle_smoke || return_smoke_goal.is_some() {
         rl.set_window_state(WindowState::default().set_window_hidden(true));
     }
     // The session smoke uses the real audio clock, so do not exhaust its frame
@@ -218,6 +222,9 @@ pub fn run_visit_with_results(
         Some(ui)
     } else { None };
     let mut world_map = WorldMap::load(&mut rl, &thread, &root, &scene)?;
+    let mut puzzle_ui = if encounters.is_some() {Some(super::puzzle_ui::PuzzleUi::load(&mut rl,&thread,&root)?)} else {None};
+    if puzzle_smoke {if let Some(ui)=&mut puzzle_ui {ui.preference=root.join("target/puzzle-smoke-music.txt");ui.muted=false;}}
+    let mut puzzle_music_start = 0;
     unsafe {
         ffi::rlSetClipPlanes(0.05, 1500.0);
     }
@@ -274,6 +281,7 @@ pub fn run_visit_with_results(
     entry.active = !smoke && !session_smoke && !dev_threats;
     if ike_smoke { entry.active = false; }
     if encounter_smoke { entry.active = false; }
+    if puzzle_smoke { entry.active=false;std::fs::create_dir_all(root.join("target/southpark-puzzles-smoke"))?; }
     let mut video = if entry.active && entry.full_intro {
         Some(VideoIntro::load(&mut rl, &thread, &root)?)
     } else { None };
@@ -338,6 +346,9 @@ pub fn run_visit_with_results(
     let initial_look = (scene.player.yaw, scene.player.pitch);
     let mut ike_smoke_position = None;
     let mut ike_smoke_player = None;
+    let mut puzzle_smoke_pose = None;
+    let mut puzzle_ike_position = None;
+    let mut outcome_smoke = puzzle_results.then(super::puzzle_smoke::OutcomeSmoke::default);
     while !rl.window_should_close() {
         if ike_smoke {
             if frame == 2 || frame == 10 || frame == 550 || frame == 560 || frame == 20 || frame == 45 {
@@ -359,6 +370,72 @@ pub fn run_visit_with_results(
             if frame == 575 { session.start(&mut scene, seed)?; }
         }
         audio.update();
+        if let Some(test)=&mut outcome_smoke {
+            if test.before_frame(&mut rl,&mut session,&mut scene)? {println!("PUZZLE_RESULTS_SMOKE_OK five_real_wins five_real_losses stan_kyle_once retry_pages return_to_world");break;}
+        }
+        if puzzle_smoke && !puzzle_results {
+            let phase=frame/20;let step=frame%20;
+            if puzzle_smoke_pose.is_none() {puzzle_smoke_pose=Some((scene.player.feet,scene.player.yaw,scene.player.pitch,scene.kenny.position()));}
+            if step==0 {
+                if session.puzzle.is_some() {
+                    session.leave_puzzle();
+                    session.update(0.25,&mut scene,crate::audio::VoiceClock::default())?;
+                    session.update(0.25,&mut scene,crate::audio::VoiceClock::default())?;
+                    if session.puzzle.is_some() || session.state!=SessionState::Exploring {return Err("Puzzle did not restore exploration".into());}
+                }
+                let (w,h)=match phase/5 {0=>(1280,800),1=>(800,600),2=>(640,480),_=>(1920,1080)};
+                rl.set_window_size(w,h);
+                session.adventure.as_mut().unwrap().spanish=phase/5%2==1;
+                if puzzle_ui.as_ref().unwrap().muted != (phase%2==1) {return Err("Puzzle mute was not retained across encounters".into());}
+                let group=[1,0,2,3,4][phase as usize%5];
+                session.adventure.as_mut().unwrap().dialogue=Some((group,crate::minigames::southpark::encounters::script(group).len()-1));
+            }
+            if step==1 || step==2 {
+                unsafe {ffi::PlayAutomationEvent(ffi::AutomationEvent {frame:0,type_:if step==1 {2} else {1},params:[KeyboardKey::KEY_E as i32,0,0,0]});}
+            }
+            if step==4 && session.puzzle.is_none() {return Err("Final NPC line did not open puzzle".into());}
+            if step==4 && phase==0 {puzzle_ike_position=ike.position;if puzzle_ike_position.is_none() {return Err("Ike missing before puzzle".into());}}
+            if step==12 {
+                if puzzle_smoke_pose!=Some((scene.player.feet,scene.player.yaw,scene.player.pitch,scene.kenny.position())) {return Err("Puzzle moved the 3D world or camera".into());}
+                if ike.position!=puzzle_ike_position {return Err("Puzzle relocated Ike".into());}
+            }
+            for (key,down) in match step {6=>vec![(KeyboardKey::KEY_W,true)],10=>vec![(KeyboardKey::KEY_M,true)],11=>vec![(KeyboardKey::KEY_W,false),(KeyboardKey::KEY_M,false)],_=>vec![]} {
+                unsafe {ffi::PlayAutomationEvent(ffi::AutomationEvent {frame:0,type_:if down {2} else {1},params:[key as i32,0,0,0]});}
+            }
+            if matches!(step,6|7|8|9) {
+                let layout=super::puzzle_ui::Layout::new(rl.get_screen_width(),rl.get_screen_height());
+                let point=if step<8 {let r=layout.primary();Vector2::new(r.x+r.width*0.5,r.y+r.height*0.5)} else {
+                    let run=session.puzzle.as_ref().unwrap();
+                    match &run.board {
+                        crate::minigames::southpark::puzzles::Board::Heaters(_)=>{let r=layout.cell(0);Vector2::new(r.x+r.width*0.5,r.y+r.height*0.5)},
+                        crate::minigames::southpark::puzzles::Board::Ufo(u)=>layout.light(u.target),
+                        crate::minigames::southpark::puzzles::Board::Bus(_)=>{let r=layout.lever(0);Vector2::new(r.x+r.width*0.5,r.y+r.height*0.5)},
+                        crate::minigames::southpark::puzzles::Board::Piano(p)=>{let r=layout.key(0,p.errors);Vector2::new(r.x+r.width*0.5,r.y+r.height*0.5)},
+                        crate::minigames::southpark::puzzles::Board::Sewers(_)=>layout.hole(0),
+                    }
+                }*layout.scale+layout.offset;
+                unsafe {
+                    ffi::PlayAutomationEvent(ffi::AutomationEvent {frame:0,type_:7,params:[point.x as i32,point.y as i32,0,0]});
+                    ffi::PlayAutomationEvent(ffi::AutomationEvent {frame:0,type_:if step%2==0 {6} else {5},params:[0,0,0,0]});
+                }
+            }
+            if step==10 && !session.puzzle.as_ref().unwrap().started {return Err("Puzzle Start click failed".into());}
+            if step==10 && audio.audit.plays.get("puzzle_music_start").copied().unwrap_or(0)!=phase+1 {return Err("Puzzle music started more than once".into());}
+            if step==14 || step==15 {
+                let layout=super::puzzle_ui::Layout::new(rl.get_screen_width(),rl.get_screen_height());
+                let r=layout.audio();let point=Vector2::new(r.x+r.width*0.5,r.y+r.height*0.5)*layout.scale+layout.offset;
+                unsafe {
+                    ffi::PlayAutomationEvent(ffi::AutomationEvent {frame:0,type_:7,params:[point.x as i32,point.y as i32,0,0]});
+                    ffi::PlayAutomationEvent(ffi::AutomationEvent {frame:0,type_:if step==14 {6} else {5},params:[0,0,0,0]});
+                }
+            }
+            if step==16 {
+                let muted=puzzle_ui.as_ref().unwrap().muted;
+                if muted!=(phase%2==0) {return Err("Puzzle audio button failed".into());}
+                if std::fs::read_to_string(&puzzle_ui.as_ref().unwrap().preference)?.trim()!=if muted {"muted"} else {"on"} {return Err("Puzzle mute persistence failed".into());}
+                if audio.audit.music_transitions.last().map(String::as_str)!=Some(if muted {"silent"} else {"save_kenny"}) {return Err("Puzzle mute did not control music".into());}
+            }
+        }
         if encounter_smoke {
             if frame < 10 {
                 let a = session.adventure.as_mut().ok_or("Encounter smoke requires adventure")?;
@@ -532,11 +609,26 @@ pub fn run_visit_with_results(
         let was_paused = session.state == SessionState::Paused;
         let had_dialogue = scene.dialogue != KennyDialogue::Closed;
         let encounter_was_open = session.adventure.as_ref().is_some_and(|a| a.dialogue.is_some());
+        let puzzle_was_open = session.puzzle.is_some();
+        if !intro_was_active && puzzle_was_open {
+            if let Some(ui)=&mut puzzle_ui {
+                use super::puzzle_ui::Action;
+                match ui.input(&rl,&session) {
+                    Action::Start=>session.puzzle.as_mut().unwrap().start(),
+                    Action::Hit(i)=>session.puzzle.as_mut().unwrap().click(i),
+                    Action::Restart=>{audio.stop_effects();audio.silence_voice();session.restart_puzzle();},
+                    Action::Pause=>{let p=session.puzzle.as_mut().unwrap();p.paused=!p.paused;},
+                    Action::Back=>session.leave_puzzle(),
+                    Action::Mute=>ui.toggle_mute(),
+                    Action::None=>{}
+                }
+            }
+        }
         if !intro_was_active {
             if let Some(ui) = &mut encounters { ui.update(&rl, &mut scene, &mut session); }
         }
         let map_was_open = session.state == SessionState::MapOpen;
-        if !smoke && !intro_was_active && !had_dialogue && !encounter_was_open {
+        if !smoke && !intro_was_active && !had_dialogue && !encounter_was_open && !puzzle_was_open && session.puzzle.is_none() {
             if map_was_open {
                 world_map.input(&rl, scene.player.feet);
                 if rl.is_key_pressed(KeyboardKey::KEY_M)
@@ -551,7 +643,7 @@ pub fn run_visit_with_results(
         reporter.observe(&session, observer)?;
         let map_consumed = map_was_open || session.state == SessionState::MapOpen;
         let mut restarted = false;
-        if !smoke && !intro_was_active && !map_consumed && !had_dialogue && !encounter_was_open {
+        if !smoke && !intro_was_active && !map_consumed && !had_dialogue && !encounter_was_open && !puzzle_was_open && session.puzzle.is_none() {
             let action = session_ui::input(&rl, &session, &return_confirmation);
             let result = match action {
                 SessionAction::Continue => session.continue_match(&mut scene),
@@ -667,7 +759,7 @@ pub fn run_visit_with_results(
             running_read |= input.forward > 0.0 && input.sprint;
         }
         let old_yaw = scene.player.yaw;
-        let focused = smoke || session_smoke || ike_smoke || encounter_smoke || return_test.is_some() || rl.is_window_focused();
+        let focused = smoke || session_smoke || ike_smoke || encounter_smoke || puzzle_smoke || return_test.is_some() || rl.is_window_focused();
         let active = !modal_at_start && cursor.update(&mut rl, &mut input, focused);
         let previous_feet = scene.player.feet;
         if active {
@@ -693,7 +785,7 @@ pub fn run_visit_with_results(
         } else if smoke {
             scene.update_kenny(dt);
         } else if let Err(error) = session.update(
-            if session_smoke || return_test.is_some() {
+            if puzzle_smoke {0.1} else if session_smoke || return_test.is_some() {
                 dt
             } else {
                 rl.get_frame_time()
@@ -712,7 +804,14 @@ pub fn run_visit_with_results(
             cursor.captured = true;
             cursor.apply(&mut rl);
         }
-        audio.set_music(if entry.active {
+        if let Some(ui)=&puzzle_ui {audio.set_background_muted(ui.muted);}
+        if session.puzzle_starts != puzzle_music_start {
+            if session.puzzle.is_some() {audio.restart_challenge_music();}
+            puzzle_music_start=session.puzzle_starts;
+        }
+        audio.set_music(if session.puzzle.as_ref().is_some_and(|p|p.paused || p.leaving) {
+            crate::audio::MusicMode::Silent
+        } else if entry.active {
             if entry.full_intro {
                 crate::audio::MusicMode::Intro
             } else {
@@ -721,7 +820,9 @@ pub fn run_visit_with_results(
         } else {
             session.music()
         });
-        ike.sync(session.state, entry.active);
+        // A 2D overlay suspends the exploration scene, including Ike's lifecycle;
+        // it must not remove or reroll his position just because a puzzle is open.
+        if session.puzzle.is_none() {ike.sync(session.state, entry.active);}
         if ike.available && !ike.spawn_attempted && ike_sprite.is_some() {
             ike.spawn_attempted = true;
             if let Some(locations) = &session.locations {
@@ -935,11 +1036,14 @@ pub fn run_visit_with_results(
             let width = rl.get_screen_width();
             let height = rl.get_screen_height();
             let rl_mouse = rl.get_mouse_position();
+            let mouse_down = rl.is_mouse_button_down(MouseButton::MOUSE_BUTTON_LEFT);
             let mut d = rl.begin_drawing(&thread);
             d.clear_background(Color::new(184, 212, 237, 255));
             // The video replaces the cinematic entirely: no town/HUD render underneath.
             if !(entry.active && entry.full_intro) {
-                {
+                // Keep all world resources/state alive, but don't draw the town
+                // behind an opaque 2D puzzle (especially on integrated GPUs).
+                if session.puzzle.is_none() {
                     let mut view = d.begin_mode3D(camera);
                     model.draw(&mut view, camera.position);
                     for (index, target) in scene.targets.iter().enumerate() {
@@ -1126,7 +1230,7 @@ pub fn run_visit_with_results(
                 if !session.in_match() {
                     draw_status(&mut d, &scene.threats, width);
                 }
-                session_ui.draw(&mut d, &session, &scene.threats, width, height, &return_confirmation);
+                if session.puzzle.is_none() {session_ui.draw(&mut d, &session, &scene.threats, width, height, &return_confirmation);}
                 if let Some(test) = &mut return_test {
                     if let Some(name) = test.capture(&session, &return_confirmation) {
                         save_frame(&captures.join(name), width, height)?;
@@ -1135,10 +1239,17 @@ pub fn run_visit_with_results(
                 if !entry.active && scene.dialogue == KennyDialogue::Closed {
                     world_map.draw(&mut d, &scene, &session, width, height);
                 }
-                if !entry.active { if let Some(ui) = &encounters { ui.draw(&mut d, &scene, &session, width, height); } }
+                if !entry.active && session.puzzle.is_none() { if let Some(ui) = &encounters { ui.draw(&mut d, &scene, &session, width, height); } }
+                if let (Some(ui),Some(encounters))=(&puzzle_ui,&encounters) {
+                    ui.draw(&mut d,&session,&encounters.portraits,session_ui.death_portrait(session.dialogue().0),width,height,rl_mouse,mouse_down);
+                }
                 if encounter_smoke && [0,3,7,9,10].contains(&frame) {
                     save_frame(&root.join(format!("target/encounter-{frame}.png")),width,height)?;
                 }
+                if puzzle_smoke && !puzzle_results && frame%20==12 {
+                    save_frame(&root.join(format!("target/southpark-puzzles-smoke/puzzle-{}-{}.png",frame/20%5,frame/100)),width,height)?;
+                }
+                if let Some(test)=&mut outcome_smoke {test.capture(&session,&root,width,height)?;}
                 if help && scene.confirmation.is_none() && (dev_threats || smoke) && !session.in_match()
                 {
                     d.draw_text(
@@ -1242,6 +1353,7 @@ pub fn run_visit_with_results(
             scene.player.pitch = 0.0;
         }
         frame += 1;
+        if puzzle_smoke && !puzzle_results && frame>=400 {println!("PUZZLES_SMOKE_OK five_scenes four_resolutions dialogue_handoff start_clicks return_to_world music_once mute_button mute_persistence world_camera_frozen ike_position_preserved");break;}
         if encounter_smoke && frame >= 22 { println!("ENCOUNTERS_SMOKE_OK eight_portraits bilingual_dialogues world_render E_first_line click_advance movement_frozen close"); break; }
         if ike_smoke && frame >= 600 {
             println!("IKE_SMOKE_OK raycast playback movement completion repeat challenge_cleanup");

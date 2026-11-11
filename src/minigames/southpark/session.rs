@@ -88,6 +88,8 @@ impl SessionConfig {
 }
 
 pub struct SaveKennySession {
+    pub puzzle: Option<super::puzzles::PuzzleRun>,
+    pub puzzle_starts: u64,
     pub adventure: Option<super::encounters::Adventure>,
     pub state: SessionState,
     pub lives: u8,
@@ -131,6 +133,8 @@ impl crate::minigames::common::host::AttemptOutcome for SaveKennySession {
 impl SaveKennySession {
     pub fn new(config: SessionConfig) -> Self {
         Self {
+            puzzle: None,
+            puzzle_starts: 0,
             adventure: None,
             state: SessionState::Exploring,
             lives: 3,
@@ -245,6 +249,7 @@ impl SaveKennySession {
         self.order[self.index.min(4)]
     }
     pub fn blocks_controls(&self) -> bool {
+        if self.puzzle.is_some() { return true; }
         if self.adventure.as_ref().is_some_and(|a| a.dialogue.is_some()) { return true; }
         if self.dynamic()
             && matches!(
@@ -308,6 +313,9 @@ impl SaveKennySession {
         order
     }
     pub fn start(&mut self, scene: &mut SouthParkScene, seed: u64) -> Result<(), String> {
+        self.puzzle = None;
+        self.cues.clear();
+        self.voice_time=0.0;
         if let Some(a) = &mut self.adventure {
             a.completed = [false; 5];
             a.dialogue = None;
@@ -346,22 +354,79 @@ impl SaveKennySession {
         }
         Ok(())
     }
-    /// Phase 2 replaces this adapter, leaving dialogue, NPCs and markers intact.
+    /// Open a modal 2D puzzle without moving Kenny, the camera or any world object.
     pub fn begin_encounter(&mut self, scene: &mut SouthParkScene, group: usize) -> Result<(), String> {
-        if self.state != SessionState::Exploring { return Err("Mission already active".into()); }
+        if self.state != SessionState::Exploring || self.puzzle.is_some() { return Err("Mission already active".into()); }
         let a = self.adventure.as_ref().ok_or("No encounters")?;
-        if a.completed[group] || a.active.is_some() { return Err("Mission unavailable".into()); }
-        let site = a.groups[group].site.clone();
+        if group >= a.groups.len() || a.completed[group] || a.active.is_some() { return Err("Mission unavailable".into()); }
         let kind = super::encounters::KINDS[group];
         scene.close_dialogue();
-        scene.clear_threat()?;
-        scene.start_threat_at(kind, site.translation())?;
+        scene.kenny.pause();
         self.order[self.index] = kind;
-        self.site = Some(site);
+        self.site = None;
         self.adventure.as_mut().unwrap().active = Some(group);
-        self.enter(SessionState::Searching);
-        self.cues.push(SessionCue::Danger);
+        self.puzzle = Some(super::puzzles::PuzzleRun::new(kind,group));
+        self.puzzle_starts = self.puzzle_starts.wrapping_add(1);
+        self.enter(SessionState::Active);
         Ok(())
+    }
+    pub fn restart_puzzle(&mut self) {
+        if self.lives == 0 || matches!(self.state,SessionState::DeathAnimation|SessionState::DeathDialogue) { return; }
+        if let Some(p) = &mut self.puzzle {
+            if p.result == Some(true) { return; }
+            p.restart();
+            self.cues.clear();
+            self.voice_time=0.0;
+            self.puzzle_starts = self.puzzle_starts.wrapping_add(1);
+            self.enter(SessionState::Active);
+        }
+    }
+    pub fn leave_puzzle(&mut self) {
+        if matches!(self.state,SessionState::DeathAnimation|SessionState::DeathDialogue) {return;}
+        if let Some(p) = &mut self.puzzle { p.leave(); }
+    }
+    fn update_puzzle(&mut self,dt:f32,scene:&mut SouthParkScene,voice:VoiceClock) {
+        let dt=if dt.is_finite() {dt.clamp(0.0,0.25)} else {0.0};
+        let p=self.puzzle.as_mut().unwrap();
+        if p.paused {return;}
+        p.tick(dt);
+        if p.leaving {
+            if p.transition<=0.0 {
+                self.puzzle=None;
+                if let Some(a)=&mut self.adventure {a.active=None;}
+                scene.kenny.resume();
+                self.enter(if self.saves==5 {SessionState::Victory} else if self.lives==0 {SessionState::Defeat} else {SessionState::Exploring});
+                if self.saves==5 {self.cues.push(SessionCue::Victory);}
+            }
+            return;
+        }
+        if let Some(won)=p.result {
+            if !p.committed {
+                p.committed=true;
+                if won {
+                    let group=p.group;
+                    self.adventure.as_mut().unwrap().completed[group]=true;
+                    self.saves+=1;
+                    self.enter(SessionState::Success);
+                    self.cues.push(SessionCue::Success);
+                } else {self.enter(SessionState::DeathAnimation);}
+            }
+        }
+        self.elapsed+=dt;
+        match self.state {
+            SessionState::DeathAnimation if self.elapsed>=self.config.death_animation_seconds=>{
+                self.voice_time=0.0;self.enter(SessionState::DeathDialogue);self.cues.push(SessionCue::DeathVoice);
+            }
+            SessionState::DeathDialogue=>{
+                self.voice_time=voice.position.unwrap_or(self.elapsed).max(self.voice_time);
+                if if voice.position.is_some() {voice.finished} else {self.elapsed>=self.config.voice_fallback_seconds} {
+                    self.lives=self.lives.saturating_sub(1);
+                    self.enter(if self.lives==0 {SessionState::Defeat} else {SessionState::Restoring});
+                    if self.lives==0 {self.cues.push(SessionCue::GameOver);}
+                }
+            }
+            _=>{}
+        }
     }
     fn stage_player(&self, scene: &mut SouthParkScene) -> Result<(), String> {
         let mut clean = scene.world.clone();
@@ -434,6 +499,7 @@ impl SaveKennySession {
         }
     }
     pub fn open_map(&mut self) -> bool {
+        if self.puzzle.is_some() {return false;}
         if matches!(
             self.state,
             SessionState::Exploring
@@ -462,6 +528,8 @@ impl SaveKennySession {
         )
     }
     pub fn explore(&mut self, scene: &mut SouthParkScene) -> Result<(), String> {
+        self.puzzle=None;
+        if let Some(a)=&mut self.adventure {a.active=None;a.dialogue=None;}
         scene.clear_threat()?;
         scene.close_dialogue();
         scene.kenny.resume();
@@ -499,6 +567,7 @@ impl SaveKennySession {
         if matches!(self.state, SessionState::Paused | SessionState::MapOpen) {
             return Ok(());
         }
+        if self.puzzle.is_some() {self.update_puzzle(dt,scene,voice);return Ok(());}
         let activation_dt = if dt.is_finite() { dt.max(0.0) } else { 0.0 };
         let dt = if dt.is_finite() {
             dt.clamp(0.0, 0.1)

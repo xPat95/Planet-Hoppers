@@ -71,6 +71,7 @@ pub struct AudioController<'a> {
     sounds: BTreeMap<&'static str, Sound<'a>>,
     config: AudioConfig,
     mode: MusicMode,
+    background_muted: bool,
     music_started: [bool; 3],
     voice_started: Option<Instant>,
     intro_started: Option<Instant>,
@@ -145,6 +146,7 @@ impl<'a> AudioController<'a> {
             sounds,
             config,
             mode: MusicMode::Silent,
+            background_muted: false,
             music_started: [false; 3],
             voice_started: None,
             intro_started: None,
@@ -157,6 +159,7 @@ impl<'a> AudioController<'a> {
         *self.audit.plays.entry(name.into()).or_default() += 1;
     }
     pub fn set_music(&mut self, mode: MusicMode) {
+        let mode=if self.background_muted && matches!(mode,MusicMode::Exploration|MusicMode::Challenge) {MusicMode::Silent} else {mode};
         if mode == self.mode {
             return;
         }
@@ -229,6 +232,18 @@ impl<'a> AudioController<'a> {
             }
         }
     }
+    /// Save Kenny's puzzle preference affects music, never functional effects/voices.
+    pub fn set_background_muted(&mut self,muted:bool) {
+        self.background_muted=muted;
+        if muted && matches!(self.mode,MusicMode::Exploration|MusicMode::Challenge) {self.set_music(MusicMode::Silent);}
+    }
+    /// One restart for a newly opened puzzle, not one for every frame or Start click.
+    pub fn restart_challenge_music(&mut self) {
+        if let Some(m)=&self.challenge {m.stop_stream();}
+        self.music_started[1]=false;
+        if self.mode==MusicMode::Challenge {self.mode=MusicMode::Silent;}
+        self.count("puzzle_music_start");
+    }
     pub fn intro_clock(&self) -> VoiceClock {
         let (Some(started), Some(m)) = (self.intro_started, self.intro.as_ref()) else {
             return VoiceClock::default();
@@ -257,7 +272,7 @@ impl<'a> AudioController<'a> {
     /// Temporary multiplier; the configured user volume remains unchanged.
     pub fn duck_exploration(&self, active: bool) {
         if let Some(music) = &self.exploration {
-            music.set_volume(self.config.music_volume * if active { 0.2 } else { 1.0 });
+            music.set_volume(self.config.music_volume * if self.background_muted {0.0} else if active { 0.2 } else { 1.0 });
         }
     }
     pub fn voice_duration(&self) -> Option<f32> {
