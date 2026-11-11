@@ -74,7 +74,7 @@ pub(super) fn run_with_args(mut args: impl Iterator<Item = String>) -> Result<()
     cursor.apply(&mut rl);
     let mut smoke = smoke::Smoke::default();
     let mut frame = 0;
-    while !rl.window_should_close() {
+    while !crate::graphics::window::should_close(&rl) {
         if test {
             smoke.before_frame(frame, &mut scene, &rl);
         }
@@ -120,7 +120,7 @@ pub(super) fn run_with_args(mut args: impl Iterator<Item = String>) -> Result<()
             None
         };
         {
-            let mut draw = rl.begin_drawing(&thread);
+            let mut draw = crate::graphics::window::begin_drawing(&mut rl, &thread);
             draw.clear_background(SKY);
             {
                 let mut view = draw.begin_mode3D(camera);

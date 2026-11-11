@@ -17,9 +17,9 @@ use std::ffi::CString;
 use std::path::{Path, PathBuf};
 
 const HELP_SHIP: &str = "W/S: acelerar / frenar | Mouse o A/D: girar | Espacio: subir | Shift: turbo | Tab: objetivo | B: piloto automático\n\
-                         E: explorar / entrar a estación | C: vista general | N: otra nave | Esc: soltar el mouse | Ctrl+Q: salir";
+                         E: explorar / entrar a estación | C: vista general | N: otra nave | Esc: soltar el mouse | Ctrl+X: salir";
 const HELP_OVERVIEW: &str = "Arrastrar: girar cámara | Rueda: acercar | Tab: seguir objetivo | P: pausa | Arriba/Abajo: velocidad del tiempo\n\
-                             C: volver a la nave | F12: captura | Ctrl+Q: salir";
+                             C: volver a la nave | F12: captura | Ctrl+X: salir";
 
 /// El plano cercano conserva el detalle de las naves; el lejano se calcula con el sistema.
 const NEAR_PLANE: f64 = 0.5;
@@ -88,7 +88,7 @@ fn draw_help_overlay(d: &mut RaylibDrawHandle, regular: &Font, bold: &Font, widt
             ("Tab", "Seguir objetivo"), ("P", "Pausa"),
             ("Arriba / Abajo", "Velocidad del tiempo"), ("C", "Volver a la nave"),
             ("O", "Mostrar / ocultar orbitas"), ("T", "Medallero de tokens"),
-            ("F12", "Guardar captura"), ("Ctrl + Q", "Salir del juego"),
+            ("F12", "Guardar captura"), ("Ctrl + X", "Salir del juego"),
         ]),
     ];
     for (col, heading, rows) in columns {
@@ -729,7 +729,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
     }
     let far_plane = outer_orbit(&s.system) * (2.0 * MAX_ZOOM_OUT + 2.0);
     {
-        let mut d = rl.begin_drawing(&thread);
+        let mut d = crate::graphics::window::begin_drawing(&mut rl, &thread);
         d.clear_background(SKY_BACKGROUND);
         d.draw_text("Cargando el sistema solar...", 40, 40, 24, Color::RAYWHITE);
     }
@@ -869,7 +869,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
 
     loop {
         music.update();
-        if rl.window_should_close() {
+        if crate::graphics::window::should_close(&rl) {
             return Ok(Exit::Quit);
         }
         let ctrl = rl.is_key_down(KeyboardKey::KEY_LEFT_CONTROL) || rl.is_key_down(KeyboardKey::KEY_RIGHT_CONTROL);
@@ -1649,7 +1649,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             abductions.prepare(&mut rl, &thread)?;
         }
         // --- Dibujo --------------------------------------------------------------------------------------------
-        let mut d = rl.begin_drawing(&thread);
+        let mut d = crate::graphics::window::begin_drawing(&mut rl, &thread);
         d.clear_background(SKY_BACKGROUND);
         nebula.draw(&mut d, camera, width, height);
         sky.draw(&mut d, &sky_frame, time);

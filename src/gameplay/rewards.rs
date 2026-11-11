@@ -15,10 +15,11 @@ pub struct RewardOutcome {
     pub progress_completed: bool,
 }
 
-/// Record an actual attempt outcome supplied by the minigame rules.
+/// Record an attempt outcome supplied by the minigame rules or secret completion code.
 ///
-/// Callers must report Victory only when the challenge really finishes; visiting
-/// a planet, returning to the host or collecting a partial objective is not a win.
+/// Callers report Victory when the challenge finishes or the player completes
+/// the explicit secret shortcut. Visiting a planet, returning to the host or
+/// collecting a partial objective is not a win.
 /// IDs must match the existing selection catalog (e.g. `smilingfriends`). Invalid
 /// identities/catalog entries return an error without changing the adventure.
 /// Repeated victories, defeats and abandonments return an empty outcome.

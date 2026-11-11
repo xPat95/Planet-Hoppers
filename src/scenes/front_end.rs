@@ -439,7 +439,7 @@ fn view(
 
     loop {
         music.update();
-        if rl.window_should_close()
+        if crate::graphics::window::should_close(&rl)
             || ((rl.is_key_down(KeyboardKey::KEY_LEFT_CONTROL)
                 || rl.is_key_down(KeyboardKey::KEY_RIGHT_CONTROL))
                 && rl.is_key_pressed(KeyboardKey::KEY_Q))
@@ -629,7 +629,7 @@ fn view(
         let menu_time = rl.get_time() as f32;
         let left_active = rl.is_key_down(KeyboardKey::KEY_LEFT);
         let right_active = rl.is_key_down(KeyboardKey::KEY_RIGHT);
-        let mut d = rl.begin_drawing(&thread);
+        let mut d = crate::graphics::window::begin_drawing(&mut rl, &thread);
         d.clear_background(SKY_BACKGROUND);
         if screen == Screen::Controls {
             galaxy.draw(&mut d, w, h, menu_time);
@@ -849,19 +849,19 @@ fn play_abduction<'a>(rl: &mut RaylibHandle, thread: &RaylibThread, root: &std::
     franchise: crate::gameplay::progress::Franchise, music: &super::menu_music::MenuMusic<'_>,
     device: Option<&'a RaylibAudio>) -> Result<bool, Error> {
     // Un cuadro negro mientras carga (la animación empieza saliendo del negro)
-    rl.begin_drawing(thread).clear_background(Color::BLACK);
+    crate::graphics::window::begin_drawing(rl, thread).clear_background(Color::BLACK);
     if franchise == crate::gameplay::progress::Franchise::SmilingFriends {
         let mut video = super::abduction::AbductionVideo::load(rl, thread, root, device)?;
         music.set_paused(true);
         let mut t = 0.0;
         while t < super::token_collection::SMILINGFRIENDS_ABDUCTION_SECONDS && !video.skip_requested(rl) {
-            if rl.window_should_close() {
+            if crate::graphics::window::should_close(&rl) {
                 return Ok(false);
             }
             video.update(t)?;
             t += rl.get_frame_time().min(0.1);
             let (w, h) = (rl.get_screen_width(), rl.get_screen_height());
-            let mut d = rl.begin_drawing(thread);
+            let mut d = crate::graphics::window::begin_drawing(rl, thread);
             video.draw(&mut d, w, h);
         }
         video.stop();
@@ -883,13 +883,13 @@ fn play_abduction<'a>(rl: &mut RaylibHandle, thread: &RaylibThread, root: &std::
             m.set_volume(super::abduction::abduction_music_volume(t, length));
             m.update_stream();
         }
-        if rl.window_should_close() {
+        if crate::graphics::window::should_close(&rl) {
             return Ok(false);
         }
         t += rl.get_frame_time().min(0.1);
         abduction.prepare(rl, thread)?;
         let (w, h) = (rl.get_screen_width(), rl.get_screen_height());
-        let mut d = rl.begin_drawing(thread);
+        let mut d = crate::graphics::window::begin_drawing(rl, thread);
         d.clear_background(Color::BLACK);
         abduction.draw(&mut d, thread, franchise, t, w, h);
     }

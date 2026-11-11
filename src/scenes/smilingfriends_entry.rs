@@ -58,7 +58,7 @@ pub fn run_with_results(args: impl Iterator<Item = String>, observer: &mut crate
         std::fs::create_dir_all(&dir)?;
         let (w, h) = (rl.get_screen_width(), rl.get_screen_height());
         {
-            let mut d = rl.begin_drawing(&thread);
+            let mut d = crate::graphics::window::begin_drawing(&mut rl, &thread);
             draw_intro(&mut d, &texture, &font, 1.0, Vector2::zero());
             save_frame(&dir.join("intro-first.png"), w, h)?;
         }
@@ -66,7 +66,7 @@ pub fn run_with_results(args: impl Iterator<Item = String>, observer: &mut crate
             update_frame(&mut texture, &frames, frame)?;
         }
         {
-            let mut d = rl.begin_drawing(&thread);
+            let mut d = crate::graphics::window::begin_drawing(&mut rl, &thread);
             draw_intro(&mut d, &texture, &font, 2.0, Vector2::zero());
             save_frame(&dir.join("intro-last.png"), w, h)?;
         }
@@ -82,10 +82,14 @@ pub fn run_with_results(args: impl Iterator<Item = String>, observer: &mut crate
         );
         return Ok(MinigameExit::Returned(MinigameResult::Abandoned));
     }
+    let mut reward_shortcut = crate::minigames::common::shortcuts::RewardShortcut::default();
     let started = Instant::now();
     let mut current = 0usize;
     let mut construction = false;                       // true: terminó el video, empieza el juego
-    while !rl.window_should_close() {
+    while !crate::graphics::window::should_close(&rl) {
+        if let Some(exit) = reward_shortcut.poll(&rl, observer)? {
+            return Ok(exit);
+        }
         if let Some(track) = music.as_mut() {
             track.update_stream();
         }
@@ -122,7 +126,7 @@ pub fn run_with_results(args: impl Iterator<Item = String>, observer: &mut crate
         }
         let mouse = rl.get_mouse_position();
         let time = started.elapsed().as_secs_f32();
-        let mut d = rl.begin_drawing(&thread);
+        let mut d = crate::graphics::window::begin_drawing(&mut rl, &thread);
         draw_intro(&mut d, &texture, &font, time, mouse);
     }
     Ok(MinigameExit::WindowClosed)

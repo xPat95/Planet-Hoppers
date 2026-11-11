@@ -5,6 +5,27 @@ use raylib::{
     prelude::*,
 };
 
+/// Ctrl+X exits the entire application, including nested videos and minigames.
+/// Check before scene input so the shortcut cannot turn into a return to flight.
+fn exit_if_requested(rl: &RaylibHandle) {
+    let control = rl.is_key_down(KeyboardKey::KEY_LEFT_CONTROL)
+        || rl.is_key_down(KeyboardKey::KEY_RIGHT_CONTROL);
+    if control && rl.is_key_pressed(KeyboardKey::KEY_X) {
+        std::process::exit(0);
+    }
+}
+
+pub fn should_close(rl: &RaylibHandle) -> bool {
+    exit_if_requested(rl);
+    rl.window_should_close()
+}
+
+/// Loading frames and cinematics use the same shortcut as gameplay loops.
+pub fn begin_drawing<'a>(rl: &'a mut RaylibHandle, thread: &RaylibThread) -> RaylibDrawHandle<'a> {
+    exit_if_requested(rl);
+    rl.begin_drawing(thread)
+}
+
 /// Open interactive scenes in borderless fullscreen at the monitor's resolution.
 /// Diagnostic runs retain their requested size so resize checks and captures
 /// can run in hidden windows without changing the desktop's display mode.

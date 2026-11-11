@@ -55,6 +55,7 @@ pub fn run_visit_with_results(
     mut args: impl Iterator<Item = String>,
     observer: &mut crate::minigames::common::host::ResultObserver<'_>,
 ) -> Result<SouthParkExit, Box<dyn std::error::Error>> {
+    let mut reward_shortcut = crate::minigames::common::shortcuts::RewardShortcut::default();
     let mut reporter = crate::minigames::common::host::AttemptReporter::default();
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let mut config_path = root.join("config/southpark-dev.json");
@@ -328,7 +329,10 @@ pub fn run_visit_with_results(
     let initial_look = (scene.player.yaw, scene.player.pitch);
     let mut ike_smoke_position = None;
     let mut ike_smoke_player = None;
-    while !rl.window_should_close() {
+    while !crate::graphics::window::should_close(&rl) {
+        if let Some(exit) = reward_shortcut.poll(&rl, observer)? {
+            return Ok(exit);
+        }
         if ike_smoke {
             if frame == 2 || frame == 10 || frame == 550 || frame == 560 || frame == 20 || frame == 45 {
                 let (key, down) = match frame {
@@ -867,7 +871,7 @@ pub fn run_visit_with_results(
             let width = rl.get_screen_width();
             let height = rl.get_screen_height();
             let rl_mouse = rl.get_mouse_position();
-            let mut d = rl.begin_drawing(&thread);
+            let mut d = crate::graphics::window::begin_drawing(&mut rl, &thread);
             d.clear_background(Color::new(184, 212, 237, 255));
             // The video replaces the cinematic entirely: no town/HUD render underneath.
             if !(entry.active && entry.full_intro) {

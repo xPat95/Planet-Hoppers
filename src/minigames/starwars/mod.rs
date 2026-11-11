@@ -165,6 +165,7 @@ pub fn run_with_results(
     observer: &mut crate::minigames::common::host::ResultObserver<'_>,
 ) -> Result<crate::minigames::common::host::MinigameExit, Box<dyn std::error::Error>> {
     use crate::minigames::common::host::{MinigameExit, MinigameResult};
+    let mut reward_shortcut = crate::minigames::common::shortcuts::RewardShortcut::default();
     let mut reporter = crate::minigames::common::host::AttemptReporter::default();
     let args: Vec<_> = args.collect();
     if args.iter().any(|a| a == "--help") {
@@ -291,7 +292,7 @@ pub fn run_with_results(
             game.distance = 125.0;
             game.travel = 125.0;
             for _ in 0..4 {
-                let mut draw = rl.begin_drawing(&thread);
+                let mut draw = crate::graphics::window::begin_drawing(&mut rl, &thread);
                 presentation.draw(&mut draw, &thread, &game, 0.0, 1280.0, 800.0);
             }
             save_capture(&rl, &captures.join(format!("{}.png", model.id)));
@@ -315,7 +316,7 @@ pub fn run_with_results(
             ] {
                 game.phase = phase;
                 for _ in 0..4 {
-                    let mut draw = rl.begin_drawing(&thread);
+                    let mut draw = crate::graphics::window::begin_drawing(&mut rl, &thread);
                     presentation.draw(&mut draw, &thread, &game, 1.0, width as f32, height as f32);
                 }
                 save_capture(&rl, &captures.join(format!("menu-{name}-{width}.png")));
@@ -336,7 +337,7 @@ pub fn run_with_results(
                 assert_eq!(presentation.font.get_glyph_info(ch).value, ch as i32);
             }
             {
-                let mut draw = rl.begin_drawing(&thread);
+                let mut draw = crate::graphics::window::begin_drawing(&mut rl, &thread);
                 presentation.draw(&mut draw, &thread, &game, 0.0, 1280.0, 800.0);
             }
             presentation =
@@ -393,7 +394,10 @@ pub fn run_with_results(
         game.intro();
     }
     let mut exit = MinigameExit::WindowClosed;
-    while !rl.window_should_close() {
+    while !crate::graphics::window::should_close(&rl) {
+        if let Some(exit) = reward_shortcut.poll(&rl, observer)? {
+            return Ok(exit);
+        }
         // Consume press events as well as held states. Very short taps can begin
         // and end between two rendered frames, especially at lower frame rates.
         let mut pressed = Vec::new();
@@ -629,7 +633,7 @@ pub fn run_with_results(
         }
         let (w, h) = (rl.get_screen_width() as f32, rl.get_screen_height() as f32);
         {
-            let mut d = rl.begin_drawing(&thread);
+            let mut d = crate::graphics::window::begin_drawing(&mut rl, &thread);
             if let Some(v) = &clip {
                 v.draw(&mut d, w, h);
             } else {

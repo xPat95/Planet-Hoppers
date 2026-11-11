@@ -107,7 +107,7 @@ fn window(
     let mut frame = 0;
     let mut smoke = smoke::Smoke::default();
     let mut mining_smoke = mining_smoke::Smoke::new(&scene);
-    while !rl.window_should_close() {
+    while !crate::graphics::window::should_close(&rl) {
         if mining_test {
             mining_smoke.before(frame, &mut scene, &mining, &rl);
         } else if test {
@@ -222,7 +222,7 @@ fn window(
             None
         };
         {
-            let mut d = rl.begin_drawing(&thread);
+            let mut d = crate::graphics::window::begin_drawing(&mut rl, &thread);
             d.clear_background(Color::new(6, 9, 13, 255));
             {
                 let mut view = d.begin_mode3D(camera);

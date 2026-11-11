@@ -122,6 +122,7 @@ pub fn run_visit_with_results(
 }
 
 fn run_inner(args: Vec<String>, visits: &mut MinecraftVisits, observer: &mut crate::minigames::common::host::ResultObserver<'_>) -> Result<MinigameExit, Error> {
+    let mut reward_shortcut = crate::minigames::common::shortcuts::RewardShortcut::default();
     let mut reporter = crate::minigames::common::host::AttemptReporter::default();
     let visit_start = visits.completed().len();
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
@@ -205,7 +206,16 @@ fn run_inner(args: Vec<String>, visits: &mut MinecraftVisits, observer: &mut cra
     let mut host_tick = 0;
     let mut host_frozen = None;
     let mut host_mine_time = None;
-    while !rl.window_should_close() {
+    while !crate::graphics::window::should_close(&rl) {
+        if let Some(exit) = reward_shortcut.poll(&rl, observer)? {
+            if visits.active_attempt().is_none() {
+                visits.start_attempt();
+            }
+            visits.finish(MinigameResult::Victory);
+            audio.stop();
+            rl.enable_cursor();
+            return Ok(exit);
+        }
         if test && !smoke.done() && !exploration_smoke {
             smoke.before(frame, &mut surface, mine.as_mut(), in_mine, &rl);
         }
@@ -301,7 +311,7 @@ fn run_inner(args: Vec<String>, visits: &mut MinecraftVisits, observer: &mut cra
             if load {
                 return_pose = surface.pose();
                 {
-                    let mut d = rl.begin_drawing(&thread);
+                    let mut d = crate::graphics::window::begin_drawing(&mut rl, &thread);
                     d.clear_background(Color::new(13, 23, 28, 255));
                     d.draw_text("Preparando DIAMOND RUSH...", 35, 35, 28, Color::WHITE);
                 }
@@ -460,7 +470,7 @@ fn run_inner(args: Vec<String>, visits: &mut MinecraftVisits, observer: &mut cra
         let w = rl.get_screen_width();
         let h = rl.get_screen_height();
         {
-            let mut d = rl.begin_drawing(&thread);
+            let mut d = crate::graphics::window::begin_drawing(&mut rl, &thread);
             d.clear_background(if in_mine {
                 Color::new(6, 9, 13, 255)
             } else {

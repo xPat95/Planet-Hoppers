@@ -82,6 +82,7 @@ pub fn run_visit(root: &Path, args: impl Iterator<Item = String>, observer: &mut
         std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map_or(7, |d| d.as_nanos() as u64)
     };
     let mut s = Session::new(Balance::default(), seed);
+    let mut reward_shortcut = crate::minigames::common::shortcuts::RewardShortcut::default();
     let mut reporter = AttemptReporter::default();
     let mut screen = Screen::Story;
     let mut story = Story::default();
@@ -104,9 +105,12 @@ pub fn run_visit(root: &Path, args: impl Iterator<Item = String>, observer: &mut
     // Hacia dónde mira la bruja (grados): clic derecho y arrastrar, o flechas / A y D
     let mut look = (0.0f32, 0.0f32);
     loop {
-        if rl.window_should_close()
+        if crate::graphics::window::should_close(&rl)
             || (rl.is_key_down(KeyboardKey::KEY_LEFT_CONTROL) && rl.is_key_pressed(KeyboardKey::KEY_Q)) {
             return Ok(MinigameExit::WindowClosed);
+        }
+        if let Some(exit) = reward_shortcut.poll(&rl, observer)? {
+            return Ok(exit);
         }
         let dt = if smoke { 1.0 / 30.0 } else { rl.get_frame_time().min(0.1) };
         let (w, h) = (rl.get_screen_width() as f32, rl.get_screen_height() as f32);
@@ -371,7 +375,7 @@ pub fn run_visit(root: &Path, args: impl Iterator<Item = String>, observer: &mut
             _ => View::Pov,
         };
         art.prepare(&mut rl, &thread)?;
-        let mut d = rl.begin_drawing(&thread);
+        let mut d = crate::graphics::window::begin_drawing(&mut rl, &thread);
         let won = s.phase == Phase::Victory;
         match base {
             Screen::Story => story::draw_story(&mut d, &thread, &mut art, &story, fx.time),
