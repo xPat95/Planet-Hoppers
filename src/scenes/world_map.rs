@@ -97,9 +97,10 @@ impl WorldMap {
         w: i32,
         h: i32,
     ) {
-        let marked = s.location_visible() || (!s.in_match() && scene.threats.running());
+        let marked = s.adventure.is_none()
+            && (s.location_visible() || (!s.in_match() && scene.threats.running()));
         if s.state == SessionState::MapOpen {
-            self.full(d, scene, marked, w, h);
+            self.full(d, scene, s, marked, w, h);
             return;
         }
         if s.blocks_controls() {
@@ -154,6 +155,12 @@ impl WorldMap {
             Color::DARKBLUE,
         );
         arrow(d, centre, scene.player.yaw, Color::BLUE);
+        if let Some(a) = &s.adventure {
+            for (i,g) in a.groups.iter().enumerate() {
+                let (p, _) = circle_marker(scene.player.feet, g.positions[0], centre, radius - 12.0, metres);
+                encounter_marker(d,p,i,a.completed[i]);
+            }
+        }
         if marked {
             let (danger, edge) = circle_marker(
                 scene.player.feet,
@@ -172,11 +179,12 @@ impl WorldMap {
             );
             kenny_marker(d, kenny, edge);
         }
-        d.draw_text("M: mapa", 20, h - 16, 12, Color::DARKBLUE);
+        d.draw_text(if s.adventure.as_ref().is_some_and(|a| !a.spanish) { "M: map" } else { "M: mapa" }, 20, h - 16, 12, Color::DARKBLUE);
     }
-    fn full(&self, d: &mut RaylibDrawHandle, scene: &SouthParkScene, marked: bool, w: i32, h: i32) {
+    fn full(&self, d: &mut RaylibDrawHandle, scene: &SouthParkScene, s: &SaveKennySession, marked: bool, w: i32, h: i32) {
+        let tr = |en, es| if s.adventure.as_ref().is_some_and(|a| !a.spanish) { en } else { es };
         d.draw_rectangle(0, 0, w, h, Color::new(13, 28, 42, 250));
-        d.draw_text("SOUTH PARK - MAPA", 24, 20, 24, Color::WHITE);
+        d.draw_text(tr("SOUTH PARK - MAP","SOUTH PARK - MAPA"), 24, 20, 24, Color::WHITE);
         d.draw_text("N", w - 42, 18, 24, Color::WHITE);
         let (origin, size) = Self::viewport(w, h);
         let scale = self.view.scale(size);
@@ -216,6 +224,11 @@ impl WorldMap {
             scene.player.yaw,
             Color::BLUE,
         );
+        if let Some(a) = &s.adventure {
+            for (i,g) in a.groups.iter().enumerate() {
+                encounter_marker(d,self.view.screen(g.positions[0],origin,size),i,a.completed[i]);
+            }
+        }
         if marked {
             warning(
                 d,
@@ -238,14 +251,14 @@ impl WorldMap {
             Color::LIGHTGRAY,
         );
         d.draw_text(
-            "Arrastrar: mover | Rueda: zoom | R: jugador | M / Esc: cerrar",
+            tr("Drag: move | Wheel: zoom | R: player | M / Esc: close", "Arrastrar: mover | Rueda: zoom | R: jugador | M / Esc: cerrar"),
             24,
             h - 40,
             18,
             Color::WHITE,
         );
         d.draw_text(
-            "Azul: jugador   Naranja K: Kenny   Rojo !: peligro",
+            if s.adventure.is_some() {tr("Blue: player | Colored !: encounters", "Azul: jugador | ! de colores: encuentros")} else {tr("Blue: player | Orange K: Kenny | Red !: danger | Colored !: encounters", "Azul: jugador | Naranja K: Kenny | Rojo !: peligro | ! de colores: encuentros")},
             24,
             h - 20,
             16,
@@ -263,6 +276,13 @@ fn arrow(d: &mut RaylibDrawHandle, p: Vector2, yaw: f32, color: Color) {
         p - forward * 6.0 + right * 6.0,
         color,
     );
+}
+fn encounter_marker(d: &mut RaylibDrawHandle, p: Vector2, i: usize, done: bool) {
+    d.draw_circle_v(p,8.0,if done { Color::GREEN } else { crate::minigames::southpark::encounters::COLORS[i] });
+    if done {
+        d.draw_line_ex(p+Vector2::new(-4.0,0.0),p+Vector2::new(-1.0,3.0),2.0,Color::WHITE);
+        d.draw_line_ex(p+Vector2::new(-1.0,3.0),p+Vector2::new(5.0,-4.0),2.0,Color::WHITE);
+    } else { d.draw_text("!",p.x as i32-2,p.y as i32-6,14,Color::BLACK); }
 }
 fn kenny_marker(d: &mut RaylibDrawHandle, p: Vector2, edge: bool) {
     d.draw_circle_v(p, 9.0, Color::new(245, 134, 25, 255));

@@ -63,14 +63,34 @@ pub struct AudioAudit {
     pub plays: BTreeMap<String, u32>,
     pub music_transitions: Vec<String>,
 }
+// Original short struck-string tones, generated once in RAM. No added music,
+// external assets, dependencies, persistent timers or audio streams.
+fn piano_note(frequency:f32)->Vec<u8> {
+    let rate=22050_u32;let count=(rate as f32*0.45) as u32;let size=count*2;
+    let mut bytes=Vec::with_capacity(size as usize+44);
+    bytes.extend_from_slice(b"RIFF");bytes.extend_from_slice(&(size+36).to_le_bytes());bytes.extend_from_slice(b"WAVEfmt ");
+    bytes.extend_from_slice(&16_u32.to_le_bytes());bytes.extend_from_slice(&1_u16.to_le_bytes());bytes.extend_from_slice(&1_u16.to_le_bytes());
+    bytes.extend_from_slice(&rate.to_le_bytes());bytes.extend_from_slice(&(rate*2).to_le_bytes());bytes.extend_from_slice(&2_u16.to_le_bytes());bytes.extend_from_slice(&16_u16.to_le_bytes());
+    bytes.extend_from_slice(b"data");bytes.extend_from_slice(&size.to_le_bytes());
+    for i in 0..count {
+        let t=i as f32/rate as f32;let phase=std::f32::consts::TAU*frequency*t;
+        let signal=phase.sin()*(-7.*t).exp()+0.35*(phase*2.001).sin()*(-13.*t).exp()+0.16*(phase*3.004).sin()*(-22.*t).exp();
+        let envelope=(1.-(-600.*t).exp())*((0.45-t)/0.05).clamp(0.,1.);
+        bytes.extend_from_slice(&((signal*envelope*18000.) as i16).to_le_bytes());
+    }
+    bytes
+}
 pub struct AudioController<'a> {
     intro: Option<Music<'a>>,
     exploration: Option<Music<'a>>,
     challenge: Option<Music<'a>>,
     voice: Option<Music<'a>>,
     sounds: BTreeMap<&'static str, Sound<'a>>,
+    piano_keys: Vec<Sound<'a>>,
+    piano_lit: Option<usize>,
     config: AudioConfig,
     mode: MusicMode,
+    cartman_muted: bool,
     music_started: [bool; 3],
     voice_started: Option<Instant>,
     intro_started: Option<Instant>,
@@ -127,6 +147,17 @@ impl<'a> AudioController<'a> {
                 }
             }
         }
+        let mut piano_keys=vec![];
+        if let Some(d)=device {
+            // Three bounded voices per pitch allow fast consecutive presses
+            // without cutting off the preceding note's release envelope.
+            for frequency in [261.63,293.66,329.63,349.23,392.0].into_iter().cycle().take(15) {
+                match d.new_wave_from_memory(".wav",&piano_note(frequency)).and_then(|wave|d.new_sound_from_wave(&wave)) {
+                    Ok(sound)=>{sound.set_volume(config.sfx_volume*0.85);piano_keys.push(sound);},
+                    Err(e)=>{audit.warnings.push(format!("Piano key: {e}"));piano_keys.clear();break;}
+                }
+            }
+        }
         if let Some(v) = &voice {
             v.set_volume(config.voice_volume);
         }
@@ -143,8 +174,11 @@ impl<'a> AudioController<'a> {
             challenge,
             voice,
             sounds,
+            piano_keys,
+            piano_lit: None,
             config,
             mode: MusicMode::Silent,
+            cartman_muted: false,
             music_started: [false; 3],
             voice_started: None,
             intro_started: None,
@@ -157,6 +191,7 @@ impl<'a> AudioController<'a> {
         *self.audit.plays.entry(name.into()).or_default() += 1;
     }
     pub fn set_music(&mut self, mode: MusicMode) {
+        let mode=if self.cartman_muted && mode==MusicMode::Challenge {MusicMode::Silent} else {mode};
         if mode == self.mode {
             return;
         }
@@ -229,6 +264,18 @@ impl<'a> AudioController<'a> {
             }
         }
     }
+    /// Persisted Music ON/OFF controls only Cartman's challenge song.
+    pub fn set_background_muted(&mut self,muted:bool) {
+        self.cartman_muted=muted;
+        if muted && self.mode==MusicMode::Challenge {self.set_music(MusicMode::Silent);}
+    }
+    /// One restart for a newly opened puzzle, not one for every frame or Start click.
+    pub fn restart_challenge_music(&mut self) {
+        if let Some(m)=&self.challenge {m.stop_stream();}
+        self.music_started[1]=false;
+        if self.mode==MusicMode::Challenge {self.mode=MusicMode::Silent;}
+        self.count("puzzle_music_start");
+    }
     pub fn intro_clock(&self) -> VoiceClock {
         let (Some(started), Some(m)) = (self.intro_started, self.intro.as_ref()) else {
             return VoiceClock::default();
@@ -299,8 +346,27 @@ impl<'a> AudioController<'a> {
         }
     }
     pub fn stop_effects(&self) {
+        for sound in &self.piano_keys {sound.stop();}
         for sound in self.sounds.values() {
             sound.stop();
+        }
+    }
+    pub fn play_piano_key(&self,index:usize) {
+        if index>=5 {return;}
+        let sound=self.piano_keys.iter().skip(index).step_by(5).find(|s|!s.is_playing()).or_else(||self.piano_keys.get(index));
+        if let Some(sound)=sound {sound.play();}
+    }
+    pub fn sync_piano(&mut self,run:Option<&crate::minigames::southpark::puzzles::PuzzleRun>) {
+        use crate::minigames::southpark::puzzles::Board;
+        // Let the final pressed note finish its short envelope; pause, mute and
+        // leaving still stop it immediately, and no new notes start on results.
+        if run.is_some_and(|r|matches!(r.board,Board::Piano(_)) && r.result.is_some() && r.result_time<0.45 && !r.paused && !r.leaving) {return;}
+        let piano=run.filter(|r|r.interactive()).and_then(|r|if let Board::Piano(p)=&r.board {Some(p)}else{None});
+        let Some(p)=piano else {for sound in &self.piano_keys {sound.stop();}self.piano_lit=None;return;};
+        let next=p.lit();
+        if next!=self.piano_lit {
+            if let Some(i)=next {self.play_piano_key(i);}
+            self.piano_lit=next;
         }
     }
     /// Preserve the dialogue stream and its fallback clock across a pause.

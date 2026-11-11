@@ -71,8 +71,16 @@ pub fn run_visit_with_results(
     let mut dev_threats = false;
     let mut muted = false;
     let mut ike_smoke = false;
+    let mut encounter_smoke = false;
+    let mut puzzle_smoke = false;
+    let mut puzzle_results = false;
+    let mut chef_smoke = false;
     while let Some(arg) = args.next() {
         match arg.as_str() {
+            "--smoke-chef" => { chef_smoke=true; no_probes=true; }
+            "--smoke-puzzles" => {puzzle_smoke=true;no_probes=true;}
+            "--smoke-puzzle-results" => {puzzle_smoke=true;puzzle_results=true;no_probes=true;}
+            "--smoke-encounters" => { encounter_smoke = true; no_probes = true; }
             "--smoke-ike" => { ike_smoke = true; no_probes = true; }
             "--smoke-return" => {
                 return_smoke_goal = Some(match args.next().as_deref() {
@@ -164,7 +172,7 @@ pub fn run_visit_with_results(
             .resizable()
             .msaa_4x()
             .title("Planet-Hoppers | South Park | SAVE KENNY!"),
-        smoke || session_smoke || entry_smoke || ike_smoke || return_smoke_goal.is_some(),
+        smoke || session_smoke || entry_smoke || ike_smoke || encounter_smoke || puzzle_smoke || chef_smoke || return_smoke_goal.is_some(),
     );
     rl.set_exit_key(None);
     rl.set_window_min_size(640, 480);
@@ -209,7 +217,17 @@ pub fn run_visit_with_results(
         session.enable_world(locations, seed);
         session.place_kenny_near_player(&mut scene)?;
     }
+    let mut encounters = if dynamic_mode && !session_smoke && !ike_smoke && !entry_smoke && return_smoke_goal.is_none() {
+        let mut adventure = crate::minigames::southpark::encounters::Adventure::build(&scene, &session.locations.as_ref().unwrap().sites)?;
+        let ui = super::encounter_ui::EncounterUi::load(&mut rl, &thread, &root, device.as_ref(), ike_volume, &mut adventure)?;
+        session.adventure = Some(adventure);
+        scene.disable_roaming_kenny();
+        Some(ui)
+    } else { None };
     let mut world_map = WorldMap::load(&mut rl, &thread, &root, &scene)?;
+    let mut puzzle_ui = if encounters.is_some() {Some(super::puzzle_ui::PuzzleUi::load(&mut rl,&thread,&root)?)} else {None};
+    if puzzle_smoke {if let Some(ui)=&mut puzzle_ui {ui.preference=root.join("target/puzzle-smoke-music.txt");ui.muted=false;}}
+    let mut puzzle_music_start = 0;
     unsafe {
         ffi::rlSetClipPlanes(0.05, 1500.0);
     }
@@ -263,8 +281,11 @@ pub fn run_visit_with_results(
     let entry_config = EntryConfig::load(&root.join("config/southpark-entry.json"))?;
     let mut entry =
         SouthParkEntry::new(visits, entry_config.clone(), audio.intro_duration(), &scene)?;
+    let chef_enabled = encounters.is_some() && !encounter_smoke && !puzzle_smoke && !entry_smoke;
     entry.active = !smoke && !session_smoke && !dev_threats;
     if ike_smoke { entry.active = false; }
+    if encounter_smoke { entry.active = false; }
+    if puzzle_smoke { entry.active=false;std::fs::create_dir_all(root.join("target/southpark-puzzles-smoke"))?; }
     let mut video = if entry.active && entry.full_intro {
         Some(VideoIntro::load(&mut rl, &thread, &root)?)
     } else { None };
@@ -329,9 +350,33 @@ pub fn run_visit_with_results(
     let initial_look = (scene.player.yaw, scene.player.pitch);
     let mut ike_smoke_position = None;
     let mut ike_smoke_player = None;
+    let mut puzzle_smoke_pose = None;
+    let mut puzzle_ike_position = None;
+    let mut outcome_smoke = puzzle_results.then(super::puzzle_smoke::OutcomeSmoke::default);
+    let mut puzzle_clock=Instant::now();
     while !crate::graphics::window::should_close(&rl) {
-        if let Some(exit) = reward_shortcut.poll(&rl, observer)? {
-            return Ok(exit);
+        if let Some(shortcut_exit) = reward_shortcut.poll(&rl, observer)? {
+            exit = shortcut_exit;
+            break;
+        }
+        if chef_smoke && visits.chef_intro_seen && frame>=180 {
+            assert!(!entry.active && cursor.captured && !session.blocks_controls());
+            assert!(visits.chef_intro_seen);
+            println!("CHEF_WORLD_HANDOFF_OK controls_restored intro_seen");
+            break;
+        }
+        if chef_enabled && !entry.active && session.state==SessionState::Paused
+            && session.puzzle.is_none() && ike_playback.is_none()
+            && rl.is_key_pressed(KeyboardKey::KEY_H) {
+            audio.set_music(crate::audio::MusicMode::Silent);
+            audio.stop_effects();
+            if let Some(ui)=&encounters {ui.stop();}
+            let es=&mut session.adventure.as_mut().unwrap().spanish;
+            let volume=ike_volume;
+            if !super::chef_intro::play(&mut rl,&thread,&root,device.as_ref(),volume,es,0)? {break;}
+            visits.chef_intro_seen=true;
+            cursor.apply(&mut rl);
+            continue;
         }
         if ike_smoke {
             if frame == 2 || frame == 10 || frame == 550 || frame == 560 || frame == 20 || frame == 45 {
@@ -353,6 +398,116 @@ pub fn run_visit_with_results(
             if frame == 575 { session.start(&mut scene, seed)?; }
         }
         audio.update();
+        if let Some(test)=&mut outcome_smoke {
+            if test.before_frame(&mut rl,&mut session,&mut scene)? {println!("PUZZLE_RESULTS_SMOKE_OK five_real_wins five_real_losses stan_kyle_once retry_pages return_to_world");break;}
+        }
+        if puzzle_smoke && !puzzle_results {
+            let phase=frame/20;let step=frame%20;
+            if puzzle_smoke_pose.is_none() {puzzle_smoke_pose=Some((scene.player.feet,scene.player.yaw,scene.player.pitch,scene.kenny.position()));}
+            if step==0 {
+                if session.puzzle.is_some() {
+                    session.leave_puzzle();
+                    session.update(0.25,&mut scene,crate::audio::VoiceClock::default())?;
+                    session.update(0.25,&mut scene,crate::audio::VoiceClock::default())?;
+                    if session.puzzle.is_some() || session.state!=SessionState::Exploring {return Err("Puzzle did not restore exploration".into());}
+                }
+                let (w,h)=match phase/5 {0=>(1280,800),1=>(800,600),2=>(640,480),_=>(1920,1080)};
+                rl.set_window_size(w,h);
+                session.adventure.as_mut().unwrap().spanish=phase/5%2==1;
+                if puzzle_ui.as_ref().unwrap().muted != (phase%2==1) {return Err("Puzzle mute was not retained across encounters".into());}
+                let group=[1,0,2,3,4][phase as usize%5];
+                session.adventure.as_mut().unwrap().dialogue=Some((group,crate::minigames::southpark::encounters::script(group).len()-1));
+            }
+            if step==1 || step==2 {
+                unsafe {ffi::PlayAutomationEvent(ffi::AutomationEvent {frame:0,type_:if step==1 {2} else {1},params:[KeyboardKey::KEY_E as i32,0,0,0]});}
+            }
+            if step==4 && session.puzzle.is_none() {return Err("Final NPC line did not open puzzle".into());}
+            if step==4 && phase==0 {puzzle_ike_position=ike.position;if puzzle_ike_position.is_none() {return Err("Ike missing before puzzle".into());}}
+            if step==12 {
+                if puzzle_smoke_pose!=Some((scene.player.feet,scene.player.yaw,scene.player.pitch,scene.kenny.position())) {return Err("Puzzle moved the 3D world or camera".into());}
+                if ike.position!=puzzle_ike_position {return Err("Puzzle relocated Ike".into());}
+            }
+            for (key,down) in match step {6=>vec![(KeyboardKey::KEY_W,true)],10=>vec![(KeyboardKey::KEY_M,true)],11=>vec![(KeyboardKey::KEY_W,false),(KeyboardKey::KEY_M,false)],_=>vec![]} {
+                unsafe {ffi::PlayAutomationEvent(ffi::AutomationEvent {frame:0,type_:if down {2} else {1},params:[key as i32,0,0,0]});}
+            }
+            if matches!(step,6|7|8|9) {
+                let layout=super::puzzle_ui::Layout::new(rl.get_screen_width(),rl.get_screen_height());
+                let point=if step<8 {let r=layout.primary();Vector2::new(r.x+r.width*0.5,r.y+r.height*0.5)} else {
+                    let run=session.puzzle.as_ref().unwrap();
+                    match &run.board {
+                        crate::minigames::southpark::puzzles::Board::Heaters(_)=>{let r=layout.cell(0);Vector2::new(r.x+r.width*0.5,r.y+r.height*0.5)},
+                        crate::minigames::southpark::puzzles::Board::Ufo(u)=>layout.light(u.target),
+                        crate::minigames::southpark::puzzles::Board::Bus(_)=>{let r=layout.lever(0);Vector2::new(r.x+r.width*0.5,r.y+r.height*0.5)},
+                        crate::minigames::southpark::puzzles::Board::Piano(p)=>{let r=layout.key(0,p.errors);Vector2::new(r.x+r.width*0.5,r.y+r.height*0.5)},
+                        crate::minigames::southpark::puzzles::Board::Sewers(_)=>layout.hole(0),
+                    }
+                }*layout.scale+layout.offset;
+                unsafe {
+                    ffi::PlayAutomationEvent(ffi::AutomationEvent {frame:0,type_:7,params:[point.x as i32,point.y as i32,0,0]});
+                    ffi::PlayAutomationEvent(ffi::AutomationEvent {frame:0,type_:if step%2==0 {6} else {5},params:[0,0,0,0]});
+                }
+            }
+            if step==10 && !session.puzzle.as_ref().unwrap().started {return Err("Puzzle Start click failed".into());}
+            if step==10 && audio.audit.plays.get("puzzle_music_start").copied().unwrap_or(0)!=phase+1 {return Err("Puzzle music started more than once".into());}
+            if step==14 || step==15 {
+                let layout=super::puzzle_ui::Layout::new(rl.get_screen_width(),rl.get_screen_height());
+                let r=layout.audio();let point=Vector2::new(r.x+r.width*0.5,r.y+r.height*0.5)*layout.scale+layout.offset;
+                unsafe {
+                    ffi::PlayAutomationEvent(ffi::AutomationEvent {frame:0,type_:7,params:[point.x as i32,point.y as i32,0,0]});
+                    ffi::PlayAutomationEvent(ffi::AutomationEvent {frame:0,type_:if step==14 {6} else {5},params:[0,0,0,0]});
+                }
+            }
+            if step==16 {
+                let muted=puzzle_ui.as_ref().unwrap().muted;
+                if muted!=(phase%2==0) {return Err("Puzzle audio button failed".into());}
+                if std::fs::read_to_string(&puzzle_ui.as_ref().unwrap().preference)?.trim()!=if muted {"muted"} else {"on"} {return Err("Puzzle mute persistence failed".into());}
+                if audio.audit.music_transitions.last().map(String::as_str)!=Some(if muted {"silent"} else {"save_kenny"}) {return Err("Puzzle mute did not control music".into());}
+            }
+        }
+        if encounter_smoke {
+            if frame < 10 {
+                let a = session.adventure.as_mut().ok_or("Encounter smoke requires adventure")?;
+                let group = (frame / 2) as usize;
+                scene.player.feet = a.groups[group].positions[0] + Vector3::new(-3.0,0.0,0.0);
+                scene.player.yaw = 0.0;
+                scene.player.pitch = 0.0;
+                a.spanish = frame % 2 == 1;
+                a.dialogue = Some((group, if frame % 2 == 1 && group != 0 && group != 2 { if group == 4 { 2 } else { 1 } } else { 0 }));
+            }
+            if frame == 10 {
+                session.adventure.as_mut().unwrap().dialogue = None;
+                session.open_map();
+            }
+            if frame == 12 {
+                session.continue_match(&mut scene)?;
+                scene.player.feet = session.adventure.as_ref().unwrap().groups[0].positions[0] + Vector3::new(-3.0,0.0,0.0);
+                cursor.captured = true;
+                cursor.apply(&mut rl);
+            }
+            if frame == 14 || frame == 16 {
+                let a = session.adventure.as_ref().unwrap();
+                if a.dialogue != Some((0,if frame == 14 {0} else {1})) {
+                    return Err("Encounter E input skipped or failed a line".into());
+                }
+                let start = a.groups[0].positions[0] + Vector3::new(-3.0,0.0,0.0);
+                if (scene.player.feet-start).length()>0.001 { return Err("Encounter failed to freeze movement".into()); }
+            }
+            for (key,down) in match frame {
+                13 | 15 => vec![(KeyboardKey::KEY_E,true)],
+                14 => vec![(KeyboardKey::KEY_E,false),(KeyboardKey::KEY_W,true)],
+                16 => vec![(KeyboardKey::KEY_E,false),(KeyboardKey::KEY_W,false)],
+                19 => vec![(KeyboardKey::KEY_ESCAPE,true)],
+                20 => vec![(KeyboardKey::KEY_ESCAPE,false)],
+                _ => vec![],
+            } {
+                unsafe { ffi::PlayAutomationEvent(ffi::AutomationEvent { frame:0,type_:if down {2} else {1},params:[key as i32,0,0,0] }); }
+            }
+            if frame == 17 || frame == 18 {
+                unsafe { ffi::PlayAutomationEvent(ffi::AutomationEvent { frame:0,type_:if frame==17 {6} else {5},params:[0,0,0,0] }); }
+            }
+            if frame == 18 && session.adventure.as_ref().unwrap().dialogue != Some((0,2)) { return Err("Encounter click did not advance".into()); }
+            if frame == 21 && (session.state != SessionState::Exploring || session.adventure.as_ref().unwrap().dialogue.is_some()) { return Err("Encounter close did not restore exploration".into()); }
+        }
         if let Some(test) = &mut return_test {
             test.before_frame(&rl, &mut scene, &session, &return_confirmation, entry.active)?;
         }
@@ -461,6 +616,28 @@ pub fn run_visit_with_results(
                 // Stop the one video track before gameplay music can start.
                 audio.set_music(crate::audio::MusicMode::Silent);
                 video = None;
+                // The original entry owns its full lifecycle. Chef is additional
+                // content, dispatched only after the original completion/skip.
+                if chef_enabled && !visits.chef_intro_seen {
+                    let before=(scene.player.feet,scene.player.yaw,scene.kenny.position(),session.lives,session.saves);
+                    if chef_smoke {
+                        assert!(visits.intro_seen && entry.full_intro);
+                        println!("ORIGINAL_BEFORE_CHEF_OK elapsed={} duration={}",entry.elapsed,entry.duration);
+                    }
+                    let es=&mut session.adventure.as_mut().unwrap().spanish;
+                    let volume=ike_volume;
+                    if !super::chef_intro::play(&mut rl,&thread,&root,device.as_ref(),volume,es,u8::from(chef_smoke))? {return Ok(SouthParkExit::WindowClosed);}
+                    visits.chef_intro_seen=true;
+                    if chef_smoke {
+                        *es=!*es;
+                        rl.set_window_size(640,480);
+                        assert!(super::chef_intro::play(&mut rl,&thread,&root,device.as_ref(),volume,es,1)?);
+                        assert!(super::chef_intro::play(&mut rl,&thread,&root,device.as_ref(),volume,es,2)?);
+                        assert_eq!(before,(scene.player.feet,scene.player.yaw,scene.kenny.position(),session.lives,session.saves));
+                        assert!(visits.intro_seen && !entry.active);
+                        println!("CHEF_SMOKE_OK original_preserved bilingual native_skip world_unchanged");
+                    }
+                }
                 cursor.captured = true;
                 cursor.apply(&mut rl);
             }
@@ -472,6 +649,7 @@ pub fn run_visit_with_results(
             && session.state == SessionState::Exploring
             && scene.dialogue == KennyDialogue::Closed
             && rl.is_key_pressed(KeyboardKey::KEY_BACKSPACE)
+            && !session.blocks_controls()
         {
             session.pause();
             return_confirmation.request();
@@ -480,8 +658,49 @@ pub fn run_visit_with_results(
         let session_was_modal = session.blocks_controls();
         let was_paused = session.state == SessionState::Paused;
         let had_dialogue = scene.dialogue != KennyDialogue::Closed;
+        let encounter_was_open = session.adventure.as_ref().is_some_and(|a| a.dialogue.is_some());
+        let puzzle_was_open = session.puzzle.is_some();
+        let now=Instant::now();
+        let timing_dt=now.duration_since(puzzle_clock).as_secs_f32();
+        puzzle_clock=now;
+        if let Some(p)=&mut session.puzzle {
+            if p.kind!=ThreatKind::Snowman && !puzzle_smoke {
+                p.externally_clocked=true;
+                if !rl.is_window_focused() && !p.leaving && p.result.is_none() {p.paused=true;}
+                p.tick(timing_dt);
+            }
+        }
+        if !intro_was_active && puzzle_was_open {
+            if let Some(ui)=&mut puzzle_ui {
+                use super::puzzle_ui::Action;
+                match if rl.is_window_focused() || puzzle_smoke {ui.input(&rl,&session)}else{Action::None} {
+                    Action::Start=>session.puzzle.as_mut().unwrap().start(),
+                    Action::Hit(i)=>{
+                        let p=session.puzzle.as_mut().unwrap();
+                        if p.interactive() && matches!(&p.board,crate::minigames::southpark::puzzles::Board::Piano(k) if !k.demonstrating) {audio.play_piano_key(i);}
+                        p.click(i);
+                    },
+                    Action::Restart=>{audio.stop_effects();audio.silence_voice();session.restart_puzzle();},
+                    Action::Pause=>{let p=session.puzzle.as_mut().unwrap();p.paused=!p.paused;},
+                    Action::Back=>session.leave_puzzle(),
+                    Action::Mute=>ui.toggle_mute(),
+                    Action::SelectBus(i)=>session.puzzle.as_mut().unwrap().select_bus_piece(i),
+                    Action::AnnotateBus(cell)=>session.puzzle.as_mut().unwrap().annotate_bus_cell(cell),
+                    Action::ToggleBusMode=>session.puzzle.as_mut().unwrap().toggle_bus_mode(),
+                    Action::PlaceBus(cell)=>session.puzzle.as_mut().unwrap().place_bus_piece(cell),
+                    Action::AccuseBus(i)=>session.puzzle.as_mut().unwrap().accuse_bus_driver(i),
+                    Action::RemoveBus=>session.puzzle.as_mut().unwrap().remove_bus_piece(),
+                    Action::ClearBus=>session.puzzle.as_mut().unwrap().clear_bus(),
+                    Action::ConfirmBus=>session.puzzle.as_mut().unwrap().confirm_bus(),
+                    Action::None=>{}
+                }
+            }
+        }
+        if !intro_was_active {
+            if let Some(ui) = &mut encounters { ui.update(&rl, &mut scene, &mut session); }
+        }
         let map_was_open = session.state == SessionState::MapOpen;
-        if !smoke && !intro_was_active && !had_dialogue {
+        if !smoke && !intro_was_active && !had_dialogue && !encounter_was_open && !puzzle_was_open && session.puzzle.is_none() {
             if map_was_open {
                 world_map.input(&rl, scene.player.feet);
                 if rl.is_key_pressed(KeyboardKey::KEY_M)
@@ -496,7 +715,7 @@ pub fn run_visit_with_results(
         reporter.observe(&session, observer)?;
         let map_consumed = map_was_open || session.state == SessionState::MapOpen;
         let mut restarted = false;
-        if !smoke && !intro_was_active && !map_consumed && !had_dialogue {
+        if !smoke && !intro_was_active && !map_consumed && !had_dialogue && !encounter_was_open && !puzzle_was_open && session.puzzle.is_none() {
             let action = session_ui::input(&rl, &session, &return_confirmation);
             let result = match action {
                 SessionAction::Continue => session.continue_match(&mut scene),
@@ -612,7 +831,7 @@ pub fn run_visit_with_results(
             running_read |= input.forward > 0.0 && input.sprint;
         }
         let old_yaw = scene.player.yaw;
-        let focused = smoke || session_smoke || ike_smoke || return_test.is_some() || rl.is_window_focused();
+        let focused = smoke || session_smoke || ike_smoke || encounter_smoke || puzzle_smoke || chef_smoke || return_test.is_some() || rl.is_window_focused();
         let active = !modal_at_start && cursor.update(&mut rl, &mut input, focused);
         let previous_feet = scene.player.feet;
         if active {
@@ -633,12 +852,12 @@ pub fn run_visit_with_results(
             0.0
         };
         audio.set_paused(session.state == SessionState::Paused);
-        if intro_was_active || restarted || (was_paused && session.state != SessionState::Paused) {
+        if intro_was_active || encounter_was_open || restarted || (was_paused && session.state != SessionState::Paused) {
             // Freeze world simulation until the FPS handoff, including Kenny.
         } else if smoke {
             scene.update_kenny(dt);
         } else if let Err(error) = session.update(
-            if session_smoke || return_test.is_some() {
+            if puzzle_smoke {0.1} else if session_smoke || return_test.is_some() {
                 dt
             } else {
                 rl.get_frame_time()
@@ -657,7 +876,15 @@ pub fn run_visit_with_results(
             cursor.captured = true;
             cursor.apply(&mut rl);
         }
-        audio.set_music(if entry.active {
+        if let Some(ui)=&puzzle_ui {audio.set_background_muted(ui.muted);}
+        audio.sync_piano(session.puzzle.as_ref());
+        if session.puzzle_starts != puzzle_music_start {
+            if session.puzzle.is_some() {audio.restart_challenge_music();}
+            puzzle_music_start=session.puzzle_starts;
+        }
+        audio.set_music(if session.puzzle.as_ref().is_some_and(|p|p.paused || p.leaving) {
+            crate::audio::MusicMode::Silent
+        } else if entry.active {
             if entry.full_intro {
                 crate::audio::MusicMode::Intro
             } else {
@@ -666,7 +893,9 @@ pub fn run_visit_with_results(
         } else {
             session.music()
         });
-        ike.sync(session.state, entry.active);
+        // A 2D overlay suspends the exploration scene, including Ike's lifecycle;
+        // it must not remove or reroll his position just because a puzzle is open.
+        if session.puzzle.is_none() {ike.sync(session.state, entry.active);}
         if ike.available && !ike.spawn_attempted && ike_sprite.is_some() {
             ike.spawn_attempted = true;
             if let Some(locations) = &session.locations {
@@ -770,7 +999,7 @@ pub fn run_visit_with_results(
                         ike_sprite.as_ref()?.hit(ike_pose.as_ref()?, origin, direction,
                             range.min(scene.interaction_distance))
                     } else if index == kenny_index {
-                        if session.in_match()
+                        if session.adventure.is_some() || session.in_match()
                             || scene.threats.owns_kenny()
                             || !scene.threats.visible_kenny()
                         {
@@ -799,7 +1028,13 @@ pub fn run_visit_with_results(
         } else {
             None
         };
-        if active && input.interact {
+        let nearby_encounter = if !ike.playing && session.state == SessionState::Exploring && scene.dialogue == KennyDialogue::Closed {
+            session.adventure.as_ref().and_then(|a| a.nearby(&scene))
+        } else { None };
+        if active && input.interact && nearby_encounter.is_some() && !(ike_index.is_some() && selected == ike_index) {
+            session.adventure.as_mut().unwrap().dialogue = Some((nearby_encounter.unwrap(), 0));
+            if let Some(ui) = &mut encounters { ui.sync_audio(&session); }
+        } else if active && input.interact {
             if let Some(index) = selected {
                 if Some(index) == ike_index {
                     if ike.begin() {
@@ -808,6 +1043,9 @@ pub fn run_visit_with_results(
                             Err(error) => { eprintln!("IKE_VIDEO_WARNING {error}"); ike.finish(); }
                         }
                     }
+                } else if index == kenny_index && session.adventure.is_some() {
+                    let a = session.adventure.as_ref().unwrap();
+                    scene.confirmation = Some((a.text("Find the ! markers to help Kenny.","Busca los marcadores ! para ayudar a Kenny.").into(),3.0));
                 } else { scene.interact(index); }
             }
         }
@@ -871,11 +1109,14 @@ pub fn run_visit_with_results(
             let width = rl.get_screen_width();
             let height = rl.get_screen_height();
             let rl_mouse = rl.get_mouse_position();
+            let mouse_down = rl.is_mouse_button_down(MouseButton::MOUSE_BUTTON_LEFT);
             let mut d = crate::graphics::window::begin_drawing(&mut rl, &thread);
             d.clear_background(Color::new(184, 212, 237, 255));
             // The video replaces the cinematic entirely: no town/HUD render underneath.
             if !(entry.active && entry.full_intro) {
-                {
+                // Keep all world resources/state alive, but don't draw the town
+                // behind an opaque 2D puzzle (especially on integrated GPUs).
+                if session.puzzle.is_none() {
                     let mut view = d.begin_mode3D(camera);
                     model.draw(&mut view, camera.position);
                     for (index, target) in scene.targets.iter().enumerate() {
@@ -918,7 +1159,8 @@ pub fn run_visit_with_results(
                         }
                     }
                     threat_models.draw(&mut view, camera.position, &scene.threats);
-                    if scene.threats.visible_kenny() {
+                    if let (Some(ui), Some(a)) = (&encounters, &session.adventure) { ui.world(&mut view, camera, a); }
+                    if session.adventure.is_none() && scene.threats.visible_kenny() {
                         sprite.draw(&mut view, &pose);
                     }
                     if ike.available {
@@ -935,6 +1177,7 @@ pub fn run_visit_with_results(
                     && !dev_threats
                     && session.state == SessionState::Exploring
                     && scene.dialogue == KennyDialogue::Closed
+                    && session.adventure.is_none()
                 {
                     d.draw_text(
                         "E: hablar | M: mapa | Retroceso: salir de South Park",
@@ -961,7 +1204,10 @@ pub fn run_visit_with_results(
                     d.draw_line(width / 2 - 7, height / 2, width / 2 + 7, height / 2, color);
                     d.draw_line(width / 2, height / 2 - 7, width / 2, height / 2 + 7, color);
                     if let Some(index) = selected {
-                        let text = if Some(index) == ike_index {
+                        let text = if let Some(a) = session.adventure.as_ref().filter(|_| Some(index) != ike_index) {
+                            if index == kenny_index { a.text("[E] Talk to Kenny","[E] Hablar con Kenny").into() }
+                            else { a.text("[E] Use","[E] Usar").into() }
+                        } else if Some(index) == ike_index {
                             "[E] Hablar con Ike".into()
                         } else if index == kenny_index {
                             "[E] Hablar con Kenny".into()
@@ -987,7 +1233,7 @@ pub fn run_visit_with_results(
                 {
                     d.draw_rectangle(0, height / 2 - 30, width, 60, Color::new(20, 30, 40, 210));
                     d.draw_text(
-                        "Cursor libre - pulsa ESC para retomar",
+                        if session.adventure.as_ref().is_some_and(|a| !a.spanish) { "Cursor free - press ESC to resume" } else { "Cursor libre - pulsa ESC para retomar" },
                         (width - 480) / 2,
                         height / 2 - 10,
                         24,
@@ -1011,6 +1257,8 @@ pub fn run_visit_with_results(
                     d.draw_text(
                         if smoke {
                             "WASD caminar | Shift correr | Mouse mirar | E interactuar | ESC cursor"
+                        } else if session.adventure.as_ref().is_some_and(|a| !a.spanish) {
+                            "WASD: move | Mouse: look | E: use"
                         } else {
                             "WASD: mover | Mouse: mirar | E: usar"
                         },
@@ -1022,6 +1270,8 @@ pub fn run_visit_with_results(
                     d.draw_text(
                         if smoke {
                             "F1 ayuda | F2 colisiones | F3 Kenny | F12 captura | Ctrl+Q salir"
+                        } else if session.adventure.as_ref().is_some_and(|a| !a.spanish) {
+                            "Shift: run | M: map | Esc/P: pause"
                         } else {
                             "Shift: correr | M: mapa | Esc/P: pausa"
                         },
@@ -1031,7 +1281,7 @@ pub fn run_visit_with_results(
                         Color::LIGHTGRAY,
                     );
                 }
-                if scene.kenny_hint
+                if session.adventure.is_none() && scene.kenny_hint
                     && !session.in_match()
                     && scene.dialogue == KennyDialogue::Closed
                     && !(kenny_smoke && frame == 195)
@@ -1053,7 +1303,7 @@ pub fn run_visit_with_results(
                 if !session.in_match() {
                     draw_status(&mut d, &scene.threats, width);
                 }
-                session_ui.draw(&mut d, &session, &scene.threats, width, height, &return_confirmation);
+                if session.puzzle.is_none() {session_ui.draw(&mut d, &session, &scene.threats, width, height, &return_confirmation);}
                 if let Some(test) = &mut return_test {
                     if let Some(name) = test.capture(&session, &return_confirmation) {
                         save_frame(&captures.join(name), width, height)?;
@@ -1062,6 +1312,20 @@ pub fn run_visit_with_results(
                 if !entry.active && scene.dialogue == KennyDialogue::Closed {
                     world_map.draw(&mut d, &scene, &session, width, height);
                 }
+                if !entry.active && session.puzzle.is_none() { if let Some(ui) = &encounters { ui.draw(&mut d, &scene, &session, width, height); } }
+                if chef_enabled && session.state==SessionState::Paused && session.puzzle.is_none() && ike_playback.is_none() {
+                    d.draw_text(if session.adventure.as_ref().is_some_and(|a|a.spanish){"H: Ver introduccion"}else{"H: Replay intro"},32,height-44,22,Color::WHITE);
+                }
+                if let (Some(ui),Some(encounters))=(&puzzle_ui,&encounters) {
+                    ui.draw(&mut d,&session,&encounters.portraits,session_ui.death_portrait(session.dialogue().0),width,height,rl_mouse,mouse_down);
+                }
+                if encounter_smoke && [0,3,7,9,10].contains(&frame) {
+                    save_frame(&root.join(format!("target/encounter-{frame}.png")),width,height)?;
+                }
+                if puzzle_smoke && !puzzle_results && frame%20==12 {
+                    save_frame(&root.join(format!("target/southpark-puzzles-smoke/puzzle-{}-{}.png",frame/20%5,frame/100)),width,height)?;
+                }
+                if let Some(test)=&mut outcome_smoke {test.capture(&session,&root,width,height)?;}
                 if help && scene.confirmation.is_none() && (dev_threats || smoke) && !session.in_match()
                 {
                     d.draw_text(
@@ -1165,6 +1429,8 @@ pub fn run_visit_with_results(
             scene.player.pitch = 0.0;
         }
         frame += 1;
+        if puzzle_smoke && !puzzle_results && frame>=400 {println!("PUZZLES_SMOKE_OK five_scenes four_resolutions dialogue_handoff start_clicks return_to_world music_once mute_button mute_persistence world_camera_frozen ike_position_preserved");break;}
+        if encounter_smoke && frame >= 22 { println!("ENCOUNTERS_SMOKE_OK eight_portraits bilingual_dialogues world_render E_first_line click_advance movement_frozen close"); break; }
         if ike_smoke && frame >= 600 {
             println!("IKE_SMOKE_OK raycast playback movement completion repeat challenge_cleanup");
             break;

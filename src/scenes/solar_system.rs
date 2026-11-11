@@ -616,6 +616,11 @@ fn run_session_with_progress(args: impl Iterator<Item = String>, game: Option<Ga
                 let catalog = ShipCatalog::load(&root.join("config/ship-selection.json"), &session.ships)?;
                 let reward_ship_name = catalog.choice(&id).map(|choice| catalog.model(choice, &session.ships).name)
                     .unwrap_or_else(|| id.clone());
+                if id == "southpark" {
+                    if let Some(game) = &session.game {
+                        session.minigames.southpark.chef_intro_seen = game.southpark_chef_intro_seen;
+                    }
+                }
                 let mut on_result = |result| {
                     if let Some(game) = &mut session.game {
                         let outcome = crate::gameplay::rewards::record_result(game, &id, result, &catalog)?;
@@ -627,7 +632,14 @@ fn run_session_with_progress(args: impl Iterator<Item = String>, game: Option<Ga
                     }
                     Ok(())
                 };
-                match minigame_host::run_with_ship_and_results(&id, &mut session.minigames, &selected_ship, &root, args.into_iter(), &mut on_result)? {
+                let minigame_exit = minigame_host::run_with_ship_and_results(&id, &mut session.minigames, &selected_ship, &root, args.into_iter(), &mut on_result)?;
+                if id == "southpark" {
+                    if let Some(game) = &mut session.game {
+                        game.southpark_chef_intro_seen = session.minigames.southpark.chef_intro_seen;
+                        if !smoke { crate::gameplay::save::store(&crate::gameplay::save::path(&root), game, &session.token_presentation)?; }
+                    }
+                }
+                match minigame_exit {
                     MinigameExit::WindowClosed if session.visit_smoke.is_none() => return Ok(session.game),
                     MinigameExit::Returned(result) => {
                         if session.regularshow_smoke {

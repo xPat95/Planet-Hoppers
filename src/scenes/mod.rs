@@ -1,4 +1,7 @@
 mod button_style;
+mod encounter_ui;
+mod puzzle_ui;
+mod puzzle_smoke;
 pub mod abduction;
 pub mod sfv;
 pub mod token_collection;
@@ -17,6 +20,7 @@ mod session_smoke;
 mod session_ui;
 pub mod solar_system;
 pub mod southpark_dev;
+mod chef_intro;
 pub mod southpark_entry;
 pub mod southpark_video;
 mod southpark_ike;

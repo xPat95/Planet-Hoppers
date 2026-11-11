@@ -129,6 +129,9 @@ pub struct SessionUi {
     pub loaded_portraits: usize,
 }
 impl SessionUi {
+    pub(super) fn death_portrait(&self,name:&str)->Option<&Texture2D> {
+        if name=="Stan" {self.stan.as_ref()} else {self.kyle.as_ref()}
+    }
     pub fn load(rl: &mut RaylibHandle, thread: &RaylibThread, root: &Path) -> Self {
         let mut load = |name: &str| {
             let path = root.join("assets/textures/minigames/South Park").join(name);
@@ -162,6 +165,54 @@ impl SessionUi {
         confirmation: &ReturnConfirmation,
     ) {
         use SessionState::*;
+        if let Some(a) = &s.adventure {
+            if s.state == DeathDialogue { self.death_dialogue(d,s,w,h); return; }
+            if s.state == Exploring { return; }
+            let tr = |en, es| a.text(en,es);
+            if s.state == Paused {
+                d.draw_rectangle(0,0,w,h,Color::new(8,16,26,220));
+                wrapped(d,tr("SAVE KENNY - Paused","SAVE KENNY - Pausa"),32,h/2-130,w-64,26,Color::YELLOW);
+                wrapped(d,if confirmation.pending { tr("Return to the solar system? This attempt's progress will be lost. No rewards will be granted.","¿Regresar al sistema solar? Se perderá el progreso de este intento. No recibirás recompensas.") } else { tr("All danger is paused. L: English / Español","El peligro está detenido. L: Español / English") },32,h/2-80,w-64,18,Color::WHITE);
+                if confirmation.pending {
+                    for (r,t) in buttons(w,h).into_iter().zip([tr("Confirm return","Confirmar regreso"),tr("Cancel","Cancelar")]) { choice_button(d,r,t,18,true); }
+                } else {
+                    for (r,t) in pause_buttons(w,h).into_iter().zip([tr("Resume","Continuar"),tr("Restart minigame","Reiniciar minijuego"),tr("Return to solar system","Regresar al sistema solar")]) { choice_button(d,r,t,18,true); }
+                }
+                return;
+            }
+            if s.state == MapOpen { return; }
+            d.draw_rectangle(16,44,w-32,114,Color::new(15,30,46,238));
+            d.draw_text(&format!("{}: {}   {}: {}/5",tr("Lives","Vidas"),s.lives,tr("Completed","Completadas"),s.saves),28,54,20,Color::WHITE);
+            let instruction = match s.current() {
+                ThreatKind::Ufo => tr("UFO: use E to switch off all three lights.","OVNI: usa E para apagar las tres luces."),
+                ThreatKind::Snowman => tr("Heaters: use E to turn on all three heaters.","Calefactores: usa E para encender los tres."),
+                ThreatKind::Bus => tr("Bus: use E on the red panel to brake.","Autobús: usa E en el panel rojo para frenar."),
+                ThreatKind::Piano => tr("Piano: use E on the yellow safety lock.","Piano: usa E en el seguro amarillo."),
+                ThreatKind::Sewer => tr("Manhole: use E to collect the lid, then cover the hole.","Alcantarilla: usa E para recoger la tapa y cubrir el agujero."),
+            };
+            let text = match s.state {
+                Searching => tr("Follow the danger marker. Take your time; approach Kenny when ready.","Sigue el marcador de peligro. Acércate a Kenny cuando estés listo, sin prisa."),
+                Success => tr("Kenny is safe! Find another group to continue.","¡Kenny está a salvo! Busca otro grupo para continuar."),
+                DeathAnimation | Restoring => tr("Kenny died! The unfinished mission will remain available.","¡Kenny murió! La misión pendiente seguirá disponible."),
+                _ => instruction,
+            };
+            wrapped(d,text,28,86,w-56,18,Color::YELLOW);
+            if matches!(s.state, Preparing | Active) {
+                let progress = match s.current() {
+                    ThreatKind::Ufo => format!("{}/3",event.lights.iter().filter(|x| !**x).count()),
+                    ThreatKind::Snowman => format!("{}/3",event.heaters.iter().filter(|x| **x).count()),
+                    _ => String::new(),
+                };
+                d.draw_text(&progress,28,132,18,Color::WHITE);
+            }
+            if matches!(s.state,Victory|Defeat) {
+                d.draw_rectangle(16,h/2-90,w-32,220,Color::new(19,40,65,252));
+                wrapped(d,if s.state==Victory { tr("KENNY SURVIVED! All five missions completed.","¡KENNY SOBREVIVIÓ! Completaste las cinco misiones.") } else { tr("OH MY GOD! THEY KILLED KENNY! Game over.","¡DIOS MÍO! ¡MATARON A KENNY! Fin de la partida.") },32,h/2-65,w-64,24,Color::YELLOW);
+                for (r,t) in buttons(w,h).into_iter().zip([tr("Play again","Volver a jugar"),tr("Return to solar system","Regresar al sistema solar")]) { choice_button(d,r,t,16,true); }
+            }
+            if let Some(error) = &s.error { wrapped(d,error,28,170,w-56,16,Color::RED); }
+            return;
+        }
         if s.state == Paused {
             draw_pause(d, w, h, confirmation);
             if let Some(error) = &s.error { wrapped(d, error, 32, h - 60, w - 64, 16, Color::ORANGE); }
@@ -350,6 +401,9 @@ impl SessionUi {
             Color::new(235, 225, 184, 255),
         );
         let (name, text, count) = s.dialogue();
+        let text = if let Some(a) = &s.adventure {
+            if name == "Stan" { a.text(text,"¡Dios mío! ¡Mataron a Kenny!") } else { a.text(text,"¡Malditos bastardos!") }
+        } else { text };
         let portrait = if name == "Stan" {
             &self.stan
         } else {
@@ -410,7 +464,7 @@ fn heart(d: &mut RaylibDrawHandle, x: f32, y: f32, color: Color) {
         color,
     );
 }
-fn wrapped(
+pub(super) fn wrapped(
     d: &mut RaylibDrawHandle,
     text: &str,
     x: i32,

@@ -7,6 +7,7 @@ use std::path::Path;
 #[derive(Default)]
 pub struct SouthParkVisits {
     pub intro_seen: bool,
+    pub chef_intro_seen: bool,
 }
 /// Kept as an alias for existing callers; all minigames share this contract.
 pub use crate::minigames::common::host::MinigameExit as SouthParkExit;
@@ -26,6 +27,7 @@ pub fn restart_attempt(
         fresh_scene.kenny_hint = false;
         fresh_session.place_kenny_near_player(&mut fresh_scene)?;
     }
+    fresh_session.adventure = session.adventure.clone();
     fresh_session.start(&mut fresh_scene, seed)?;
     *scene = fresh_scene;
     *session = fresh_session;
