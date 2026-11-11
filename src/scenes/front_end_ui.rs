@@ -1,8 +1,7 @@
 //! Secondary-screen presentation, sharing the menu's subdued button style.
-use super::{chrome, draw_intro_button, slanted, CYAN, INK, MUTED};
+use super::draw_intro_button;
 use raylib::prelude::*;
 
-const ORANGE: Color = Color::new(255, 178, 88, 255);
 
 /// Pass the codepoint count directly: raylib 5.5.1's string wrapper counts
 /// UTF-8 bytes, which is incorrect for accented Spanish characters.
@@ -62,19 +61,6 @@ pub(super) fn centered(
         size,
         color,
     );
-}
-
-fn heading(d: &mut RaylibDrawHandle, font: &Font, label: &str, x: f32, y: f32, size: f32) {
-    for (dx, dy, color) in [
-        (3.0, 5.0, Color::new(19, 4, 146, 255)),
-        (-2.0, 0.0, CYAN),
-        (2.0, 0.0, CYAN),
-        (0.0, -2.0, CYAN),
-        (0.0, 2.0, CYAN),
-    ] {
-        d.draw_text_ex(font, label, Vector2::new(x + dx, y + dy), size, 1.0, color);
-    }
-    d.draw_text_ex(font, label, Vector2::new(x, y), size, 1.0, Color::WHITE);
 }
 
 pub(super) fn action(
@@ -165,90 +151,36 @@ pub(super) fn hangar_title(
     }
 }
 
-pub(super) fn controls(d: &mut RaylibDrawHandle, title: &Font, body: &Font, w: i32, h: i32) {
-    d.draw_rectangle(0, 0, w, h, Color::new(3, 5, 24, 155));
-    let left = (w as f32 * 0.065).round();
-    text(
-        d,
-        body,
-        "PLANET-HOPPERS / GUÍA DE VUELO",
-        left,
-        34.0,
-        18.0,
-        CYAN,
-    );
-    heading(
-        d,
-        title,
-        "CONTROLES",
-        left,
-        68.0,
-        (w as f32 * 0.047).clamp(40.0, 62.0),
-    );
-    slanted(d, left, 145.0, 104.0, 4.0, |t| chrome(t, 0.0));
-    text(
-        d,
-        body,
-        "Tu próxima aventura empieza al mando.",
-        left,
-        164.0,
-        22.0,
-        INK,
-    );
-    let gap = w as f32 * 0.065;
-    let col_width = (w as f32 - left * 2.0 - gap) * 0.5;
-    let row_height = ((h as f32 - 295.0) / 5.0).clamp(62.0, 86.0);
-    let groups = [
-        (
-            "01 / PILOTAJE",
-            [
-                ("W / S", "Acelerar / frenar"),
-                ("MOUSE / A / D / R / F", "Orientar la nave"),
-                ("SHIFT", "Turbo"),
-                ("ESPACIO", "Subir · ascenso vertical"),
-                ("TAB / B", "Elegir objetivo / piloto automático"),
-            ],
-        ),
-        (
-            "02 / EXPLORACIÓN Y SESIÓN",
-            [
-                ("E / ENTER", "Explorar planeta / entrar a estación"),
-                ("C / O", "Vista general / órbitas"),
-                ("ESC", "Soltar / recapturar mouse en vuelo"),
-                (
-                    "ESC / P · SOUTH PARK",
-                    "Pausa, reinicio y regreso al sistema solar",
-                ),
-                ("CTRL + X", "Salir del juego"),
-            ],
-        ),
-    ];
-    for (column, (section, rows)) in groups.iter().enumerate() {
-        let x = left + column as f32 * (col_width + gap);
-        text(
-            d,
-            title,
-            section,
-            x,
-            219.0,
-            (col_width / 24.0).min(18.0),
-            CYAN,
-        );
-        for (i, (key, description)) in rows.iter().enumerate() {
-            let y = 260.0 + i as f32 * row_height;
-            slanted(d, x, y + 3.0, 3.0, 17.0, |_| ORANGE);
-            text(d, title, key, x + 16.0, y, 17.0, Color::WHITE);
-            let size = (col_width / body.measure_text(description, 100.0, 1.0).x * 100.0).min(21.0);
-            text(d, body, description, x + 16.0, y + 25.0, size, INK);
-        }
-    }
-    text(
-        d,
-        body,
-        "ESC / VOLVER AL MENÚ",
-        left,
-        h as f32 - 35.0,
-        16.0,
-        MUTED,
-    );
+/// La pantalla de controles del menú: la misma tarjeta de vidrio que la ayuda del sistema solar (`holo::ControlsCard`,
+/// con la misma letra), centrada sobre el fondo de hiperespacio y escalada a la ventana.
+pub(super) fn controls(d: &mut RaylibDrawHandle, regular: &Font, bold: &Font, w: i32, h: i32) {
+    use crate::scenes::holo;
+    d.draw_rectangle(0, 0, w, h, Color::new(3, 5, 24, 110));
+    let card = holo::ControlsCard {
+        title: "CONTROLES",
+        subtitle: "Tu próxima aventura empieza al mando.",
+        footer: Some("Esc para volver al menú"),
+        columns: [
+            ("PILOTAR LA NAVE", &[
+                ("W / S", "Acelerar / frenar"), ("Mouse o A / D", "Girar"),
+                ("R / F", "Inclinar arriba / abajo"), ("Espacio", "Subir"),
+                ("Shift", "Turbo"), ("Tab", "Cambiar objetivo"),
+                ("B", "Piloto automático"),
+            ]),
+            ("EXPLORACIÓN Y SESIÓN", &[
+                ("E / Enter", "Explorar / entrar al hangar"), ("C", "Vista general"),
+                ("O", "Mostrar / ocultar órbitas"), ("T", "Medallero de tokens"),
+                ("Esc", "Soltar el mouse"), ("Esc / P", "Pausa en los minijuegos"),
+                ("Ctrl + X", "Salir del juego"),
+            ]),
+        ],
+        width: 820.0,
+        column_x: [72.0, 440.0],
+        divider_x: 410.0,
+    };
+    let (cw, ch) = (card.width, card.height());
+    let scale = ((w as f32 - 120.0) / cw).min((h as f32 - 150.0) / ch).clamp(0.4, 1.7);
+    let at = Vector2::new((w as f32 - cw * scale) * 0.5, (h as f32 - ch * scale) * 0.5 + 18.0);
+    holo::panel(d, Rectangle::new(at.x, at.y, cw * scale, ch * scale), holo::CYAN, 1.0);
+    card.draw(d, regular, bold, at, scale);
 }

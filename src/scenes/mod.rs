@@ -3,6 +3,7 @@ mod encounter_ui;
 mod puzzle_ui;
 mod puzzle_smoke;
 pub mod abduction;
+pub mod holo;
 pub mod sfv;
 pub mod token_collection;
 pub mod token_collection_ui;

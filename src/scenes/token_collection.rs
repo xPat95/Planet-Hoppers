@@ -230,24 +230,32 @@ pub struct CollectionLayout {
     pub scale: f32,
 }
 
+/// El panel del medallero, en unidades de diseño (se escala a la ventana): compacto, con las medallas juntas.
+pub const PANEL_W: f32 = 640.0;
+pub const PANEL_H: f32 = 480.0;
+/// Con qué tamaño se calcula la escala (más grande que el panel: así el panel queda chico y las medallas conservan su
+/// tamaño en la pantalla).
+const FIT_W: f32 = 720.0;
+const FIT_H: f32 = 500.0;
+/// Qué parte de lo que entra en la ventana ocupa (así queda como panel, no como pantalla llena).
+const PANEL_FILL: f32 = 0.88;
+
 impl CollectionLayout {
     pub fn new(width: f32, height: f32) -> Self {
-        let scale = ((width - 32.0) / 900.0)
-            .min((height - 32.0) / 620.0)
-            .max(0.1);
+        let scale = (((width - 32.0) / FIT_W).min((height - 32.0) / FIT_H) * PANEL_FILL).max(0.1);
         Self {
-            x: (width - 900.0 * scale) * 0.5,
-            y: (height - 620.0 * scale) * 0.5,
+            x: (width - PANEL_W * scale) * 0.5,
+            y: (height - PANEL_H * scale) * 0.5,
             scale,
         }
     }
 
     pub fn slot(&self, index: usize) -> [f32; 4] {
         [
-            self.x + (40.0 + (index % 3) as f32 * 280.0) * self.scale,
-            self.y + (126.0 + (index / 3) as f32 * 218.0) * self.scale,
-            260.0 * self.scale,
-            198.0 * self.scale,
+            self.x + (25.0 + (index % 3) as f32 * 200.0) * self.scale,
+            self.y + (124.0 + (index / 3) as f32 * 160.0) * self.scale,
+            190.0 * self.scale,
+            156.0 * self.scale,
         ]
     }
 

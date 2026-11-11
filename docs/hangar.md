@@ -14,7 +14,7 @@ cargo run --locked --bin solarsystem       # sistema solar directo, catálogo de
 cargo run --locked --bin southpark         # South Park independiente
 ```
 
-El ejecutable predeterminado es `planet-hoppers`. El flujo del jugador es **Menú principal → Nueva partida → Hangar → Comenzar aventura → Sistema solar**. Controles muestra la ayuda y Salir cierra la aplicación. No hay guardado funcional: se omite Continuar y el estado dura únicamente durante la sesión.
+El ejecutable predeterminado es `planet-hoppers`. El flujo del jugador es **Menú principal → Nueva partida → Hangar → Comenzar aventura → Sistema solar**. Controles muestra la ayuda: la misma tarjeta de vidrio y la misma letra (Advent Pro) que la ayuda del sistema solar (`holo::ControlsCard` en `src/scenes/holo.rs`, que dibuja las dos), centrada y escalada a la ventana sobre el fondo de hiperespacio azul de Cami (`assets/ui/backgrounds/controls.png`) y Salir cierra la aplicación. No hay guardado funcional: se omite Continuar y el estado dura únicamente durante la sesión.
 
 Las escenas se ejecutan secuencialmente en el mismo proceso. El menú y el hangar comparten una ventana; esta libera sus recursos antes de abrir el sistema solar. Se conserva el contrato existente de ventanas secuenciales con South Park.
 

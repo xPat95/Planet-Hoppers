@@ -1,7 +1,6 @@
 //! Sistema solar jugable (fases 1 a 6). Une la lógica de `solar_system` (órbitas, rotación, proximidad) y `ships`
 //! (vuelo y choques) con la representación de `graphics::space`, y coordina las visitas: "Explorar planeta" cierra
 //! esta ventana, abre el minijuego y al terminar vuelve al mismo sistema solar, con la nave junto al planeta.
-use super::button_style;
 use super::minigame_host::{self, MinigameVisits};
 use crate::gameplay::planet_visit::PlanetReturnPose;
 use crate::gameplay::station::{chase_position, DepartureBounds, Station};
@@ -35,19 +34,17 @@ const ENTRY_CAMERA_MOVE: f32 = 1.35;
 const ORBIT_SEGMENTS: usize = 144;
 
 fn help_button(width: i32, height: i32) -> Rectangle {
-    Rectangle::new((width - 156) as f32, (height - 68) as f32, 136.0, 48.0)
+    Rectangle::new((width - 178) as f32, (height - 106) as f32, 160.0, 86.0)
 }
 
 fn draw_help_overlay(d: &mut RaylibDrawHandle, regular: &Font, bold: &Font, width: i32, height: i32, progress: f32, open: bool) {
     let button = help_button(width, height);
     let cyan = Color::new(137, 228, 255, 255);
-    let blue = Color::new(66, 173, 223, 255);
-    let orange = Color::new(255, 174, 89, 255);
-    let ink = Color::new(223, 238, 255, 255);
+    // El acento del estilo holográfico (antes naranja)
+    let accent = super::holo::ACCENT;
     if progress < 0.01 {
-        button_style::surface(d, button, false, true);
-        let label = "?  AYUDA";
-        button_style::centered_label(d, button, label, 23, Color::new(8, 24, 55, 255));
+        let hovered = button.check_collision_point_rec(d.get_mouse_position());
+        super::holo::button(d, bold, regular, button, "H", "AYUDA", None, hovered);
         return;
     }
     let eased = progress * progress * (3.0 - 2.0 * progress);
@@ -60,48 +57,41 @@ fn draw_help_overlay(d: &mut RaylibDrawHandle, regular: &Font, bold: &Font, widt
     let cy = button.y + button.height * 0.5 + (height as f32 * 0.5 - button.y - button.height * 0.5) * eased;
     let x = cx - w * 0.5;
     let y = cy - h * 0.5;
+    // Panel de vidrio holográfico (el mismo estilo que el medallero y los controles del menú)
     let panel = Rectangle::new(x, y, w, h);
-    d.draw_rectangle_rec(Rectangle::new(x + 6.0, y + 6.0, w, h), Color::new(1, 5, 20, 220));
-    d.draw_rectangle_rec(panel, Color::new(10, 27, 55, 250));
-    d.draw_rectangle_lines_ex(panel, 3.0, cyan);
-    d.draw_rectangle_rec(Rectangle::new(x + 8.0, y + 8.0, w - 16.0, 7.0), blue);
-    d.draw_rectangle_rec(Rectangle::new(x + 8.0, y + h - 15.0, w - 16.0, 7.0), orange);
+    super::holo::panel(d, panel, cyan, 1.0);
     if eased < 0.8 { return; }
     let scale = (panel_w / 820.0).min(panel_h / 580.0);
     let tx = |v: f32| (x + v * scale) as i32;
     let ty = |v: f32| (y + v * scale) as i32;
     let fs = |v: f32| v * scale;
-    draw_ui(d, bold, "CONTROLES", tx(72.0), ty(53.0), fs(31.0), cyan);
-    draw_ui(d, regular, "Sistema solar / guia de vuelo", tx(72.0), ty(94.0), fs(19.0), ink);
-    d.draw_line(tx(70.0), ty(130.0), tx(750.0), ty(130.0), blue);
-    d.draw_line(tx(410.0), ty(150.0), tx(410.0), ty(514.0), Color::new(57, 108, 150, 255));
-    let columns: [(f32, &str, &[(&str, &str)]); 2] = [
-        (72.0, "PILOTAR LA NAVE", &[
-            ("W / S", "Acelerar / frenar"), ("Mouse o A / D", "Girar"),
-            ("Espacio", "Subir"), ("Shift", "Turbo"),
-            ("Tab", "Cambiar objetivo"), ("B", "Piloto automatico"),
-            ("E", "Explorar / entrar al hangar"), ("C", "Vista general"),
-            ("N", "Otra nave"), ("Esc", "Soltar el mouse"),
-        ]),
-        (440.0, "VISTA GENERAL", &[
-            ("Arrastrar", "Girar camara"), ("Rueda", "Acercar / alejar"),
-            ("Tab", "Seguir objetivo"), ("P", "Pausa"),
-            ("Arriba / Abajo", "Velocidad del tiempo"), ("C", "Volver a la nave"),
-            ("O", "Mostrar / ocultar orbitas"), ("T", "Medallero de tokens"),
-            ("F12", "Guardar captura"), ("Ctrl + X", "Salir del juego"),
-        ]),
-    ];
-    for (col, heading, rows) in columns {
-        draw_ui(d, bold, heading, tx(col), ty(151.0), fs(23.0), orange);
-        for (i, (key, action)) in rows.iter().enumerate() {
-            let yy = ty(197.0 + i as f32 * 32.0);
-            draw_ui(d, bold, key, tx(col), yy, fs(19.0), cyan);
-            draw_ui(d, regular, action, tx(col + 112.0), yy, fs(19.0), ink);
-        }
-    }
+    // La misma tarjeta que la pantalla de controles del menú
+    super::holo::ControlsCard {
+        title: "CONTROLES",
+        subtitle: "Sistema solar / guía de vuelo",
+        footer: open.then_some("H o Esc para cerrar"),
+        columns: [
+            ("PILOTAR LA NAVE", &[
+                ("W / S", "Acelerar / frenar"), ("Mouse o A / D", "Girar"),
+                ("Espacio", "Subir"), ("Shift", "Turbo"),
+                ("Tab", "Cambiar objetivo"), ("B", "Piloto automático"),
+                ("E", "Explorar / entrar al hangar"), ("C", "Vista general"),
+                ("N", "Otra nave"), ("Esc", "Soltar el mouse"),
+            ]),
+            ("VISTA GENERAL", &[
+                ("Arrastrar", "Girar cámara"), ("Rueda", "Acercar / alejar"),
+                ("Tab", "Seguir objetivo"), ("P", "Pausa"),
+                ("Arriba / Abajo", "Velocidad del tiempo"), ("C", "Volver a la nave"),
+                ("O", "Mostrar / ocultar órbitas"), ("T", "Medallero de tokens"),
+                ("F12", "Guardar captura"), ("Ctrl + X", "Salir del juego"),
+            ]),
+        ],
+        width: 820.0,
+        column_x: [72.0, 440.0],
+        divider_x: 410.0,
+    }.draw(d, regular, bold, Vector2::new(x, y), scale);
     if open {
-        draw_ui(d, bold, "X", tx(737.0), ty(34.0), fs(24.0), orange);
-        draw_ui(d, regular, "H o Esc para cerrar", tx(346.0), ty(534.0), fs(18.0), ink);
+        super::holo::glow_text(d, bold, "X", Vector2::new(tx(737.0) as f32, ty(34.0) as f32), fs(24.0), accent, accent);
     }
 }
 
@@ -186,6 +176,33 @@ enum Destination {
     Planet(usize),
     Station,
 }
+/// Qué hacer ahora (la línea de la misión, arriba a la izquierda) y, si se habla de un planeta, el color de su logo:
+/// volar al objetivo (con la distancia), explorarlo si ya se llegó, o volver a la estación con todo ganado.
+fn mission_step(s: &Session, in_reach: Option<usize>) -> (String, Option<Color>) {
+    let all_won = s.game.as_ref().is_some_and(|g| g.progress().is_complete());
+    match s.target {
+        Some(Destination::Planet(i)) => {
+            let p = &s.system.planets[i];
+            let color = logo_color(&p.config.id);
+            if in_reach == Some(i) {
+                (format!("Presiona E para explorar {}", p.config.name), color)
+            } else {
+                let distance = ((p.position() - s.ship.position).length() - p.config.radius).max(0.0);
+                (format!("Vuela a {}  ·  {distance:.0}", p.config.name), color)
+            }
+        }
+        Some(Destination::Station) => {
+            let distance = (s.station.exit_position() - s.ship.position).length();
+            if all_won {
+                (format!("¡Galaxia salvada! Vuelve a la estación  ·  {distance:.0}"), None)
+            } else {
+                (format!("Vuela a la estación  ·  {distance:.0}"), None)
+            }
+        }
+        None => ("Elige un destino con Tab".to_owned(), None),
+    }
+}
+
 /// La letra y el color de la distancia de un planeta con logo: el color del logo (la del objetivo, entera y en
 /// negrita; las demás, un poco transparentes). Sin color propio, `fallback`.
 fn logo_tint<'f>(id: &str, target: bool, fallback: Color, regular: &'f Font, bold: &'f Font) -> (&'f Font, Color) {
@@ -195,15 +212,7 @@ fn logo_tint<'f>(id: &str, target: bool, fallback: Color, regular: &'f Font, bol
 
 /// El color de la distancia de cada planeta, el de su logo, para que la etiqueta y el logo vayan juntos.
 fn logo_color(id: &str) -> Option<Color> {
-    Some(match id {
-        "halloween" => Color::new(255, 40, 150, 255),
-        "starwars" => Color::new(255, 196, 40, 255),
-        "smilingfriends" => Color::new(247, 150, 205, 255),
-        "minecraft" => Color::new(215, 215, 222, 255),
-        "regularshow" => Color::new(240, 240, 240, 255),
-        "southpark" => Color::new(205, 150, 105, 255),
-        _ => return None,
-    })
+    crate::gameplay::progress::Franchise::from_id(id).ok().map(super::token_collection_ui::franchise_color)
 }
 
 /// El objetivo de la navegación: el primer planeta, desde `from` (incluido) en el orden del sistema, cuyo minijuego
@@ -1786,7 +1795,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             for (i, (p, m)) in s.system.planets.iter().zip(&markers).enumerate() {
                 let at = m.at;
                 let is_target = s.target == Some(Destination::Planet(i));
-                let c = if is_target { Color::new(255, 214, 90, 255) } else { Color::new(150, 170, 220, 170) };
+                let c = if is_target { super::holo::ACCENT } else { Color::new(150, 170, 220, 170) };
                 let distance = ((p.position() - s.ship.position).length() - p.config.radius).max(0.0);
                 let logo = planet_logos.get(p.config.id.as_str());
                 let visible_bounds = visual_bounds[i];
@@ -1842,43 +1851,32 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             d.draw_line(cx, cy + 3, cx, cy + 8, white);
             let ship_name = &s.ships.ships[s.ship_index].name;
             let boosting = s.ship.speed > s.ships.flight.cruise_speed + 1.0;
+            // Una sombra suave detrás del encabezado, para leerlo sobre un planeta claro
+            d.draw_rectangle_gradient_h(0, 0, 520, 150, Color::new(1, 6, 20, 150), Color::new(1, 6, 20, 0));
             draw_ui(&mut d, &ui_bold, ship_name, 16, 14, 25.0, white);
-            draw_ui(&mut d, &ui_regular, &format!("Velocidad {:.0}{}", s.ship.speed, if boosting { "  TURBO" } else { "" }), 16, 44, 21.0, dim);
-            let target = s.target.map_or("ninguno", |destination| destination.name(s));
-            draw_ui(&mut d, &ui_regular, &format!("Objetivo: {target}"), 16, 69, 21.0, dim);
+            // La misión: en qué paso va (cuántas medallas lleva) y qué hacer ahora, en una línea que cambia sola
+            let won = s.game.as_ref().map_or(0, |g| g.progress().token_count());
+            let label = if won >= 6 { "MISIÓN COMPLETA".to_owned() } else { format!("MISIÓN {}/6", won + 1) };
+            draw_ui(&mut d, &ui_bold, &label, 16, 46, 17.0, super::holo::CYAN);
+            let (step, color) = mission_step(s, in_reach);
+            draw_ui(&mut d, &ui_regular, &step, 16, 66, 22.0, color.unwrap_or(white));
+            let speed = format!("Velocidad {:.0}{}", s.ship.speed, if boosting { "  ·  TURBO" } else { "" });
+            draw_ui(&mut d, &ui_regular, &speed, 16, 94, 18.0, dim);
             if let Some(i) = s.ship.carried_by {
-                draw_ui(&mut d, &ui_regular, &format!("Acompañando la órbita de {}", s.system.planets[i].config.name), 16, 94, 21.0, dim);
+                draw_ui(&mut d, &ui_regular, &format!("Acompañando la órbita de {}", s.system.planets[i].config.name), 16, 116, 18.0, dim);
             }
             if let Some(i) = in_reach {
                 let p = &s.system.planets[i].config;
                 let (w, h) = (width as f32, height as f32);
-                let button = Rectangle::new(w / 2.0 - 170.0, h - 150.0, 340.0, 64.0);
-                button_style::surface(
-                    &mut d,
-                    button,
-                    button.check_collision_point_rec(draw_mouse),
-                    true,
-                );
+                let button = Rectangle::new(w / 2.0 - 190.0, h - 170.0, 380.0, 84.0);
                 let title = format!("Explorar {}", p.name);
-                button_style::centered_label(
-                    &mut d,
-                    Rectangle::new(button.x, button.y + 5.0, button.width, 32.0),
-                    &title,
-                    28,
-                    Color::new(8, 24, 55, 255),
-                );
-                let sub = if p.minigame.is_some() { "[E] Explorar planeta" } else { "[E]  (minijuego en construcción)" };
-                button_style::centered_label(
-                    &mut d,
-                    Rectangle::new(button.x, button.y + 34.0, button.width, 23.0),
-                    sub,
-                    18,
-                    Color::new(24, 42, 70, 255),
-                );
+                let sub = if p.minigame.is_some() { "Explorar planeta" } else { "Minijuego en construcción" };
+                super::holo::button(&mut d, &ui_bold, &ui_regular, button, "E", &title, Some(sub),
+                    button.check_collision_point_rec(draw_mouse));
             }
             if station_reentry_delay<=0.0 && s.station.in_reach(s.ship.position, station_ship_radius(s, &ship_model)) {
-                let text = "[E] Entrar a la estación espacial";
-                draw_ui(&mut d, &ui_bold, text, (width - text_width(&ui_bold, text, 22.0)) / 2, height - 112, 22.0, Color::new(109,222,239,255));
+                let button = Rectangle::new(width as f32 / 2.0 - 210.0, height as f32 - 150.0, 420.0, 60.0);
+                super::holo::button(&mut d, &ui_bold, &ui_regular, button, "E", "Entrar a la estación espacial", None, false);
             }
         } else {
             let focus = s.focus.map_or("Sol", |destination| destination.name(s));
@@ -1909,7 +1907,8 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         if let Some((text, t)) = &notice {
             let a = (t.min(1.0) * 255.0) as u8;
             let w = text_width(&ui_bold, text, 25.0);
-            draw_ui(&mut d, &ui_bold, text, width / 2 - w / 2, 70, 25.0, Color::new(255, 214, 90, a));
+            let accent = super::holo::ACCENT;
+            draw_ui(&mut d, &ui_bold, text, width / 2 - w / 2, 70, 25.0, Color::new(accent.r, accent.g, accent.b, a));
         }
         let token_progress = s.game.as_ref().map_or(&empty_progress, |game| game.progress());
         token_textures.draw_hud(&mut d, &ui_bold, token_progress, width, height);

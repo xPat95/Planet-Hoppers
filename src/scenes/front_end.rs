@@ -6,7 +6,7 @@ use crate::{
     graphics::{
         hangar::{Hangar, HangarStyle},
         resources::save_frame,
-        space::{Sky, SKY_BACKGROUND},
+        space::SKY_BACKGROUND,
     },
     ships::ShipsConfig,
 };
@@ -18,7 +18,6 @@ use std::{collections::{BTreeMap, BTreeSet}, path::PathBuf};
 mod ui;
 
 type Error = Box<dyn std::error::Error>;
-const INK: Color = Color::new(221, 234, 244, 255);
 const MUTED: Color = Color::new(133, 157, 179, 255);
 const CYAN: Color = Color::new(105, 213, 234, 255);
 const MORPH_DURATION: f32 = 0.42;
@@ -131,40 +130,6 @@ const BUTTONS_DELAY: f32 = 0.55;
 const BUTTON_STAGGER: f32 = 0.12;
 const BUTTON_INTRO: f32 = 0.45;
 
-struct MenuGalaxy {
-    shader: Shader,
-    resolution: i32,
-    time: i32,
-}
-
-impl MenuGalaxy {
-    fn load(rl: &mut RaylibHandle, thread: &RaylibThread) -> Result<Self, Error> {
-        let shader = rl.load_shader_from_memory(
-            thread,
-            None,
-            Some(include_str!("../graphics/shaders/menu_galaxy.fs")),
-        );
-        let resolution = shader.get_shader_location("resolution");
-        let time = shader.get_shader_location("time");
-        if !shader.is_shader_valid() || resolution < 0 || time < 0 {
-            return Err("Menu galaxy shader failed to compile".into());
-        }
-        Ok(Self {
-            shader,
-            resolution,
-            time,
-        })
-    }
-
-    fn draw(&mut self, d: &mut RaylibDrawHandle, width: i32, height: i32, time: f32) {
-        self.shader
-            .set_shader_value(self.resolution, Vector2::new(width as f32, height as f32));
-        self.shader.set_shader_value(self.time, time);
-        let mut layer = d.begin_shader_mode(&mut self.shader);
-        layer.draw_rectangle(0, 0, width, height, Color::WHITE);
-    }
-}
-
 struct MainMenuLayout {
     buttons_y: f32,
     button_height: f32,
@@ -253,64 +218,6 @@ fn draw_intro_button(
     d.draw_text_ex(font, label, at, size, 1.5, text_color);
 }
 
-/// Degradé del logo, de arriba (t = 0) hacia abajo (t = 1): cielo azul que se aclara hasta casi blanco, un
-/// horizonte marcado y después naranja que se vuelve amarillo claro.
-const CHROME: [(f32, (u8, u8, u8)); 6] = [
-    (0.0, (38, 128, 226)),
-    (0.46, (226, 246, 255)),
-    (0.5, (160, 58, 30)),
-    (0.64, (238, 104, 48)),
-    (0.84, (255, 196, 74)),
-    (1.0, (255, 244, 196)),
-];
-/// Inclinación de los botones (como las letras del logo): cuánto se corre el borde de arriba a la derecha.
-const BUTTON_SLANT: f32 = 0.32;
-
-fn chrome(t: f32, lift: f32) -> Color {
-    let i = CHROME.iter().rposition(|(at, _)| *at <= t).unwrap_or(0).min(CHROME.len() - 2);
-    let ((a, ca), (b, cb)) = (CHROME[i], CHROME[i + 1]);
-    let k = ((t - a) / (b - a)).clamp(0.0, 1.0);
-    let mix = |x: u8, y: u8| {
-        let v = x as f32 + (y as f32 - x as f32) * k;
-        (v + (255.0 - v) * lift) as u8
-    };
-    Color::new(mix(ca.0, cb.0), mix(ca.1, cb.1), mix(ca.2, cb.2), 255)
-}
-
-/// Paralelogramo inclinado, línea por línea: `color(t)` da el color de cada fila (t de 0 arriba a 1 abajo).
-fn slanted(d: &mut RaylibDrawHandle, x: f32, y: f32, w: f32, h: f32, color: impl Fn(f32) -> Color) {
-    let rows = h.round().max(1.0) as i32;
-    for k in 0..rows {
-        let t = (k as f32 + 0.5) / rows as f32;
-        let shift = (1.0 - t) * h * BUTTON_SLANT;
-        d.draw_rectangle((x + shift).round() as i32, (y + k as f32).round() as i32, w.round() as i32, 1, color(t));
-    }
-}
-
-fn menu_random(index: u32, salt: u32) -> f32 {
-    let mut x = index.wrapping_mul(0x9e37_79b9) ^ salt;
-    x ^= x >> 16;
-    x = x.wrapping_mul(0x7feb_352d);
-    x ^= x >> 15;
-    (x >> 8) as f32 / 16_777_216.0
-}
-
-fn draw_moving_stars(d: &mut RaylibDrawHandle, width: i32, height: i32, time: f32) {
-    for i in 0..130 {
-        let speed = 2.0 + menu_random(i, 0x2345) * 5.0;
-        let x = (menu_random(i, 0x7183) * width as f32 + time * speed).rem_euclid(width as f32);
-        let y = (menu_random(i, 0x9e12) * height as f32 + time * speed * 0.28)
-            .rem_euclid(height as f32);
-        let twinkle = 0.72 + 0.28 * (time * (0.8 + speed * 0.1) + i as f32).sin();
-        let alpha = (135.0 * twinkle) as u8;
-        let tint = if i % 3 == 0 {
-            Color::new(131, 222, 255, alpha)
-        } else {
-            Color::new(169, 209, 255, alpha)
-        };
-        d.draw_circle_v(Vector2::new(x, y), if i % 7 == 0 { 1.5 } else { 0.8 }, tint);
-    }
-}
 fn back_button(w: i32) -> Rectangle {
     Rectangle::new(w as f32 - 182.0, 24.0, 150.0, 42.0)
 }
@@ -402,18 +309,21 @@ fn view(
     rl.set_window_min_size(960, 640);
     rl.enable_cursor();
     rl.set_target_fps(if smoke_goal.is_some() { 0 } else { 60 });
-    let sky = Sky::new();
     let intro_backdrop = rl.load_texture(
         &thread,
         &root
             .join("assets/ui/backgrounds/planet-hoppers-intro.png")
             .to_string_lossy(),
     )?;
-    let mut galaxy = MenuGalaxy::load(&mut rl, &thread)?;
+    // El fondo de la pantalla de controles (dibujo de Cami: un salto al hiperespacio azul)
+    let controls_backdrop = rl.load_texture(&thread, &root.join("assets/ui/backgrounds/controls.png").to_string_lossy())?;
+    controls_backdrop.set_texture_filter(&thread, TextureFilter::TEXTURE_FILTER_BILINEAR);
     let menu_font = ui::load_font(&root.join("assets/fonts/TitilliumWeb-Bold.ttf"))?;
     // Fuente nítida al achicarla (se carga grande y se escala según el botón)
     unsafe { ffi::SetTextureFilter(menu_font.texture, ffi::TextureFilter::TEXTURE_FILTER_BILINEAR as i32) };
-    let secondary_title = ui::load_font(&root.join("assets/fonts/Bungee-Regular.ttf"))?;
+    // La letra de la pantalla de controles: la misma del sistema solar (así las dos tarjetas son iguales)
+    let advent_regular = ui::load_font(&root.join("assets/fonts/AdventPro-Regular.ttf"))?;
+    let advent_bold = ui::load_font(&root.join("assets/fonts/AdventPro-Bold.ttf"))?;
     let body_font = ui::load_font(&root.join("assets/fonts/TitilliumWeb-Bold.ttf"))?;
     let hangar_name_font = ui::load_font(&root.join("assets/fonts/Orbitron-Bold.ttf"))?;
     let mut hangar_logos = BTreeMap::new();
@@ -625,22 +535,15 @@ fn view(
                 rl.get_world_to_screen(hangar.ship_center(), camera),
             ))
         } else { None };
-        let sky_frame = sky.project(&rl, camera);
-        let menu_time = rl.get_time() as f32;
         let left_active = rl.is_key_down(KeyboardKey::KEY_LEFT);
         let right_active = rl.is_key_down(KeyboardKey::KEY_RIGHT);
         let mut d = crate::graphics::window::begin_drawing(&mut rl, &thread);
         d.clear_background(SKY_BACKGROUND);
         if screen == Screen::Controls {
-            galaxy.draw(&mut d, w, h, menu_time);
+            draw_intro_backdrop(&mut d, &controls_backdrop, w, h);
         }
         if screen == Screen::Hangar {
             hangar.draw_backdrop(&mut d, camera, Vector2::new(w as f32, h as f32));
-        } else if screen == Screen::Controls {
-            sky.draw(&mut d, &sky_frame, menu_time);
-        }
-        if screen == Screen::Controls {
-            draw_moving_stars(&mut d, w, h, menu_time);
         }
         match screen {
             Screen::Main => {
@@ -659,7 +562,7 @@ fn view(
                 }
             }
             Screen::Controls => {
-                ui::controls(&mut d, &secondary_title, &body_font, w, h);
+                ui::controls(&mut d, &advent_regular, &advent_bold, w, h);
                 ui::action(&mut d, &body_font, back_button(w), "VOLVER", mouse, true);
             }
             Screen::Hangar => {
