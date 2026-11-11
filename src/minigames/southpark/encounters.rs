@@ -50,9 +50,10 @@ impl Adventure {
                     let positions: Vec<_> = MEMBERS[i]
                         .iter()
                         .enumerate()
-                        .map(|(j, _)| base + Vector3::new(j as f32 * 1.5, 0.0, side))
+                        .map(|(j, _)| base + Vector3::new(j as f32 * 1.8, 0.0, side+j as f32*0.6))
                         .collect();
-                    if positions.iter().all(|p| {
+                    let centre=positions.iter().copied().fold(Vector3::zero(),|sum,p|sum+p)/positions.len() as f32;
+                    if (positions.len()==1 || scene.world.can_occupy(centre,2.2,1.8)) && positions.iter().all(|p| {
                         scene.world.can_occupy(*p, 0.65, 1.8)
                             && event_route(
                                 &scene.roads,

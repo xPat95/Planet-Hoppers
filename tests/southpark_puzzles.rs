@@ -88,85 +88,35 @@ fn ufo_reflexes_win_and_idle_or_wrong_clicks_lose() {
     assert_eq!(wrong.result, Some(false));
 }
 #[test]
-fn bus_clues_have_exactly_one_solution_and_attempts_are_bounded() {
-    let mut solutions = vec![];
-    for a in 0..4 {
-        for b in 0..4 {
-            for c in 0..4 {
-                for d in 0..4 {
-                    let order = [a, b, c, d];
-                    let mut unique = order;
-                    unique.sort();
-                    if unique != [0, 1, 2, 3] {
-                        continue;
-                    }
-                    let index = |n| order.iter().position(|x| *x == n).unwrap();
-                    if index(0) < index(3)
-                        && index(0) == index(2) + 1
-                        && index(1) != 0
-                        && index(1) != 2
-                    {
-                        solutions.push(order);
-                    }
-                }
-            }
-        }
-    }
-    assert_eq!(solutions, vec![BUS_SOLUTION]);
-    let mut p = playing(ThreatKind::Bus);
-    for i in BUS_SOLUTION {
-        p.click(i);
-    }
-    assert_eq!(p.result, Some(true));
-    let mut p = playing(ThreatKind::Bus);
-    p.click(3);
-    p.click(3);
-    let Board::Bus(b) = &p.board else { panic!() };
-    assert_eq!(b.entered, vec![3]);
-    for i in [2, 1, 0] {
-        p.click(i);
-    }
-    assert!(p.result.is_none());
-    for _ in 0..2 {
-        for i in [3, 2, 1, 0] {
-            p.click(i);
-        }
-    }
-    assert_eq!(p.result, Some(false));
+fn murdoku_has_the_original_unique_solution_and_one_confirmation() {
+    use planet_hoppers::minigames::southpark::murdoku::{solutions,SOLUTION,DANGEROUS};
+    assert_eq!(solutions(),vec![(SOLUTION,DANGEROUS)]);
+    let mut p=playing(ThreatKind::Bus);p.confirm_bus();assert!(p.result.is_none());
+    for (i,cell) in SOLUTION.into_iter().enumerate() {p.select_bus_piece(i);p.place_bus_piece(cell);}
+    p.accuse_bus_driver(DANGEROUS);p.confirm_bus();assert_eq!(p.result,Some(true));
+    p.accuse_bus_driver(1);p.clear_bus();p.confirm_bus();assert_eq!(p.result,Some(true));
 }
 #[test]
-fn piano_blocks_demo_input_and_plays_five_increasing_rounds() {
-    let mut p = playing(ThreatKind::Piano);
-    p.click(4);
-    let Board::Piano(k) = &p.board else { panic!() };
-    assert_eq!((k.input, k.errors), (0, 0));
-    for round in 0..5 {
-        p.tick(6.0);
-        let Board::Piano(k) = &p.board else { panic!() };
-        assert!(!k.demonstrating);
-        assert_eq!(k.length(), round + 2);
-        let notes = k.notes[..k.length()].to_vec();
-        for n in notes {
-            p.click(n);
-        }
+fn piano_has_eight_distinct_rounds_at_constant_speed() {
+    let mut p=playing(ThreatKind::Piano);let mut patterns=vec![];
+    p.click(4);let Board::Piano(k)=&p.board else {panic!()};assert_eq!((k.input,k.errors),(0,0));
+    for length in [3,4,5,5,6,6,7,7] {
+        p.tick(6.);let Board::Piano(k)=&p.board else {panic!()};
+        assert_eq!(k.length(),length);assert_eq!(k.illumination(),0.45);
+        let notes=k.notes[..length].to_vec();assert!(!patterns.contains(&notes));patterns.push(notes.clone());
+        for n in notes {p.click(n);}
     }
-    assert_eq!(p.result, Some(true));
+    assert_eq!(p.result,Some(true));
 }
 #[test]
-fn piano_mistakes_repeat_round_and_third_drops_the_piano() {
-    let mut p = playing(ThreatKind::Piano);
-    p.tick(6.0);
-    p.click(1);
-    p.click(3);
-    for error in 1..=3 {
-        p.tick(6.0);
-        p.click(4);
-        let Board::Piano(k) = &p.board else { panic!() };
-        assert_eq!(k.round, 1);
-        assert_eq!(k.errors, error);
-        assert!(k.demonstrating);
+fn piano_repeats_the_same_pattern_then_loses_on_second_error() {
+    let mut p=playing(ThreatKind::Piano);
+    let Board::Piano(k)=&p.board else {panic!()};let notes=k.notes;
+    for error in 1..=2 {
+        p.tick(6.);p.click((notes[0]+1)%5);
+        let Board::Piano(k)=&p.board else {panic!()};assert_eq!(k.notes,notes);assert_eq!(k.errors,error);
     }
-    assert_eq!(p.result, Some(false));
+    assert_eq!(p.result,Some(false));
 }
 #[test]
 fn manholes_are_fair_and_reachable_with_fixed_time_steps() {
@@ -217,9 +167,9 @@ fn every_restart_clears_timers_results_inputs_and_pending_feedback() {
 fn results_ignore_additional_clicks_and_invalid_indices() {
     let mut p = playing(ThreatKind::Bus);
     p.click(usize::MAX);
-    for i in BUS_SOLUTION {
-        p.click(i);
-    }
+    use planet_hoppers::minigames::southpark::murdoku::{SOLUTION,DANGEROUS};
+    for (i,cell) in SOLUTION.into_iter().enumerate() {p.select_bus_piece(i);p.place_bus_piece(cell);}
+    p.accuse_bus_driver(DANGEROUS);p.confirm_bus();
     let before = format!("{:?}", p.board);
     p.click(1);
     p.tick(200.0);

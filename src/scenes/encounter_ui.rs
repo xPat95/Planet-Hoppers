@@ -131,12 +131,26 @@ impl<'a> EncounterUi<'a> {
         );
     }
     pub fn world(&self, d: &mut RaylibMode3D<RaylibDrawHandle>, camera: Camera3D, a: &Adventure) {
+        let mut draws=vec![];
         for (i, g) in a.groups.iter().enumerate() {
+            let centre=g.positions.iter().copied().fold(Vector3::zero(),|sum,p|sum+p)/g.positions.len() as f32;
+            let direction=Vector3::new(camera.position.x-centre.x,0.,camera.position.z-centre.z);
+            let normal=if direction.length()>0.01 {direction.normalized()}else{Vector3::new(0.,0.,1.)};
+            let right=Vector3::new(normal.z,0.,-normal.x);
+            let gap=0.28;
+            let total=MEMBERS[i].iter().map(|id|self.sprites[*id].width()).sum::<f32>()+gap*(g.positions.len()-1) as f32;
+            let mut offset=-total*0.5;
             for (j, p) in g.positions.iter().enumerate() {
                 let sprite = &self.sprites[MEMBERS[i][j]];
-                sprite.draw(d, &sprite.pose(*p, camera.position, 0.0, 0.0));
+                // Compose two independent cutouts on a shared facing plane.
+                // The group's validated clearance covers every viewing angle.
+                let feet=if g.positions.len()==2 {centre+right*(offset+sprite.width()*0.5)}else{*p};
+                offset+=sprite.width()+gap;
+                draws.push((sprite,sprite.pose(feet,feet+normal*5.,0.,0.)));
             }
         }
+        draws.sort_by(|a,b|(b.1.origin-camera.position).length().total_cmp(&(a.1.origin-camera.position).length()));
+        for (sprite,pose) in draws {sprite.draw(d,&pose);}
     }
     pub fn draw(
         &self,

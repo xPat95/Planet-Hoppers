@@ -3,7 +3,7 @@ use super::threats::ThreatKind;
 
 pub const FADE_SECONDS: f32 = 0.32;
 pub const HEATER_SOLUTION: [u8; 16] = [10, 14, 10, 10, 3, 5, 9, 6, 12, 3, 14, 10, 6, 9, 3, 10];
-pub const BUS_SOLUTION: [usize; 4] = [2, 0, 3, 1];
+pub use super::murdoku::Case as Bus;
 pub const SEWER_ROUTE: [(f32, f32); 6] = [
     (0.08, 0.19),
     (0.36, 0.19),
@@ -12,7 +12,36 @@ pub const SEWER_ROUTE: [(f32, f32); 6] = [
     (0.74, 0.80),
     (0.93, 0.80),
 ];
-pub const HOLES: [f32; 7] = [0.14, 0.28, 0.41, 0.55, 0.69, 0.81, 0.92];
+pub const HOLES: [f32; 12] = [
+    0.07, 0.14, 0.22, 0.30, 0.38, 0.46, 0.54, 0.62, 0.70, 0.78, 0.86, 0.94,
+];
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Rating {
+    Perfect,
+    Good,
+    Miss,
+}
+impl Rating {
+    pub fn judge(error: f32, perfect: f32, good: f32) -> Self {
+        if error.abs() <= perfect {
+            Self::Perfect
+        } else if error.abs() <= good {
+            Self::Good
+        } else {
+            Self::Miss
+        }
+    }
+    pub fn label(self, es: bool) -> &'static str {
+        match (self, es) {
+            (Self::Perfect, false) => "PERFECT",
+            (Self::Perfect, true) => "PERFECTO",
+            (Self::Good, false) => "GOOD",
+            (Self::Good, true) => "BIEN",
+            (Self::Miss, false) => "MISS",
+            (Self::Miss, true) => "FALLO",
+        }
+    }
+}
 
 #[derive(Clone, Debug)]
 pub struct Heaters {
@@ -73,6 +102,8 @@ pub struct Ufo {
     pub charge: f32,
     pub hits: u32,
     pub misses: u32,
+    pub completed: usize,
+    pub score: u32,
     random: u64,
 }
 impl Ufo {
@@ -80,22 +111,49 @@ impl Ufo {
         self.random ^= self.random << 13;
         self.random ^= self.random >> 7;
         self.random ^= self.random << 17;
-        self.target = (self.target + 1 + (self.random as usize % 5)) % 6;
-        self.reaction = 0.0;
+        self.target = self.random as usize % 3;
+        self.reaction = -0.35;
     }
-    pub fn window(&self, elapsed: f32) -> f32 {
-        1.55 - 0.70 * (elapsed / 20.0).clamp(0.0, 1.0)
+    pub fn window(&self, _elapsed: f32) -> f32 {
+        match self.completed {
+            0..=5 => 1.2,
+            6..=12 => 0.95,
+            _ => 0.75,
+        }
     }
-}
-#[derive(Clone, Debug)]
-pub struct Bus {
-    pub entered: Vec<usize>,
-    pub attempts: u8,
-    pub rejected: bool,
+    fn resolve(&mut self, rating: Rating) -> Option<bool> {
+        match rating {
+            Rating::Perfect => {
+                self.score += 100;
+                self.hits += 1;
+                self.charge -= 0.08;
+            }
+            Rating::Good => {
+                self.score += 60;
+                self.hits += 1;
+                self.charge -= 0.04;
+            }
+            Rating::Miss => {
+                self.misses += 1;
+                self.charge += 0.20;
+            }
+        }
+        self.charge = self.charge.clamp(0., 1.);
+        self.completed += 1;
+        let result = if self.charge >= 1. {
+            Some(false)
+        } else if self.completed == 20 {
+            Some(true)
+        } else {
+            None
+        };
+        self.next();
+        result
+    }
 }
 #[derive(Clone, Debug)]
 pub struct Piano {
-    pub notes: [usize; 6],
+    pub notes: [usize; 7],
     pub round: usize,
     pub input: usize,
     pub errors: u8,
@@ -104,22 +162,57 @@ pub struct Piano {
 }
 impl Piano {
     pub fn length(&self) -> usize {
-        self.round + 2
+        [3, 4, 5, 5, 6, 6, 7, 7][self.round.min(7)]
+    }
+    pub fn illumination(&self) -> f32 {
+        0.45
+    }
+    pub fn beat(&self) -> f32 {
+        self.illumination() + 0.18
+    }
+    fn pattern(round: usize) -> [usize; 7] {
+        let mut seed = 0x91a3_u64.wrapping_mul(round as u64 + 1);
+        let mut notes = [0; 7];
+        for i in 0..7 {
+            seed ^= seed << 13;
+            seed ^= seed >> 7;
+            seed ^= seed << 17;
+            notes[i] = seed as usize % 5;
+            if i > 0 && notes[i] == notes[i - 1] {
+                notes[i] = (notes[i] + 1) % 5;
+            }
+        }
+        notes
     }
     pub fn lit(&self) -> Option<usize> {
         if !self.demonstrating || self.demo_time < 0.45 {
             return None;
         }
         let time = self.demo_time - 0.45;
-        let n = (time / 0.75) as usize;
-        (n < self.length() && time % 0.75 < 0.50).then(|| self.notes[n])
+        let n = (time / self.beat()) as usize;
+        (n < self.length() && time % self.beat() < self.illumination()).then(|| self.notes[n])
     }
 }
 #[derive(Clone, Debug)]
 pub struct Sewers {
-    pub open: [bool; 7],
-    pub closed: [bool; 7],
+    pub open: [bool; 12],
+    pub closed: [bool; 12],
     pub position: f32,
+    pub target: usize,
+    pub approach: f32,
+    pub cooldown: f32,
+}
+impl Sewers {
+    pub fn window(&self) -> f32 {
+        match self.target {
+            0..=2 => 1.4,
+            3..=6 => 1.1,
+            _ => 0.85,
+        }
+    }
+    pub fn active(&self) -> bool {
+        self.target < 12 && self.approach >= 0.
+    }
 }
 #[derive(Clone, Debug)]
 pub enum Board {
@@ -146,6 +239,10 @@ pub struct PuzzleRun {
     pub feedback: f32,
     pub last_hit: Option<usize>,
     pub mistake: bool,
+    pub rating: Option<Rating>,
+    /// The native host samples Instant before input, so timing judgments and
+    /// rendered rings use the same monotonic active-game clock.
+    pub externally_clocked: bool,
 }
 impl PuzzleRun {
     pub fn new(kind: ThreatKind, group: usize) -> Self {
@@ -154,18 +251,16 @@ impl PuzzleRun {
             ThreatKind::Ufo => Board::Ufo(Ufo {
                 target: 2,
                 reaction: 0.0,
-                charge: 0.15,
+                charge: 0.25,
                 hits: 0,
                 misses: 0,
+                completed: 0,
+                score: 0,
                 random: 0x5137a9,
             }),
-            ThreatKind::Bus => Board::Bus(Bus {
-                entered: vec![],
-                attempts: 3,
-                rejected: false,
-            }),
+            ThreatKind::Bus => Board::Bus(Bus::default()),
             ThreatKind::Piano => Board::Piano(Piano {
-                notes: [1, 3, 0, 4, 2, 0],
+                notes: Piano::pattern(0),
                 round: 0,
                 input: 0,
                 errors: 0,
@@ -173,9 +268,12 @@ impl PuzzleRun {
                 demonstrating: true,
             }),
             ThreatKind::Sewer => Board::Sewers(Sewers {
-                open: [true, false, true, false, true, false, true],
-                closed: [false; 7],
+                open: [true; 12],
+                closed: [false; 12],
                 position: 0.0,
+                target: 0,
+                approach: 0.,
+                cooldown: 0.,
             }),
         };
         Self {
@@ -194,6 +292,8 @@ impl PuzzleRun {
             feedback: 0.0,
             last_hit: None,
             mistake: false,
+            rating: None,
+            externally_clocked: false,
         }
     }
     pub fn ready(&self) -> bool {
@@ -250,42 +350,51 @@ impl PuzzleRun {
                 }
                 Board::Ufo(u) => {
                     u.reaction += step;
-                    if u.reaction >= u.window(self.elapsed) {
-                        u.charge = (u.charge + 0.22).min(1.0);
-                        u.misses += 1;
-                        u.next();
-                        self.feedback = 0.35;
+                    if u.reaction > u.window(self.elapsed) + 0.140 {
+                        let excess = u.reaction - u.window(self.elapsed) - 0.140;
+                        self.result = u.resolve(Rating::Miss);
+                        u.reaction += excess;
+                        self.rating = Some(Rating::Miss);
+                        self.feedback = 0.6;
                         self.mistake = true;
-                    }
-                    if u.charge >= 1.0 {
-                        self.result = Some(false);
-                    } else if self.elapsed >= 20.0 {
-                        self.result = Some(true);
                     }
                 }
                 Board::Piano(p) => {
                     if p.demonstrating {
                         p.demo_time += step;
-                        if p.demo_time >= 0.45 + p.length() as f32 * 0.75 {
+                        if p.demo_time >= 0.45 + p.length() as f32 * p.beat() {
                             p.demonstrating = false;
                             p.input = 0;
                         }
                     }
                 }
                 Board::Sewers(s) => {
-                    s.position = (self.elapsed / 28.0).min(1.0);
-                    for (i, at) in HOLES.iter().enumerate() {
-                        if !s.closed[i] && self.elapsed >= at * 28.0 - 4.0 {
-                            s.open[i] = true;
+                    s.cooldown = (s.cooldown - step).max(0.);
+                    if s.target == 12 {
+                        s.position = (s.position + step * 0.08).min(1.);
+                        if s.position >= 1. {
+                            self.result = Some(true);
                         }
-                        if s.position >= *at && s.open[i] {
-                            self.result = Some(false);
-                            s.position = *at;
-                            break;
-                        }
+                        continue;
                     }
-                    if self.result.is_none() && s.position >= 1.0 {
-                        self.result = Some(true);
+                    s.approach += step;
+                    let start = if s.target == 0 {
+                        0.
+                    } else {
+                        HOLES[s.target - 1]
+                    };
+                    // Kenny reaches the lid 260 ms after coincidence: the full
+                    // GOOD window remains available, including at low FPS.
+                    let crossing = s.window() + 0.26;
+                    s.position =
+                        start + (HOLES[s.target] - start) * (s.approach / crossing).clamp(0., 1.);
+                    if s.approach >= crossing {
+                        if s.open[s.target] {
+                            self.result = Some(false);
+                        } else {
+                            s.target += 1;
+                            s.approach -= crossing;
+                        }
                     }
                 }
                 _ => {}
@@ -299,6 +408,9 @@ impl PuzzleRun {
         if matches!(&self.board,Board::Piano(p) if p.demonstrating) {
             return;
         }
+        if matches!(&self.board,Board::Ufo(u) if u.reaction<0.) {
+            return;
+        }
         self.last_hit = Some(index);
         self.feedback = 0.35;
         self.mistake = false;
@@ -310,47 +422,27 @@ impl PuzzleRun {
                     self.result = Some(true);
                 }
             }
-            Board::Ufo(u) if index < 6 => {
-                if index == u.target {
-                    u.hits += 1;
-                    u.charge = (u.charge - 0.065).max(0.0);
-                    u.next();
+            Board::Ufo(u) if index < 3 && u.reaction >= 0. => {
+                let rating = if index == u.target {
+                    Rating::judge(u.reaction - u.window(self.elapsed), 0.065, 0.140)
                 } else {
-                    u.charge = (u.charge + 0.10).min(1.0);
-                    self.mistake = true;
-                    if u.charge >= 1.0 {
-                        self.result = Some(false);
-                    }
-                }
-            }
-            Board::Bus(b) if index < 4 => {
-                if b.entered.contains(&index) {
-                    return;
-                }
-                b.rejected = false;
-                b.entered.push(index);
-                if b.entered.len() == 4 {
-                    if b.entered.as_slice() == BUS_SOLUTION {
-                        self.result = Some(true);
-                    } else {
-                        b.attempts -= 1;
-                        b.entered.clear();
-                        b.rejected = true;
-                        self.mistake = true;
-                        if b.attempts == 0 {
-                            self.result = Some(false);
-                        }
-                    }
-                }
+                    Rating::Miss
+                };
+                self.result = u.resolve(rating);
+                self.rating = Some(rating);
+                self.mistake = rating == Rating::Miss;
+                self.feedback = 0.6;
             }
             Board::Piano(p) if index < 5 => {
                 if index == p.notes[p.input] {
                     p.input += 1;
                     if p.input == p.length() {
-                        if p.round == 4 {
+                        if p.round == 7 {
                             self.result = Some(true);
                         } else {
                             p.round += 1;
+                            p.errors = 0;
+                            p.notes = Piano::pattern(p.round);
                             p.input = 0;
                             p.demo_time = 0.0;
                             p.demonstrating = true;
@@ -362,16 +454,73 @@ impl PuzzleRun {
                     p.input = 0;
                     p.demo_time = -0.40;
                     p.demonstrating = true;
-                    if p.errors == 3 {
+                    if p.errors == 2 {
                         self.result = Some(false);
                     }
                 }
             }
-            Board::Sewers(s) if index < 7 && s.open[index] => {
-                s.open[index] = false;
-                s.closed[index] = true;
+            Board::Sewers(s) if index < 12 && s.open[index] && s.cooldown <= 0. => {
+                let rating = if index == s.target && s.active() {
+                    Rating::judge(s.approach - s.window(), 0.09, 0.17)
+                } else {
+                    Rating::Miss
+                };
+                self.rating = Some(rating);
+                self.feedback = 0.5;
+                self.mistake = rating == Rating::Miss;
+                if rating != Rating::Miss {
+                    s.open[index] = false;
+                    s.closed[index] = true;
+                } else {
+                    s.cooldown = 0.22;
+                }
             }
             _ => {}
+        }
+    }
+    pub fn confirm_bus(&mut self) {
+        if !self.interactive() {
+            return;
+        }
+        if let Board::Bus(b) = &self.board {
+            if b.ready() {
+                self.result = Some(b.correct());
+            }
+        }
+    }
+    pub fn select_bus_piece(&mut self, piece: usize) {
+        if self.interactive() {
+            if let Board::Bus(b) = &mut self.board {
+                b.select(piece);
+            }
+        }
+    }
+    pub fn place_bus_piece(&mut self, cell: usize) {
+        if self.interactive() {
+            if let Board::Bus(b) = &mut self.board {
+                b.place(cell);
+            }
+        }
+    }
+    pub fn remove_bus_piece(&mut self) {
+        if self.interactive() {
+            if let Board::Bus(b) = &mut self.board {
+                b.remove();
+            }
+        }
+    }
+    pub fn accuse_bus_driver(&mut self, piece: usize) {
+        if self.interactive() {
+            if let Board::Bus(b) = &mut self.board {
+                b.accuse(piece);
+            }
+        }
+    }
+    pub fn clear_bus(&mut self) {
+        if self.interactive() {
+            if let Board::Bus(b) = &mut self.board {
+                b.clear();
+            }
         }
     }
 }

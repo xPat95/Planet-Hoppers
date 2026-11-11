@@ -1,6 +1,6 @@
 //! Automated native-renderer inspection of real puzzle outcomes, not fake results.
 use crate::minigames::southpark::{
-    puzzles::{Board, BUS_SOLUTION, HEATER_SOLUTION},
+    puzzles::{Board, HEATER_SOLUTION},
     session::{SaveKennySession, SessionState},
     SouthParkScene,
 };
@@ -71,11 +71,12 @@ impl OutcomeSmoke {
                 }
                 Board::Ufo(u) => {
                     let i = u.target;
-                    p.click(i);
+                    if (u.reaction-u.window(p.elapsed)).abs()<0.065 {p.click(i);}
                 }
-                Board::Bus(b) => {
-                    let i = BUS_SOLUTION[b.entered.len().min(3)];
-                    p.click(i);
+                Board::Bus(_) => {
+                    use crate::minigames::southpark::murdoku::{SOLUTION,DANGEROUS};
+                    for (i,cell) in SOLUTION.into_iter().enumerate() {p.select_bus_piece(i);p.place_bus_piece(cell);}
+                    p.accuse_bus_driver(DANGEROUS);p.confirm_bus();
                 }
                 Board::Piano(k) => {
                     if !k.demonstrating {
@@ -84,19 +85,14 @@ impl OutcomeSmoke {
                     }
                 }
                 Board::Sewers(sewers) => {
-                    let open = sewers.open;
-                    for (i, v) in open.into_iter().enumerate() {
-                        if v {
-                            p.click(i);
-                        }
-                    }
+                    if sewers.target<12 && (sewers.approach-sewers.window()).abs()<0.09 {let i=sewers.target;p.click(i);}
                 }
             }
         } else {
             match &p.board {
-                Board::Bus(b) => {
-                    let i = [3, 2, 1, 0][b.entered.len().min(3)];
-                    p.click(i);
+                Board::Bus(_) => {
+                    for (i,cell) in crate::minigames::southpark::murdoku::SOLUTION.into_iter().enumerate() {p.select_bus_piece(i);p.place_bus_piece(cell);}
+                    p.accuse_bus_driver(1);p.confirm_bus();
                 }
                 Board::Piano(k) => {
                     if !k.demonstrating {

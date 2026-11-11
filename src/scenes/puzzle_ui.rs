@@ -90,8 +90,8 @@ impl Layout {
     }
     pub fn light(&self, i: usize) -> Vector2 {
         self.point(
-            0.18 + i as f32 * 0.128,
-            0.35 + ((i as f32 - 2.5).abs() / 2.5) * -0.045,
+            0.27 + i as f32 * 0.23,
+            0.35,
         )
     }
     pub fn lever(&self, i: usize) -> Rectangle {
@@ -111,15 +111,38 @@ impl Layout {
         let p = route_point(HOLES[i]);
         self.point(p.0, p.1)
     }
+    pub fn case_grid(&self)->Rectangle {
+        let side=(self.scene.height*0.72).min(self.scene.width*0.62);
+        Rectangle::new(self.scene.x+self.scene.width*0.035,self.scene.y+self.scene.height*0.16,side,side)
+    }
+    pub fn case_cell(&self,cell:usize)->Rectangle {
+        let g=self.case_grid();let size=g.width/6.;
+        Rectangle::new(g.x+(cell%6) as f32*size,g.y+(cell/6) as f32*size,size,size)
+    }
+    pub fn case_panel(&self)->Rectangle {
+        let g=self.case_grid();let x=g.x+g.width+20.;
+        Rectangle::new(x,self.scene.y+self.scene.height*0.16,self.scene.x+self.scene.width-x-12.,self.scene.height*0.70)
+    }
+    pub fn case_card(&self,piece:usize)->Rectangle {
+        let r=self.case_panel();let w=r.width/2.;let h=self.scene.height*0.09;
+        Rectangle::new(r.x+(piece%2) as f32*w,r.y+(piece/2) as f32*(h+5.),w-5.,h)
+    }
+    pub fn case_accusation(&self,piece:usize)->Rectangle {
+        let r=self.case_panel();let w=r.width/5.;
+        Rectangle::new(r.x+(piece-1) as f32*w,self.scene.y+self.scene.height*0.80,w-3.,34.)
+    }
+    pub fn bus_remove(&self)->Rectangle {let p=self.point(0.31,0.94);Rectangle::new(p.x,p.y,self.scene.width*0.23,30.)}
+    pub fn bus_clear(&self)->Rectangle {let p=self.point(0.06,0.94);Rectangle::new(p.x,p.y,self.scene.width*0.21,30.)}
+    pub fn bus_confirm(&self)->Rectangle {let p=self.point(0.69,0.94);Rectangle::new(p.x,p.y,self.scene.width*0.25,30.)}
     pub fn hit(&self, p: Vector2, run: &PuzzleRun) -> Option<usize> {
         match &run.board {
             Board::Heaters(_) => (0..16).find(|i| self.cell(*i).check_collision_point_rec(p)),
             Board::Ufo(_) => {
-                (0..6).find(|i| (self.light(*i) - p).length() < self.scene.width * 0.047)
+                (0..3).find(|i| (self.light(*i) - p).length() < self.scene.width * 0.047)
             }
-            Board::Bus(_) => (0..4).find(|i| self.lever(*i).check_collision_point_rec(p)),
+            Board::Bus(_) => (0..36).find(|i|self.case_cell(*i).check_collision_point_rec(p)),
             Board::Piano(k) => (0..5).find(|i| self.key(*i, k.errors).check_collision_point_rec(p)),
-            Board::Sewers(_) => (0..7).find(|i| (self.hole(*i) - p).length() < 27.0),
+            Board::Sewers(_) => (0..12).find(|i| (self.hole(*i) - p).length() < 24.0),
         }
     }
 }
@@ -132,6 +155,12 @@ pub enum Action {
     Pause,
     Back,
     Mute,
+    SelectBus(usize),
+    PlaceBus(usize),
+    AccuseBus(usize),
+    RemoveBus,
+    ClearBus,
+    ConfirmBus,
 }
 pub struct PuzzleUi {
     title: Font,
@@ -194,7 +223,7 @@ impl PuzzleUi {
             eprintln!("PUZZLE_AUDIO_PREFERENCE {e}");
         }
     }
-    pub fn input(&self, rl: &RaylibHandle, s: &SaveKennySession) -> Action {
+    pub fn input(&mut self, rl: &RaylibHandle, s: &SaveKennySession) -> Action {
         let Some(run) = &s.puzzle else {
             return Action::None;
         };
@@ -257,6 +286,26 @@ impl PuzzleUi {
                 || clicked && l.primary().check_collision_point_rec(mouse)
             {
                 return Action::Start;
+            }
+            return Action::None;
+        }
+        if matches!(run.board,Board::Ufo(_)) {
+            for (i,key) in [KeyboardKey::KEY_A,KeyboardKey::KEY_S,KeyboardKey::KEY_D].into_iter().enumerate() {
+                if rl.is_key_pressed(key) {return Action::Hit(i);}
+            }
+            return Action::None;
+        }
+        if let Board::Bus(bus)=&run.board {
+            if clicked && l.bus_clear().check_collision_point_rec(mouse) {return Action::ClearBus;}
+            if rl.is_key_pressed(KeyboardKey::KEY_DELETE) || clicked && l.bus_remove().check_collision_point_rec(mouse) {return Action::RemoveBus;}
+            if bus.ready() && (rl.is_key_pressed(KeyboardKey::KEY_ENTER) || clicked && l.bus_confirm().check_collision_point_rec(mouse)) {return Action::ConfirmBus;}
+            if clicked {
+                if let Some(i)=(0..6).find(|i|l.case_card(*i).check_collision_point_rec(mouse)) {return Action::SelectBus(i);}
+                if let Some(i)=(1..6).find(|i|l.case_accusation(*i).check_collision_point_rec(mouse)) {return Action::AccuseBus(i);}
+                if let Some(cell)=(0..36).find(|i|l.case_cell(*i).check_collision_point_rec(mouse)) {
+                    if let Some(piece)=bus.positions.iter().position(|c|*c==Some(cell)) {return Action::SelectBus(piece);}
+                    return Action::PlaceBus(cell);
+                }
             }
             return Action::None;
         }
@@ -455,27 +504,28 @@ impl PuzzleUi {
             &instruction,
             Vector2::new(left.x + 8.0, left.y + 83.0),
             left.width - 14.0,
-            if l.width < 1100.0 { 30.0 } else { 26.0 },
+            if run.kind==ThreatKind::Bus {20.0} else if l.width < 1100.0 { 30.0 } else { 26.0 },
             INK,
         );
         let status_y = left.y + if l.width < 1100.0 { 257.0 } else { 266.0 };
+        let multi_status=matches!(run.board,Board::Ufo(_)|Board::Bus(_)|Board::Piano(_));
         self.text(
             &mut d,
             &status(run, es),
             Vector2::new(left.x + 8.0, status_y),
-            if l.width < 1100.0 { 26.0 } else { 25.0 },
+            if multi_status {20.0} else if l.width < 1100.0 { 26.0 } else { 25.0 },
             if run.mistake && run.feedback > 0.0 {
                 RED
             } else {
                 INK
             },
         );
-        meter(
+        if run.kind!=ThreatKind::Bus {meter(
             &mut d,
-            Rectangle::new(left.x + 8.0, status_y + 36.0, left.width - 20.0, 10.0),
+            Rectangle::new(left.x + 8.0, status_y + if multi_status {51.0}else{36.0}, left.width - 20.0, 10.0),
             progress(run),
             accent(run.kind),
-        );
+        );}
         let portrait_y = status_y + 71.0;
         let portrait_h = (left.y + left.height - 66.0 - portrait_y).max(116.0);
         let members = MEMBERS[run.group];
@@ -817,10 +867,10 @@ impl PuzzleUi {
             b.height * 0.055,
             Color::new(176, 167, 192, 255),
         );
-        for i in 0..6 {
+        for i in 0..3 {
             let p = l.light(i);
             let r = b.width * 0.041;
-            let lit = run.result.is_none() && u.target == i;
+            let lit = run.started && run.result.is_none() && u.target == i && u.reaction>=0.;
             if lit {
                 d.draw_circle_v(
                     p,
@@ -840,13 +890,16 @@ impl PuzzleUi {
             );
             if lit {
                 d.draw_circle_v(p - Vector2::new(r * 0.2, r * 0.25), r * 0.42, PAPER);
+                let radius=r*(1.+(1.-u.reaction/u.window(run.elapsed))*1.3).max(0.7);
+                d.draw_ring(p,radius,radius+3.,0.,360.,64,GOLD);
+                d.draw_ring(p,r-2.,r,0.,360.,64,PAPER);
             }
             if run.interactive() && (p - mouse).length() < r + 5.0 {
                 d.draw_ring(p, r + 2.0, r + 4.0, 0.0, 360.0, 32, PAPER);
             }
             self.text(
                 d,
-                &(i + 1).to_string(),
+                ["A","S","D"][i],
                 p - Vector2::new(6.0, 12.0),
                 20.0,
                 if lit { INK } else { PAPER },
@@ -894,154 +947,90 @@ impl PuzzleUi {
         if run.feedback > 0.0 {
             self.text(
                 d,
-                &tr(
-                    es,
-                    if run.mistake {
-                        "Too slow!"
-                    } else {
-                        "Lights out!"
-                    },
-                    if run.mistake {
-                        "¡Cuidado!"
-                    } else {
-                        "¡Apagada!"
-                    },
-                ),
-                l.point(0.73, 0.64),
+                run.rating.unwrap_or(Rating::Miss).label(es),
+                l.point(0.70, 0.64-run.feedback*0.025),
                 24.0,
                 GOLD,
             );
         }
     }
-    fn bus(
-        &self,
-        d: &mut impl RaylibDraw,
-        l: &Layout,
-        run: &PuzzleRun,
-        bus: &Bus,
-        mouse: Vector2,
-        es: bool,
-    ) {
-        let b = l.scene;
-        d.draw_rectangle_rec(b, Color::new(222, 228, 210, 255));
-        for (i, x) in [0.06, 0.28, 0.51, 0.75].into_iter().enumerate() {
-            house(
-                d,
-                l.point(x, 0.07),
-                b.width * 0.10,
-                [BLUE, RED, GREEN, BROWN][i],
-            );
-        }
-        d.draw_rectangle_rec(
-            Rectangle::new(b.x, b.y + b.height * 0.22, b.width, b.height * 0.14),
-            Color::new(120, 126, 124, 255),
-        );
-        for i in 0..14 {
-            let p = l.point(i as f32 * 0.08, 0.30);
-            d.draw_line_ex(p, p + Vector2::new(20.0, 0.0), 2.0, PAPER);
-        }
-        let advance = if run.result == Some(false) {
-            run.result_time.min(1.0) * 0.18
-        } else {
-            0.0
-        };
-        let at = l.point(0.07 + (3 - bus.attempts) as f32 * 0.10 + advance, 0.27);
-        self.kenny(
-            d,
-            l.point(0.80, 0.32),
-            b.height * 0.17,
-            if run.result == Some(false) {
-                (run.result_time * 95.0).min(85.0)
-            } else {
-                0.0
-            },
-            Color::WHITE,
-        );
-        school_bus(d, at, b.width * 0.26);
-        // Driver's notes are part of the bus console, always visible during play.
-        let note = Rectangle::new(
-            b.x + b.width * 0.08,
-            b.y + b.height * 0.37,
-            b.width * 0.84,
-            b.height * 0.18,
-        );
-        paper(d, note, PAPER, BROWN);
-        self.wrap(d,&tr(es,"1 BLUE before 4 YELLOW.\n3 RED immediately before 1 BLUE.\n2 GREEN is neither first nor third.","1 AZUL antes de 4 AMARILLO.\n3 ROJO justo antes de 1 AZUL.\n2 VERDE no es primero ni tercero."),Vector2::new(note.x+12.0,note.y+3.0),note.width-24.0,25.0,INK);
-        let console = Rectangle::new(
-            b.x + b.width * 0.06,
-            b.y + b.height * 0.59,
-            b.width * 0.88,
-            b.height * 0.34,
-        );
-        paper(d, console, Color::new(225, 187, 91, 255), INK);
-        for i in 0..12 {
-            let p = Vector2::new(
-                console.x + 12.0 + i as f32 * (console.width - 24.0) / 12.0,
-                console.y + console.height - 8.0,
-            );
-            d.draw_line_ex(p, p + Vector2::new(9.0, 0.0), 4.0, INK);
-        }
-        for i in 0..4 {
-            let r = l.lever(i);
-            let color = [BLUE, GREEN, RED, GOLD][i];
-            let active = bus.entered.contains(&i);
-            paper(d, r, Color::new(244, 229, 193, 255), BROWN);
-            let centre = Vector2::new(r.x + r.width * 0.5, r.y + r.height * 0.53);
-            d.draw_rectangle_rounded(
-                Rectangle::new(centre.x - 8.0, centre.y - 28.0, 16.0, 64.0),
-                0.5,
-                8,
-                INK,
-            );
-            let handle = centre + Vector2::new(0.0, if active { 26.0 } else { -16.0 });
-            d.draw_line_ex(centre + Vector2::new(0.0, 30.0), handle, 8.0, BROWN);
-            d.draw_circle_v(handle + Vector2::new(1.0, 3.0), 19.0, INK);
-            d.draw_circle_v(handle, 17.0, color);
-            if run.interactive() && l.lever(i).check_collision_point_rec(mouse) {
-                d.draw_circle_lines(handle.x as i32, handle.y as i32, 22.0, INK);
+    fn case_token(&self,d:&mut impl RaylibDraw,piece:usize,r:Rectangle,selected:bool) {
+        let colors=[GOLD,BLUE,RED,GREEN,Color::new(40,43,48,255),PAPER];
+        if selected {d.draw_rectangle_lines_ex(r,3.,GOLD);}
+        if piece==0 {self.kenny(d,Vector2::new(r.x+r.width*0.5,r.y+r.height*0.92),r.height*0.85,0.,Color::WHITE);return;}
+        let c=Vector2::new(r.x+r.width*0.5,r.y+r.height*0.42);let size=r.width.min(r.height);
+        d.draw_circle_v(c+Vector2::new(2.,3.),size*0.25,SHADOW);
+        d.draw_rectangle_rounded(Rectangle::new(c.x-size*0.28,c.y+size*0.10,size*0.56,size*0.37),0.3,8,INK);
+        d.draw_rectangle_rounded(Rectangle::new(c.x-size*0.25,c.y+size*0.13,size*0.50,size*0.30),0.3,8,colors[piece]);
+        d.draw_circle_v(c,size*0.21,Color::new(233,187,143,255));
+        d.draw_rectangle_rounded(Rectangle::new(c.x-size*0.25,c.y-size*0.26,size*0.5,size*0.19),0.3,6,colors[piece]);
+        d.draw_line_ex(c+Vector2::new(-size*0.26,-size*0.08),c+Vector2::new(size*0.28,-size*0.08),2.,INK);
+        self.text(d,["K","A","B","C","D","E"][piece],Vector2::new(c.x-5.,c.y+size*0.14),size*0.24,if piece==4 {PAPER}else{INK});
+    }
+    fn bus(&self,d:&mut impl RaylibDraw,l:&Layout,run:&PuzzleRun,bus:&Bus,mouse:Vector2,es:bool) {
+        use crate::minigames::southpark::murdoku as m;
+        let b=l.scene;let grid=l.case_grid();let size=grid.width/6.;
+        d.draw_rectangle_rec(b,Color::new(225,226,202,255));
+        self.heading(d,&tr(es,"Who Will Hit Kenny?","¿Quién atropellará a Kenny?"),l.point(0.025,0.015),if l.width<1100. {23.}else{29.},INK);
+        let zones=[Color::new(176,198,209,255),Color::new(189,181,204,255),Color::new(163,174,154,255),Color::new(190,169,174,255)];
+        for z in 0..4 {let p=l.point(0.025+z as f32*0.24,0.105);d.draw_circle_v(p+Vector2::new(5.,7.),5.,zones[z]);self.text(d,m::zone_name(z as u8,es),p+Vector2::new(14.,-2.),16.,INK);}
+        paper(d,Rectangle::new(grid.x-5.,grid.y-5.,grid.width+10.,grid.height+10.),PAPER,INK);
+        for cell in 0..36 {
+            let r=l.case_cell(cell);d.draw_rectangle_rec(r,zones[m::ZONES[cell] as usize]);
+            d.draw_rectangle_lines_ex(r,1.,Color::new(222,220,204,255));
+            if m::BUILDINGS.contains(&cell) || cell==m::RADIO {
+                let block=Rectangle::new(r.x+2.,r.y+2.,size-4.,size-4.);
+                d.draw_rectangle_rec(block,Color::new(126,99,111,255));
+                for dx in [0.25,0.63] {d.draw_rectangle_rec(Rectangle::new(r.x+size*dx,r.y+size*0.35,size*0.15,size*0.22),PAPER);}
+                if cell==m::RADIO {d.draw_line_ex(Vector2::new(r.x+size*0.5,r.y+5.),Vector2::new(r.x+size*0.5,r.y+size*0.25),3.,INK);}
             }
-            self.text(
-                d,
-                &format!("0{}", i + 1),
-                Vector2::new(r.x + 12.0, r.y + 6.0),
-                22.0,
-                INK,
-            );
-            d.draw_circle(
-                (r.x + r.width - 17.0) as i32,
-                (r.y + 19.0) as i32,
-                6.0,
-                if active { GREEN } else { BROWN },
-            );
-            if let Some(n) = bus.entered.iter().position(|j| *j == i) {
-                self.text(
-                    d,
-                    &format!("#{}", n + 1),
-                    Vector2::new(r.x + 10.0, r.y + r.height - 33.0),
-                    23.0,
-                    INK,
-                );
+            if m::KIOSKS.contains(&cell) {
+                paper(d,Rectangle::new(r.x+7.,r.y+7.,size-14.,size-14.),BROWN,INK);
+                for row in 1..4 {let y=r.y+size*row as f32/4.;d.draw_line_ex(Vector2::new(r.x+11.,y),Vector2::new(r.x+size-11.,y),2.,PAPER);}
             }
+            if cell==m::PLANT {d.draw_circle_v(Vector2::new(r.x+size*0.5,r.y+size*0.5),size*0.29,GREEN);d.draw_rectangle_rec(Rectangle::new(r.x+size*0.3,r.y+size*0.6,size*0.4,size*0.2),BROWN);}
+            if m::BENCHES.contains(&cell) {
+                for row in 0..3 {d.draw_rectangle_rec(Rectangle::new(r.x+size*0.17,r.y+size*(0.25+row as f32*0.14),size*0.66,size*0.10),BROWN);}
+                for x in [0.23,0.7] {d.draw_rectangle_rec(Rectangle::new(r.x+size*x,r.y+size*0.60,3.,size*0.18),INK);}
+            }
+            if m::MANHOLES.contains(&cell) {let c=Vector2::new(r.x+size*0.5,r.y+size*0.5);d.draw_ellipse(c.x as i32,c.y as i32,size*0.34,size*0.23,INK);d.draw_ellipse(c.x as i32,c.y as i32,size*0.24,size*0.14,Color::new(75,94,85,255));}
         }
-        self.text(
-            d,
-            &tr(
-                es,
-                if bus.rejected {
-                    "Wrong order. Read the clues and try again."
-                } else {
-                    "EMERGENCY BRAKE • SELECT THE ORDER"
-                },
-                if bus.rejected {
-                    "Orden incorrecto. Revisa las pistas y prueba otra vez."
-                } else {
-                    "FRENO DE EMERGENCIA • ELIGE EL ORDEN"
-                },
-            ),
-            l.point(0.07, 0.95),
-            if l.width < 1100.0 { 18.0 } else { 21.0 },
-            if bus.rejected { RED } else { INK },
-        );
+        for pair in m::BUSES {let r=l.case_cell(pair[0]);school_bus(d,Vector2::new(r.x+5.,r.y+size*0.76),size*2.-10.);}
+        // Join the three original desk cells into the same L-shaped building.
+        for cell in m::BUILDINGS {let r=l.case_cell(cell);
+            if cell%6<5 && m::BUILDINGS.contains(&(cell+1)) {d.draw_rectangle_rec(Rectangle::new(r.x+size-2.,r.y+2.,4.,size-4.),Color::new(126,99,111,255));}
+            if cell+6<36 && m::BUILDINGS.contains(&(cell+6)) {d.draw_rectangle_rec(Rectangle::new(r.x+2.,r.y+size-2.,size-4.,4.),Color::new(126,99,111,255));}
+        }
+        // Exact region borders, including the L-shaped depot and narrow centre leg.
+        for cell in 0..36 {let r=l.case_cell(cell);let z=m::ZONES[cell];
+            if cell%6==0 || m::ZONES[cell-1]!=z {d.draw_line_ex(Vector2::new(r.x,r.y),Vector2::new(r.x,r.y+size),4.,INK);}
+            if cell<6 || m::ZONES[cell-6]!=z {d.draw_line_ex(Vector2::new(r.x,r.y),Vector2::new(r.x+size,r.y),4.,INK);}
+        }
+        d.draw_rectangle_lines_ex(grid,4.,INK);
+        for (piece,cell) in bus.positions.iter().enumerate() {if let Some(cell)=cell {let r=l.case_cell(*cell);self.case_token(d,piece,Rectangle::new(r.x+4.,r.y+4.,size-8.,size-8.),bus.selected==Some(piece));}}
+        for piece in 0..6 {
+            let r=l.case_card(piece);paper(d,r,if bus.selected==Some(piece){GOLD}else{PAPER},INK);
+            self.case_token(d,piece,Rectangle::new(r.x+2.,r.y+2.,r.height-4.,r.height-4.),false);
+            self.wrap(d,m::name(piece,es),Vector2::new(r.x+r.height,r.y+5.),r.width-r.height-4.,17.,INK);
+        }
+        let panel=l.case_panel();let clue=Rectangle::new(panel.x,b.y+b.height*0.48,panel.width,b.height*0.245);
+        paper(d,clue,PAPER,BROWN);
+        let explanation=bus.selected.map_or(if es{"Elige una ficha para leer su pista. Pulsa una casilla para colocarla."}else{"Select a token to read its clue. Click a cell to place it."},|i|m::clue(i,es));
+        self.wrap(d,explanation,Vector2::new(clue.x+8.,clue.y+8.),clue.width-16.,if l.width<1100. {19.}else{21.},INK);
+        self.text(d,&tr(es,"Dangerous driver?","¿Chofer peligroso?"),Vector2::new(panel.x,b.y+b.height*0.75),20.,INK);
+        for piece in 1..6 {let r=l.case_accusation(piece);paper(d,r,if bus.accused==Some(piece){GOLD}else{PAPER},INK);self.case_token(d,piece,Rectangle::new(r.x+(r.width-r.height)*0.5,r.y,r.height,r.height),false);}
+        for (r,label,enabled) in [(l.bus_clear(),tr(es,"Clear board","Vaciar tablero"),true),(l.bus_remove(),tr(es,"Remove token","Retirar ficha"),bus.selected.is_some()),(l.bus_confirm(),tr(es,"Confirm","Confirmar"),bus.ready())] {
+            self.button(d,r,&label,mouse,false,if enabled{PAPER}else{Color::new(205,202,191,255)},run.interactive()&&enabled);
+        }
+        if run.result.is_some() {
+            // Consequence only after the single confirmation; never disclose a
+            // location or driver before the player commits their whole answer.
+            let stage=Rectangle::new(panel.x,b.y+b.height*0.48,panel.width,b.height*0.25);
+            paper(d,stage,PAPER,BROWN);let t=run.result_time.min(1.);
+            let stop=if run.result==Some(true){0.25}else{0.62};
+            self.kenny(d,Vector2::new(stage.x+stage.width*0.80,stage.y+stage.height*0.86),stage.height*0.67,if run.result==Some(false){t*85.}else{0.},Color::WHITE);
+            school_bus(d,Vector2::new(stage.x+stage.width*(0.03+t*stop),stage.y+stage.height*0.80),stage.width*0.42);
+        }
     }
     fn piano(
         &self,
@@ -1375,8 +1364,14 @@ impl PuzzleUi {
                 PAPER,
             );
         }
-        for i in 0..7 {
-            let p = l.hole(i);
+        for i in 0..12 {
+            let mut p = l.hole(i);
+            if run.feedback>0. && run.mistake && run.last_hit==Some(i) {p.y-=(run.feedback*22.).sin().abs()*7.;}
+            if run.started && run.result.is_none() && i==s.target && !s.closed[i] {
+                let radius=22.*(1.+(1.-s.approach/s.window())*1.5).max(0.65);
+                d.draw_ring(p,radius,radius+3.,0.,360.,48,GOLD);
+                d.draw_ring(p,21.,23.,0.,360.,48,PAPER);
+            }
             let open = s.open[i];
             d.draw_ellipse(p.x as i32, (p.y + 3.0) as i32, 24.0, 17.0, SHADOW);
             d.draw_ellipse(p.x as i32, p.y as i32, 22.0, 16.0, BROWN);
@@ -1471,7 +1466,7 @@ impl PuzzleUi {
         paper(d, label, PAPER, BROWN);
         self.heading(
             d,
-            "South Park",
+            if run.feedback>0. {run.rating.map_or("South Park",|r|r.label(es))}else{"South Park"},
             Vector2::new(label.x + 13.0, label.y + 2.0),
             22.0,
             INK,
@@ -1877,7 +1872,7 @@ fn title(k: ThreatKind, es: bool) -> String {
     match k {
         ThreatKind::Snowman => tr(es, "Cold feet", "Frío de muerte"),
         ThreatKind::Ufo => tr(es, "Lights out!", "¡Fuera luces!"),
-        ThreatKind::Bus => tr(es, "Emergency stop", "Freno de emergencia"),
+        ThreatKind::Bus => tr(es, "Who Will Hit Kenny?", "¿Quién atropellará a Kenny?"),
         ThreatKind::Piano => tr(es, "A minor disaster", "Un desastre menor"),
         ThreatKind::Sewer => tr(es, "Watch your step", "Mira por dónde vas"),
     }
@@ -1885,10 +1880,10 @@ fn title(k: ThreatKind, es: bool) -> String {
 fn instructions(k: ThreatKind, es: bool) -> String {
     match k {
     ThreatKind::Snowman=>tr(es,"Click to rotate each cable. Connect the + source to all 3 heaters before Kenny freezes.\nYou have 30 seconds.","Gira los cables con un clic. Conecta la fuente + a los 3 calefactores antes de que Kenny se congele.\nTienes 30 segundos."),
-    ThreatKind::Ufo=>tr(es,"Click the glowing light on the UFO. Too slow? The beam charges up.\nKeep it below 100% for 20 seconds.","Pulsa la luz encendida del OVNI. Si tardas, el rayo se carga.\nMantenlo por debajo del 100% durante 20 segundos."),
-    ThreatKind::Bus=>tr(es,"Pull each lever once. Deduce the order from the driver's notes on the panel.\nThree wrong orders and Kenny is toast.","Activa cada palanca una vez. Deduce el orden con las notas del conductor.\nTres fallos y Kenny queda hecho tortilla."),
-    ThreatKind::Piano=>tr(es,"Watch the keys, then play them in the same order.\nFive rounds. Three mistakes and the piano drops.","Observa las teclas y repítelas en el mismo orden.\nCinco rondas. Con tres errores, el piano cae."),
-    ThreatKind::Sewer=>tr(es,"Click open manholes to close them before Kenny arrives.\nWatch out: more lids will open along the way!","Cierra las alcantarillas abiertas antes de que llegue Kenny.\n¡Cuidado! Se abrirán otras durante el camino."),
+    ThreatKind::Ufo=>tr(es,"Press A, S or D as the shrinking ring meets its circle.\n20 targets. PERFECT: 100 points; GOOD: 60. Keep the beam below 100%.","Pulsa A, S o D cuando el anillo coincida con su círculo.\n20 objetivos. PERFECTO: 100 puntos; BIEN: 60. Evita que el rayo llegue al 100%."),
+    ThreatKind::Bus=>tr(es,"One token per row and column. Read all six clues. Buildings, kiosks and planter block cells. Choose the dangerous driver; confirm once.","Una ficha por fila y columna. Lee las seis pistas. Edificios, quioscos y jardinera bloquean casillas. Elige al chofer peligroso; confirma una vez."),
+    ThreatKind::Piano=>tr(es,"Watch and listen, then repeat the notes. Eight rounds at a steady tempo.\nOne mistake per round is allowed. A second drops the piano.","Observa y escucha, luego repite las notas. Ocho rondas al mismo ritmo.\nPuedes fallar una vez por ronda. Al segundo error cae el piano."),
+    ThreatKind::Sewer=>tr(es,"Click each lid when its shrinking ring meets the rim.\n12 lids, three faster stages. Early clicks bounce open. Save Kenny before he steps in!","Pulsa cada tapa cuando el anillo coincida con su borde.\n12 tapas, tres tramos cada vez más rápidos. Si te adelantas, rebota y se abre."),
 }
 }
 fn short_instructions(k: ThreatKind, es: bool) -> String {
@@ -1900,23 +1895,19 @@ fn short_instructions(k: ThreatKind, es: bool) -> String {
         ),
         ThreatKind::Ufo => tr(
             es,
-            "Click the glowing light. Survive 20 seconds without filling the beam.",
-            "Pulsa la luz encendida. Resiste 20 segundos sin llenar el rayo.",
+            "A / S / D when rings meet.\n20 targets. Keep beam below 100%.",
+            "A / S / D al coincidir los anillos.\n20 objetivos. Rayo por debajo del 100%.",
         ),
-        ThreatKind::Bus => tr(
-            es,
-            "Read the notes. Pull the 4 levers in the right order.\n3 attempts.",
-            "Lee las pistas. Pulsa las 4 palancas en orden.\n3 intentos.",
-        ),
+        ThreatKind::Bus => tr(es,"One token per row and column. Read all six clues. Buildings, kiosks and planter are blocked. Choose a driver; confirm once.","Una ficha por fila y columna. Lee las seis pistas. Edificios, quioscos y jardinera bloquean. Elige un chofer; confirma una vez."),
         ThreatKind::Piano => tr(
             es,
-            "Watch, then repeat the notes.\n5 rounds.\n3 mistakes allowed.",
-            "Observa y repite las notas.\n5 rondas.\nMáximo 3 errores.",
+            "Watch, listen, repeat.\n8 rounds, same tempo.\nSecond error in a round: defeat.",
+            "Observa, escucha y repite.\n8 rondas, mismo ritmo.\nSegundo error por ronda: derrota.",
         ),
         ThreatKind::Sewer => tr(
             es,
-            "Click open lids before Kenny gets there. More will open!",
-            "Cierra las tapas abiertas antes de que llegue Kenny. ¡Se abrirán más!",
+            "Click when ring meets lid.\n12 lids, 3 stages.\nEarly clicks bounce open!",
+            "Pulsa al coincidir anillo y tapa.\n12 tapas, 3 tramos.\n¡Si te adelantas, se abre!",
         ),
     }
 }
@@ -1952,22 +1943,11 @@ fn status(r: &PuzzleRun, es: bool) -> String {
             h.destinations.iter().filter(|x| **x).count(),
             (30.0 - r.elapsed).max(0.0)
         ),
-        Board::Ufo(u) => format!(
-            "{} {:.0}%   •   {:.0} s",
-            tr(es, "Beam", "Rayo"),
-            u.charge * 100.0,
-            (20.0 - r.elapsed).max(0.0)
-        ),
-        Board::Bus(b) => format!("{}: {} / 3", tr(es, "Attempts", "Intentos"), b.attempts),
-        Board::Piano(p) => format!(
-            "{} {}/5  •  {} {}/3",
-            tr(es, "Round", "Ronda"),
-            p.round + 1,
-            tr(es, "Errors", "Errores"),
-            p.errors
-        ),
+        Board::Ufo(u) => format!("{} {:.0}% | {}/20\n{}: {}",tr(es,"Beam","Rayo"),u.charge*100.,u.completed,tr(es,"Score","Puntos"),u.score),
+        Board::Bus(_) => tr(es,"No time limit.","Sin límite de tiempo."),
+        Board::Piano(p) => format!("{} {}/8\n{}: {} | {}/{}",tr(es,"Round","Ronda"),p.round+1,tr(es,"Errors left","Fallos libres"),1_u8.saturating_sub(p.errors),p.input,p.length()),
         Board::Sewers(s) => format!(
-            "{}: {} / 7",
+            "{}: {} / 12",
             tr(es, "Lids closed", "Tapas cerradas"),
             s.closed.iter().filter(|x| **x).count()
         ),
@@ -1977,8 +1957,8 @@ fn progress(r: &PuzzleRun) -> f32 {
     match &r.board {
         Board::Heaters(_) => (30.0 - r.elapsed) / 30.0,
         Board::Ufo(u) => u.charge,
-        Board::Bus(b) => b.attempts as f32 / 3.0,
-        Board::Piano(p) => (p.round as f32) / 5.0,
+        Board::Bus(_) => 0.0,
+        Board::Piano(p) => (p.round as f32) / 8.0,
         Board::Sewers(s) => s.position,
     }
 }
@@ -2010,10 +1990,10 @@ mod tests {
                 let p = PuzzleRun::new(kind, 0);
                 let count = match kind {
                     ThreatKind::Snowman => 16,
-                    ThreatKind::Ufo => 6,
-                    ThreatKind::Bus => 4,
+                    ThreatKind::Ufo => 3,
+                    ThreatKind::Bus => 36,
                     ThreatKind::Piano => 5,
-                    ThreatKind::Sewer => 7,
+                    ThreatKind::Sewer => 12,
                 };
                 for i in 0..count {
                     let point = match kind {
@@ -2022,7 +2002,7 @@ mod tests {
                         _ => {
                             let r = match kind {
                                 ThreatKind::Snowman => l.cell(i),
-                                ThreatKind::Bus => l.lever(i),
+                                ThreatKind::Bus => l.case_cell(i),
                                 _ => l.key(i, 0),
                             };
                             Vector2::new(r.x + r.width * 0.5, r.y + r.height * 0.5)

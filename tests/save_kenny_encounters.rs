@@ -3,7 +3,7 @@ use planet_hoppers::minigames::{
     southpark::{
         encounters::{script, Adventure, MEMBERS},
         locations::WorldLocations,
-        puzzles::{Board, BUS_SOLUTION, HEATER_SOLUTION},
+        puzzles::{Board, HEATER_SOLUTION},
         session::{SaveKennySession, SessionState, VoiceClock},
         threats::ThreatState,
         DevConfig, SouthParkScene,
@@ -116,9 +116,10 @@ fn exploration_encounters_all_2d_puzzles_and_victory() {
                     let target = u.target;
                     p.click(target);
                 }
-                Board::Bus(b) => {
-                    let next = BUS_SOLUTION[b.entered.len().min(3)];
-                    p.click(next);
+                Board::Bus(_) => {
+                    use planet_hoppers::minigames::southpark::murdoku::{SOLUTION,DANGEROUS};
+                    for (i,cell) in SOLUTION.into_iter().enumerate() {p.select_bus_piece(i);p.place_bus_piece(cell);}
+                    p.accuse_bus_driver(DANGEROUS);p.confirm_bus();
                 }
                 Board::Piano(k) => {
                     if !k.demonstrating {

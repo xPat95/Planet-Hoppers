@@ -389,7 +389,7 @@ impl SaveKennySession {
         let dt=if dt.is_finite() {dt.clamp(0.0,0.25)} else {0.0};
         let p=self.puzzle.as_mut().unwrap();
         if p.paused {return;}
-        p.tick(dt);
+        if !p.externally_clocked {p.tick(dt);}
         if p.leaving {
             if p.transition<=0.0 {
                 self.puzzle=None;

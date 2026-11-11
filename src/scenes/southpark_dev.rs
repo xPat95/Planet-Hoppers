@@ -353,6 +353,7 @@ pub fn run_visit_with_results(
     let mut puzzle_smoke_pose = None;
     let mut puzzle_ike_position = None;
     let mut outcome_smoke = puzzle_results.then(super::puzzle_smoke::OutcomeSmoke::default);
+    let mut puzzle_clock=Instant::now();
     while !rl.window_should_close() {
         if chef_smoke && visits.chef_intro_seen && frame>=180 {
             assert!(!entry.active && cursor.captured && !session.blocks_controls());
@@ -655,16 +656,36 @@ pub fn run_visit_with_results(
         let had_dialogue = scene.dialogue != KennyDialogue::Closed;
         let encounter_was_open = session.adventure.as_ref().is_some_and(|a| a.dialogue.is_some());
         let puzzle_was_open = session.puzzle.is_some();
+        let now=Instant::now();
+        let timing_dt=now.duration_since(puzzle_clock).as_secs_f32();
+        puzzle_clock=now;
+        if let Some(p)=&mut session.puzzle {
+            if p.kind!=ThreatKind::Snowman && !puzzle_smoke {
+                p.externally_clocked=true;
+                if !rl.is_window_focused() && !p.leaving && p.result.is_none() {p.paused=true;}
+                p.tick(timing_dt);
+            }
+        }
         if !intro_was_active && puzzle_was_open {
             if let Some(ui)=&mut puzzle_ui {
                 use super::puzzle_ui::Action;
-                match ui.input(&rl,&session) {
+                match if rl.is_window_focused() || puzzle_smoke {ui.input(&rl,&session)}else{Action::None} {
                     Action::Start=>session.puzzle.as_mut().unwrap().start(),
-                    Action::Hit(i)=>session.puzzle.as_mut().unwrap().click(i),
+                    Action::Hit(i)=>{
+                        let p=session.puzzle.as_mut().unwrap();
+                        if p.interactive() && matches!(&p.board,crate::minigames::southpark::puzzles::Board::Piano(k) if !k.demonstrating) {audio.play_piano_key(i);}
+                        p.click(i);
+                    },
                     Action::Restart=>{audio.stop_effects();audio.silence_voice();session.restart_puzzle();},
                     Action::Pause=>{let p=session.puzzle.as_mut().unwrap();p.paused=!p.paused;},
                     Action::Back=>session.leave_puzzle(),
                     Action::Mute=>ui.toggle_mute(),
+                    Action::SelectBus(i)=>session.puzzle.as_mut().unwrap().select_bus_piece(i),
+                    Action::PlaceBus(cell)=>session.puzzle.as_mut().unwrap().place_bus_piece(cell),
+                    Action::AccuseBus(i)=>session.puzzle.as_mut().unwrap().accuse_bus_driver(i),
+                    Action::RemoveBus=>session.puzzle.as_mut().unwrap().remove_bus_piece(),
+                    Action::ClearBus=>session.puzzle.as_mut().unwrap().clear_bus(),
+                    Action::ConfirmBus=>session.puzzle.as_mut().unwrap().confirm_bus(),
                     Action::None=>{}
                 }
             }
@@ -850,6 +871,7 @@ pub fn run_visit_with_results(
             cursor.apply(&mut rl);
         }
         if let Some(ui)=&puzzle_ui {audio.set_background_muted(ui.muted);}
+        audio.sync_piano(session.puzzle.as_ref());
         if session.puzzle_starts != puzzle_music_start {
             if session.puzzle.is_some() {audio.restart_challenge_music();}
             puzzle_music_start=session.puzzle_starts;

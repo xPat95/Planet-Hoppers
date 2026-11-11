@@ -9,6 +9,8 @@ use serde::Deserialize;
 use std::path::Path;
 pub mod encounters;
 pub mod puzzles;
+pub mod traffic;
+pub mod murdoku;
 pub mod kenny;
 pub mod ike;
 pub mod locations;
