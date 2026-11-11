@@ -15,10 +15,11 @@ pub struct RewardOutcome {
     pub progress_completed: bool,
 }
 
-/// Record an actual attempt outcome supplied by the minigame rules.
+/// Record an attempt outcome supplied by the minigame rules or secret completion code.
 ///
-/// Callers must report Victory only when the challenge really finishes; visiting
-/// a planet, returning to the host or collecting a partial objective is not a win.
+/// Callers report Victory when the challenge finishes or the player completes
+/// the explicit secret shortcut. Visiting a planet, returning to the host or
+/// collecting a partial objective is not a win.
 /// IDs must match the existing selection catalog (e.g. `smilingfriends`). Invalid
 /// identities/catalog entries return an error without changing the adventure.
 /// Repeated victories, defeats and abandonments return an empty outcome.
@@ -45,4 +46,19 @@ pub fn record_result(
         ship_unlocked,
         progress_completed: game.progress.is_complete(),
     })
+}
+
+/// Presentation cheat: grant only missing tokens and their ships, atomically.
+/// Active/initial ship selection and existing progress remain unchanged.
+pub fn complete_for_presentation(game: &mut GameState, catalog: &ShipCatalog) -> Result<usize, String> {
+    let mut completed = game.clone();
+    let mut granted = 0;
+    for franchise in Franchise::ALL {
+        if !completed.progress().is_completed(franchise) {
+            record_result(&mut completed, franchise.as_str(), MinigameResult::Victory, catalog)?;
+            granted += 1;
+        }
+    }
+    *game = completed;
+    Ok(granted)
 }

@@ -20,6 +20,7 @@ uniform float lightRange;     // Distancia a la que la luz cae a la mitad
 uniform float goo;            // 0 a 1: una criatura maldecida se vuelve baba negra y mojada
 uniform float hidden;         // 1 = todavía en lo oscuro, invisible del todo (ni los ojos); 0 = ya la agarró la luz
 uniform float lampPower;      // El parpadeo del farol (1 = normal, casi 0 = se apaga)
+uniform float rimPower;       // Cuánto da la luz fría de atrás (1 = la del juego; menos, más suave)
 uniform vec3 lampTint;        // Color del farol (cero: el cálido de siempre; en el final, luces de disco)
 uniform float fogDensity;
 uniform float shadowOn;       // 0 mientras se dibuja el mapa de sombras
@@ -70,7 +71,7 @@ void main() {
     vec3 rimDir = normalize(vec3(0.85, 0.35, -0.5));   // De atrás y de un costado
     // Corte duro: solo la línea del borde, nada de brillo hacia el frente de la criatura
     float edge = smoothstep(0.48, 0.66, 1.0 - max(dot(n, v), 0.0)) * max(dot(n, rimDir), 0.0) * smoothstep(0.9, 0.55, n.y);
-    lit += vec3(0.28, 0.45, 1.0) * edge * 6.0 * (0.6 + 0.4 * (base.r + base.g + base.b));
+    lit += vec3(0.28, 0.45, 1.0) * edge * 6.0 * rimPower * (0.6 + 0.4 * (base.r + base.g + base.b));
     // Niebla: lo lejos se hunde en la oscuridad; los ojos la atraviesan más
     float k = exp(-length(cameraPosition - worldPosition) * fogDensity);
     vec3 color = (mix(FOG, lit, k) + emissive * mix(1.0, k, 0.45)) * (1.0 - hidden);

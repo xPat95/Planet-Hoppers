@@ -4,6 +4,14 @@ Proyecto universitario de Gráficas por Computadora: un videojuego 3D de explora
 
 El ciclo de estación y hangar, los tokens, el desbloqueo de naves y las abducciones están integrados.
 El progreso se guarda automáticamente y el menú permite continuar la partida.
+Toda la partida se ejecuta a pantalla completa con la resolución del monitor: menú, hangar, sistema solar, videos y minijuegos, también al regresar entre escenas. Las pruebas automáticas conservan sus ventanas ocultas y tamaños de captura.
+
+**Ctrl+X** cierra inmediatamente el programa desde cualquier escena, incluidos menús, hangar, vuelos, videos y minijuegos; funciona con cualquiera de las dos teclas Ctrl.
+
+Easter egg: dentro de cualquiera de los seis minijuegos (también en su intro o pausa), mantén **Ctrl** y pulsa **1 → 2 → 3 → 4** en orden, con un máximo de cinco segundos entre números. Salta el desafío y regresa al flujo del token del planeta, con los mismos desbloqueos y guardado de una victoria. Funciona con la fila numérica o el teclado numérico; soltar Ctrl o equivocarse reinicia la secuencia. Repetirlo no duplica tokens ni cambia la nave activa.
+
+Para la presentación: en el **sistema solar**, mantén **Ctrl** y pulsa **C → N → P** en orden (máximo cinco segundos entre letras). Entrega de inmediato todos los tokens que falten hasta llegar a **6/6**, desbloquea sus naves y guarda la partida. Abre el medallero sin reproducir las abducciones pendientes; conserva la nave activa. También funciona con la ayuda o el medallero abiertos. Repetirlo con los seis tokens no entrega recompensas adicionales.
+
 Ver [abducciones y persistencia](docs/minigames/abduction-rewards.md) para los flujos y verificaciones.
 El final descrito más abajo sigue planificado.
 

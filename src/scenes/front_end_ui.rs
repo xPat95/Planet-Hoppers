@@ -219,7 +219,7 @@ pub(super) fn controls(d: &mut RaylibDrawHandle, title: &Font, body: &Font, w: i
                     "ESC / P · SOUTH PARK",
                     "Pausa, reinicio y regreso al sistema solar",
                 ),
-                ("CTRL + Q", "Salir del juego"),
+                ("CTRL + X", "Salir del juego"),
             ],
         ),
     ];

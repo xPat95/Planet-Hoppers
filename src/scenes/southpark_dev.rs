@@ -55,6 +55,7 @@ pub fn run_visit_with_results(
     mut args: impl Iterator<Item = String>,
     observer: &mut crate::minigames::common::host::ResultObserver<'_>,
 ) -> Result<SouthParkExit, Box<dyn std::error::Error>> {
+    let mut reward_shortcut = crate::minigames::common::shortcuts::RewardShortcut::default();
     let mut reporter = crate::minigames::common::host::AttemptReporter::default();
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let mut config_path = root.join("config/southpark-dev.json");
@@ -165,17 +166,16 @@ pub fn run_visit_with_results(
     if dynamic_mode {
         scene.kenny_hint = false;
     }
-    let (mut rl, thread) = raylib::init()
-        .size(1280, 800)
-        .resizable()
-        .msaa_4x()
-        .title("Planet-Hoppers | South Park | SAVE KENNY!")
-        .build();
+    let (mut rl, thread) = crate::graphics::window::build(
+        raylib::init()
+            .size(1280, 800)
+            .resizable()
+            .msaa_4x()
+            .title("Planet-Hoppers | South Park | SAVE KENNY!"),
+        smoke || session_smoke || entry_smoke || ike_smoke || encounter_smoke || puzzle_smoke || chef_smoke || return_smoke_goal.is_some(),
+    );
     rl.set_exit_key(None);
     rl.set_window_min_size(640, 480);
-    if smoke || session_smoke || entry_smoke || ike_smoke || encounter_smoke || puzzle_smoke || chef_smoke || return_smoke_goal.is_some() {
-        rl.set_window_state(WindowState::default().set_window_hidden(true));
-    }
     // The session smoke uses the real audio clock, so do not exhaust its frame
     // budget faster than the combined voice file can physically play.
     rl.set_target_fps(if session_smoke || entry_smoke || return_smoke_goal.is_some() {
@@ -354,7 +354,11 @@ pub fn run_visit_with_results(
     let mut puzzle_ike_position = None;
     let mut outcome_smoke = puzzle_results.then(super::puzzle_smoke::OutcomeSmoke::default);
     let mut puzzle_clock=Instant::now();
-    while !rl.window_should_close() {
+    while !crate::graphics::window::should_close(&rl) {
+        if let Some(shortcut_exit) = reward_shortcut.poll(&rl, observer)? {
+            exit = shortcut_exit;
+            break;
+        }
         if chef_smoke && visits.chef_intro_seen && frame>=180 {
             assert!(!entry.active && cursor.captured && !session.blocks_controls());
             assert!(visits.chef_intro_seen);
@@ -1106,7 +1110,7 @@ pub fn run_visit_with_results(
             let height = rl.get_screen_height();
             let rl_mouse = rl.get_mouse_position();
             let mouse_down = rl.is_mouse_button_down(MouseButton::MOUSE_BUTTON_LEFT);
-            let mut d = rl.begin_drawing(&thread);
+            let mut d = crate::graphics::window::begin_drawing(&mut rl, &thread);
             d.clear_background(Color::new(184, 212, 237, 255));
             // The video replaces the cinematic entirely: no town/HUD render underneath.
             if !(entry.active && entry.full_intro) {

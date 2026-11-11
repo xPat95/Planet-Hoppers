@@ -21,6 +21,11 @@ pub const ART: [AbductionArt; 6] = [
     AbductionArt { franchise: Franchise::RegularShow, background: "regular_show", characters: &["Mordecai","Rigby"], color: Color::new(255,213,128,255) },
 ];
 
+/// Manda ya lo que raylib tiene juntado para dibujar (antes de borrar la pantalla en medio de un cuadro).
+fn flush_2d() {
+    unsafe { raylib::ffi::rlDrawRenderBatchActive() };
+}
+
 pub fn cover_source(image: [f32; 2], viewport: [f32; 2]) -> Rectangle {
     let scale = (viewport[0] / image[0]).max(viewport[1] / image[1]);
     let (w,h) = (viewport[0]/scale, viewport[1]/scale);
@@ -31,8 +36,17 @@ fn smooth(t: f32) -> f32 { let t=t.clamp(0.0,1.0); t*t*(3.0-2.0*t) }
 fn alpha(c: Color, a: f32) -> Color { Color::new(c.r,c.g,c.b,(255.0*a.clamp(0.0,1.0)) as u8) }
 
 struct Cast { background: Texture2D, models: Vec<Model>, ship: SpaceModel }
+
+/// La de Hexbound no es una abducción sino la invitación a la fiesta, dibujada con el arte y la luz del minijuego
+/// (`minigames::halloween::draw_invitation`), con la carta de Cami (si todavía no está el dibujo, una de papel). Al
+/// ganar el minijuego es otra escena: la carta de agradecimiento sola, con corazones (`thanks`, `draw_thanks`).
+struct Hexbound { art: crate::minigames::halloween::Art, letter: Option<Texture2D>, thank_you: Option<Texture2D>, thanks: bool }
+
+const HEXBOUND_LETTER: &str = "assets/ui/halloween/invitation.png";
+const HEXBOUND_THANKS: &str = "assets/ui/halloween/thanks.png";
 pub struct AbductionRenderer {
     cast: BTreeMap<Franchise, Cast>,
+    hexbound: Option<Hexbound>,
     // Models hold weak shader references; release them before the shader.
     _shader: Shader,
     ship_shader: SpaceShader,
@@ -44,6 +58,7 @@ impl AbductionRenderer {
         let shader = rl.load_shader_from_memory(thread, Some(include_str!("../graphics/shaders/abduction.vs")), Some(include_str!("../graphics/shaders/abduction.fs")));
         if !shader.is_shader_valid() { return Err("No se pudo cargar la iluminación de abducción".into()); }
         let mut cast = BTreeMap::new();
+        let mut hexbound = None;
         let ships = ShipsConfig::load(&root.join("config/ships.json"))?;
         let catalog = ShipCatalog::load(&root.join("config/ship-selection.json"), &ships)?;
         let ship_shader = SpaceShader::load(rl,thread)?;
@@ -68,12 +83,52 @@ impl AbductionRenderer {
             let ship = catalog.model(choice,&ships);
             let ship = SpaceModel::load(rl,thread,&root.join(&ship.model),&ship_shader,
                 ship.model_rotation_degrees,Fit::Length(2.0))?;
+            if art.franchise == Franchise::Halloween {
+                let mut card = |path: &str| -> Result<Option<Texture2D>, Box<dyn std::error::Error>> {
+                    let path = root.join(path);
+                    if !path.is_file() {
+                        return Ok(None);
+                    }
+                    let t = rl.load_texture(thread, &path.to_string_lossy())?;
+                    t.set_texture_filter(thread, TextureFilter::TEXTURE_FILTER_BILINEAR);
+                    Ok(Some(t))
+                };
+                let (letter, thank_you) = (card(HEXBOUND_LETTER)?, card(HEXBOUND_THANKS)?);
+                let art = crate::minigames::halloween::Art::load(rl, thread, root).map_err(|e| e.to_string())?;
+                hexbound = Some(Hexbound { art, letter, thank_you, thanks: false });
+            }
             cast.insert(art.franchise, Cast { background, models, ship });
         }
-        Ok(Self { cast, _shader: shader, ship_shader })
+        Ok(Self { cast, hexbound, _shader: shader, ship_shader })
     }
 
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle, franchise: Franchise, t: f32, width: i32, height: i32) {
+    /// Qué carta lleva la escena de Hexbound: la de agradecimiento (al ganar el minijuego) o la invitación.
+    pub fn set_hexbound_thanks(&mut self, thanks: bool) {
+        if let Some(hex) = &mut self.hexbound {
+            hex.thanks = thanks;
+        }
+    }
+
+    /// Antes de `begin_drawing`: la escena de Hexbound necesita su textura del tamaño de la ventana.
+    pub fn prepare(&mut self, rl: &mut RaylibHandle, thread: &RaylibThread) -> Result<(), Box<dyn std::error::Error>> {
+        if let Some(hex) = &mut self.hexbound {
+            hex.art.prepare(rl, thread).map_err(|e| e.to_string())?;
+        }
+        Ok(())
+    }
+
+    pub fn draw(&mut self, d: &mut RaylibDrawHandle, thread: &RaylibThread, franchise: Franchise, t: f32, width: i32, height: i32) {
+        // raylib junta lo que se dibuja en 2D y lo manda después: lo que ya dibujó el sistema solar (etiquetas, logos)
+        // tiene que salir antes de que la escena borre la pantalla, o aparece encima de ella
+        flush_2d();
+        if let Some(hex) = self.hexbound.as_mut().filter(|_| franchise == Franchise::Halloween) {
+            if hex.thanks {
+                crate::minigames::halloween::draw_thanks(d, &hex.art.font, hex.thank_you.as_ref(), t);
+            } else {
+                crate::minigames::halloween::draw_invitation(d, thread, &mut hex.art, hex.letter.as_ref(), t);
+            }
+            return;
+        }
         let Some(cast) = self.cast.get(&franchise) else { return; };
         let art = ART.iter().find(|a| a.franchise == franchise).unwrap();
         let (w,h) = (width as f32,height as f32);
@@ -125,6 +180,26 @@ impl AbductionRenderer {
         let fade = (1.0-smooth(t/0.35)).max(smooth((t-4.35)/0.45));
         d.draw_rectangle(0,0,width,height,alpha(Color::BLACK,fade));
     }
+}
+
+/// La música de la invitación de Hexbound: "Exploring", la de la intro del minijuego, desde el principio.
+const HEXBOUND_MUSIC: (&str, f32) = ("assets/audio/music/Halloween/exploring.mp3", 0.35);
+
+/// La música propia de la abducción de una franquicia (solo Hexbound tiene), lista para tocar.
+pub fn abduction_music<'a>(device: Option<&'a RaylibAudio>, root: &Path, franchise: Franchise) -> Option<Music<'a>> {
+    if franchise != Franchise::Halloween {
+        return None;
+    }
+    device.and_then(|d| d.new_music(&root.join(HEXBOUND_MUSIC.0).to_string_lossy()).ok()).map(|mut m| {
+        m.looping = false;
+        m.set_volume(HEXBOUND_MUSIC.1);
+        m
+    })
+}
+
+/// El volumen de esa música en el segundo `t` de una escena de `length` segundos: se apaga con el fundido final.
+pub fn abduction_music_volume(t: f32, length: f32) -> f32 {
+    HEXBOUND_MUSIC.1 * (1.0 - smooth((t - (length - 0.45)) / 0.45))
 }
 
 const SMILINGFRIENDS_VIDEO: &str = "assets/video/smilingfriends/abduction.sfv";
@@ -192,6 +267,7 @@ impl<'a> AbductionVideo<'a> {
 
     /// El cuadro actual llenando toda la ventana (recortado al centro, sin estirar) y el botón SKIP.
     pub fn draw(&self, d: &mut RaylibDrawHandle, width: i32, height: i32) {
+        flush_2d();
         let (w, h) = (width as f32, height as f32);
         d.clear_background(Color::BLACK);
         let source = cover_source([self.texture.width as f32, self.texture.height as f32], [w, h]);

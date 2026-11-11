@@ -390,19 +390,18 @@ fn view(
     let mut hangar_elapsed = 0.0f32;
     let mut morph: Option<f32> = None;
     let mut close_focus: Option<Camera3D> = None;
-    let (mut rl, thread) = raylib::init()
-        .size(1280, 800)
-        .resizable()
-        .msaa_4x()
-        .title("Planet Hoppers")
-        .build();
+    let (mut rl, thread) = crate::graphics::window::build(
+        raylib::init()
+            .size(1280, 800)
+            .resizable()
+            .msaa_4x()
+            .title("Planet Hoppers"),
+        smoke_goal.is_some(),
+    );
     rl.set_exit_key(None);
     rl.set_window_min_size(960, 640);
     rl.enable_cursor();
     rl.set_target_fps(if smoke_goal.is_some() { 0 } else { 60 });
-    if smoke_goal.is_some() {
-        rl.set_window_state(WindowState::default().set_window_hidden(true));
-    }
     let sky = Sky::new();
     let intro_backdrop = rl.load_texture(
         &thread,
@@ -440,7 +439,7 @@ fn view(
 
     loop {
         music.update();
-        if rl.window_should_close()
+        if crate::graphics::window::should_close(&rl)
             || ((rl.is_key_down(KeyboardKey::KEY_LEFT_CONTROL)
                 || rl.is_key_down(KeyboardKey::KEY_RIGHT_CONTROL))
                 && rl.is_key_pressed(KeyboardKey::KEY_Q))
@@ -630,7 +629,7 @@ fn view(
         let menu_time = rl.get_time() as f32;
         let left_active = rl.is_key_down(KeyboardKey::KEY_LEFT);
         let right_active = rl.is_key_down(KeyboardKey::KEY_RIGHT);
-        let mut d = rl.begin_drawing(&thread);
+        let mut d = crate::graphics::window::begin_drawing(&mut rl, &thread);
         d.clear_background(SKY_BACKGROUND);
         if screen == Screen::Controls {
             galaxy.draw(&mut d, w, h, menu_time);
@@ -646,16 +645,17 @@ fn view(
         match screen {
             Screen::Main => {
                 draw_intro_backdrop(&mut d, &intro_backdrop, w, h);
-                for (i, label) in ["JUGAR", "CONTROLES", "SALIR"].iter().enumerate() {
-                    let bt = ((intro - BUTTONS_DELAY - i as f32 * BUTTON_STAGGER)
-                        / BUTTON_INTRO)
-                        .clamp(0.0, 1.0);
-                    let mut rect = menu_button(w, h, i);
+                // Los botones suben desde abajo, uno detrás del otro (CONTINUAR, si hay partida guardada, el último)
+                let rise = |i: usize, mut rect: Rectangle| {
+                    let bt = ((intro - BUTTONS_DELAY - i as f32 * BUTTON_STAGGER) / BUTTON_INTRO).clamp(0.0, 1.0);
                     rect.y += (1.0 - bt).powi(3) * h as f32 * 0.45;
-                    draw_intro_button(&mut d, &menu_font, rect, label, mouse, true);
+                    rect
+                };
+                for (i, label) in ["JUGAR", "CONTROLES", "SALIR"].iter().enumerate() {
+                    draw_intro_button(&mut d, &menu_font, rise(i, menu_button(w, h, i)), label, mouse, true);
                 }
                 if saved.is_some() {
-                    draw_intro_button(&mut d, &menu_font, continue_button(w,h), "[R] CONTINUAR", mouse, true);
+                    draw_intro_button(&mut d, &menu_font, rise(3, continue_button(w, h)), "[R] CONTINUAR", mouse, true);
                 }
             }
             Screen::Controls => {
@@ -849,19 +849,19 @@ fn play_abduction<'a>(rl: &mut RaylibHandle, thread: &RaylibThread, root: &std::
     franchise: crate::gameplay::progress::Franchise, music: &super::menu_music::MenuMusic<'_>,
     device: Option<&'a RaylibAudio>) -> Result<bool, Error> {
     // Un cuadro negro mientras carga (la animación empieza saliendo del negro)
-    rl.begin_drawing(thread).clear_background(Color::BLACK);
+    crate::graphics::window::begin_drawing(rl, thread).clear_background(Color::BLACK);
     if franchise == crate::gameplay::progress::Franchise::SmilingFriends {
         let mut video = super::abduction::AbductionVideo::load(rl, thread, root, device)?;
         music.set_paused(true);
         let mut t = 0.0;
         while t < super::token_collection::SMILINGFRIENDS_ABDUCTION_SECONDS && !video.skip_requested(rl) {
-            if rl.window_should_close() {
+            if crate::graphics::window::should_close(&rl) {
                 return Ok(false);
             }
             video.update(t)?;
             t += rl.get_frame_time().min(0.1);
             let (w, h) = (rl.get_screen_width(), rl.get_screen_height());
-            let mut d = rl.begin_drawing(thread);
+            let mut d = crate::graphics::window::begin_drawing(rl, thread);
             video.draw(&mut d, w, h);
         }
         video.stop();
@@ -869,17 +869,33 @@ fn play_abduction<'a>(rl: &mut RaylibHandle, thread: &RaylibThread, root: &std::
         return Ok(true);
     }
     let mut abduction = super::abduction::AbductionRenderer::load(rl, thread, root, &[franchise])?;
+    // La de Hexbound trae su música (la de la intro del minijuego) en vez de la del menú
+    let own = super::abduction::abduction_music(device, root, franchise);
+    if let Some(m) = &own {
+        music.set_paused(true);
+        m.play_stream();
+    }
+    let length = super::token_collection::abduction_seconds(franchise);
     let mut t = 0.0;
-    while t < super::token_collection::ABDUCTION_SECONDS {
+    while t < length {
         music.update();
-        if rl.window_should_close() {
+        if let Some(m) = &own {
+            m.set_volume(super::abduction::abduction_music_volume(t, length));
+            m.update_stream();
+        }
+        if crate::graphics::window::should_close(&rl) {
             return Ok(false);
         }
         t += rl.get_frame_time().min(0.1);
+        abduction.prepare(rl, thread)?;
         let (w, h) = (rl.get_screen_width(), rl.get_screen_height());
-        let mut d = rl.begin_drawing(thread);
+        let mut d = crate::graphics::window::begin_drawing(rl, thread);
         d.clear_background(Color::BLACK);
-        abduction.draw(&mut d, franchise, t, w, h);
+        abduction.draw(&mut d, thread, franchise, t, w, h);
+    }
+    if let Some(m) = &own {
+        m.stop_stream();
+        music.set_paused(false);
     }
     Ok(true)
 }

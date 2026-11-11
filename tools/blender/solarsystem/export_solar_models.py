@@ -51,6 +51,9 @@ for _pose in ("solo_a", "solo_b", "solo_c", "hop", "sway", "spin"):
     EXPORTS["halloween_game_witchhappy_" + _pose] = (
         "assets/models/characters/halloween/witch.blend", "Halloween_GameWitchHappy_%s_ROOT" % _pose,
         "assets/models/minigames/halloween/witch_happy_%s.glb" % _pose, "near")
+# El papelito de la invitación (la abducción de Hexbound), que la bruja tiene en la mano
+EXPORTS["halloween_game_note"] = ("assets/models/characters/halloween/witch.blend", "Halloween_GameNote_ROOT",
+                                  "assets/models/minigames/halloween/note.glb", "near")
 # Criaturas del minijuego: una pose por archivo
 for _c, _poses in (("Devil", ("walk_a", "walk_b", "dance_a", "dance_b")), ("Ghost", ("float_a", "float_b", "dance_a", "dance_b")),
                    ("Demon", ("walk_a", "walk_b", "dance_a", "dance_b"))):

@@ -14,6 +14,8 @@ mod sound;
 mod story;
 
 pub use app::run_visit;
+pub use render::Art;
+pub use story::{draw_invitation, draw_invitation_lit, draw_thanks, InvitationLight, INVITATION, INVITATION_LIGHT, THANKS};
 pub use glyph::{recognize, Glyph};
 
 impl crate::minigames::common::host::AttemptOutcome for Session {

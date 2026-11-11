@@ -1,7 +1,7 @@
 use planet_hoppers::{
     gameplay::{progress::Franchise, rewards::{record_result, RewardOutcome}, selection::{GameState, ShipCatalog}},
     minigames::common::host::MinigameResult,
-    scenes::token_collection::{CollectionLayout, TokenPresentation, abduction_seconds, ABDUCTION_SECONDS, TOAST_SECONDS, CEREMONY_SECONDS, TOKENS, slot_index},
+    scenes::token_collection::{CollectionLayout, TokenPresentation, abduction_length, returns_abducted, ABDUCTION_SECONDS, TOAST_SECONDS, CEREMONY_SECONDS, TOKENS, slot_index},
     ships::ShipsConfig,
 };
 use std::path::Path;
@@ -83,9 +83,9 @@ fn fifo_notices_never_own_a_separate_token_counter() {
     assert_eq!(ui.pending_count(), 6);
     for art in &TOKENS {
         ui.advance(0.0, true);
-        if art.franchise != Franchise::Minecraft {
+        if art.franchise != Franchise::Minecraft && returns_abducted(art.franchise) {
             assert_eq!(ui.abduction(), Some(art.franchise));
-            ui.advance(abduction_seconds(art.franchise), true);
+            ui.advance(abduction_length(art.franchise, false), true);
         }
         assert_eq!(ui.active().unwrap().franchise, art.franchise);
         ui.advance(CEREMONY_SECONDS, true);

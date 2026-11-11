@@ -16,6 +16,7 @@ pub fn run_visit(
     args: impl Iterator<Item = String>,
     observer: &mut crate::minigames::common::host::ResultObserver<'_>,
 ) -> Result<ExitReason, Error> {
+    let mut reward_shortcut = crate::minigames::common::shortcuts::RewardShortcut::default();
     let mut reporter = crate::minigames::common::host::AttemptReporter::default();
     let mut smoke = false;
     let mut return_goal = None;
@@ -63,18 +64,17 @@ pub fn run_visit(
     let root = project_root.join("assets/minigames/regularshow");
     let captures = project_root.join("target/regularshow");
     std::fs::create_dir_all(&captures)?;
-    let (mut rl, thread) = raylib::init()
-        .size(1280, 720)
-        .resizable()
-        .title("Regular Show: El Martillo")
-        .build();
+    let (mut rl, thread) = crate::graphics::window::build(
+        raylib::init()
+            .size(1280, 720)
+            .resizable()
+            .title("Regular Show: El Martillo"),
+        smoke,
+    );
     rl.set_exit_key(None);
     // JPEG decoding happens continuously during cinematics.
     rl.set_trace_log(TraceLogLevel::LOG_WARNING);
     rl.set_window_min_size(960, 540);
-    if smoke {
-        rl.set_window_state(WindowState::default().set_window_hidden(true));
-    }
     rl.set_target_fps(if smoke { 0 } else { 60 });
     let mut canvas = rl.load_render_texture(&thread, WIDTH as u32, HEIGHT as u32)?;
     canvas
@@ -113,7 +113,7 @@ pub fn run_visit(
                 let w = rl.get_screen_width();
                 let h = rl.get_screen_height();
                 let (dest, _) = viewport(w, h);
-                let mut d = rl.begin_drawing(&thread);
+                let mut d = crate::graphics::window::begin_drawing(&mut rl, &thread);
                 d.clear_background(Color::BLACK);
                 d.draw_texture_pro(
                     canvas.texture(),
@@ -142,11 +142,14 @@ pub fn run_visit(
     let mut smoke_ticks = 0;
     let mut room_captures = [false; 3];
     loop {
-        if rl.window_should_close()
+        if crate::graphics::window::should_close(&rl)
             || (rl.is_key_down(KeyboardKey::KEY_LEFT_CONTROL)
                 && rl.is_key_pressed(KeyboardKey::KEY_Q))
         {
             return Ok(ExitReason::WindowClosed);
+        }
+        if let Some(exit) = reward_shortcut.poll(&rl, observer)? {
+            return Ok(exit);
         }
         let dt = if smoke {
             1.0 / 60.0
@@ -446,7 +449,7 @@ pub fn run_visit(
             dest.y += (g.elapsed * 71.0).cos() * g.shake * 0.4 * scale;
         }
         {
-            let mut d = rl.begin_drawing(&thread);
+            let mut d = crate::graphics::window::begin_drawing(&mut rl, &thread);
             d.clear_background(Color::new(13, 11, 20, 255));
             d.draw_texture_pro(
                 canvas.texture(),

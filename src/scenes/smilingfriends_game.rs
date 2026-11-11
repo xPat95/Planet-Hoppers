@@ -524,6 +524,7 @@ pub fn play_with_results(rl: &mut RaylibHandle, thread: &RaylibThread, root: &Pa
         m.play_stream();
         m
     });
+    let mut reward_shortcut = crate::minigames::common::shortcuts::RewardShortcut::default();
     let mut reporter = crate::minigames::common::host::AttemptReporter::default();
     let dialogue = Dialogue::load(&root.join(DIALOGUE))?;
     let title = rl.load_font_ex(thread, &root.join("assets/fonts/Bungee-Regular.ttf").to_string_lossy(), 72, Some(CHARSET))?;
@@ -593,8 +594,11 @@ pub fn play_with_results(rl: &mut RaylibHandle, thread: &RaylibThread, root: &Pa
     let mut leaving: Option<usize> = None;
 
     loop {
-        if rl.window_should_close() {
+        if crate::graphics::window::should_close(&rl) {
             return Ok(None);
+        }
+        if reward_shortcut.poll(rl, observer)?.is_some() {
+            return Ok(Some(MinigameResult::Victory));
         }
         if let Some(m) = &music {
             // Con el menú de salir abierto, más bajita
@@ -655,7 +659,9 @@ pub fn play_with_results(rl: &mut RaylibHandle, thread: &RaylibThread, root: &Pa
         if let Step::Prompt { .. } = game.step {
             if done_typing {
                 for (i, key) in [KeyboardKey::KEY_ONE, KeyboardKey::KEY_TWO, KeyboardKey::KEY_THREE].iter().enumerate() {
-                    if rl.is_key_pressed(*key) {
+                    if !rl.is_key_down(KeyboardKey::KEY_LEFT_CONTROL)
+                        && !rl.is_key_down(KeyboardKey::KEY_RIGHT_CONTROL)
+                        && rl.is_key_pressed(*key) {
                         picked = Some(i);
                     }
                 }
@@ -793,7 +799,7 @@ pub fn play_with_results(rl: &mut RaylibHandle, thread: &RaylibThread, root: &Pa
 
         // --- Dibujo ------------------------------------------------------------------------------------------
         let shake_off = Vector2::new((time * 70.0).sin(), (time * 53.0).cos()) * (shake * 22.0 + boom_shake * 40.0);
-        let mut d = rl.begin_drawing(thread);
+        let mut d = crate::graphics::window::begin_drawing(rl, thread);
         d.clear_background(INK);
         if let Some(bg) = backgrounds.get(&bg_name) {
             // El fondo cubre toda la pantalla y se mueve apenas

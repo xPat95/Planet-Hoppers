@@ -80,17 +80,16 @@ fn window(
     let mut scene = MineScene::load(&manifest, MinecraftConfig::load(config)?)?;
     let mut mining = MiningSession::new(&scene, MiningConfig::load(mining_config)?);
     let visuals = MiningVisuals::default();
-    let (mut rl, thread) = raylib::init()
-        .size(1280, 800)
-        .resizable()
-        .title("Planet-Hoppers | DIAMOND RUSH | Mina - desarrollo")
-        .build();
+    let (mut rl, thread) = crate::graphics::window::build(
+        raylib::init()
+            .size(1280, 800)
+            .resizable()
+            .title("Planet-Hoppers | DIAMOND RUSH | Mina - desarrollo"),
+        test,
+    );
     rl.set_exit_key(None);
     rl.set_window_min_size(800, 600);
     rl.set_target_fps(if test { 0 } else { 120 });
-    if test {
-        rl.set_window_state(WindowState::default().set_window_hidden(true));
-    }
     unsafe {
         ffi::rlSetClipPlanes(0.05, 100.0);
     }
@@ -108,7 +107,7 @@ fn window(
     let mut frame = 0;
     let mut smoke = smoke::Smoke::default();
     let mut mining_smoke = mining_smoke::Smoke::new(&scene);
-    while !rl.window_should_close() {
+    while !crate::graphics::window::should_close(&rl) {
         if mining_test {
             mining_smoke.before(frame, &mut scene, &mining, &rl);
         } else if test {
@@ -223,7 +222,7 @@ fn window(
             None
         };
         {
-            let mut d = rl.begin_drawing(&thread);
+            let mut d = crate::graphics::window::begin_drawing(&mut rl, &thread);
             d.clear_background(Color::new(6, 9, 13, 255));
             {
                 let mut view = d.begin_mode3D(camera);

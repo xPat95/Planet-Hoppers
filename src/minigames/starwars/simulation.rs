@@ -3,20 +3,21 @@ use std::f32::consts::TAU;
 pub const TUNNEL_RADIUS: f32 = 10.5;
 pub const WALL_APOTHEM: f32 = TUNNEL_RADIUS * 0.923_879_5;
 pub const SHIP_HALF: [f32; 3] = [1.0, 0.48, 1.5];
-pub const REACTOR_Z: f32 = 2500.0;
+pub const REACTOR_Z: f32 = 2060.0;
+pub const ROUTE_WAVES: usize = 20;
 pub const ATTACK_Z: f32 = REACTOR_Z - 66.0;
 pub const CORE_RADIUS: f32 = 2.15;
 // Full steel bulkheads, each with independently breakable passage panels.
 // Irregular but repeatable placement: two after halfway, four in the final approach.
 pub const BULKHEADS: [(f32, f32, f32); 6] = [
-    (1350.0, -3.0, 2.0),
-    (1800.0, 3.0, -2.0),
-    (2130.0, 3.0, 2.0),
-    (2210.0, -3.0, 2.0),
-    (2275.0, -3.0, -2.0),
-    (2340.0, 3.0, -2.0),
+    (1100.0, -3.0, 2.0),
+    (1420.0, 3.0, -2.0),
+    (1690.0, 3.0, 2.0),
+    (1770.0, -3.0, 2.0),
+    (1835.0, -3.0, -2.0),
+    (1900.0, 3.0, -2.0),
 ];
-pub const REAR_ENCOUNTERS: [f32; 4] = [420.0, 930.0, 1440.0, 1940.0];
+pub const REAR_ENCOUNTERS: [f32; 4] = [360.0, 780.0, 1180.0, 1580.0];
 pub const REAR_WARNING: f32 = 1.65;
 pub const REAR_FLIGHT: f32 = 0.55;
 pub const REAR_RADIUS: f32 = 0.38;
@@ -260,7 +261,7 @@ fn route() -> Vec<Obstacle> {
         items: vec![],
         group: 0,
     };
-    for wave in 0..26 {
+    for wave in 0..ROUTE_WAVES {
         b.group = wave;
         let z = 155.0 + wave as f32 * 76.0;
         let side = if (wave / 6) % 2 == 0 { 1.0 } else { -1.0 };
@@ -366,7 +367,7 @@ fn route() -> Vec<Obstacle> {
     }
     // Subtract all three shoot-through openings from each steel bulkhead.
     for (index, (z, x, y)) in BULKHEADS.into_iter().enumerate() {
-        b.group = 26 + index;
+        b.group = ROUTE_WAVES + index;
         let openings = gate_openings(x, y);
         let mut levels = vec![-11.0, 11.0];
         for [_, py, _, hy] in openings {
@@ -920,21 +921,22 @@ mod tests {
         }
     }
     #[test]
-    fn six_full_bulkheads_keep_originals_and_add_four_separate_encounters() {
+    fn shorter_route_keeps_six_full_bulkheads_and_three_routes_per_gate() {
         let items = route();
         assert_eq!(BULKHEADS.len(), 6);
         assert_eq!(
             BULKHEADS
                 .iter()
-                .filter(|(z, _, _)| *z > REACTOR_Z / 2.0 && *z < 2055.0)
+                .filter(|(z, _, _)| *z > REACTOR_Z / 2.0 && *z < BULKHEADS[2].0)
                 .count(),
             2
         );
-        for original in [2210.0, 2340.0] {
-            assert!(BULKHEADS.iter().any(|(z, _, _)| *z == original));
-        }
         for (i, (z, _, _)) in BULKHEADS.iter().enumerate() {
-            let pieces: Vec<_> = items.iter().filter(|o| o.group == 26 + i).collect();
+            let pieces: Vec<_> = items
+                .iter()
+                .filter(|o| o.group == ROUTE_WAVES + i)
+                .collect();
+            assert!(!pieces.is_empty());
             assert!(pieces.iter().all(|o| (o.pos[2] - z).abs() < 2.0));
             // A solid section must still block shots and hull after all panels are broken.
             let solids: Vec<_> = pieces
@@ -948,14 +950,14 @@ mod tests {
         assert_eq!(
             items
                 .iter()
-                .filter(|o| o.group >= 26 && o.material == Material::Cargo)
+                .filter(|o| o.group >= ROUTE_WAVES && o.material == Material::Cargo)
                 .count(),
             18
         );
     }
     #[test]
     fn all_six_bulkheads_have_independent_flyable_breakable_routes() {
-        for group in 26..26 + BULKHEADS.len() {
+        for group in ROUTE_WAVES..ROUTE_WAVES + BULKHEADS.len() {
             let gate: Vec<_> = route().into_iter().filter(|o| o.group == group).collect();
             let panels: Vec<_> = gate
                 .iter()
@@ -1238,7 +1240,10 @@ mod tests {
         assert_eq!(g.phase, Phase::Outro);
         assert_eq!(g.reactor_hp, 0);
         use crate::{
-            gameplay::{rewards::record_result, selection::{GameState, ShipCatalog}},
+            gameplay::{
+                rewards::record_result,
+                selection::{GameState, ShipCatalog},
+            },
             minigames::common::host::AttemptReporter,
             ships::ShipsConfig,
         };
@@ -1297,6 +1302,11 @@ mod tests {
         assert_eq!(g.hull, 3);
         assert_eq!(g.distance, ATTACK_Z);
         assert_eq!(g.rear_encounters, 4);
+        assert!(g.time < 56.0, "short mission took {} seconds", g.time);
+        println!(
+            "SHORT_ROUTE_OK meters={REACTOR_Z} flight_seconds={:.2}",
+            g.time
+        );
     }
     #[test]
     fn rear_warning_locks_position_and_can_be_evaded() {
@@ -1385,6 +1395,8 @@ mod tests {
         assert_eq!(g.hull, 3);
         assert!(g.destroyed >= 2);
         assert_eq!(g.rear_encounters, 4);
+        assert!(g.time < 56.0, "short mission took {} seconds", g.time);
+        println!("SHORT_ROUTE_NORMAL_OK meters={REACTOR_Z} flight_seconds={:.2}", g.time);
     }
     #[test]
     fn no_auto_pilot() {

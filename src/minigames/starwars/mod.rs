@@ -32,13 +32,17 @@ fn capture_scene(g: &mut Game, stage: usize) {
         if stage >= 29 {
             g.distance = BULKHEADS[[0, 1, 2, 4][stage - 29]].0 - 30.0;
         } else if stage >= 27 {
-            g.distance = if stage == 27 { 2180.0 } else { 2310.0 };
+            g.distance = if stage == 27 {
+                BULKHEADS[3].0 - 30.0
+            } else {
+                BULKHEADS[5].0 - 30.0
+            };
         } else if stage == 26 {
-            g.distance = 2185.0;
+            g.distance = BULKHEADS[3].0 - 25.0;
             g.pos = [-3.0, 2.0];
             g.camera = g.pos;
             for o in &mut g.obstacles {
-                if o.pos[2] == 2210.0
+                if o.pos[2] == BULKHEADS[3].0
                     && o.material == simulation::Material::Cargo
                     && o.pos[0] == -3.0
                 {
@@ -55,7 +59,7 @@ fn capture_scene(g: &mut Game, stage: usize) {
     }
     if stage >= 10 {
         let target = match stage {
-            10 | 11 => 420.0,
+            10 | 11 => REAR_ENCOUNTERS[0],
             12 => 715.0,
             _ => 865.0,
         };
@@ -90,7 +94,7 @@ fn capture_scene(g: &mut Game, stage: usize) {
         2 => 195.0,
         3 => 345.0,
         4 => 470.0,
-        5 => 2160.0,
+        5 => BULKHEADS[3].0 - 50.0,
         6 => ATTACK_Z,
         _ => ATTACK_Z,
     };
@@ -99,7 +103,7 @@ fn capture_scene(g: &mut Game, stage: usize) {
             break;
         }
         let mut input = diagnostic_pilot(g);
-        if stage == 5 && g.distance > 2050.0 {
+        if stage == 5 && g.distance > BULKHEADS[2].0 - 80.0 {
             input.fire = false;
         }
         g.update(STEP, input);
@@ -161,6 +165,7 @@ pub fn run_with_results(
     observer: &mut crate::minigames::common::host::ResultObserver<'_>,
 ) -> Result<crate::minigames::common::host::MinigameExit, Box<dyn std::error::Error>> {
     use crate::minigames::common::host::{MinigameExit, MinigameResult};
+    let mut reward_shortcut = crate::minigames::common::shortcuts::RewardShortcut::default();
     let mut reporter = crate::minigames::common::host::AttemptReporter::default();
     let args: Vec<_> = args.collect();
     if args.iter().any(|a| a == "--help") {
@@ -183,15 +188,14 @@ pub fn run_with_results(
     if capture || smoke {
         std::fs::create_dir_all(&captures)?;
     }
-    let (mut rl, thread) = raylib::init()
-        .size(1280, 800)
-        .title("Planet Hoppers | Asalto al nucleo - Vuelo libre")
-        .resizable()
-        .msaa_4x()
-        .build();
-    if smoke_hidden || check_startup || check_ships || check_menus {
-        rl.set_window_state(WindowState::default().set_window_hidden(true));
-    }
+    let (mut rl, thread) = crate::graphics::window::build(
+        raylib::init()
+            .size(1280, 800)
+            .title("Planet Hoppers | Asalto al nucleo - Vuelo libre")
+            .resizable()
+            .msaa_4x(),
+        smoke_hidden || capture || check_startup || check_ships || check_menus,
+    );
     rl.set_exit_key(None);
     rl.set_window_min_size(960, 600);
     rl.set_target_fps(60);
@@ -288,7 +292,7 @@ pub fn run_with_results(
             game.distance = 125.0;
             game.travel = 125.0;
             for _ in 0..4 {
-                let mut draw = rl.begin_drawing(&thread);
+                let mut draw = crate::graphics::window::begin_drawing(&mut rl, &thread);
                 presentation.draw(&mut draw, &thread, &game, 0.0, 1280.0, 800.0);
             }
             save_capture(&rl, &captures.join(format!("{}.png", model.id)));
@@ -312,7 +316,7 @@ pub fn run_with_results(
             ] {
                 game.phase = phase;
                 for _ in 0..4 {
-                    let mut draw = rl.begin_drawing(&thread);
+                    let mut draw = crate::graphics::window::begin_drawing(&mut rl, &thread);
                     presentation.draw(&mut draw, &thread, &game, 1.0, width as f32, height as f32);
                 }
                 save_capture(&rl, &captures.join(format!("menu-{name}-{width}.png")));
@@ -333,7 +337,7 @@ pub fn run_with_results(
                 assert_eq!(presentation.font.get_glyph_info(ch).value, ch as i32);
             }
             {
-                let mut draw = rl.begin_drawing(&thread);
+                let mut draw = crate::graphics::window::begin_drawing(&mut rl, &thread);
                 presentation.draw(&mut draw, &thread, &game, 0.0, 1280.0, 800.0);
             }
             presentation =
@@ -374,22 +378,26 @@ pub fn run_with_results(
         "27_compuerta_abierta.png",
         "28_compuerta_tres_paneles.png",
         "29_compuerta_final_tres_paneles.png",
-        "30_disco_1350.png",
-        "31_disco_1800.png",
-        "32_disco_2130.png",
-        "33_disco_2275.png",
+        "30_disco_1100.png",
+        "31_disco_1420.png",
+        "32_disco_1690.png",
+        "33_disco_1835.png",
     ];
     let mut menu_frames = 0;
     let mut victory_frames = 0;
     let mut smoke_replay_verified = false;
     let mut previous_phase = game.phase;
+    let mut menu_phase = game.phase;
     let (mut intro_saved, mut outro_saved) = (false, false);
     let (mut frames, mut frame_time) = (0u32, 0.0f32);
     if !capture {
         game.intro();
     }
     let mut exit = MinigameExit::WindowClosed;
-    while !rl.window_should_close() {
+    while !crate::graphics::window::should_close(&rl) {
+        if let Some(exit) = reward_shortcut.poll(&rl, observer)? {
+            return Ok(exit);
+        }
         // Consume press events as well as held states. Very short taps can begin
         // and end between two rendered frames, especially at lower frame rates.
         let mut pressed = Vec::new();
@@ -406,17 +414,43 @@ pub fn run_with_results(
                 });
             }
         }
-        // Mouse and keyboard share the final screen's two actions.
-        if game.phase == Phase::Won && rl.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_LEFT) {
-            let buttons = render::victory_buttons(
-                rl.get_screen_width() as f32,
-                rl.get_screen_height() as f32,
-            );
-            if buttons[0].check_collision_point_rec(rl.get_mouse_position()) {
-                pressed.push(KeyboardKey::KEY_ENTER);
+        if menu_phase != game.phase {
+            presentation.menu_selection = 0;
+            menu_phase = game.phase;
+        }
+        let buttons = render::menu_buttons(
+            game.phase,
+            rl.get_screen_width() as f32,
+            rl.get_screen_height() as f32,
+        );
+        if !buttons.is_empty() {
+            let count = buttons.len();
+            if pressed.contains(&KeyboardKey::KEY_DOWN) || pressed.contains(&KeyboardKey::KEY_S) {
+                presentation.menu_selection = (presentation.menu_selection + 1) % count;
             }
-            if buttons[1].check_collision_point_rec(rl.get_mouse_position()) {
-                pressed.push(KeyboardKey::KEY_ESCAPE);
+            if pressed.contains(&KeyboardKey::KEY_UP) || pressed.contains(&KeyboardKey::KEY_W) {
+                presentation.menu_selection = (presentation.menu_selection + count - 1) % count;
+            }
+            let click = rl.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_LEFT);
+            if click || rl.get_mouse_delta().length_sqr() > 0.0 {
+                if let Some(index) = buttons
+                    .iter()
+                    .position(|b| b.check_collision_point_rec(rl.get_mouse_position()))
+                {
+                    presentation.menu_selection = index;
+                    if click {
+                        pressed.push(KeyboardKey::KEY_ENTER);
+                    }
+                }
+            }
+            if pressed.contains(&KeyboardKey::KEY_ENTER) {
+                let action = match (presentation.menu_selection, count) {
+                    (0, _) => KeyboardKey::KEY_ENTER,
+                    (1, 3) => KeyboardKey::KEY_R,
+                    _ => KeyboardKey::KEY_ESCAPE,
+                };
+                pressed.retain(|key| *key != KeyboardKey::KEY_ENTER);
+                pressed.push(action);
             }
         }
         if pressed.contains(&KeyboardKey::KEY_ESCAPE) {
@@ -439,9 +473,6 @@ pub fn run_with_results(
         }
         let dt = rl.get_frame_time().clamp(0.0, 0.1);
         ambient += dt;
-        if pressed.contains(&KeyboardKey::KEY_F11) {
-            rl.toggle_borderless_windowed();
-        }
         if capture {
             if capture_frame == 0 {
                 if !(8..10).contains(&capture_stage) {
@@ -602,7 +633,7 @@ pub fn run_with_results(
         }
         let (w, h) = (rl.get_screen_width() as f32, rl.get_screen_height() as f32);
         {
-            let mut d = rl.begin_drawing(&thread);
+            let mut d = crate::graphics::window::begin_drawing(&mut rl, &thread);
             if let Some(v) = &clip {
                 v.draw(&mut d, w, h);
             } else {

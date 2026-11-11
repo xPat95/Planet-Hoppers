@@ -111,7 +111,8 @@ pub(super) fn render_view(screen: &mut RaylibDrawHandle, thread: &RaylibThread, 
         }
     }
     {
-        art.shader.begin_frame(lamp, camera.position, 0.0);
+        art.shader.begin_frame(lamp, camera.position, light.fill);
+        art.shader.shader.set_shader_value(art.rim, light.rim);
         art.shader.shader.set_shader_value(art.lamp_range, light.range);
         art.shader.shader.set_shader_value(art.lamp_power, light.power);
         art.shader.shader.set_shader_value(art.fog_density, light.fog);
@@ -129,10 +130,12 @@ pub(super) fn render_view(screen: &mut RaylibDrawHandle, thread: &RaylibThread, 
         for e in extras {
             match *e {
                 Extra::Glow(p, r, c) => d3.draw_sphere(p, r, c),
+
             }
         }
     }
     art.shader.shader.set_shader_value(art.lamp_tint, Vector3::zero());
+    art.shader.shader.set_shader_value(art.rim, 1.0f32);
     // El resplandor de su luz, cuando se la ve desde afuera
     if back.halo {
         let p = project_in(lamp, camera, tw, th);
@@ -296,8 +299,11 @@ pub(super) enum Who {
     /// La bruja feliz del final (ojos cerrados de felicidad), bailando.
     HappyWitch,
     Creature(Kind),
-    /// La bruja en su escoba (la nave) y el planeta calavera: sin poses (para la historieta).
+    /// La bruja en su escoba (la nave) y el planeta calavera: sin poses (para la historieta). La nave en el espacio del
+    /// archivo y el papelito, para la invitación.
     Broom,
+    Rider,
+    Note,
     Planet,
 }
 
@@ -329,13 +335,16 @@ impl Item {
 }
 
 /// La luz de una escena: el farol (dónde, cuánto, de qué color: cero es el cálido de siempre, y a qué distancia cae
-/// a la mitad) y la niebla.
+/// a la mitad), la niebla, un relleno parejo (0 en el juego: lo que no mira al farol queda negro) y cuánto da la luz
+/// fría de atrás (1 en el juego).
 pub(super) struct Light {
     pub lamp: Vector3,
     pub power: f32,
     pub tint: Vector3,
     pub range: f32,
     pub fog: f32,
+    pub fill: f32,
+    pub rim: f32,
 }
 
 /// Lo que va atrás de los modelos: estrellas (en el espacio) y el resplandor del farol (cuando se lo ve de afuera).
@@ -529,6 +538,17 @@ fn draw_items(d3: &mut impl RaylibDraw3D, art: &mut Art, items: &[Item]) {
                 art.broom.draw_with(d3, &mut art.shader, it.m, &|_, e| e);
                 continue;
             }
+            Who::Rider => {
+                // La estela brilla más que en la nave del sistema solar (las estrellas, las brasas y los brillitos)
+                art.rider.draw_with(d3, &mut art.shader, it.m, &|n, e| {
+                    if n.contains("BroomStar") || n.contains("BroomEmber") || n.contains("BroomGlitter") { e * TRAIL_GLOW } else { e }
+                });
+                continue;
+            }
+            Who::Note => {
+                art.note.draw(d3, &mut art.shader, it.m);
+                continue;
+            }
             Who::Planet => {
                 // El brillo propio del planeta (la fiesta en las cuencas), según `boost`: apagado si es 0
                 let glow = it.boost;
@@ -541,7 +561,7 @@ fn draw_items(d3: &mut impl RaylibDraw3D, art: &mut Art, items: &[Item]) {
             Who::Witch => (&mut art.witch, &mut art.shader),
             Who::HappyWitch => (&mut art.witch_happy, &mut art.shader),
             Who::Creature(k) => art.posed(k),
-            Who::Broom | Who::Planet => unreachable!(),
+            Who::Broom | Who::Rider | Who::Note | Who::Planet => unreachable!(),
         };
         match it.shape {
             Shape::Blend(a, b, t) => posed.pose(a, b, t),
@@ -567,6 +587,34 @@ fn point(x: f32, y: f32) -> Vector3 {
 }
 pub(super) const UP: Vector3 = Vector3::new(0.0, 1.0, 0.0);
 pub(super) const FORWARD: Vector3 = Vector3::new(0.0, 0.0, -1.0);
+
+/// Cuánto más brilla la estela de la escoba en la invitación.
+const TRAIL_GLOW: f32 = 2.4;
+
+/// El brazo levantado de la bruja de la nave (en el espacio del archivo): el hombro, el codo y desde dónde empieza
+/// (lo que está arriba de `ARM_ABOVE` y más afuera que el hombro; más abajo, del mismo lado, están las piernas).
+const SHOULDER: Vector3 = Vector3::new(-0.12, 0.29, 0.0);
+const ELBOW: Vector3 = Vector3::new(-0.265, 0.30, 0.0);
+const ARM_ABOVE: f32 = 0.26;
+/// Cuánto gira para bajar el brazo: desde el hombro y desde el codo (radianes).
+const ARM_DOWN: (f32, f32) = (1.1, 0.9);
+
+/// Cómo se mueve un punto del brazo levantado: todo el brazo sube y baja desde el hombro (`lift`), el antebrazo
+/// saluda girando desde el codo (`wave`) y, con `down` (de 0 a 1), el brazo se baja al costado (desde el hombro, y el
+/// codo se estira), con el doblez suave. `None` si el punto no es del brazo.
+pub(super) fn arm_bend(p: Vector3, lift: f32, wave: f32, down: f32) -> Option<Matrix> {
+    if p.y < ARM_ABOVE || p.x > SHOULDER.x {
+        return None;
+    }
+    let around = |pivot: Vector3, axis: Vector3, angle: f32| {
+        Matrix::translate(-pivot.x, -pivot.y, -pivot.z) * Matrix::rotate(axis, angle) * Matrix::translate(pivot.x, pivot.y, pivot.z)
+    };
+    let w_arm = smooth((SHOULDER.x - p.x) / 0.07);
+    let w_fore = smooth((ELBOW.x + 0.005 - p.x) / 0.03);
+    let z = Vector3::new(0.0, 0.0, 1.0);
+    Some(around(ELBOW, Vector3::new(1.0, 0.0, 0.0), wave * w_fore) * around(ELBOW, z, ARM_DOWN.1 * down * w_fore)
+        * around(SHOULDER, z, (ARM_DOWN.0 * down - lift) * w_arm))
+}
 
 /// Ruido barato entre 0 y 1 (para las convulsiones).
 pub(super) fn noise(a: f32) -> f32 {
@@ -615,10 +663,18 @@ pub struct Art {
     shadow: Option<RenderTexture2D>,
     pub(super) witch: Posed,
     pub(super) witch_happy: Posed,
-    /// La bruja en su escoba (la nave) y el planeta calavera, para la historieta.
+    /// La bruja en su escoba (la nave) y el planeta calavera, para la historieta; y, para la invitación, la nave en el
+    /// espacio del archivo (el origen en el asiento de la bruja, mirando hacia +z) y el papelito.
     broom: SpaceModel,
+    rider: SpaceModel,
+    /// Las mallas de la nave como vienen (para moverle el brazo y la falda cada cuadro) y cuáles son de piel y de negro.
+    rider_rest: Vec<(Vec<Vector3>, Vec<Vector3>)>,
+    rider_skin: Vec<usize>,
+    rider_black: Vec<usize>,
+    note: SpaceModel,
     planet: SpaceModel,
     lamp_tint: i32,
+    rim: i32,
     devil: Posed,
     ghost: Posed,
     demon: Posed,
@@ -633,6 +689,12 @@ pub struct Art {
     lens_see: i32,
     /// La escena se dibuja acá y después pasa por la lente.
     target: Option<RenderTexture2D>,
+    /// La transición de círculo de la invitación: la capa de la carta (del tamaño de la ventana) y el shader que le
+    /// abre el agujero.
+    pub(super) overlay: Option<RenderTexture2D>,
+    pub(super) iris: Shader,
+    pub(super) iris_center: i32,
+    pub(super) iris_radius: i32,
     /// Las vidas: el sombrero de bruja violeta (la que queda) y gris (la que se perdió), dibujos de Cami.
     life_full: Texture2D,
     life_empty: Texture2D,
@@ -642,12 +704,45 @@ pub struct Art {
 
 impl Art {
     /// Antes de dibujar: la textura cuadrada de la escena, según el alto de la ventana (ver `SUPERSAMPLE`).
+    /// Le da vida a la nave (la bruja en la escoba, que es una sola pose): el brazo levantado se mueve desde el hombro
+    /// (`lift`, radianes), saluda desde el codo (`wave`) y se baja (`down`, de 0 a 1), y la parte de atrás de la falda
+    /// flamea con el viento.
+    pub(super) fn animate_rider(&mut self, lift: f32, wave: f32, down: f32, t: f32) {
+        let mut data = self.rider_rest.clone();
+        for &m in &self.rider_skin {
+            let (v, n) = &mut data[m];
+            for k in 0..v.len() {
+                if let Some(bend) = arm_bend(v[k], lift, wave, down) {
+                    v[k] = v[k].transform_with(bend);
+                    n[k] = (n[k].transform_with(bend) - Vector3::zero().transform_with(bend)).normalized();
+                }
+            }
+        }
+        for &m in &self.rider_black {
+            let (v, _) = &mut data[m];
+            for p in v.iter_mut() {
+                // Lo de atrás y abajo (la falda larga, no el sombrero): ondas que corren hacia atrás
+                let back = ((-p.z - 0.1) / 0.3).clamp(0.0, 1.0);
+                if back > 0.0 && p.y < 0.1 {
+                    let k = back * back;
+                    p.y += 0.018 * k * (p.z * 16.0 + t * 13.0).sin();
+                    p.x += 0.012 * k * (p.z * 11.0 + t * 9.0 + 1.3).sin();
+                }
+            }
+        }
+        self.rider.set_mesh_vertices(&data);
+    }
+
     pub fn prepare(&mut self, rl: &mut RaylibHandle, thread: &RaylibThread) -> Result<(), Error> {
         let side = ((rl.get_render_height() as f32 * SUPERSAMPLE) as i32).min(4096);   // Tope de la placa de video
         if self.target.as_ref().is_none_or(|t| t.texture.width != side) {
             let t = rl.load_render_texture(thread, side as u32, side as u32)?;
             t.texture().set_texture_filter(thread, TextureFilter::TEXTURE_FILTER_BILINEAR);
             self.target = Some(t);
+        }
+        let (w, h) = (rl.get_screen_width(), rl.get_screen_height());
+        if self.overlay.as_ref().is_none_or(|o| o.texture.width != w || o.texture.height != h) {
+            self.overlay = Some(rl.load_render_texture(thread, w as u32, h as u32)?);
         }
         Ok(())
     }
@@ -662,14 +757,23 @@ impl Art {
         shader.shader.set_shader_value(shadow_map, 10i32);       // El mapa de sombras va en la unidad de textura 10
         let dir = root.join("assets/models/minigames/halloween");
         let witch = Posed::load(rl, thread, &shader, &dir,
-                                &["witch_solo_a", "witch_solo_b", "witch_solo_c", "witch_hop", "witch_sway", "witch_spin", "witch_cast", "witch_warn", "witch_stand"])?;
+                                &["witch_solo_a", "witch_solo_b", "witch_solo_c", "witch_hop", "witch_sway", "witch_spin", "witch_cast", "witch_warn", "witch_stand",
+])?;
         let witch_happy = Posed::load(rl, thread, &shader, &dir, &["witch_happy_solo_a", "witch_happy_solo_b", "witch_happy_solo_c",
                                                                   "witch_happy_hop", "witch_happy_sway", "witch_happy_spin"])?;
         let broom = SpaceModel::load(rl, thread, &root.join("assets/models/ships/halloween/exports/witch_broom.glb"), &shader,
                                      [0.0; 3], Fit::Length(1.6))?;
+        let raw = || Fit::Same(Matrix::identity(), Vector3::zero());
+        let rider = SpaceModel::load(rl, thread, &root.join("assets/models/ships/halloween/exports/witch_broom.glb"), &shader,
+                                     [0.0; 3], raw())?;
+        let note = SpaceModel::load(rl, thread, &dir.join("note.glb"), &shader, [0.0; 3], raw())?;
+        let rider_rest = rider.mesh_vertices();
+        let (rider_skin, rider_black) = (rider.part_meshes("HW_WitchSkin"), rider.part_meshes("HW_WitchBlack"));
         let planet = SpaceModel::load(rl, thread, &root.join("assets/models/planets/halloween/exports/halloween_planet.glb"),
                                       &shader, [0.0; 3], Fit::Radius(1.0))?;
         let lamp_tint = shader.shader.get_shader_location("lampTint");
+        let rim = shader.shader.get_shader_location("rimPower");
+        shader.shader.set_shader_value(rim, 1.0f32);
         let devil = Posed::load(rl, thread, &shader, &dir, &["devil_walk_a", "devil_walk_b", "devil_dance_a", "devil_dance_b"])?;
         let ghost = Posed::load(rl, thread, &shader, &dir, &["ghost_float_a", "ghost_float_b", "ghost_dance_a", "ghost_dance_b"])?;
         let demon = Posed::load(rl, thread, &shader, &dir, &["demon_walk_a", "demon_walk_b", "demon_dance_a", "demon_dance_b"])?;
@@ -680,6 +784,8 @@ impl Art {
         let lens_half = lens.get_shader_location("fovHalf");
         let (lens_time, lens_hit) = (lens.get_shader_location("time"), lens.get_shader_location("hit"));
         let lens_see = lens.get_shader_location("seeThrough");
+        let iris = rl.load_shader_from_memory(thread, None, Some(include_str!("iris.fs")));
+        let (iris_center, iris_radius) = (iris.get_shader_location("center"), iris.get_shader_location("radius"));
         let shadow = Some(load_shadow_map(SHADOW_SIZE));
         let mut life = |name: &str| -> Result<Texture2D, Error> {
             let t = rl.load_texture(thread, &root.join("assets/ui/halloween").join(name).to_string_lossy())?;
@@ -691,8 +797,8 @@ impl Art {
         let font_big = rl.load_font_ex(thread, &root.join("assets/fonts/JollyLodger-Regular.ttf").to_string_lossy(), 256, None)?;
         font_big.texture().set_texture_filter(thread, TextureFilter::TEXTURE_FILTER_BILINEAR);
         Ok(Self { shader, lamp_range, goo, hidden, lamp_power, fog_density, shadow_on, light_vp, shadow, witch, witch_happy,
-                  broom, planet, lamp_tint, devil, ghost, demon, font, lens, lens_aspect, lens_half,
-                  lens_time, lens_hit, lens_see, target: None, life_full, life_empty, font_big, title })
+                  broom, rider, rider_rest, rider_skin, rider_black, note, planet, lamp_tint, rim, devil, ghost, demon, font, lens, lens_aspect, lens_half,
+                  lens_time, lens_hit, lens_see, target: None, overlay: None, iris, iris_center, iris_radius, life_full, life_empty, font_big, title })
     }
 
     /// La cámara de cada momento. Desde los ojos (a la altura real de los de la bruja, con un campo de visión
@@ -1043,7 +1149,7 @@ pub fn draw_game(screen: &mut RaylibDrawHandle, thread: &RaylibThread, art: &mut
     let slam = fx.banner.as_ref().map_or(0.0, |b| 0.7 * (1.0 - (BANNER - b.2) / 0.3).max(0.0))
         .max(fx.fright.map_or(0.0, |(_, k)| 0.15 + 0.2 * noise((k * 14.0).floor() + 7.0)));
     let hit = fx.scare.map_or(0.0, |(_, k)| 1.0 - (k / SCARE).min(1.0)).max(slam);
-    let light = Light { lamp, power, tint: Vector3::zero(), range: LAMP_RANGE, fog: FOG_DENSITY };
+    let light = Light { lamp, power, tint: Vector3::zero(), range: LAMP_RANGE, fog: FOG_DENSITY, fill: 0.0, rim: 1.0 };
     let (tw, th) = render_view(screen, thread, art, &items, &[], camera, light, FISH_HALF, Rectangle::new(0.0, 0.0, w, h),
                                t, hit, Backdrop { stars: false, halo: view != View::Pov, see_through: false });
     let d = screen;

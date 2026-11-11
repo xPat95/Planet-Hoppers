@@ -17,9 +17,9 @@ use std::ffi::CString;
 use std::path::{Path, PathBuf};
 
 const HELP_SHIP: &str = "W/S: acelerar / frenar | Mouse o A/D: girar | Espacio: subir | Shift: turbo | Tab: objetivo | B: piloto automático\n\
-                         E: explorar / entrar a estación | C: vista general | N: otra nave | Esc: soltar el mouse | Ctrl+Q: salir";
+                         E: explorar / entrar a estación | C: vista general | N: otra nave | Esc: soltar el mouse | Ctrl+X: salir";
 const HELP_OVERVIEW: &str = "Arrastrar: girar cámara | Rueda: acercar | Tab: seguir objetivo | P: pausa | Arriba/Abajo: velocidad del tiempo\n\
-                             C: volver a la nave | F12: captura | Ctrl+Q: salir";
+                             C: volver a la nave | F12: captura | Ctrl+X: salir";
 
 /// El plano cercano conserva el detalle de las naves; el lejano se calcula con el sistema.
 const NEAR_PLANE: f64 = 0.5;
@@ -88,7 +88,7 @@ fn draw_help_overlay(d: &mut RaylibDrawHandle, regular: &Font, bold: &Font, widt
             ("Tab", "Seguir objetivo"), ("P", "Pausa"),
             ("Arriba / Abajo", "Velocidad del tiempo"), ("C", "Volver a la nave"),
             ("O", "Mostrar / ocultar orbitas"), ("T", "Medallero de tokens"),
-            ("F12", "Guardar captura"), ("Ctrl + Q", "Salir del juego"),
+            ("F12", "Guardar captura"), ("Ctrl + X", "Salir del juego"),
         ]),
     ];
     for (col, heading, rows) in columns {
@@ -181,11 +181,46 @@ enum View {
     Overview,
 }
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Debug)]
 enum Destination {
     Planet(usize),
     Station,
 }
+/// La letra y el color de la distancia de un planeta con logo: el color del logo (la del objetivo, entera y en
+/// negrita; las demás, un poco transparentes). Sin color propio, `fallback`.
+fn logo_tint<'f>(id: &str, target: bool, fallback: Color, regular: &'f Font, bold: &'f Font) -> (&'f Font, Color) {
+    let c = logo_color(id).unwrap_or(fallback);
+    if target { (bold, c) } else { (regular, Color::new(c.r, c.g, c.b, 185)) }
+}
+
+/// El color de la distancia de cada planeta, el de su logo, para que la etiqueta y el logo vayan juntos.
+fn logo_color(id: &str) -> Option<Color> {
+    Some(match id {
+        "halloween" => Color::new(255, 40, 150, 255),
+        "starwars" => Color::new(255, 196, 40, 255),
+        "smilingfriends" => Color::new(247, 150, 205, 255),
+        "minecraft" => Color::new(215, 215, 222, 255),
+        "regularshow" => Color::new(240, 240, 240, 255),
+        "southpark" => Color::new(205, 150, 105, 255),
+        _ => return None,
+    })
+}
+
+/// El objetivo de la navegación: el primer planeta, desde `from` (incluido) en el orden del sistema, cuyo minijuego
+/// todavía no se ganó; con todos ganados, la estación. Así, al ganar un planeta el objetivo pasa al siguiente que falta,
+/// y si se perdió o se abandonó, se queda en el mismo para reintentar.
+fn next_objective(system: &SolarSystem, game: Option<&GameState>, from: usize) -> Destination {
+    let won = |i: usize| {
+        let id = system.planets[i].config.minigame.as_deref();
+        match (game, id.map(crate::gameplay::progress::Franchise::from_id)) {
+            (Some(g), Some(Ok(f))) => g.progress().is_completed(f),
+            _ => false,
+        }
+    };
+    let n = system.planets.len();
+    (0..n).map(|k| (from + k) % n).find(|&i| !won(i)).map_or(Destination::Station, Destination::Planet)
+}
+
 impl Destination {
     fn next(current: Option<Self>, count: usize) -> Option<Self> {
         match current {
@@ -478,6 +513,7 @@ fn run_session_with_progress(args: impl Iterator<Item = String>, game: Option<Ga
     // The actual departure is resolved after loading the fitted visual bounds.
     let mut ship = Ship::new(station.dock_target(), 0.0);
     ship.look_at(ship.position + station.exit_forward());
+    let objective = next_objective(&system, game.as_ref(), 0);
     let mut session = Session {
         station,
         ship_index: ships.ships.iter().position(|s| s.id == ships.active_ship).unwrap_or(0),
@@ -489,7 +525,7 @@ fn run_session_with_progress(args: impl Iterator<Item = String>, game: Option<Ga
         focus: None,
         paused: false,
         time_scale: 1.0,
-        target: Some(Destination::Planet(0)),
+        target: Some(objective),
         minigames: MinigameVisits::default(),
         token_presentation: presentation,
         last_completion: None,
@@ -621,7 +657,7 @@ fn run_session_with_progress(args: impl Iterator<Item = String>, game: Option<Ga
                     return Err("La visita alteró la nave o las órbitas del anfitrión".into());
                 }
                 session.view = View::Ship;
-                session.target = Some(Destination::Planet(i));
+                session.target = Some(next_objective(&session.system, session.game.as_ref(), i));
                 session.ship.carried_by = None;
                 if let Some(n) = &mut session.visit_smoke {
                     *n += 1;
@@ -685,17 +721,16 @@ fn station_ship_radius(s: &Session, model: &Option<SpaceModel>) -> f32 {
 
 /// Una ventana del sistema solar, hasta salir del juego o ir a un minijuego.
 fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::error::Error>> {
-    let (mut rl, thread) = raylib::init()
-        .size(1280, 800)
-        .resizable()
-        .msaa_4x()
-        .title("Planet-Hoppers | Sistema solar")
-        .build();
+    let (mut rl, thread) = crate::graphics::window::build(
+        raylib::init()
+            .size(1280, 800)
+            .resizable()
+            .msaa_4x()
+            .title("Planet-Hoppers | Sistema solar"),
+        smoke,
+    );
     rl.set_exit_key(None);
     rl.set_window_min_size(640, 480);
-    if smoke {
-        rl.set_window_state(WindowState::default().set_window_hidden(true));
-    }
     rl.set_target_fps(60);
     // El audio del sistema solar: se cierra al salir de esta ventana (los minijuegos abren el suyo). El crescendo suena
     // mientras se carga todo
@@ -706,7 +741,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
     }
     let far_plane = outer_orbit(&s.system) * (2.0 * MAX_ZOOM_OUT + 2.0);
     {
-        let mut d = rl.begin_drawing(&thread);
+        let mut d = crate::graphics::window::begin_drawing(&mut rl, &thread);
         d.clear_background(SKY_BACKGROUND);
         d.draw_text("Cargando el sistema solar...", 40, 40, 24, Color::RAYWHITE);
     }
@@ -788,6 +823,10 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         None
     };
     let mut video_playing = false;
+    // La de Hexbound trae su música (la de la intro del minijuego)
+    let hexbound_music = super::abduction::abduction_music(audio.as_ref(), root, crate::gameplay::progress::Franchise::Halloween)
+        .filter(|_| s.token_presentation.required_abductions().contains(&crate::gameplay::progress::Franchise::Halloween));
+    let mut hexbound_playing = false;
     let empty_progress = crate::gameplay::progress::ProgressState::default();
     let mut planet_logos = BTreeMap::new();
     for id in ["halloween", "starwars", "smilingfriends", "minecraft", "regularshow", "southpark"] {
@@ -835,6 +874,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
     let mut help_restore_cursor = false;
     let mut show_orbits = true;
     let mut collection_open = false;
+    let mut presentation_shortcut = crate::minigames::common::shortcuts::PresentationShortcut::default();
     let mut collection_progress = 0.0_f32;
     let mut token_was_blocking = false;
     let mut token_restore_cursor = false;
@@ -842,10 +882,31 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
 
     loop {
         music.update();
-        if rl.window_should_close() {
+        if crate::graphics::window::should_close(&rl) {
             return Ok(Exit::Quit);
         }
         let ctrl = rl.is_key_down(KeyboardKey::KEY_LEFT_CONTROL) || rl.is_key_down(KeyboardKey::KEY_RIGHT_CONTROL);
+        if presentation_shortcut.poll(&rl) {
+            let catalog = ShipCatalog::load(&root.join("config/ship-selection.json"), &s.ships)?;
+            if s.game.is_none() {
+                let active = &s.ships.ships[s.ship_index];
+                let choice = catalog.choices.iter().find(|c| c.id == active.id || c.ship_id.as_deref() == Some(active.id.as_str()))
+                    .ok_or("Nave de desarrollo sin identidad de selección")?;
+                s.game = Some(GameState::new_game(&choice.id, &catalog)?);
+            }
+            let game = s.game.as_mut().unwrap();
+            let granted = crate::gameplay::rewards::complete_for_presentation(game, &catalog)?;
+            s.token_presentation.finish_for_presentation();
+            if !smoke {
+                crate::gameplay::save::store(&crate::gameplay::save::path(root), game, &s.token_presentation)?;
+            }
+            collection_open = true;
+            token_restore_cursor |= rl.is_cursor_hidden() || (help_open && help_restore_cursor);
+            token_was_blocking = true;
+            rl.enable_cursor();
+            help_open = false;
+            notice = Some((format!("CNP: {granted} tokens obtenidos | Coleccion completa: 6/6"), 5.0));
+        }
         if ctrl && rl.is_key_pressed(KeyboardKey::KEY_Q) {
             return Ok(Exit::Quit);
         }
@@ -899,6 +960,25 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 video.stop();
             }
         }
+        let hexbound_now = s.token_presentation.abduction() == Some(crate::gameplay::progress::Franchise::Halloween);
+        if let Some(m) = &hexbound_music {
+            if hexbound_now && !hexbound_playing {
+                m.seek_stream(0.0);
+                m.play_stream();
+            } else if !hexbound_now && hexbound_playing {
+                m.stop_stream();
+            }
+            if hexbound_now {
+                m.set_volume(super::abduction::abduction_music_volume(s.token_presentation.elapsed(),
+                    super::token_collection::abduction_length(crate::gameplay::progress::Franchise::Halloween,
+                                                              s.token_presentation.abduction_is_initial())));
+                m.update_stream();
+            }
+        }
+        if hexbound_music.is_some() && hexbound_now != hexbound_playing {
+            music.set_paused(hexbound_now);
+            hexbound_playing = hexbound_now;
+        }
         if video_now != video_playing {
             music.set_paused(video_now);
             video_playing = video_now;
@@ -921,7 +1001,9 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         // Sin teclado durante las pruebas ni mientras se sale hacia un minijuego
         let intro_controls_ready = intro_time.is_none_or(|elapsed| elapsed >= ENTRY_STATION_HOLD + ENTRY_CAMERA_MOVE - 0.15);
         let accepts_input = (!smoke || s.launch_smoke || s.station_smoke || s.minecraft_smoke || s.regularshow_smoke || s.docking_smoke.is_some()) && !tokens_blocking && !cinematic_was_blocking && !token_toggle && !token_close && !help_open && !toggle_help && !close_help && intro_controls_ready && leaving.is_none() && !entering_station;
-        let pressed = |rl: &RaylibHandle, k: KeyboardKey| accepts_input && rl.is_key_pressed(k);
+        let pressed = |rl: &RaylibHandle, k: KeyboardKey| accepts_input
+            && !(ctrl && matches!(k, KeyboardKey::KEY_C | KeyboardKey::KEY_N | KeyboardKey::KEY_P))
+            && rl.is_key_pressed(k);
         let down = |rl: &RaylibHandle, k: KeyboardKey| accepts_input && rl.is_key_down(k);
         if pressed(&rl,KeyboardKey::KEY_F3) {s.collision_debug=!s.collision_debug;}
         if pressed(&rl,KeyboardKey::KEY_O) { show_orbits = !show_orbits; }
@@ -1599,8 +1681,11 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         shader.begin_frame(center, camera.position, 0.16);
         sun_shader.begin_frame(center, camera.position, time);
 
+        if s.token_presentation.abduction().is_some() {
+            abductions.prepare(&mut rl, &thread)?;
+        }
         // --- Dibujo --------------------------------------------------------------------------------------------
-        let mut d = rl.begin_drawing(&thread);
+        let mut d = crate::graphics::window::begin_drawing(&mut rl, &thread);
         d.clear_background(SKY_BACKGROUND);
         nebula.draw(&mut d, camera, width, height);
         sky.draw(&mut d, &sky_frame, time);
@@ -1712,8 +1797,10 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                     if let Some(logo) = logo {
                         let height = draw_planet_logo(&mut d, logo, at.x, y);
                         let distance_label = format!("{distance:.0}");
-                        let w = text_width(&ui_regular, &distance_label, 18.0);
-                        draw_ui(&mut d, &ui_regular, &distance_label, at.x as i32 - w / 2, (y + height + 2.0) as i32, 18.0, c);
+                        // Del color del logo; la del objetivo, entera y en negrita
+                        let (font, lc) = logo_tint(p.config.id.as_str(), is_target, c, &ui_regular, &ui_bold);
+                        let w = text_width(font, &distance_label, 18.0);
+                        draw_ui(&mut d, font, &distance_label, at.x as i32 - w / 2, (y + height + 2.0) as i32, 18.0, lc);
                     } else {
                         let label = format!("{}  {:.0}", p.config.name, distance);
                         let w = text_width(&ui_regular, &label, 18.0);
@@ -1727,8 +1814,10 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                     let tip = Vector2::new(cx + angle.cos() * rad, cy + angle.sin() * rad);
                     let back = Vector2::new(angle.cos(), angle.sin()) * -18.0;
                     let side = Vector2::new(-angle.sin(), angle.cos()) * 10.0;
-                    d.draw_triangle(tip, tip + back - side, tip + back + side, c);
-                    d.draw_triangle(tip, tip + back + side, tip + back - side, c);
+                    // La flecha, del color del logo del objetivo
+                    let arrow = logo_color(p.config.id.as_str()).unwrap_or(c);
+                    d.draw_triangle(tip, tip + back - side, tip + back + side, arrow);
+                    d.draw_triangle(tip, tip + back + side, tip + back - side, arrow);
                     let label = format!("{distance:.0}");
                     let label_x = tip.x + back.x * 2.5;
                     let label_y = tip.y + back.y * 2.5 - 8.0;
@@ -1740,8 +1829,9 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                         draw_ui(&mut d, &ui_regular, &label, label_x as i32 - w / 2, label_y as i32, 18.0, c);
                     }
                     if logo.is_some() {
-                        let w = text_width(&ui_regular, &label, 18.0);
-                        draw_ui(&mut d, &ui_regular, &label, label_x as i32 - w / 2, label_y as i32, 18.0, c);
+                        let (font, lc) = logo_tint(p.config.id.as_str(), is_target, c, &ui_regular, &ui_bold);
+                        let w = text_width(font, &label, 18.0);
+                        draw_ui(&mut d, font, &label, label_x as i32 - w / 2, label_y as i32, 18.0, lc);
                     }
                 }
             }
@@ -1831,7 +1921,8 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         if let Some(video) = abduction_video.as_ref().filter(|_| video_playing) {
             video.draw(&mut d, width, height);
         } else if let Some(franchise) = s.token_presentation.abduction() {
-            abductions.draw(&mut d, franchise, s.token_presentation.elapsed(), width, height);
+            abductions.set_hexbound_thanks(!s.token_presentation.abduction_is_initial());
+            abductions.draw(&mut d, &thread, franchise, s.token_presentation.elapsed(), width, height);
         }
         token_textures.draw_ship_notice(&mut d, &ui_bold, &s.token_presentation, width, height);
         if !s.token_presentation.is_busy() { d.draw_fps(width - 96, 14); }
@@ -1851,5 +1942,36 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         }
         drop(d);
         frame += 1;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::gameplay::rewards::record_result;
+
+    #[test]
+    fn el_objetivo_pasa_al_siguiente_planeta_sin_ganar() {
+        let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        let system = SolarSystem::new(&SolarSystemConfig::load(&root.join("config/solar-system.json")).unwrap());
+        let ships = ShipsConfig::load(&root.join("config/ships.json")).unwrap();
+        let catalog = ShipCatalog::load(&root.join("config/ship-selection.json"), &ships).unwrap();
+        let mut game = GameState::new_game("minecraft", &catalog).unwrap();
+        let id = |i: usize| system.planets[i].config.minigame.clone().unwrap();
+        // Al empezar, el primer planeta; si se pierde, sigue ahí; si se gana, pasa al siguiente que falta
+        assert_eq!(next_objective(&system, Some(&game), 0), Destination::Planet(0));
+        record_result(&mut game, &id(0), MinigameResult::Defeat, &catalog).unwrap();
+        assert_eq!(next_objective(&system, Some(&game), 0), Destination::Planet(0));
+        record_result(&mut game, &id(0), MinigameResult::Victory, &catalog).unwrap();
+        assert_eq!(next_objective(&system, Some(&game), 0), Destination::Planet(1));
+        // Saltea los ya ganados, dando la vuelta
+        record_result(&mut game, &id(2), MinigameResult::Victory, &catalog).unwrap();
+        assert_eq!(next_objective(&system, Some(&game), 2), Destination::Planet(3));
+        assert_eq!(next_objective(&system, Some(&game), 5), Destination::Planet(5));
+        // Con todos ganados, la estación
+        for i in 0..system.planets.len() {
+            record_result(&mut game, &id(i), MinigameResult::Victory, &catalog).unwrap();
+        }
+        assert_eq!(next_objective(&system, Some(&game), 3), Destination::Station);
     }
 }
