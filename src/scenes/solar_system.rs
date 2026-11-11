@@ -820,6 +820,8 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
     entry_goal.look_at(s.system.planets[0].position());
     let sky = Sky::new();
     let mut nebula = NebulaSky::load(&mut rl, &thread)?;
+    let (bw, bh) = (rl.get_screen_width(), rl.get_screen_height());
+    let mut bloom = crate::graphics::bloom::Bloom::load(&mut rl, &thread, bw, bh)?;
     let ui_regular = load_solar_font(&root.join("assets/fonts/AdventPro-Regular.ttf"))?;
     let ui_bold = load_solar_font(&root.join("assets/fonts/AdventPro-Bold.ttf"))?;
     let token_textures = super::token_collection_ui::TokenTextures::load(&mut rl, &thread, root)?;
@@ -1693,8 +1695,12 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         if s.token_presentation.abduction().is_some() {
             abductions.prepare(&mut rl, &thread)?;
         }
+        bloom.prepare(&mut rl, &thread, width, height)?;
         // --- Dibujo --------------------------------------------------------------------------------------------
         let mut d = crate::graphics::window::begin_drawing(&mut rl, &thread);
+        // El cielo y la escena 3D van a una textura, para sumarles el bloom (la interfaz va después, sin bloom)
+        {
+        let mut d = d.begin_texture_mode(&thread, &mut bloom.scene);
         d.clear_background(SKY_BACKGROUND);
         nebula.draw(&mut d, camera, width, height);
         sky.draw(&mut d, &sky_frame, time);
@@ -1738,6 +1744,8 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 let lod = if to.length() > p.config.radius * FAR_LOD { far.as_ref().or(near.as_ref()) } else { near.as_ref() };
                 shader.set_planet_fill(planet_fill(&p.config.id));
                 shader.set_planet_toon(p.config.id == "smilingfriends");
+                // Smiling Friends no brilla en el bloom, salvo Satanás (sus ojos y su fuego)
+                shader.bloom_only = (p.config.id == "smilingfriends").then_some(&["Satan", "FireRed"][..]);
                 let radius = p.config.radius;
                 match p.config.id.as_str() {
                     "regularshow" => {
@@ -1759,6 +1767,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             }
             shader.set_planet_fill(Vector3::zero());
             shader.set_planet_toon(false);
+            shader.bloom_only = None;
             shader.set_planet_key(Vector3::zero(), Vector4::new(0.0, 0.0, 0.0, 0.0), 1.0, false);
             let sp = &s.ship;
             let ship_world = Matrix::rotate_z(sp.bank) * Matrix::rotate_x(sp.pitch) * Matrix::rotate_y(sp.yaw)
@@ -1772,6 +1781,8 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 crate::graphics::station_debug::draw(&mut d3,&s.station,sp.position,station_ship_radius(s,&ship_model));
             }
         }
+        }
+        bloom.composite(&mut d, &thread);
 
         // --- Interfaz ------------------------------------------------------------------------------------------
         let white = Color::new(230, 232, 245, 255);

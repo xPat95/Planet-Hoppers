@@ -24,6 +24,10 @@ pub struct SpaceShader {
     planet_wet: i32,
     wet_surface: i32,
     planet_toon: i32,
+    no_bloom: i32,
+    /// Mientras se dibuja un modelo que no tiene que brillar en el bloom: las partes cuyo material contiene alguno de
+    /// estos nombres sí brillan (en Smiling Friends, Satanás). `None`: todo brilla como siempre.
+    pub bloom_only: Option<&'static [&'static str]>,
 }
 
 impl SpaceShader {
@@ -64,8 +68,9 @@ impl SpaceShader {
             (loc("planetKeyPosition"), loc("planetKey"), loc("planetKeyRange"), loc("planetWet"));
         let planet_toon = loc("planetToon");
         let wet_surface = loc("wetSurface");
+        let no_bloom = loc("noBloom");
         Ok(Self { shader, camera_position: Vector3::zero(), light, camera, emissive, ambient, outline, transport, dissolve,
-                  roughness, studio, planet_fill, planet_key_position, planet_key, planet_key_range, planet_wet, wet_surface, planet_toon })
+                  roughness, studio, planet_fill, planet_key_position, planet_key, planet_key_range, planet_wet, wet_surface, planet_toon, no_bloom, bloom_only: None })
     }
 
     /// Valores que no cambian en todo el cuadro.
@@ -474,6 +479,10 @@ impl SpaceModel {
             if shader.roughness >= 0 { shader.shader.set_shader_value(shader.roughness, part.roughness); }
             if shader.wet_surface >= 0 { shader.shader.set_shader_value(shader.wet_surface, part.wet_surface); }
             shader.shader.set_shader_value(shader.outline, if part.sticker { 2.0f32 } else if part.outline { 1.0 } else { 0.0 });
+            if shader.no_bloom >= 0 {
+                let off = shader.bloom_only.is_some_and(|keep| !keep.iter().any(|k| part.name.contains(k)));
+                shader.shader.set_shader_value(shader.no_bloom, if off { 1.0f32 } else { 0.0 });
+            }
             if part.outline {
                 unsafe { ffi::rlEnableBackfaceCulling() };
             }
@@ -487,6 +496,7 @@ impl SpaceModel {
             }
         }
         shader.shader.set_shader_value(shader.outline, 0.0f32);
+        if shader.no_bloom >= 0 { shader.shader.set_shader_value(shader.no_bloom, 0.0f32); }
         unsafe {
             ffi::rlEnableDepthMask();
             ffi::rlEnableBackfaceCulling();

@@ -21,6 +21,7 @@ uniform float planetKeyRange;
 uniform float planetWet;
 uniform float wetSurface; // 1 = rojo mojado, 2 = sangre/grietas negras
 uniform float planetToon; // 1 = bandas de luz y borde de tinta para Smiling Friends
+uniform float noBloom;    // 1 = no derrama luz en el bloom (se marca con alfa 254/255, invisible)
 out vec4 finalColor;
 void main() {
     // Las imágenes vienen en sRGB y los factores de glTF son lineales: todo se pasa a lineal antes de iluminar
@@ -119,4 +120,5 @@ void main() {
         float edge = 1.0 - smoothstep(0.0, 0.13, grain - transportDissolve);
         finalColor.rgb = mix(finalColor.rgb, vec3(0.40, 0.86, 1.0), edge * 0.75);
     }
+    if (noBloom > 0.5) finalColor.a = min(finalColor.a, 254.0 / 255.0);
 }

@@ -1,4 +1,5 @@
 pub mod billboard;
+pub mod bloom;
 pub mod hangar;
 mod hangar_backdrop;
 pub mod station_dock;
