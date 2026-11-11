@@ -97,7 +97,8 @@ impl WorldMap {
         w: i32,
         h: i32,
     ) {
-        let marked = s.location_visible() || (!s.in_match() && scene.threats.running());
+        let marked = s.adventure.is_none()
+            && (s.location_visible() || (!s.in_match() && scene.threats.running()));
         if s.state == SessionState::MapOpen {
             self.full(d, scene, s, marked, w, h);
             return;
@@ -257,7 +258,7 @@ impl WorldMap {
             Color::WHITE,
         );
         d.draw_text(
-            tr("Blue: player | Orange K: Kenny | Red !: danger | Colored !: encounters", "Azul: jugador | Naranja K: Kenny | Rojo !: peligro | ! de colores: encuentros"),
+            if s.adventure.is_some() {tr("Blue: player | Colored !: encounters", "Azul: jugador | ! de colores: encuentros")} else {tr("Blue: player | Orange K: Kenny | Red !: danger | Colored !: encounters", "Azul: jugador | Naranja K: Kenny | Rojo !: peligro | ! de colores: encuentros")},
             24,
             h - 20,
             16,

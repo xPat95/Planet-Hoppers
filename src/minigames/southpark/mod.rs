@@ -78,7 +78,7 @@ pub struct SouthParkScene {
     pub dialogue: KennyDialogue,
     pub kenny_hint: bool,
     pub threats: ThreatDirector,
-    kenny_obstacle: usize,
+    kenny_obstacle: Option<usize>,
 }
 
 impl SouthParkScene {
@@ -161,7 +161,7 @@ impl SouthParkScene {
             roads,
             dialogue: KennyDialogue::Closed,
             kenny_hint: config.kenny_hint,
-            kenny_obstacle,
+            kenny_obstacle: Some(kenny_obstacle),
             threats: ThreatDirector::new(threats::ThreatConfig::load(Path::new(concat!(
                 env!("CARGO_MANIFEST_DIR"),
                 "/config/southpark-threats.json"
@@ -202,6 +202,7 @@ impl SouthParkScene {
         }
     }
     pub fn update_kenny(&mut self, dt: f32) {
+        if self.kenny_obstacle.is_none() { return; }
         let player_body = self.world.body(
             self.player.feet,
             self.player.config.radius,
@@ -234,7 +235,7 @@ impl SouthParkScene {
             });
             self.threats.release_completed(&mut self.kenny, &clean);
         }
-        self.world.obstacles[self.kenny_obstacle].bounds = self.kenny.body(&self.world);
+        if let Some(index) = self.kenny_obstacle { self.world.obstacles[index].bounds = self.kenny.body(&self.world); }
         self.sync_threats();
     }
     pub fn kenny_target(&self) -> usize {
@@ -242,6 +243,14 @@ impl SouthParkScene {
             .iter()
             .position(|t| t.id == KENNY_ID)
             .expect("Kenny target is registered")
+    }
+    /// Remove only the legacy roaming actor's collision, retaining shared state
+    /// and resources for narrative and puzzle consumers. Safe to call repeatedly.
+    pub fn disable_roaming_kenny(&mut self) {
+        if let Some(index) = self.kenny_obstacle.take() {
+            self.world.obstacles.remove(index);
+        }
+        self.kenny.pause();
     }
     pub fn accept_challenge(&mut self) {
         if self.dialogue == KennyDialogue::Invitation {
@@ -306,7 +315,7 @@ impl SouthParkScene {
             self.threats.offset = previous;
             return Err(error);
         }
-        self.world.obstacles[self.kenny_obstacle].bounds = self.kenny.body(&self.world);
+        if let Some(index) = self.kenny_obstacle { self.world.obstacles[index].bounds = self.kenny.body(&self.world); }
         self.sync_threats();
         Ok(())
     }
@@ -326,7 +335,7 @@ impl SouthParkScene {
             return false;
         }
         let bounds = self.kenny.body(&self.world);
-        self.world.obstacles[self.kenny_obstacle].bounds = bounds;
+        if let Some(index) = self.kenny_obstacle { self.world.obstacles[index].bounds = bounds; }
         let index = self.kenny_target();
         self.targets[index].bounds = bounds;
         true
@@ -343,7 +352,7 @@ impl SouthParkScene {
             ),
         });
         self.threats.restart(&mut self.kenny, &clean, &self.roads)?;
-        self.world.obstacles[self.kenny_obstacle].bounds = self.kenny.body(&self.world);
+        if let Some(index) = self.kenny_obstacle { self.world.obstacles[index].bounds = self.kenny.body(&self.world); }
         self.sync_threats();
         Ok(())
     }
@@ -359,7 +368,7 @@ impl SouthParkScene {
             ),
         });
         self.threats.clear(&mut self.kenny, &clean)?;
-        self.world.obstacles[self.kenny_obstacle].bounds = self.kenny.body(&self.world);
+        if let Some(index) = self.kenny_obstacle { self.world.obstacles[index].bounds = self.kenny.body(&self.world); }
         self.sync_threats();
         Ok(())
     }

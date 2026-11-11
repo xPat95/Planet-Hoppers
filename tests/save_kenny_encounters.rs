@@ -41,10 +41,13 @@ fn exploration_encounters_all_2d_puzzles_and_victory() {
             .iter()
             .all(|l| MEMBERS[i].contains(&l.speaker) && !l.en.is_empty() && !l.es.is_empty()));
     }
+    let exploration_kenny = scene.kenny.position();
     for _ in 0..300 {
         s.update(1.0, &mut scene, VoiceClock::default()).unwrap();
     }
     assert_eq!(s.state, SessionState::Exploring);
+    assert_eq!(scene.kenny.position(), exploration_kenny, "Mission exploration must not move the legacy 3D Kenny actor");
+    assert!(!scene.world.obstacles.iter().any(|o|o.id==planet_hoppers::minigames::southpark::kenny::KENNY_ID), "No invisible Kenny collider in exploration");
     assert_eq!(s.lives, 3);
     // A failed encounter consumes one life after the existing Stan/Kyle reaction,
     // returns to exploration, and stays available for retry.

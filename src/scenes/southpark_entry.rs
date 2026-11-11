@@ -7,6 +7,7 @@ use std::path::Path;
 #[derive(Default)]
 pub struct SouthParkVisits {
     pub intro_seen: bool,
+    pub chef_intro_seen: bool,
 }
 /// Kept as an alias for existing callers; all minigames share this contract.
 pub use crate::minigames::common::host::MinigameExit as SouthParkExit;

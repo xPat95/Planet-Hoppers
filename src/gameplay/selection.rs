@@ -92,6 +92,8 @@ impl ShipCatalog {
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct GameState {
+    #[serde(default)]
+    pub southpark_chef_intro_seen: bool,
     first_ship: String,
     active_ship: String,
     unlocked: BTreeSet<String>,
@@ -111,6 +113,7 @@ impl GameState {
             return Err("Nave inicial desconocida".into());
         }
         Ok(Self {
+            southpark_chef_intro_seen: false,
             first_ship: id.into(),
             active_ship: id.into(),
             unlocked: BTreeSet::from([id.to_string()]),

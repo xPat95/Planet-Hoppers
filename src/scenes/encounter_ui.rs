@@ -264,7 +264,7 @@ impl Drop for EncounterUi<'_> {
     }
 }
 
-fn decode_portrait(path: &Path) -> Result<Image, Box<dyn std::error::Error>> {
+pub(super) fn decode_portrait(path: &Path) -> Result<Image, Box<dyn std::error::Error>> {
     let mut decoder =
         image_webp::WebPDecoder::new(std::io::BufReader::new(std::fs::File::open(path)?))?;
     let (w, h) = decoder.dimensions();

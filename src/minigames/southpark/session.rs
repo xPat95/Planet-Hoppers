@@ -562,6 +562,7 @@ impl SaveKennySession {
         scene: &mut SouthParkScene,
         voice: VoiceClock,
     ) -> Result<(), String> {
+        if self.adventure.is_some() { scene.disable_roaming_kenny(); }
         // A modal pause must freeze everything, including animation damping and
         // the activation clock. Resuming restores the exact previous phase.
         if matches!(self.state, SessionState::Paused | SessionState::MapOpen) {
@@ -597,7 +598,11 @@ impl SaveKennySession {
             }
         }
         match self.state {
-            SessionState::Exploring => scene.update_kenny(dt),
+            SessionState::Exploring => {
+                // Mission exploration belongs to the eight children. Keep the
+                // legacy actor available for technical/legacy threat modes only.
+                if self.adventure.is_none() { scene.update_kenny(dt); }
+            }
             SessionState::Interlude => {
                 if scene.threats.kind.is_none() {
                     scene.update_kenny(dt);

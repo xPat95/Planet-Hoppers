@@ -73,8 +73,10 @@ pub fn run_visit_with_results(
     let mut encounter_smoke = false;
     let mut puzzle_smoke = false;
     let mut puzzle_results = false;
+    let mut chef_smoke = false;
     while let Some(arg) = args.next() {
         match arg.as_str() {
+            "--smoke-chef" => { chef_smoke=true; no_probes=true; }
             "--smoke-puzzles" => {puzzle_smoke=true;no_probes=true;}
             "--smoke-puzzle-results" => {puzzle_smoke=true;puzzle_results=true;no_probes=true;}
             "--smoke-encounters" => { encounter_smoke = true; no_probes = true; }
@@ -171,7 +173,7 @@ pub fn run_visit_with_results(
         .build();
     rl.set_exit_key(None);
     rl.set_window_min_size(640, 480);
-    if smoke || session_smoke || entry_smoke || ike_smoke || encounter_smoke || puzzle_smoke || return_smoke_goal.is_some() {
+    if smoke || session_smoke || entry_smoke || ike_smoke || encounter_smoke || puzzle_smoke || chef_smoke || return_smoke_goal.is_some() {
         rl.set_window_state(WindowState::default().set_window_hidden(true));
     }
     // The session smoke uses the real audio clock, so do not exhaust its frame
@@ -219,6 +221,7 @@ pub fn run_visit_with_results(
         let mut adventure = crate::minigames::southpark::encounters::Adventure::build(&scene, &session.locations.as_ref().unwrap().sites)?;
         let ui = super::encounter_ui::EncounterUi::load(&mut rl, &thread, &root, device.as_ref(), ike_volume, &mut adventure)?;
         session.adventure = Some(adventure);
+        scene.disable_roaming_kenny();
         Some(ui)
     } else { None };
     let mut world_map = WorldMap::load(&mut rl, &thread, &root, &scene)?;
@@ -278,6 +281,7 @@ pub fn run_visit_with_results(
     let entry_config = EntryConfig::load(&root.join("config/southpark-entry.json"))?;
     let mut entry =
         SouthParkEntry::new(visits, entry_config.clone(), audio.intro_duration(), &scene)?;
+    let chef_enabled = encounters.is_some() && !encounter_smoke && !puzzle_smoke && !entry_smoke;
     entry.active = !smoke && !session_smoke && !dev_threats;
     if ike_smoke { entry.active = false; }
     if encounter_smoke { entry.active = false; }
@@ -350,6 +354,25 @@ pub fn run_visit_with_results(
     let mut puzzle_ike_position = None;
     let mut outcome_smoke = puzzle_results.then(super::puzzle_smoke::OutcomeSmoke::default);
     while !rl.window_should_close() {
+        if chef_smoke && visits.chef_intro_seen && frame>=180 {
+            assert!(!entry.active && cursor.captured && !session.blocks_controls());
+            assert!(visits.chef_intro_seen);
+            println!("CHEF_WORLD_HANDOFF_OK controls_restored intro_seen");
+            break;
+        }
+        if chef_enabled && !entry.active && session.state==SessionState::Paused
+            && session.puzzle.is_none() && ike_playback.is_none()
+            && rl.is_key_pressed(KeyboardKey::KEY_H) {
+            audio.set_music(crate::audio::MusicMode::Silent);
+            audio.stop_effects();
+            if let Some(ui)=&encounters {ui.stop();}
+            let es=&mut session.adventure.as_mut().unwrap().spanish;
+            let volume=if puzzle_ui.as_ref().is_some_and(|ui|ui.muted){0.}else{ike_volume};
+            if !super::chef_intro::play(&mut rl,&thread,&root,device.as_ref(),volume,es,0)? {break;}
+            visits.chef_intro_seen=true;
+            cursor.apply(&mut rl);
+            continue;
+        }
         if ike_smoke {
             if frame == 2 || frame == 10 || frame == 550 || frame == 560 || frame == 20 || frame == 45 {
                 let (key, down) = match frame {
@@ -588,6 +611,28 @@ pub fn run_visit_with_results(
                 // Stop the one video track before gameplay music can start.
                 audio.set_music(crate::audio::MusicMode::Silent);
                 video = None;
+                // The original entry owns its full lifecycle. Chef is additional
+                // content, dispatched only after the original completion/skip.
+                if chef_enabled && !visits.chef_intro_seen {
+                    let before=(scene.player.feet,scene.player.yaw,scene.kenny.position(),session.lives,session.saves);
+                    if chef_smoke {
+                        assert!(visits.intro_seen && entry.full_intro);
+                        println!("ORIGINAL_BEFORE_CHEF_OK elapsed={} duration={}",entry.elapsed,entry.duration);
+                    }
+                    let es=&mut session.adventure.as_mut().unwrap().spanish;
+                    let volume=if puzzle_ui.as_ref().is_some_and(|ui|ui.muted){0.}else{ike_volume};
+                    if !super::chef_intro::play(&mut rl,&thread,&root,device.as_ref(),volume,es,u8::from(chef_smoke))? {return Ok(SouthParkExit::WindowClosed);}
+                    visits.chef_intro_seen=true;
+                    if chef_smoke {
+                        *es=!*es;
+                        rl.set_window_size(640,480);
+                        assert!(super::chef_intro::play(&mut rl,&thread,&root,device.as_ref(),volume,es,1)?);
+                        assert!(super::chef_intro::play(&mut rl,&thread,&root,device.as_ref(),volume,es,2)?);
+                        assert_eq!(before,(scene.player.feet,scene.player.yaw,scene.kenny.position(),session.lives,session.saves));
+                        assert!(visits.intro_seen && !entry.active);
+                        println!("CHEF_SMOKE_OK original_preserved bilingual native_skip world_unchanged");
+                    }
+                }
                 cursor.captured = true;
                 cursor.apply(&mut rl);
             }
@@ -759,7 +804,7 @@ pub fn run_visit_with_results(
             running_read |= input.forward > 0.0 && input.sprint;
         }
         let old_yaw = scene.player.yaw;
-        let focused = smoke || session_smoke || ike_smoke || encounter_smoke || puzzle_smoke || return_test.is_some() || rl.is_window_focused();
+        let focused = smoke || session_smoke || ike_smoke || encounter_smoke || puzzle_smoke || chef_smoke || return_test.is_some() || rl.is_window_focused();
         let active = !modal_at_start && cursor.update(&mut rl, &mut input, focused);
         let previous_feet = scene.player.feet;
         if active {
@@ -926,7 +971,7 @@ pub fn run_visit_with_results(
                         ike_sprite.as_ref()?.hit(ike_pose.as_ref()?, origin, direction,
                             range.min(scene.interaction_distance))
                     } else if index == kenny_index {
-                        if session.in_match()
+                        if session.adventure.is_some() || session.in_match()
                             || scene.threats.owns_kenny()
                             || !scene.threats.visible_kenny()
                         {
@@ -1087,7 +1132,7 @@ pub fn run_visit_with_results(
                     }
                     threat_models.draw(&mut view, camera.position, &scene.threats);
                     if let (Some(ui), Some(a)) = (&encounters, &session.adventure) { ui.world(&mut view, camera, a); }
-                    if scene.threats.visible_kenny() {
+                    if session.adventure.is_none() && scene.threats.visible_kenny() {
                         sprite.draw(&mut view, &pose);
                     }
                     if ike.available {
@@ -1208,7 +1253,7 @@ pub fn run_visit_with_results(
                         Color::LIGHTGRAY,
                     );
                 }
-                if scene.kenny_hint
+                if session.adventure.is_none() && scene.kenny_hint
                     && !session.in_match()
                     && scene.dialogue == KennyDialogue::Closed
                     && !(kenny_smoke && frame == 195)
@@ -1240,6 +1285,9 @@ pub fn run_visit_with_results(
                     world_map.draw(&mut d, &scene, &session, width, height);
                 }
                 if !entry.active && session.puzzle.is_none() { if let Some(ui) = &encounters { ui.draw(&mut d, &scene, &session, width, height); } }
+                if chef_enabled && session.state==SessionState::Paused && session.puzzle.is_none() && ike_playback.is_none() {
+                    d.draw_text(if session.adventure.as_ref().is_some_and(|a|a.spanish){"H: Ver introduccion"}else{"H: Replay intro"},32,height-44,22,Color::WHITE);
+                }
                 if let (Some(ui),Some(encounters))=(&puzzle_ui,&encounters) {
                     ui.draw(&mut d,&session,&encounters.portraits,session_ui.death_portrait(session.dialogue().0),width,height,rl_mouse,mouse_down);
                 }
