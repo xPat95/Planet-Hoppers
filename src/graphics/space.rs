@@ -434,9 +434,9 @@ impl SpaceModel {
                 continue;
             }
             let map = &self.model.materials()[part.material].maps()[0];
-            let tex = texture_average(map.texture);
-            let tint = Vector3::new(map.color.r as f32 / 255.0 * tex.x, map.color.g as f32 / 255.0 * tex.y,
-                                    map.color.b as f32 / 255.0 * tex.z);
+            // El color del material (lineal, como glTF) y su textura, leída una vez a la CPU
+            let tint = Vector3::new(map.color.r as f32, map.color.g as f32, map.color.b as f32) / 255.0;
+            let texture = CpuTexture::load(map.texture);
             let raw = match &part.rebuilt { Some(m) => *m.as_ref(), None => *self.model.meshes()[part.mesh].as_ref() };
             let n = raw.vertexCount.max(0) as usize;
             if n == 0 || raw.vertices.is_null() {
@@ -445,8 +445,12 @@ impl SpaceModel {
             let pos = unsafe { std::slice::from_raw_parts(raw.vertices as *const Vector3, n) };
             let nor = (!raw.normals.is_null()).then(|| unsafe { std::slice::from_raw_parts(raw.normals as *const Vector3, n) });
             let col = (!raw.colors.is_null()).then(|| unsafe { std::slice::from_raw_parts(raw.colors as *const u8, n * 4) });
+            let uv = (!raw.texcoords.is_null()).then(|| unsafe { std::slice::from_raw_parts(raw.texcoords as *const Vector2, n) });
             let vert = |i: usize| {
                 let c = col.map_or(Vector3::one(), |c| Vector3::new(c[i * 4] as f32, c[i * 4 + 1] as f32, c[i * 4 + 2] as f32) / 255.0);
+                // La textura se lee en la coordenada de cada vértice (el color queda horneado en el vértice)
+                let t = match (&texture, uv) { (Some(tx), Some(uv)) => tx.sample(uv[i]), _ => Vector3::one() };
+                let c = Vector3::new(c.x * t.x, c.y * t.y, c.z * t.z);
                 SoftVertex {
                     pos: pos[i].transform_with(self.fit),
                     normal: nor.map_or(Vector3::up(), |n| dir(n[i])),
@@ -462,7 +466,8 @@ impl SpaceModel {
                     (idx[t * 3] as usize, idx[t * 3 + 1] as usize, idx[t * 3 + 2] as usize)
                 };
                 if a.max(b).max(c) < n {
-                    tris.push(super::software::SoftTriangle { v: [vert(a), vert(b), vert(c)], emissive: part.emissive, flat: part.sticker });
+                    tris.push(super::software::SoftTriangle { v: [vert(a), vert(b), vert(c)], emissive: part.emissive, flat: part.sticker,
+                                                             group: part.material as u32 });
                 }
             }
         }
@@ -739,25 +744,37 @@ pub fn draw_sun_glow(d: &mut impl RaylibDraw, at: Vector2, radius: f32, viewport
     }
 }
 
-/// El color promedio de una textura (blanco si no hay): el renderizador por software usa un color por material.
-fn texture_average(texture: ffi::Texture2D) -> Vector3 {
-    if texture.id <= 1 || texture.width <= 0 {
-        return Vector3::one();
-    }
-    unsafe {
-        let image = ffi::LoadImageFromTexture(texture);
-        let colors = ffi::LoadImageColors(image);
-        let count = (image.width * image.height).max(0) as usize;
-        let mut sum = Vector3::zero();
-        let step = (count / 4096).max(1);
-        let mut n = 0.0;
-        for i in (0..count).step_by(step) {
-            let c = *colors.add(i);
-            sum = sum + Vector3::new(c.r as f32, c.g as f32, c.b as f32);
-            n += 1.0;
+/// Una textura copiada a la CPU (para el renderizador por software), con sus colores pasados a lineales.
+struct CpuTexture {
+    width: usize,
+    height: usize,
+    pixels: Vec<Vector3>,
+}
+
+impl CpuTexture {
+    fn load(texture: ffi::Texture2D) -> Option<Self> {
+        if texture.id <= 1 || texture.width <= 0 || texture.height <= 0 {
+            return None;
         }
-        ffi::UnloadImageColors(colors);
-        ffi::UnloadImage(image);
-        if n == 0.0 { Vector3::one() } else { sum / (n * 255.0) }
+        unsafe {
+            let image = ffi::LoadImageFromTexture(texture);
+            let colors = ffi::LoadImageColors(image);
+            let (width, height) = (image.width.max(0) as usize, image.height.max(0) as usize);
+            let linear = |v: u8| (v as f32 / 255.0).powf(2.2);
+            let pixels = (0..width * height).map(|i| {
+                let c = *colors.add(i);
+                Vector3::new(linear(c.r), linear(c.g), linear(c.b))
+            }).collect();
+            ffi::UnloadImageColors(colors);
+            ffi::UnloadImage(image);
+            Some(Self { width, height, pixels })
+        }
+    }
+
+    /// El color en una coordenada de textura (repetida fuera de 0..1), el texel más cercano.
+    fn sample(&self, uv: Vector2) -> Vector3 {
+        let x = (uv.x.rem_euclid(1.0) * self.width as f32) as usize % self.width;
+        let y = (uv.y.rem_euclid(1.0) * self.height as f32) as usize % self.height;
+        self.pixels[y * self.width + x]
     }
 }

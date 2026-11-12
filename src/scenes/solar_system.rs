@@ -2146,7 +2146,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 scene.renderer.width, scene.renderer.height, st.rasterized, st.submitted, st.ms);
             if s.demo_video && frame % 60 == 0 { println!("SOFT_FRAME_MS {:.1} tris={}", st.ms, st.rasterized); }
             let w = text_width(&ui_bold, &label, 18.0);
-            draw_ui(&mut d, &ui_bold, &label, (width - w) / 2, 14, 18.0, super::holo::CYAN);
+            draw_ui(&mut d, &ui_bold, &label, (width - w) / 2, height - 34, 18.0, super::holo::CYAN);
         }
 
         // --- Interfaz ------------------------------------------------------------------------------------------

@@ -29,6 +29,8 @@ pub struct SoftTriangle {
     pub emissive: Vector3,
     /// Sin luz: el color tal cual (los personajes de caricatura).
     pub flat: bool,
+    /// De qué material es: al simplificar solo se juntan vértices del mismo (si no, el mar se mezcla con las nubes).
+    pub group: u32,
 }
 
 #[derive(Clone, Default)]
@@ -54,24 +56,24 @@ impl SoftMesh {
         let mut best = self.clone();
         for cells in [160.0, 120.0, 90.0, 68.0, 52.0, 40.0, 30.0, 22.0, 16.0, 12.0, 8.0, 6.0, 4.0] {
             let cell = size / cells;
-            let key = |p: Vector3| (((p.x - lo.x) / cell) as i32, ((p.y - lo.y) / cell) as i32, ((p.z - lo.z) / cell) as i32);
-            let mut sums: HashMap<(i32, i32, i32), (Vector3, Vector3, Vector3, f32)> = HashMap::new();
+            let key = |p: Vector3, g: u32| (((p.x - lo.x) / cell) as i32, ((p.y - lo.y) / cell) as i32, ((p.z - lo.z) / cell) as i32, g);
+            let mut sums: HashMap<(i32, i32, i32, u32), (Vector3, Vector3, Vector3, f32)> = HashMap::new();
             for t in &self.tris {
                 for v in &t.v {
-                    let e = sums.entry(key(v.pos)).or_insert((Vector3::zero(), Vector3::zero(), Vector3::zero(), 0.0));
+                    let e = sums.entry(key(v.pos, t.group)).or_insert((Vector3::zero(), Vector3::zero(), Vector3::zero(), 0.0));
                     e.0 = e.0 + v.pos;
                     e.1 = e.1 + v.normal;
                     e.2 = e.2 + v.color;
                     e.3 += 1.0;
                 }
             }
-            let rep = |k: (i32, i32, i32), v: &SoftVertex| {
+            let rep = |k: (i32, i32, i32, u32), v: &SoftVertex| {
                 let (p, n, c, w) = sums[&k];
                 SoftVertex { pos: p / w, normal: if n.length() > 1e-6 { n.normalized() } else { v.normal }, color: c / w }
             };
             let mut tris = Vec::new();
             for t in &self.tris {
-                let k = [key(t.v[0].pos), key(t.v[1].pos), key(t.v[2].pos)];
+                let k = [key(t.v[0].pos, t.group), key(t.v[1].pos, t.group), key(t.v[2].pos, t.group)];
                 if k[0] == k[1] || k[1] == k[2] || k[0] == k[2] {
                     continue;
                 }
@@ -103,7 +105,7 @@ impl SoftMesh {
             }).collect();
         }
         let vert = |p: Vector3| SoftVertex { pos: p, normal: p, color };
-        SoftMesh { tris: tris.into_iter().map(|[a, b, c]| SoftTriangle { v: [vert(a), vert(b), vert(c)], emissive: Vector3::zero(), flat: false }).collect() }
+        SoftMesh { tris: tris.into_iter().map(|[a, b, c]| SoftTriangle { v: [vert(a), vert(b), vert(c)], emissive: Vector3::zero(), flat: false, group: 0 }).collect() }
     }
 }
 
@@ -327,10 +329,12 @@ fn raster(t: &ScreenTri, color: &mut [u8], depth: &mut [f32], width: usize, y0: 
             let z = 1.0 / iz;
             let mix = |v: [Vector3; 3]| (v[0] * w0 + v[1] * w1 + v[2] * w2) * z;
             let rgb = fragment(t, mix(t.world), mix(t.normal), mix(t.color), eye, sun, time);
+            // Los colores se calculan lineales y se pasan a la pantalla (gamma 2,2), como el shader de la GPU
             let ci = di * 4;
-            color[ci] = (rgb.x.clamp(0.0, 1.0) * 255.0) as u8;
-            color[ci + 1] = (rgb.y.clamp(0.0, 1.0) * 255.0) as u8;
-            color[ci + 2] = (rgb.z.clamp(0.0, 1.0) * 255.0) as u8;
+            let out = |v: f32| (v.clamp(0.0, 1.0).powf(1.0 / 2.2) * 255.0) as u8;
+            color[ci] = out(rgb.x);
+            color[ci + 1] = out(rgb.y);
+            color[ci + 2] = out(rgb.z);
         }
     }
 }
@@ -360,7 +364,8 @@ fn fragment(t: &ScreenTri, world: Vector3, normal: Vector3, color: Vector3, eye:
             let hot = Vector3::new(1.0, 0.97, 0.85);
             let warm = Vector3::new(1.0, 0.62, 0.22);
             let k = (0.35 + 0.65 * edge.powf(0.6)) * (0.75 + 0.35 * g);
-            warm + (hot - warm) * k.clamp(0.0, 1.0)
+            let c = warm + (hot - warm) * k.clamp(0.0, 1.0);
+            Vector3::new(c.x.powf(2.2), c.y.powf(2.2), c.z.powf(2.2))
         }
         Shade::Lit => {
             if t.flat {
