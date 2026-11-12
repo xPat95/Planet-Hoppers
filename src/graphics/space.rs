@@ -422,6 +422,14 @@ impl SpaceModel {
     }
 
     /// Deja de dibujar las piezas cuyo material empieza con alguno de estos nombres.
+    /// Cuántos triángulos manda a dibujar este modelo (para el contador de rendimiento, F4).
+    pub fn triangles(&self) -> usize {
+        self.parts.iter().map(|p| match &p.rebuilt {
+            Some(mesh) => mesh.triangleCount.max(0) as usize,
+            None => self.model.meshes()[p.mesh].triangleCount.max(0) as usize,
+        }).sum()
+    }
+
     pub fn hide_materials(&mut self, prefixes: &[&str]) {
         self.parts.retain(|p| !prefixes.iter().any(|x| p.name.starts_with(x)));
     }

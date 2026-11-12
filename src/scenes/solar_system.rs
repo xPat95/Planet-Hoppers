@@ -215,6 +215,171 @@ fn logo_color(id: &str) -> Option<Color> {
     crate::gameplay::progress::Franchise::from_id(id).ok().map(super::token_collection_ui::franchise_color)
 }
 
+/// El planeta del video de entrega (`--demo-video`): Smiling Friends.
+const DEMO_PLANET: usize = 2;
+
+/// El piloto del video de entrega: vuela por el espacio hasta el planeta (con turbo), se acerca frenando, le da una
+/// vuelta completa alrededor y se aleja. Arma la misma entrada que el teclado (`FlightInput`), así la nave vuela con
+/// la física de siempre.
+#[derive(Default)]
+struct DemoPilot {
+    phase: u8,
+    time: f32,
+    phase_time: f32,
+    /// En la vuelta: cuánto giró alrededor del planeta y el ángulo anterior.
+    turned: f32,
+    last_angle: Option<f32>,
+}
+
+impl DemoPilot {
+    fn input(&mut self, ship: &Ship, system: &SolarSystem, flight: &crate::ships::FlightConfig, dt: f32) -> FlightInput {
+        self.time += dt;
+        self.phase_time += dt;
+        let p = &system.planets[DEMO_PLANET];
+        let (c, r) = (p.position(), p.config.radius);
+        let rel = ship.position - c;
+        let mut input = FlightInput { ascend: false, throttle: 1.0, boost: false, turn: (0.0, 0.0), mouse: (0.0, 0.0), aim_at: None };
+        let next = |me: &mut Self| { me.phase += 1; me.phase_time = 0.0; };
+        match self.phase {
+            // Viaje: con turbo hasta acercarse, y después frenando hasta quedar cerca
+            0 => {
+                input.aim_at = Some(ship.autopilot_aim(DEMO_PLANET, flight, system));
+                let dist = rel.length() - r;
+                input.boost = dist > r * 5.0;
+                let wanted = (flight.cruise_speed * (dist / (r * 3.0)).clamp(0.35, 1.0)).max(flight.cruise_speed * 0.35);
+                input.throttle = if ship.speed > wanted * 1.05 { -1.0 } else { 1.0 };
+                if dist < r * 0.8 || self.phase_time > 25.0 { next(self); }
+            }
+            // La vuelta: apunta un poco adelante sobre un círculo a 2,2 radios del centro, a velocidad tranquila
+            1 => {
+                let flat = Vector3::new(rel.x, 0.0, rel.z).normalized();
+                let angle = flat.z.atan2(flat.x);
+                if let Some(last) = self.last_angle {
+                    let mut d = angle - last;
+                    if d > std::f32::consts::PI { d -= std::f32::consts::TAU; }
+                    if d < -std::f32::consts::PI { d += std::f32::consts::TAU; }
+                    self.turned += d.abs();
+                }
+                self.last_angle = Some(angle);
+                let ahead = angle + 0.6;
+                let height = rel.y.clamp(-r * 0.2, r * 0.2);
+                input.aim_at = Some(c + Vector3::new(ahead.cos(), 0.0, ahead.sin()) * (r * 1.65) + Vector3::up() * height);
+                let wanted = flight.cruise_speed * 1.1;
+                input.throttle = if ship.speed > wanted { -0.4 } else { 0.6 };
+                if self.turned >= std::f32::consts::TAU || self.phase_time > 30.0 { next(self); }
+            }
+            // Se aleja, con turbo, hacia afuera del planeta
+            2 => {
+                input.aim_at = Some(ship.position + rel.normalized() * (r * 50.0) + Vector3::up() * r * 4.0);
+                input.boost = self.phase_time > 1.0;
+                if self.phase_time > 6.0 { next(self); }
+            }
+            _ => input.throttle = 0.0,
+        }
+        input
+    }
+
+    fn done(&self) -> bool {
+        self.phase >= 3
+    }
+
+    /// En la vuelta, cuánto mira la cámara hacia el planeta (entra y sale suave).
+    fn look(&self) -> f32 {
+        let smooth = |t: f32| { let t = t.clamp(0.0, 1.0); t * t * (3.0 - 2.0 * t) };
+        match self.phase {
+            1 => smooth(self.phase_time / 1.5) * (1.0 - smooth((self.turned / std::f32::consts::TAU - 0.88) / 0.12)),
+            _ => 0.0,
+        }
+    }
+
+    /// El contador de F4 se ve en el acercamiento y la vuelta (así se ve cambiar el nivel de detalle).
+    fn show_stats(&self) -> bool {
+        self.phase == 1
+    }
+}
+
+/// Qué pasó con cada planeta este cuadro: descartado (con los triángulos que se ahorró), dibujado entero, o dibujado
+/// con su versión liviana (los que dibujó y los que tendría la completa).
+#[derive(Clone, Copy)]
+enum PlanetRender {
+    Culled(usize),
+    Near(usize),
+    Far(usize, usize),
+}
+
+/// Lo que hizo el renderizador este cuadro con los planetas (para el contador de F4).
+struct RenderStats {
+    planets: Vec<PlanetRender>,
+}
+
+/// Si una esfera (centro y radio) entra en la pirámide de visión de la cámara: se compara su posición, en los ejes de
+/// la cámara, con los bordes de la pantalla (con el radio de margen).
+fn in_view(camera: Camera3D, aspect: f32, center: Vector3, radius: f32) -> bool {
+    let forward = (camera.target - camera.position).normalized();
+    let right = forward.cross(camera.up).normalized();
+    let up = right.cross(forward);
+    let to = center - camera.position;
+    let z = to.dot(forward);
+    if z < -radius {
+        return false;
+    }
+    let half_y = (camera.fovy.to_radians() * 0.5).tan();
+    let half_x = half_y * aspect;
+    // El radio, medido de costado a la pirámide (un poco más grande cuanto más abierta)
+    let (ry, rx) = (radius * (1.0 + half_y * half_y).sqrt(), radius * (1.0 + half_x * half_x).sqrt());
+    to.dot(right).abs() <= z * half_x + rx && to.dot(up).abs() <= z * half_y + ry
+}
+
+/// El contador de F4: triángulos dibujados y ahorrados por el descarte y el nivel de detalle, y qué versión de cada
+/// planeta se dibujó. F5 y F6 apagan el descarte y el nivel de detalle para comparar.
+#[allow(clippy::too_many_arguments)]
+fn draw_render_stats(d: &mut RaylibDrawHandle, regular: &Font, bold: &Font, stats: &RenderStats, s: &Session,
+                     culling: bool, lod_on: bool, width: i32) {
+    let (mut drawn, mut culled, mut saved) = (0usize, 0usize, 0usize);
+    for p in &stats.planets {
+        match *p {
+            PlanetRender::Culled(t) => culled += t,
+            PlanetRender::Near(t) => drawn += t,
+            PlanetRender::Far(t, full) => { drawn += t; saved += full - t; }
+        }
+    }
+    let rows = stats.planets.len() as f32;
+    let rect = Rectangle::new(width as f32 - 400.0, 44.0, 380.0, 170.0 + rows * 24.0);
+    super::holo::panel(d, rect, super::holo::CYAN, 1.0);
+    let thousands = |n: usize| {
+        let s = n.to_string();
+        let mut out = String::new();
+        for (i, c) in s.chars().enumerate() {
+            if i > 0 && (s.len() - i) % 3 == 0 { out.push('.'); }
+            out.push(c);
+        }
+        out
+    };
+    let (x, mut y) = (rect.x + 18.0, rect.y + 12.0);
+    let line = |d: &mut RaylibDrawHandle, font: &Font, text: &str, y: f32, color: Color| draw_ui(d, font, text, x as i32, y as i32, 19.0, color);
+    line(d, bold, "RENDIMIENTO (F4)", y, super::holo::CYAN);
+    y += 28.0;
+    line(d, regular, &format!("Triángulos dibujados: {}", thousands(drawn)), y, Color::WHITE);
+    y += 24.0;
+    line(d, regular, &format!("Ahorrados por descarte: {}", thousands(culled)), y, super::holo::INK);
+    y += 24.0;
+    line(d, regular, &format!("Ahorrados por nivel de detalle: {}", thousands(saved)), y, super::holo::INK);
+    y += 30.0;
+    for (p, r) in s.system.planets.iter().zip(&stats.planets) {
+        let (state, n) = match *r {
+            PlanetRender::Culled(t) => ("fuera de vista", t),
+            PlanetRender::Near(t) => ("completo", t),
+            PlanetRender::Far(t, _) => ("liviano", t),
+        };
+        let color = logo_color(&p.config.id).unwrap_or(Color::WHITE);
+        line(d, regular, &format!("{}: {state} ({})", p.config.name, thousands(n)), y, color);
+        y += 24.0;
+    }
+    y += 6.0;
+    let flag = |on: bool| if on { "sí" } else { "NO" };
+    line(d, regular, &format!("F5 descarte: {}   F6 detalle: {}", flag(culling), flag(lod_on)), y, super::holo::INK);
+}
+
 /// El objetivo de la navegación: el primer planeta, desde `from` (incluido) en el orden del sistema, cuyo minijuego
 /// todavía no se ganó; con todos ganados, la estación. Así, al ganar un planeta el objetivo pasa al siguiente que falta,
 /// y si se perdió o se abandonó, se queda en el mismo para reintentar.
@@ -288,6 +453,8 @@ struct Session {
     launch_smoke: bool,
     intro_smoke: bool,
     help_smoke: bool,
+    /// `--demo-video`: vuelo automático para el video de entrega (ver `DemoPilot`), guardando cada cuadro.
+    demo_video: bool,
     station_smoke: bool,
     ending_smoke: bool,
     collision_debug: bool,
@@ -460,6 +627,7 @@ fn run_session_with_progress(args: impl Iterator<Item = String>, game: Option<Ga
     let mut launch_smoke = false;
     let mut intro_smoke = false;
     let mut help_smoke = false;
+    let mut demo_video = false;
     let mut station_smoke = false;
     let mut ending_origin = None;
     let mut collision_debug = false;
@@ -473,6 +641,7 @@ fn run_session_with_progress(args: impl Iterator<Item = String>, game: Option<Ga
             "--smoke-launch" => { smoke = true; launch_smoke = true; }
             "--smoke-intro" => { smoke = true; intro_smoke = true; }
             "--smoke-help" => { smoke = true; help_smoke = true; overview = true; }
+            "--demo-video" => { smoke = true; demo_video = true; }
             "--smoke-station" => { smoke = true; station_smoke = true; }
             "--debug-collisions" => collision_debug = true,
             "--smoke-docking" => { smoke = true; docking_smoke = true; }
@@ -563,6 +732,7 @@ fn run_session_with_progress(args: impl Iterator<Item = String>, game: Option<Ga
         launch_smoke,
         intro_smoke,
         help_smoke,
+        demo_video,
         station_smoke,
         ending_smoke: ending_origin.is_some(),
         collision_debug,
@@ -907,6 +1077,11 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
     let mut help_progress = if s.help_smoke { 1.0_f32 } else { 0.0_f32 };
     let mut help_restore_cursor = false;
     let mut show_orbits = true;
+    // Contador de rendimiento (F4) y, para compararlos, el descarte (F5) y el nivel de detalle (F6) encendidos o no
+    let mut show_stats = false;
+    let mut demo = DemoPilot::default();
+    let mut culling = true;
+    let mut lod_on = true;
     let mut collection_open = false;
     let mut presentation_shortcut = crate::minigames::common::shortcuts::PresentationShortcut::default();
     let mut collection_progress = 0.0_f32;
@@ -1043,6 +1218,9 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             && rl.is_key_pressed(k);
         let down = |rl: &RaylibHandle, k: KeyboardKey| accepts_input && rl.is_key_down(k);
         if pressed(&rl,KeyboardKey::KEY_F3) {s.collision_debug=!s.collision_debug;}
+        if pressed(&rl, KeyboardKey::KEY_F4) { show_stats = !show_stats; }
+        if pressed(&rl, KeyboardKey::KEY_F5) { culling = !culling; }
+        if pressed(&rl, KeyboardKey::KEY_F6) { lod_on = !lod_on; }
         if pressed(&rl,KeyboardKey::KEY_O) { show_orbits = !show_orbits; }
         debug_camera="ninguna";
 
@@ -1268,6 +1446,24 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 println!("ENTRY_SMOKE_PASS speed={:.1}", s.ship.speed);
                 return Ok(Exit::Quit);
             }
+        } else if s.demo_video {
+            // El video: un cuadro guardado cada dos (30 por segundo, con dt de 1/60), hasta que el piloto termina
+            show_stats = demo.show_stats();
+            if frame == 0 {
+                std::fs::create_dir_all(captures.join("demo-video"))?;
+                // Empieza en el espacio, del lado iluminado del planeta, a unos 9 radios, mirándolo
+                let p = &s.system.planets[DEMO_PLANET];
+                let (c, r) = (p.position(), p.config.radius);
+                let sunward = (s.system.center() - c).normalized();
+                let side = Vector3::up().cross(sunward).normalized();
+                s.ship.position = c + (sunward * 0.8 + side * 0.6).normalized() * (r * 9.0) + Vector3::up() * (r * 1.2);
+                s.ship.look_at(c);
+                s.ship.speed = 0.0;
+                s.ship.carried_by = None;
+                s.target = Some(Destination::Planet(DEMO_PLANET));
+            }
+            if frame % 2 == 0 { capture = Some(format!("demo-video/frame_{:05}.png", frame / 2)); }
+            if demo.done() { println!("DEMO_VIDEO_DONE frames={}", frame / 2); return Ok(Exit::Quit); }
         } else if s.launch_smoke {
             unsafe { ffi::PlayAutomationEvent(ffi::AutomationEvent {frame:0,type_:1,params:[KeyboardKey::KEY_W as i32,0,0,0]}); }
             if (2..=12).contains(&frame) {
@@ -1503,6 +1699,9 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                     mouse,
                     aim_at,
                 };
+                if s.demo_video {
+                    input = demo.input(&s.ship, &s.system, &s.ships.flight, dt);
+                }
                 if s.target==Some(Destination::Station) && input.aim_at.is_some() {
                     s.station.assist_approach(&s.ship,&mut input,&s.ships.flight);
                 }
@@ -1643,6 +1842,16 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                     intro_time = (next < ENTRY_STATION_HOLD + ENTRY_CAMERA_MOVE).then_some(next);
                     if intro_time.is_none() { chase = wanted; }
                     Camera3D::perspective(position, target, Vector3::up(), 44.0)
+                } else if s.demo_video && demo.look() > 0.0 {
+                    // El video, en la vuelta: la cámara se corre hacia afuera y mira en parte al planeta, para que se
+                    // vea mientras la nave lo rodea
+                    let k = demo.look();
+                    let c = s.system.planets[DEMO_PLANET].position();
+                    let out = (s.ship.position - c).normalized();
+                    let len = s.ships.ships[s.ship_index].camera_length();
+                    let position = chase + (out * len * 2.5 + Vector3::up() * len * 0.8) * k;
+                    let target = flight_target + (c - flight_target) * (0.55 * k);
+                    Camera3D::perspective(position, target, Vector3::up(), 44.0 + 16.0 * k)
                 } else {
                     Camera3D::perspective(chase + jitter, flight_target, Vector3::up(), 44.0)
                 }
@@ -1723,6 +1932,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             })
             .collect();
         let (width, height) = (rl.get_screen_width(), rl.get_screen_height());
+        let mut render_stats = RenderStats { planets: vec![PlanetRender::Culled(0); s.system.planets.len()] };
         let draw_mouse = rl.get_mouse_position();
 
         shader.begin_frame(center, camera.position, 0.16);
@@ -1770,14 +1980,21 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 station_model.draw(&mut d3, &mut shader, s.station.rotation()*Matrix::translate(station_pos.x, station_pos.y, station_pos.z));
                 crate::graphics::station_dock::draw(&mut d3,&s.station);
             }
-            for (p, (near, far)) in s.system.planets.iter().zip(&planets) {
+            for (i, (p, (near, far))) in s.system.planets.iter().zip(&planets).enumerate() {
                 let pos = p.position();
                 let to = pos - camera.position;
-                if to.dot(forward) < -p.config.radius * 1.5 {
-                    continue; // Detrás de la cámara
+                let full = near.as_ref().map_or(0, SpaceModel::triangles);
+                // Descarte: un planeta fuera de la vista (su esfera fuera de la pirámide de la cámara) no se manda a
+                // dibujar. Con F5 se apaga, para comparar
+                if culling && !in_view(camera, width as f32 / height as f32, pos, p.config.radius * 1.6) {
+                    render_stats.planets[i] = PlanetRender::Culled(full);
+                    continue;
                 }
                 let world = p.orientation() * Matrix::translate(pos.x, pos.y, pos.z);
-                let lod = if to.length() > p.config.radius * FAR_LOD { far.as_ref().or(near.as_ref()) } else { near.as_ref() };
+                // Nivel de detalle: lejos, la versión liviana (si tiene); con F6 se apaga, para comparar
+                let lod = if lod_on && to.length() > p.config.radius * FAR_LOD { far.as_ref().or(near.as_ref()) } else { near.as_ref() };
+                let used = lod.map_or(0, SpaceModel::triangles);
+                render_stats.planets[i] = if used < full { PlanetRender::Far(used, full) } else { PlanetRender::Near(used) };
                 shader.set_planet_fill(planet_fill(&p.config.id));
                 shader.set_planet_toon(p.config.id == "smilingfriends");
                 // Smiling Friends no brilla en el bloom, salvo Satanás (sus ojos y su fuego)
@@ -1971,7 +2188,11 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             abductions.draw(&mut d, &thread, franchise, s.token_presentation.elapsed(), width, height);
         }
         token_textures.draw_ship_notice(&mut d, &ui_bold, &s.token_presentation, width, height);
-        if !s.token_presentation.is_busy() { d.draw_fps(width - 96, 14); }
+        // (En el video no: guardar cada cuadro lo hace parecer lento)
+        if !s.token_presentation.is_busy() && !s.demo_video { d.draw_fps(width - 96, 14); }
+        if show_stats && !s.token_presentation.is_busy() {
+            draw_render_stats(&mut d, &ui_regular, &ui_bold, &render_stats, s, culling, lod_on, width);
+        }
         if s.collision_debug && !s.token_presentation.is_busy() {
             crate::graphics::station_debug::hud(&mut d,&s.station,s.ship.position,station_ship_radius(s,&ship_model),&debug_last,debug_camera);
         }
