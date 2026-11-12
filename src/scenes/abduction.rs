@@ -53,8 +53,36 @@ pub struct AbductionRenderer {
 }
 
 impl AbductionRenderer {
+    /// Regreso al mundo original: mismos personajes y fondo, sin la nave ni la abducción.
+    pub fn draw_home(&self, d: &mut RaylibDrawHandle, franchise: Franchise, t: f32, width: i32, height: i32) {
+        let Some(cast) = self.cast.get(&franchise) else { return; };
+        let (w, h) = (width as f32, height as f32);
+        d.draw_texture_pro(&cast.background,
+            cover_source([cast.background.width as f32, cast.background.height as f32], [w, h]),
+            Rectangle::new(0.0, 0.0, w, h), Vector2::zero(), 0.0, Color::WHITE);
+        let camera = Camera3D::perspective(Vector3::new(0.0, 1.1, 9.0 / (w / h.max(1.0)).min(1.25)),
+            Vector3::new(0.0, 1.1, 0.0), Vector3::up(), 43.0);
+        let mut d3 = d.begin_mode3D(camera);
+        let landing = smooth(t / 3.0);
+        for (i, model) in cast.models.iter().enumerate() {
+            let x = (i as f32 - (cast.models.len() - 1) as f32 * 0.5) * 1.35;
+            d3.draw_model_ex(model, Vector3::new(x, 0.25 + (1.0 - landing) * 4.0, 0.0),
+                Vector3::up(), (1.0 - landing) * 30.0, Vector3::one(), Color::WHITE);
+        }
+    }
+
     pub fn load(rl: &mut RaylibHandle, thread: &RaylibThread, root: &Path,
         franchises: &[Franchise]) -> Result<Self, Box<dyn std::error::Error>> {
+        Self::load_cast(rl, thread, root, franchises, false)
+    }
+
+    pub(super) fn load_home(rl: &mut RaylibHandle, thread: &RaylibThread, root: &Path,
+        franchise: Franchise) -> Result<Self, Box<dyn std::error::Error>> {
+        Self::load_cast(rl, thread, root, &[franchise], true)
+    }
+
+    fn load_cast(rl: &mut RaylibHandle, thread: &RaylibThread, root: &Path,
+        franchises: &[Franchise], home: bool) -> Result<Self, Box<dyn std::error::Error>> {
         let shader = rl.load_shader_from_memory(thread, Some(include_str!("../graphics/shaders/abduction.vs")), Some(include_str!("../graphics/shaders/abduction.fs")));
         if !shader.is_shader_valid() { return Err("No se pudo cargar la iluminación de abducción".into()); }
         let mut cast = BTreeMap::new();
@@ -83,7 +111,7 @@ impl AbductionRenderer {
             let ship = catalog.model(choice,&ships);
             let ship = SpaceModel::load(rl,thread,&root.join(&ship.model),&ship_shader,
                 ship.model_rotation_degrees,Fit::Length(2.0))?;
-            if art.franchise == Franchise::Halloween {
+            if art.franchise == Franchise::Halloween && !home {
                 let mut card = |path: &str| -> Result<Option<Texture2D>, Box<dyn std::error::Error>> {
                     let path = root.join(path);
                     if !path.is_file() {

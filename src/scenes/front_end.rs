@@ -60,51 +60,55 @@ pub fn run() -> Result<(), Error> {
             _ => return Err(format!("Opción desconocida: {arg}").into()),
         }
     }
-    let selected = view(
-        Screen::Main,
-        SelectionMode::Initial,
-        None,
-        smoke.then_some(goal.clone()),
-    )?;
-    if matches!(&selected, Some(SelectionTransition::StartAdventure(_) | SelectionTransition::ContinueAdventure(_))) {
-        let (game, presentation) = match selected.unwrap() {
-            // Fuera de las pruebas, la abducción inicial ya se vio en el hangar
-            SelectionTransition::StartAdventure(game) if !smoke => (game, super::token_collection::TokenPresentation::initial_shown()),
-            SelectionTransition::StartAdventure(game) => (game, super::token_collection::TokenPresentation::default()),
-            SelectionTransition::ContinueAdventure(save) => (save.game, save.presentation),
-            _ => unreachable!(),
-        };
-        let flags = if docking {
-            vec!["--smoke-docking".into()]
-        } else if regularshow {
-            vec!["--smoke-regularshow".into()]
-        } else if starwars {
-            vec!["--smoke-starwars".into()]
-        } else if minecraft {
-            vec!["--smoke-minecraft".into()]
-        } else if returns {
-            vec!["--smoke-returns".into()]
-        } else if smoke {
-            vec!["--smoke-launch".into()]
-        } else {
-            vec![]
-        };
-        let game = super::solar_system::run_with_progress(game, presentation, flags.into_iter())?;
-        if smoke {
-            let expected_tokens = usize::from(returns || minecraft || starwars || regularshow);
-            let expected_unlocked = 1 + game.progress().completed().filter(|f| f.as_str() != game.first_ship()).count();
-            if game.first_ship() != goal || (!docking && (game.active_ship() != goal
-                || game.unlocked_count() != expected_unlocked || game.progress().token_count() != expected_tokens))
-            {
-                return Err("El sistema solar no conservó la selección inicial".into());
+    loop {
+        let selected = view(
+            Screen::Main,
+            SelectionMode::Initial,
+            None,
+            smoke.then_some(goal.clone()),
+        )?;
+        if matches!(&selected, Some(SelectionTransition::StartAdventure(_) | SelectionTransition::ContinueAdventure(_))) {
+            let (game, presentation) = match selected.unwrap() {
+                // Fuera de las pruebas, la abducción inicial ya se vio en el hangar
+                SelectionTransition::StartAdventure(game) if !smoke => (game, super::token_collection::TokenPresentation::initial_shown()),
+                SelectionTransition::StartAdventure(game) => (game, super::token_collection::TokenPresentation::default()),
+                SelectionTransition::ContinueAdventure(save) => (save.game, save.presentation),
+                _ => unreachable!(),
+            };
+            let flags = if docking {
+                vec!["--smoke-docking".into()]
+            } else if regularshow {
+                vec!["--smoke-regularshow".into()]
+            } else if starwars {
+                vec!["--smoke-starwars".into()]
+            } else if minecraft {
+                vec!["--smoke-minecraft".into()]
+            } else if returns {
+                vec!["--smoke-returns".into()]
+            } else if smoke {
+                vec!["--smoke-launch".into()]
+            } else {
+                vec![]
+            };
+            let (game, menu) = super::solar_system::run_with_progress_and_menu(game, presentation, flags.into_iter())?;
+            if smoke {
+                let expected_tokens = usize::from(returns || minecraft || starwars || regularshow);
+                let expected_unlocked = 1 + game.progress().completed().filter(|f| f.as_str() != game.first_ship()).count();
+                if game.first_ship() != goal || (!docking && (game.active_ship() != goal
+                    || game.unlocked_count() != expected_unlocked || game.progress().token_count() != expected_tokens))
+                {
+                    return Err("El sistema solar no conservó la selección inicial".into());
+                }
+                println!(
+                    "FRONT_END_SMOKE_PASS active={} initial={} unlocked={}",
+                    game.active_ship(),
+                    game.first_ship(),
+                    game.unlocked_count()
+                );
             }
-            println!(
-                "FRONT_END_SMOKE_PASS active={} initial={} unlocked={}",
-                game.active_ship(),
-                game.first_ship(),
-                game.unlocked_count()
-            );
+            if menu { continue; }
         }
+        break;
     }
     Ok(())
 }

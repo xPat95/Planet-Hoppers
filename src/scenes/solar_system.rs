@@ -289,6 +289,7 @@ struct Session {
     intro_smoke: bool,
     help_smoke: bool,
     station_smoke: bool,
+    ending_smoke: bool,
     collision_debug: bool,
     docking_smoke: Option<u32>,
     departing: bool,
@@ -310,7 +311,7 @@ struct Marker {
     angle: f32,
 }
 
-fn planet_fill(id: &str) -> Vector3 {
+pub(super) fn planet_fill(id: &str) -> Vector3 {
     match id {
         "regularshow" => Vector3::new(0.30, 0.34, 0.34),
         "southpark" => Vector3::new(0.22, 0.24, 0.26),
@@ -388,11 +389,12 @@ fn rl_screen_marker(point: Vector3, camera: Camera3D, width: i32, height: i32) -
 
 enum Exit {
     Quit,
+    Menu,
     Visit(usize),
     Dock,
 }
 
-fn color(hex: &str) -> Color {
+pub(super) fn color(hex: &str) -> Color {
     let [r, g, b] = hex_color(hex).unwrap_or([255, 0, 255]);
     Color::new(r, g, b, 255)
 }
@@ -428,15 +430,23 @@ pub fn run_with_game(game: GameState, args: impl Iterator<Item = String>) -> Res
 
 pub fn run_with_progress(game: GameState, presentation: super::token_collection::TokenPresentation,
     args: impl Iterator<Item = String>) -> Result<GameState, Box<dyn std::error::Error>> {
-    run_session_with_progress(args, Some(game), presentation)?.ok_or_else(|| "Se perdió el estado de la aventura".into())
+    run_with_progress_and_menu(game, presentation, args).map(|(game, _)| game)
+}
+
+pub(super) fn run_with_progress_and_menu(game: GameState, presentation: super::token_collection::TokenPresentation,
+    args: impl Iterator<Item = String>) -> Result<(GameState, bool), Box<dyn std::error::Error>> {
+    let mut menu = false;
+    let game = run_session_with_progress(args, Some(game), presentation, &mut menu)?
+        .ok_or("Se perdió el estado de la aventura")?;
+    Ok((game, menu))
 }
 
 fn run_session(args: impl Iterator<Item = String>, game: Option<GameState>) -> Result<Option<GameState>, Box<dyn std::error::Error>> {
-    run_session_with_progress(args, game, super::token_collection::TokenPresentation::default())
+    run_session_with_progress(args, game, super::token_collection::TokenPresentation::default(), &mut false)
 }
 
 fn run_session_with_progress(args: impl Iterator<Item = String>, game: Option<GameState>,
-    mut presentation: super::token_collection::TokenPresentation) -> Result<Option<GameState>, Box<dyn std::error::Error>> {
+    mut presentation: super::token_collection::TokenPresentation, menu: &mut bool) -> Result<Option<GameState>, Box<dyn std::error::Error>> {
     let mut game = game;
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let mut config_path = root.join("config/solar-system.json");
@@ -451,6 +461,7 @@ fn run_session_with_progress(args: impl Iterator<Item = String>, game: Option<Ga
     let mut intro_smoke = false;
     let mut help_smoke = false;
     let mut station_smoke = false;
+    let mut ending_origin = None;
     let mut collision_debug = false;
     let mut docking_smoke = false;
     let mut overview = false;
@@ -458,6 +469,7 @@ fn run_session_with_progress(args: impl Iterator<Item = String>, game: Option<Ga
     while let Some(arg) = args.next() {
         match arg.as_str() {
             "--smoke" => smoke = true,
+            "--smoke-ending" => { smoke = true; ending_origin = Some(args.next().ok_or("--smoke-ending necesita la franquicia inicial")?); }
             "--smoke-launch" => { smoke = true; launch_smoke = true; }
             "--smoke-intro" => { smoke = true; intro_smoke = true; }
             "--smoke-help" => { smoke = true; help_smoke = true; overview = true; }
@@ -480,6 +492,7 @@ fn run_session_with_progress(args: impl Iterator<Item = String>, game: Option<Ga
                 println!("cargo run --bin solarsystem -- [--overview] [--config PATH] [--ships PATH] [--smoke]");
                 println!("Nave:\n{HELP_SHIP}\nVista general:\n{HELP_OVERVIEW}");
                 println!("--smoke: recorrido automático sin ventana visible; guarda capturas en target/solarsystem/");
+                println!("--smoke-ending FRANQUICIA: final completo sin modificar la partida; capturas en target/ending/");
                 println!("--smoke-visit: ida y vuelta a South Park (con su prueba de entrada) y captura al volver");
                 println!("--smoke-regularshow: interacción E, tres niveles, videos, derrota, abandono y regreso seguro");
                 println!("--smoke-starwars: visita al túnel con la nave activa y regreso al sistema solar");
@@ -495,6 +508,14 @@ fn run_session_with_progress(args: impl Iterator<Item = String>, game: Option<Ga
     }
     let config = SolarSystemConfig::load(&config_path)?;
     let mut ships = ShipsConfig::load(&ships_path)?;
+    if let Some(origin) = &ending_origin {
+        let catalog = ShipCatalog::load(&root.join("config/ship-selection.json"), &ships)?;
+        let mut fixture = GameState::new_game(origin, &catalog)?;
+        crate::gameplay::rewards::complete_for_presentation(&mut fixture, &catalog)?;
+        fixture.activate(if origin == "minecraft" { "southpark" } else { "minecraft" })?;
+        presentation.finish_for_presentation();
+        game = Some(fixture);
+    }
     if docking_smoke && game.is_none() {
         let catalog = ShipCatalog::load(&root.join("config/ship-selection.json"), &ships)?;
         game = Some(GameState::new_game("minecraft", &catalog)?);
@@ -543,6 +564,7 @@ fn run_session_with_progress(args: impl Iterator<Item = String>, game: Option<Ga
         intro_smoke,
         help_smoke,
         station_smoke,
+        ending_smoke: ending_origin.is_some(),
         collision_debug,
         docking_smoke: docking_smoke.then_some(0),
         departing: true,
@@ -558,6 +580,7 @@ fn run_session_with_progress(args: impl Iterator<Item = String>, game: Option<Ga
     loop {
         match fly(&root, &mut session, smoke)? {
             Exit::Quit => return Ok(session.game),
+            Exit::Menu => { *menu = true; return Ok(session.game); }
             Exit::Dock => {
                 let catalog = ShipCatalog::load(&root.join("config/ship-selection.json"), &session.ships)?;
                 if session.game.is_none() {
@@ -999,7 +1022,10 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 crate::gameplay::save::store(&crate::gameplay::save::path(root), game, &s.token_presentation)?;
             }
         }
-        let tokens_blocking = collection_open || collection_progress > 0.0 || s.token_presentation.is_busy()
+        let ending_ready = (!smoke || s.ending_smoke) && fade <= 0.0 && intro_time.is_none() && leaving.is_none() && !entering_station
+            && !help_open && help_progress <= 0.0 && !collection_open && collection_progress <= 0.0
+            && s.game.as_ref().is_some_and(|game| super::ending::ready(game, &s.token_presentation));
+        let tokens_blocking = ending_ready || collection_open || collection_progress > 0.0 || s.token_presentation.is_busy()
             || (!smoke && s.token_presentation.phase().is_none() && s.token_presentation.pending_count() > 0);
         if tokens_blocking && !token_was_blocking {
             token_restore_cursor = rl.is_cursor_hidden();
@@ -1644,6 +1670,16 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             }
         }
         let camera = side_camera.unwrap_or(camera);
+        if ending_ready {
+            music.set_paused(true);
+            if s.token_presentation.ending.elapsed == 0.0 {
+                if let Some(r) = &riser { r.play(); }
+            }
+            let menu = super::ending::run(&mut rl, &thread, root, s.game.as_ref().unwrap(), &mut s.token_presentation,
+                &s.system, &s.ship, &sun, &mut sun_shader, &planets, ship_model.as_ref(), &mut shader,
+                &sky, &mut nebula, &mut bloom, &ui_bold, camera, s.ending_smoke)?;
+            return Ok(if menu { Exit::Menu } else { Exit::Quit });
+        }
         // También cubre el sistema cuando la nave se aleja más allá de la última órbita.
         let far = far_plane.max(camera.position.length() + outer * 2.0);
         unsafe { ffi::rlSetClipPlanes(NEAR_PLANE, far as f64) };

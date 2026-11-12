@@ -99,6 +99,8 @@ struct Sequence { notice: RewardNotice, initial: bool, phase: RewardPhase }
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize)]
 pub struct TokenPresentation {
+    #[serde(default)]
+    pub ending: super::ending::EndingState,
     pending: VecDeque<Sequence>,
     announced: BTreeSet<Franchise>,
     active: Option<Sequence>,
