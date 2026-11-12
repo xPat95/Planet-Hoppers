@@ -4,6 +4,7 @@ Proyecto universitario de Gráficas por Computadora: un videojuego 3D de explora
 
 El ciclo de estación y hangar, los tokens, el desbloqueo de naves y las abducciones están integrados.
 El progreso se guarda automáticamente y el menú permite continuar la partida.
+El [final cinematográfico](docs/ending.md) se activa después de las seis recompensas: colapso solar, absorción de planetas y nave, regreso del protagonista inicial y pantalla FIN con créditos y retorno al menú.
 Toda la partida se ejecuta a pantalla completa con la resolución del monitor: menú, hangar, sistema solar, videos y minijuegos, también al regresar entre escenas. Las pruebas automáticas conservan sus ventanas ocultas y tamaños de captura.
 
 **Ctrl+X** cierra inmediatamente el programa desde cualquier escena, incluidos menús, hangar, vuelos, videos y minijuegos; funciona con cualquiera de las dos teclas Ctrl.
