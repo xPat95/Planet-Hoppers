@@ -11,6 +11,10 @@ pub struct BossLine {
     /// Imagen del jefe para esta línea (de `assets/textures/minigames/smilingfriends/characters/`).
     pub pose: String,
     pub text: String,
+    /// La música se corta de golpe mientras dura esta línea y sigue desde donde quedó al pasar a la siguiente (el
+    /// "No pressure." del jefe).
+    #[serde(default)]
+    pub silence: bool,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -35,6 +39,9 @@ pub struct Choice {
     /// Texto de contexto de la respuesta (lo que hace o quiere decir; ver `Round::context`).
     #[serde(default)]
     pub context: Option<String>,
+    /// Elegirla hace perder la escena en el acto (con su efecto, como la explosión de Desmond), aunque sume risa.
+    #[serde(default)]
+    pub fail: bool,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -246,6 +253,9 @@ pub struct Game {
     /// Risa acumulada de la persona actual.
     pub laugh: u32,
     pub strikes: u32,
+    /// En qué pregunta se perdió la escena con una respuesta que hace perder (`Choice::fail`): mientras dura la
+    /// explosión se sigue viendo ese lugar, no el del final de la escena.
+    pub failed_at: Option<usize>,
 }
 
 impl crate::minigames::common::host::AttemptOutcome for Game {
@@ -261,7 +271,7 @@ impl crate::minigames::common::host::AttemptOutcome for Game {
 
 impl Game {
     pub fn new(dialogue: Dialogue) -> Self {
-        Self { dialogue, step: Step::Boss { line: 0 }, laugh: 0, strikes: 0 }
+        Self { dialogue, step: Step::Boss { line: 0 }, laugh: 0, strikes: 0, failed_at: None }
     }
 
     /// Fracción del medidor de risa (0..1).
@@ -274,7 +284,8 @@ impl Game {
         let Step::Prompt { encounter, round } = self.step else { return };
         let Some(c) = self.dialogue.encounters[encounter].rounds[round].choices.get(choice) else { return };
         self.laugh += c.laugh;
-        if c.laugh == 0 {
+        // Una mala respuesta, o una que hace perder la escena, suma un strike (una sola vez)
+        if c.laugh == 0 || c.fail {
             self.strikes += 1;
         }
         self.step = Step::Reaction { encounter, round, choice };
@@ -289,8 +300,12 @@ impl Game {
             Step::Boss { .. } => Step::Intro { encounter: 0 },
             Step::Intro { encounter } => Step::Prompt { encounter, round: 0 },
             Step::Prompt { .. } => self.step, // Hay que elegir
-            Step::Reaction { encounter, round, .. } => {
-                if self.strikes >= self.dialogue.max_strikes {
+            Step::Reaction { encounter, round, choice } => {
+                let fail = self.dialogue.encounters[encounter].rounds[round].choices[choice].fail;
+                if fail {
+                    self.failed_at = Some(round);
+                    Step::Failed { encounter }
+                } else if self.strikes >= self.dialogue.max_strikes {
                     Step::Defeat
                 } else if self.laugh >= self.dialogue.laugh_goal {
                     Step::Laughing { encounter }
@@ -311,6 +326,7 @@ impl Game {
             }
             Step::Failed { encounter } => {
                 self.laugh = 0;
+                self.failed_at = None;
                 if self.strikes >= self.dialogue.max_strikes {
                     Step::Defeat
                 } else {

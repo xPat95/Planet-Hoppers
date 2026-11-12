@@ -17,7 +17,8 @@
       },
       {
         "pose": "boss_full.png",
-        "text": "Choose your words carefully. Screw up three times and the company loses faith in you. And so do I. No pressure."
+        "text": "Choose your words carefully. Screw up three times and the company loses faith in you. And so do I. No pressure.",
+        "silence": true
       },
       {
         "pose": "boss_pointing.png",
@@ -261,13 +262,15 @@
               "text": "Well... one day at a time, right?",
               "laugh": 20,
               "reply": "Yeah. I know. There are a lot of them.",
-              "reaction": "hmm..."
+              "reaction": "hmm...",
+              "fail": true
             },
             {
               "text": "I don't know, honestly.",
               "laugh": 0,
               "reply": "Right. Same.",
-              "reaction": "*sighs*"
+              "reaction": "*sighs*",
+              "fail": true
             }
           ]
         },

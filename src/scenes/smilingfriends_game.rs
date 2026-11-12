@@ -1,7 +1,7 @@
 //! Pantalla del minijuego de Smiling Friends (después del video de entrada): personajes como recortes de cartón
 //! sobre fondos pintados, texto que se escribe solo en cajas de historieta, respuestas en tarjetas y animaciones
 //! grandes al reír, al fallar, al ganar y al perder. Cada escena puede tener su efecto: luces de boliche ("disco")
-//! o una bomba al fallar ("bomb"); al reírse, un recorte puede darse vuelta y revelar otro personaje, o puede
+//! o una explosión que llena la pantalla al fallar ("bomb"); al reírse, un recorte puede darse vuelta y revelar otro personaje, o puede
 //! saltar un primer plano a pantalla completa. Las reglas viven en `minigames::smilingfriends`.
 use crate::graphics::resources::save_frame;
 use crate::minigames::common::host::MinigameResult;
@@ -26,9 +26,9 @@ const VICTORY_POSE: &str = "boss_pointing.png";
 const DEFEAT_POSE: &str = "boss_full.png";
 /// Remate al reírse: el recorte se da vuelta como una carta entre estos dos momentos y aparece el otro dibujo.
 const FLIP: (f32, f32) = (0.6, 1.0);
-/// Bomba: cae, se quema la mecha y explota en este momento.
-const BOOM_AT: f32 = 1.4;
-const BOMB_DONE: f32 = 2.4;
+/// Explosión: un instante de miedo (el personaje tiembla) y explota en este momento; el texto sigue después.
+const BOOM_AT: f32 = 0.6;
+const BOMB_DONE: f32 = 1.8;
 
 // Paleta del póster de la serie (docs/references/smilingfriends/minigame/poster_palette.png): cielo celeste, amarillo
 // de la carita, tinta azul oscura, naranja de Charlie, rosa de Pim y los colores de las letras del título.
@@ -456,6 +456,12 @@ const CARD_SWAP: f32 = 0.55;
 const CARD_DONE: f32 = 1.75;
 
 /// Pregunta actual, si el paso tiene una (para saber el lugar vigente).
+/// La pregunta cuyo lugar se ve ahora: la actual o, si se perdió la escena con una respuesta que hace perder, aquella
+/// donde se perdió.
+fn scene_round(game: &Game) -> Option<usize> {
+    round_of(game.step).or(if matches!(game.step, Step::Failed { .. }) { game.failed_at } else { None })
+}
+
 fn round_of(step: Step) -> Option<usize> {
     match step {
         Step::Prompt { round, .. } | Step::Reaction { round, .. } => Some(round),
@@ -524,6 +530,8 @@ pub fn play_with_results(rl: &mut RaylibHandle, thread: &RaylibThread, root: &Pa
         m.play_stream();
         m
     });
+    // Si la música está cortada ahora (ver `BossLine::silence`)
+    let mut music_cut = false;
     let mut reward_shortcut = crate::minigames::common::shortcuts::RewardShortcut::default();
     let mut reporter = crate::minigames::common::host::AttemptReporter::default();
     let dialogue = Dialogue::load(&root.join(DIALOGUE))?;
@@ -601,6 +609,12 @@ pub fn play_with_results(rl: &mut RaylibHandle, thread: &RaylibThread, root: &Pa
             return Ok(Some(MinigameResult::Victory));
         }
         if let Some(m) = &music {
+            // En la línea del jefe que lo pide ("No pressure."), la música se corta de golpe; después sigue desde ahí
+            let silent = matches!(game.step, Step::Boss { line } if game.dialogue.boss.lines[line].silence);
+            if silent != music_cut {
+                if silent { m.pause_stream() } else { m.resume_stream() }
+                music_cut = silent;
+            }
             // Con el menú de salir abierto, más bajita
             m.set_volume(if leaving.is_some() { MUSIC_VOLUME * 0.4 } else { MUSIC_VOLUME });
             m.update_stream();
@@ -751,7 +765,7 @@ pub fn play_with_results(rl: &mut RaylibHandle, thread: &RaylibThread, root: &Pa
             && step_time >= CARD_SWAP;
         let card_backdrop = enc.and_then(|e| e.card_backdrop.as_ref()).and_then(|b| backgrounds.get(b).map(|bg| (bg, b.as_str())));
         let start = |e: &Encounter| (e.background.clone(), e.cast[0].image.clone());
-        let place = enc.map(|e| match (game.step, round_of(game.step)) {
+        let place = enc.map(|e| match (game.step, scene_round(&game)) {
             (Step::Intro { .. }, _) => start(e),
             // Antes de que la tarjeta tape la pantalla, todavía se ve el lugar anterior
             (Step::Prompt { .. }, Some(r)) if card.is_some() && step_time < CARD_SWAP => {
@@ -1116,76 +1130,39 @@ fn launch(p: &mut Pose, t: f32, w: f32, h: f32) {
     p.tint = mix(p.tint, Color::new(70, 60, 60, 255), (s * 2.0).min(0.6));
 }
 
-/// Bomba de caricatura: cae junto al personaje, rebota, se quema la mecha, se infla y explota (¡KABOOM!).
-fn draw_bomb(d: &mut RaylibDrawHandle, title: &Font, t: f32, target: Vector2, w: f32, h: f32) {
-    let r = h * 0.07;
-    if t < BOOM_AT {
-        // Cae desde arriba con un rebote
-        let fall = (t / 0.45).min(1.0);
-        let bounce = if t > 0.45 { ((t - 0.45) * 9.0).sin().abs() * 30.0 * (-(t - 0.45) * 4.0).exp() } else { 0.0 };
-        let c = Vector2::new(target.x + w * 0.14, -r + (target.y + r) * fall * fall - bounce);
-        let swell = 1.0 + 0.12 * smoothstep((t - 0.8) / 0.6) * (1.0 + (t * 30.0).sin());
-        let red = smoothstep((t - 0.9) / 0.5);
-        d.draw_circle_v(c + Vector2::new(7.0, 7.0), r * swell, fade(INK, 0.5));
-        d.draw_circle_v(c, r * swell + 5.0, INK);
-        d.draw_circle_v(c, r * swell, mix(Color::new(40, 40, 52, 255), Color::new(150, 30, 30, 255), red * 0.6));
-        d.draw_circle_v(c + Vector2::new(-r * 0.35, -r * 0.35), r * 0.22, Color::new(140, 140, 160, 255));
-        // Tapa y mecha que se va acortando
-        let cap = c + Vector2::new(r * 0.45, -r * 0.8);
-        d.draw_rectangle_pro(Rectangle::new(cap.x, cap.y, r * 0.5, r * 0.32), Vector2::new(r * 0.25, r * 0.16), 35.0, INK);
-        let burn = smoothstep((t - 0.5) / (BOOM_AT - 0.5));
-        let mut prev = cap;
-        let steps = 10;
-        let mut tip = cap;
-        for k in 1..=steps {
-            let u = k as f32 / steps as f32;
-            if u > 1.0 - burn * 0.9 {
-                break;
-            }
-            let p = cap + Vector2::new(u * r * 0.9, -u * r * 0.9 + (u * 6.0).sin() * r * 0.15);
-            d.draw_line_ex(prev, p, 4.0, Color::new(205, 170, 110, 255));
-            prev = p;
-            tip = p;
-        }
-        if t > 0.45 {
-            // Chispa que titila en la punta
-            for k in 0..8 {
-                let a = k as f32 / 8.0 * 2.0 * PI + t * 20.0;
-                let len = r * (0.25 + 0.15 * ((t * 40.0 + k as f32).sin()));
-                d.draw_line_ex(tip, tip + Vector2::new(a.cos(), a.sin()) * len, 3.0, if k % 2 == 0 { YELLOW } else { ORANGE });
-            }
-            d.draw_circle_v(tip, 5.0, PAPER);
-        }
+/// La explosión al fallar: sin bomba ni de dónde sale, de golpe una explosión de caricatura que llena toda la
+/// pantalla (rayos, bolas de fuego que crecen más allá de los bordes, humo) y el ¡KABOOM!.
+fn draw_bomb(d: &mut RaylibDrawHandle, title: &Font, t: f32, _target: Vector2, w: f32, h: f32) {
+    let s = t - BOOM_AT;
+    if s < 0.0 {
         return;
     }
-    // ¡KABOOM!: destello blanco, bolas de fuego que crecen, humo y el texto
-    let s = t - BOOM_AT;
-    let at = Vector2::new(target.x + w * 0.14, target.y);
+    let at = Vector2::new(w * 0.5, h * 0.5);
+    let reach = (w * w + h * h).sqrt() * 0.5;           // Hasta las esquinas
     let flash = (1.0 - s / 0.12).max(0.0);              // Destello corto: no lava los colores del fuego
-    for j in 0..14 {
-        // Rayos de la explosión
-        let a = j as f32 / 14.0 * 2.0 * PI;
-        let len = h * 0.6 * ease_out_back((s / 0.3).min(1.0));
+    for j in 0..18 {
+        // Rayos de la explosión, hasta afuera de la pantalla
+        let a = j as f32 / 18.0 * 2.0 * PI + 0.2;
+        let len = reach * 1.2 * ease_out_back((s / 0.25).min(1.0));
         let alpha = (1.0 - s / 0.8).max(0.0);
-        d.draw_line_ex(at, at + Vector2::new(a.cos(), a.sin()) * len, 10.0, fade(YELLOW, alpha));
+        d.draw_line_ex(at, at + Vector2::new(a.cos(), a.sin()) * len, 18.0, fade(YELLOW, alpha));
     }
-    for (k, col) in [(2.2, Color::new(70, 62, 62, 235)), (1.6, Color::new(232, 70, 30, 255)), (1.1, ORANGE), (0.6, YELLOW)].iter() {
-        let grow = ease_out_back((s / 0.4).min(1.0)) * h * 0.32 * k;
-        let alpha = if *k > 2.0 { (1.0 - (s - 0.5) / 1.5).clamp(0.0, 1.0) } else { (1.0 - (s - 0.2) / 0.6).clamp(0.0, 1.0) };
-        for j in 0..9 {
-            let a = j as f32 / 9.0 * 2.0 * PI + k;
-            let o = Vector2::new(a.cos(), a.sin()) * grow * 0.45;
-            d.draw_circle_v(at + o, grow * 0.55, fade(*col, alpha));
+    for (k, col) in [(1.5, Color::new(70, 62, 62, 240)), (1.15, Color::new(232, 70, 30, 255)), (0.8, ORANGE), (0.45, YELLOW)].iter() {
+        let grow = ease_out_back((s / 0.35).min(1.0)) * reach * k;
+        let alpha = if *k > 1.4 { (1.0 - (s - 0.6) / 1.2).clamp(0.0, 1.0) } else { (1.0 - (s - 0.25) / 0.7).clamp(0.0, 1.0) };
+        for j in 0..11 {
+            let a = j as f32 / 11.0 * 2.0 * PI + k;
+            let o = Vector2::new(a.cos(), a.sin()) * grow * 0.4;
+            d.draw_circle_v(at + o, grow * 0.6, fade(*col, alpha));
         }
     }
-    if s < 1.6 {
-        let size = h * 0.16 * ease_out_back((s / 0.3).min(1.0));
+    if s < 1.4 {
+        let size = h * 0.2 * ease_out_back((s / 0.3).min(1.0));
         let word = "KABOOM!";
         let m = title.measure_text(word, size, 2.0);
-        let c = Vector2::new(w / 2.0, h * 0.42);
         let wob = (s * 30.0).sin() * 3.0 * (1.0 - s).max(0.0);
-        d.draw_text_pro(title, word, c + Vector2::new(10.0, 10.0), m * 0.5, -8.0 + wob, size, 2.0, INK);
-        d.draw_text_pro(title, word, c, m * 0.5, -8.0 + wob, size, 2.0, ORANGE);
+        d.draw_text_pro(title, word, at + Vector2::new(12.0, 12.0), m * 0.5, -8.0 + wob, size, 2.0, INK);
+        d.draw_text_pro(title, word, at, m * 0.5, -8.0 + wob, size, 2.0, ORANGE);
     }
     d.draw_rectangle(0, 0, w as i32, h as i32, fade(PAPER, flash));
 }
@@ -1311,7 +1288,7 @@ fn hud(d: &mut RaylibDrawHandle, title: &Font, body: &Font, game: &Game, meter: 
         let e = &game.dialogue.encounters[encounter];
         let name = match game.step {
             Step::Intro { .. } => e.name.clone(),
-            step => place_name(e, round_of(step)),
+            _ => place_name(e, scene_round(game)),
         };
         let label = format!("{}  -  {}/{}", name, encounter + 1, game.dialogue.encounters.len());
         outlined(d, body, &label, Vector2::new(r.x + 4.0, r.y + r.height + 14.0), 24.0, PAPER, INK, 2.0);

@@ -85,3 +85,28 @@ fn elegir_fuera_de_una_pregunta_no_hace_nada() {
     assert_eq!(game.step, Step::Boss { line: 0 });
     assert_eq!(game.strikes, 0);
 }
+
+#[test]
+fn con_desmond_solo_la_montana_rusa_sirve() {
+    // Llegar a la primera pregunta de Desmond (la tercera escena) con las mejores respuestas
+    let d = dialogue();
+    let desmond = d.encounters.iter().position(|e| e.cast[0].name == "DESMOND").unwrap();
+    for wrong in [1, 2] {
+        let mut game = Game::new(dialogue());
+        while game.step != (Step::Prompt { encounter: desmond, round: 0 }) {
+            if matches!(game.step, Step::Prompt { .. }) {
+                let best = pick(&game, true);
+                game.choose(best);
+            } else {
+                game.advance();
+            }
+        }
+        let strikes = game.strikes;
+        game.choose(wrong);
+        game.advance();
+        // Cualquier otra respuesta pierde la escena en el acto (con su explosión), con un solo strike
+        assert_eq!(game.step, Step::Failed { encounter: desmond });
+        assert_eq!(game.strikes, strikes + 1);
+        assert_eq!(game.failed_at, Some(0));
+    }
+}

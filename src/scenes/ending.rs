@@ -1,5 +1,5 @@
 //! Final temporizado; transforma copias visuales, nunca las órbitas ni el vuelo.
-use super::{abduction::AbductionRenderer, token_collection::TokenPresentation};
+use super::{holo, token_collection::TokenPresentation};
 use crate::{
     gameplay::{progress::Franchise, selection::GameState},
     graphics::{
@@ -76,7 +76,7 @@ pub(crate) fn run(
     smoke: bool,
 ) -> Result<bool, Box<dyn std::error::Error>> {
     let identity = protagonist(game)?;
-    let home = AbductionRenderer::load_home(rl, thread, root, identity)?;
+    let postcards = Postcards::load(rl, thread, root)?;
     let mut disk = rl.load_shader_from_memory(
         thread,
         None,
@@ -132,7 +132,7 @@ pub(crate) fn run(
             checkpoint = t as i32;
         }
         let (w, h) = (rl.get_screen_width(), rl.get_screen_height());
-        let button = Rectangle::new(w as f32 * 0.5 - 170.0, h as f32 * 0.79, 340.0, 52.0);
+        let button = Rectangle::new(w as f32 * 0.5 - 170.0, h as f32 * 0.84, 340.0, 52.0);
         if t >= FIN
             && (rl.is_key_pressed(KeyboardKey::KEY_ENTER)
                 || (rl.is_mouse_button_pressed(MouseButton::MOUSE_BUTTON_LEFT)
@@ -278,66 +278,17 @@ pub(crate) fn run(
             );
         } else {
             d.clear_background(Color::BLACK);
-            home.draw_home(&mut d, identity, t - HOME, w, h);
-            let fade = 1.0 - smooth((t - HOME) / 1.5);
+            postcards.draw(&mut d, font, t - HOME, w, h);
+            let fade = 1.0 - smooth((t - HOME) / 1.2);
             d.draw_rectangle(0, 0, w, h, Color::new(0, 0, 0, (fade * 255.0) as u8));
-            if t > HOME + 4.0 && t < FIN {
-                d.draw_rectangle(0, (h as f32 * 0.1) as i32, w, 54, Color::new(0, 0, 0, 130));
-                centered(
-                    &mut d,
-                    font,
-                    "De vuelta a casa",
-                    w,
-                    (h as f32 * 0.12) as i32,
-                    34.0,
-                    Color::WHITE,
-                );
-            }
+            // FIN: en la misma pantalla del collage (no otra encima): los créditos debajo y el botón para volver
             if t >= FIN {
-                d.draw_rectangle(0, 0, w, h, Color::new(0, 0, 0, 170));
-                centered(&mut d, font, "FIN", w, h / 3, 90.0, Color::WHITE);
-                centered(
-                    &mut d,
-                    font,
-                    "PLANET HOPPERS",
-                    w,
-                    h / 3 + 104,
-                    30.0,
-                    Color::SKYBLUE,
-                );
-                centered(
-                    &mut d,
-                    font,
-                    "Gracias por jugar",
-                    w,
-                    h / 3 + 148,
-                    25.0,
-                    Color::WHITE,
-                );
-                centered(
-                    &mut d,
-                    font,
-                    "Pablo  /  Cami  /  Norman",
-                    w,
-                    (h as f32 * 0.70) as i32,
-                    23.0,
-                    Color::WHITE,
-                );
-                super::button_style::surface(
-                    &mut d,
-                    button,
-                    button.check_collision_point_rec(d_mouse()),
-                    true,
-                );
-                centered(
-                    &mut d,
-                    font,
-                    "Volver al menu principal  [Enter]",
-                    w,
-                    button.y as i32 + 14,
-                    23.0,
-                    Color::new(8, 24, 55, 255),
-                );
+                let credits = "PLANET HOPPERS   ·   Gracias por jugar   ·   Pablo  /  Cami  /  Norman";
+                let size = (h as f32 * 0.026).clamp(16.0, 24.0);
+                let cw = font.measure_text(credits, size, 1.0).x;
+                d.draw_text_ex(font, credits, Vector2::new((w as f32 - cw) * 0.5, h as f32 * 0.795), size, 1.0, holo::CYAN);
+                let hovered = button.check_collision_point_rec(d_mouse());
+                holo::button(&mut d, font, font, button, "Enter", "Volver al menú principal", None, hovered);
             }
         }
         d.draw_rectangle(0, 0, w, (h as f32 * 0.065) as i32, Color::BLACK);
@@ -373,25 +324,174 @@ pub(crate) fn run(
     }
 }
 
+/// Las seis postales del final: el agujero negro se llevó los planetas, pero ganaste y estás a salvo. Es un collage
+/// tipo bento (tarjetas de distintos tamaños que encajan en una grilla de 4×3) con una foto de verdad de cada minijuego
+/// (`assets/images/ending/<franquicia>.png`: el monstruo de Hexbound, la explosión de Smiling Friends, el muñeco de
+/// nieve asesino...), en el estilo de la interfaz: vidrio oscuro, borde y esquinas encendidas del color de la
+/// franquicia y su logo abajo. Caen de a una, asentándose; después aparece el mensaje de que ganaste.
+struct Postcards {
+    cards: Vec<(Texture2D, Texture2D, Color, [f32; 4], f32)>,
+}
+
+/// Dónde va cada franquicia en la grilla de 4 columnas × 3 filas: columna, fila, ancho y alto (en celdas), según
+/// la forma de su foto: Smiling Friends, la grande; Hexbound (el render de la calavera, vertical), la alta; South
+/// Park y Star Wars, las anchas; Regular Show y Minecraft, las chicas.
+fn bento_cell(franchise: Franchise) -> [f32; 4] {
+    match franchise {
+        Franchise::SmilingFriends => [0.0, 0.0, 2.0, 2.0],
+        Franchise::Halloween => [2.0, 0.0, 1.0, 2.0],
+        Franchise::RegularShow => [3.0, 0.0, 1.0, 1.0],
+        Franchise::Minecraft => [3.0, 1.0, 1.0, 1.0],
+        Franchise::SouthPark => [0.0, 2.0, 2.0, 1.0],
+        Franchise::StarWars => [2.0, 2.0, 2.0, 1.0],
+    }
+}
+
+/// Qué altura de la foto queda en el centro al recortarla (0 arriba, 0,5 al medio): a Steve no se le corta la cabeza.
+fn photo_focus(franchise: Franchise) -> f32 {
+    match franchise {
+        Franchise::Minecraft => 0.3,
+        _ => 0.5,
+    }
+}
+
+/// Cuándo cae cada tarjeta (segundos desde que empieza esta parte) y cuánto tarda en asentarse.
+const CARD_FIRST: f32 = 1.0;
+const CARD_STEP: f32 = 0.45;
+const CARD_FALL: f32 = 0.6;
+
+impl Postcards {
+    fn load(rl: &mut RaylibHandle, thread: &RaylibThread, root: &Path) -> Result<Self, Box<dyn std::error::Error>> {
+        let mut cards = Vec::new();
+        // Primero la grande y después las demás, en el orden en que caen
+        for franchise in [Franchise::SmilingFriends, Franchise::Halloween, Franchise::RegularShow, Franchise::Minecraft,
+                          Franchise::SouthPark, Franchise::StarWars] {
+            let mut tex = |path: String| -> Result<Texture2D, Box<dyn std::error::Error>> {
+                let t = rl.load_texture(thread, &root.join(path).to_string_lossy())?;
+                t.set_texture_filter(thread, TextureFilter::TEXTURE_FILTER_BILINEAR);
+                Ok(t)
+            };
+            let photo = tex(format!("assets/images/ending/{}.png", franchise.as_str()))?;
+            let logo = tex(format!("assets/ui/logos/{}.png", franchise.as_str()))?;
+            cards.push((photo, logo, super::token_collection_ui::franchise_color(franchise), bento_cell(franchise),
+                        photo_focus(franchise)));
+        }
+        Ok(Self { cards })
+    }
+
+    fn draw(&self, d: &mut RaylibDrawHandle, font: &Font, t: f32, width: i32, height: i32) {
+        let (w, h) = (width as f32, height as f32);
+        // Fondo: la oscuridad azul del sistema solar, con estrellas que titilan
+        d.draw_rectangle_gradient_v(0, 0, width, height, Color::new(6, 14, 34, 255), Color::new(1, 4, 14, 255));
+        let hash = |s: f32| ((s.sin() * 43_758.547).fract() + 1.0).fract();
+        for i in 0..160 {
+            let k = i as f32;
+            let p = Vector2::new(hash(k * 12.9 + 1.0) * w, hash(k * 78.2 + 2.0) * h);
+            let a = 0.25 + 0.55 * hash(k * 3.7) * (0.6 + 0.4 * (t * (1.0 + hash(k) * 2.0) + k).sin());
+            d.draw_circle_v(p, 0.8 + 1.2 * hash(k * 5.1), holo::fade(Color::new(200, 225, 255, 255), a));
+        }
+        // La grilla: 4×3 celdas apaisadas, centrada debajo del mensaje
+        let gap = (h * 0.014).max(8.0);
+        let cell_h = (h * 0.5 - gap * 2.0) / 3.0;
+        let cell_w = (cell_h * 1.55).min((w * 0.86 - gap * 3.0) / 4.0);
+        let grid_w = cell_w * 4.0 + gap * 3.0;
+        let origin = Vector2::new((w - grid_w) * 0.5, h * 0.26);
+        for (i, (photo, logo, color, [c, r, cw, ch], focus)) in self.cards.iter().enumerate() {
+            let k = (t - (CARD_FIRST + i as f32 * CARD_STEP)) / CARD_FALL;
+            if k <= 0.0 {
+                continue;
+            }
+            let rect = Rectangle::new(origin.x + c * (cell_w + gap), origin.y + r * (cell_h + gap),
+                                      cw * cell_w + (cw - 1.0) * gap, ch * cell_h + (ch - 1.0) * gap);
+            // Se asienta: empieza un poco más grande y más arriba, y baja a su lugar con un rebote
+            let land = ease_out_back(k);
+            let grow = 1.0 + (1.0 - land) * 0.12;
+            let (rw, rh) = (rect.width * grow, rect.height * grow);
+            let at = Rectangle::new(rect.x + rect.width * 0.5 - rw * 0.5, rect.y + rect.height * 0.5 - rh * 0.5 - (1.0 - land) * gap * 3.0, rw, rh);
+            let tilt = [-1.2, 1.5, -1.8, 1.4, -1.0, 1.7][i] * (0.6 + 0.4 * land);
+            draw_bento(d, photo, logo, *color, at, smooth(k * 2.5), t + i as f32, tilt, *focus);
+        }
+        // El mensaje, cuando ya cayeron todas: ganaste y estás bien
+        let all = CARD_FIRST + 5.0 * CARD_STEP + CARD_FALL;
+        let words = smooth((t - all) / 0.8);
+        if words > 0.0 {
+            let title = "¡Ganaste! Estás a salvo";
+            let size = (h * 0.065).clamp(32.0, 62.0);
+            let tw = font.measure_text(title, size, 1.0).x;
+            holo::glow_text(d, font, title, Vector2::new((w - tw) * 0.5, h * 0.09), size,
+                holo::fade(Color::WHITE, words), holo::CYAN);
+            let sub = "Sobreviviste al agujero negro y salvaste los seis mundos";
+            let ss = (h * 0.028).clamp(16.0, 26.0);
+            let sw = font.measure_text(sub, ss, 1.0).x;
+            d.draw_text_ex(font, sub, Vector2::new((w - sw) * 0.5, h * 0.09 + size * 1.15), ss, 1.0, holo::fade(holo::INK, words));
+        }
+    }
+}
+
+/// Un rebote al final (para que la tarjeta "se asiente").
+fn ease_out_back(t: f32) -> f32 {
+    let t = t.clamp(0.0, 1.0) - 1.0;
+    1.0 + t * t * (2.4 * t + 1.4)
+}
+
+/// Una tarjeta del bento, como una postal: papel crema con sombra, apenas torcida, la foto adentro con margen, su
+/// logo sobre una franja oscura al pie de la foto, y una estampilla del color de la franquicia (borde dentado y una
+/// estrellita) en la esquina de arriba.
+#[allow(clippy::too_many_arguments)]
+fn draw_bento(d: &mut RaylibDrawHandle, photo: &Texture2D, logo: &Texture2D, color: Color, rect: Rectangle,
+              alpha: f32, t: f32, angle: f32, focus: f32) {
+    let paper = Color::new(244, 238, 226, 255);
+    let center = Vector2::new(rect.x + rect.width * 0.5, rect.y + rect.height * 0.5);
+    let (sin, cos) = angle.to_radians().sin_cos();
+    let local = |x: f32, y: f32| center + Vector2::new(x * cos - y * sin, x * sin + y * cos);
+    let card = |d: &mut RaylibDrawHandle, c: Vector2, w: f32, h: f32, col: Color| {
+        d.draw_rectangle_pro(Rectangle::new(c.x, c.y, w, h), Vector2::new(w * 0.5, h * 0.5), angle, col);
+    };
+    let (w, h) = (rect.width, rect.height);
+    // Brillo del color de la franquicia, sombra y papel
+    let pulse = 0.85 + 0.15 * (t * 1.7).sin();
+    d.draw_circle_gradient(center.x as i32, center.y as i32, w.max(h) * 0.7, holo::fade(color, 0.12 * alpha * pulse),
+        holo::fade(color, 0.0));
+    card(d, center + Vector2::new(5.0, 8.0), w, h, holo::fade(Color::BLACK, 0.5 * alpha));
+    card(d, center, w, h, holo::fade(paper, alpha));
+    // La foto, con margen de papel parejo
+    let m = (w.min(h) * 0.055).clamp(6.0, 16.0);
+    let (pw, ph) = (w - m * 2.0, h - m * 2.0);
+    let mut src = super::abduction::cover_source([photo.width as f32, photo.height as f32], [pw, ph]);
+    src.y = (photo.height as f32 - src.height) * focus;
+    d.draw_texture_pro(photo, src, Rectangle::new(center.x, center.y, pw, ph), Vector2::new(pw * 0.5, ph * 0.5), angle,
+        holo::fade(Color::WHITE, alpha));
+    // La franja oscura al pie de la foto, con el logo
+    let band = (ph * 0.24).clamp(30.0, 64.0);
+    let bc = local(0.0, ph * 0.5 - band * 0.5);
+    card(d, bc, pw, band, holo::fade(Color::new(4, 10, 24, 190), alpha));
+    let scale = ((pw * 0.45) / logo.width as f32).min((band * 0.74) / logo.height as f32);
+    let (lw, lh) = (logo.width as f32 * scale, logo.height as f32 * scale);
+    let lc = local(-pw * 0.5 + band * 0.3 + lw * 0.5, ph * 0.5 - band * 0.5);
+    d.draw_texture_pro(logo, Rectangle::new(0.0, 0.0, logo.width as f32, logo.height as f32),
+        Rectangle::new(lc.x, lc.y, lw, lh), Vector2::new(lw * 0.5, lh * 0.5), angle, holo::fade(Color::WHITE, alpha));
+    // La estampilla: papel dentado, el color de la franquicia adentro y una estrellita de cuatro puntas
+    let st = (w.min(h) * 0.2).clamp(26.0, 54.0);
+    let sc = local(w * 0.5 - m - st * 0.62, -h * 0.5 + m + st * 0.72);
+    card(d, sc + Vector2::new(2.0, 3.0), st, st * 1.18, holo::fade(Color::BLACK, 0.35 * alpha));
+    card(d, sc, st, st * 1.18, holo::fade(paper, alpha));
+    let teeth = 6;
+    for i in 0..=teeth {
+        let f = i as f32 / teeth as f32 - 0.5;
+        for (x, y) in [(f * st, -st * 0.59), (f * st, st * 0.59), (-st * 0.5, f * st * 1.18), (st * 0.5, f * st * 1.18)] {
+            let p = sc + Vector2::new(x * cos - y * sin, x * sin + y * cos);
+            d.draw_circle_v(p, st * 0.045, holo::fade(Color::new(4, 10, 24, 255), alpha));
+        }
+    }
+    card(d, sc, st * 0.78, st * 0.96, holo::fade(color, alpha));
+    let star = st * 0.22;
+    for (dx, dy) in [(1.0, 0.0), (0.0, 1.0)] {
+        let v = Vector2::new(dx * cos - dy * sin, dx * sin + dy * cos) * star;
+        d.draw_line_ex(sc - v, sc + v, 2.5, holo::fade(Color::WHITE, alpha));
+    }
+    d.draw_circle_v(sc, st * 0.06, holo::fade(Color::WHITE, alpha));
+}
+
 fn d_mouse() -> Vector2 {
     unsafe { raylib::ffi::GetMousePosition().into() }
-}
-fn centered(
-    d: &mut impl RaylibDraw,
-    font: &Font,
-    text: &str,
-    w: i32,
-    y: i32,
-    size: f32,
-    color: Color,
-) {
-    let width = font.measure_text(text, size, 1.0).x;
-    d.draw_text_ex(
-        font,
-        text,
-        Vector2::new((w as f32 - width) * 0.5, y as f32),
-        size,
-        1.0,
-        color,
-    );
 }
