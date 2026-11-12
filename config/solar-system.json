@@ -9,7 +9,7 @@
     {
       "id": "halloween",
       "name": "Hexbound",
-      "orbit_radius": 150.0,
+      "orbit_radius": 112.0,
       "radius": 18.0,
       "orbit_speed_degrees": 0.55,
       "rotation_speed_degrees": -7.0,
@@ -23,7 +23,7 @@
     {
       "id": "starwars",
       "name": "Star Wars",
-      "orbit_radius": 230.0,
+      "orbit_radius": 172.0,
       "radius": 22.0,
       "orbit_speed_degrees": 2.2,
       "rotation_speed_degrees": 5.0,
@@ -37,7 +37,7 @@
     {
       "id": "smilingfriends",
       "name": "Smiling Friends",
-      "orbit_radius": 320.0,
+      "orbit_radius": 240.0,
       "radius": 22.0,
       "orbit_speed_degrees": 1.5,
       "rotation_speed_degrees": 6.0,
@@ -50,7 +50,7 @@
     {
       "id": "minecraft",
       "name": "Minecraft",
-      "orbit_radius": 410.0,
+      "orbit_radius": 308.0,
       "radius": 16.0,
       "orbit_speed_degrees": 1.1,
       "rotation_speed_degrees": 10.0,
@@ -63,7 +63,7 @@
     {
       "id": "regularshow",
       "name": "Un Show Más",
-      "orbit_radius": 500.0,
+      "orbit_radius": 375.0,
       "radius": 20.0,
       "orbit_speed_degrees": 0.85,
       "rotation_speed_degrees": 9.0,
@@ -77,7 +77,7 @@
     {
       "id": "southpark",
       "name": "South Park",
-      "orbit_radius": 590.0,
+      "orbit_radius": 442.0,
       "radius": 18.0,
       "orbit_speed_degrees": 0.7,
       "rotation_speed_degrees": 8.0,

@@ -12,7 +12,7 @@ fn el_orden_orbital_es_el_definitivo_con_la_escala_comun() {
     let actual: Vec<_> = config.planets.iter().map(|p| p.id.as_str()).collect();
     assert_eq!(actual, ["halloween", "starwars", "smilingfriends", "minecraft", "regularshow", "southpark"]);
     let radii: Vec<_> = config.planets.iter().map(|p| p.orbit_radius).collect();
-    assert_eq!(radii, [1800.0, 2760.0, 3840.0, 4920.0, 6000.0, 7080.0]);
+    assert_eq!(radii, [1344.0, 2064.0, 2880.0, 3696.0, 4500.0, 5304.0]);
     assert!(config.planets.windows(2).all(|pair| pair[0].orbit_radius < pair[1].orbit_radius));
     let angles: Vec<_> = config.planets.iter().map(|p| p.start_angle_degrees).collect();
     // Preserve current angles by identity: angular placement is not orbital order.
@@ -89,9 +89,9 @@ fn radios_e_identidades_se_conservan_durante_toda_la_simulacion() {
     use planet_hoppers::{gameplay::progress::Franchise, scenes::token_collection::TOKENS};
     let mut system = SolarSystem::new(&config());
     let expected = [
-        ("halloween", "Hexbound", 1800.0), ("starwars", "Star Wars", 2760.0),
-        ("smilingfriends", "Smiling Friends", 3840.0), ("minecraft", "Minecraft", 4920.0),
-        ("regularshow", "Un Show Más", 6000.0), ("southpark", "South Park", 7080.0),
+        ("halloween", "Hexbound", 1344.0), ("starwars", "Star Wars", 2064.0),
+        ("smilingfriends", "Smiling Friends", 2880.0), ("minecraft", "Minecraft", 3696.0),
+        ("regularshow", "Un Show Más", 4500.0), ("southpark", "South Park", 5304.0),
     ];
     for step in 0..3600 {
         system.update([1.0 / 144.0, 1.0 / 30.0, 0.1, 1.0, 60.0][step % 5]);
