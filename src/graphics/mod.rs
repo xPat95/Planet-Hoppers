@@ -14,3 +14,4 @@ pub mod software;
 pub mod space;
 pub mod threats;
 pub mod window;
+pub mod software_asset;

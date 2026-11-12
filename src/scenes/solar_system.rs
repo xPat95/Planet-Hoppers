@@ -7,6 +7,8 @@ use crate::gameplay::station::{chase_position, DepartureBounds, Station};
 use crate::minigames::common::host::{MinigameCompletion, MinigameExit, MinigameResult};
 use crate::graphics::resources::save_frame;
 use crate::graphics::space::{draw_sun_glow, Fit, NebulaSky, Sky, SpaceModel, SpaceShader, SunShader, SKY_BACKGROUND};
+use crate::graphics::software_asset::Asset;
+use crate::graphics::software::{FlightCamera, IndexedMesh, SoftMesh};
 use crate::ships::{FlightInput, Ship, ShipsConfig};
 use crate::gameplay::selection::{GameState, ShipCatalog, SelectionTransition};
 use crate::solar_system::{hex_color, Planet, SolarSystem, SolarSystemConfig};
@@ -136,11 +138,10 @@ struct DiskBounds { left: f32, right: f32, top: f32, bottom: f32 }
 
 fn projected_disk_bounds(
     rl: &RaylibHandle,
-    camera: Camera3D,
+    camera: FlightCamera,
     planet: &Planet,
-    model: &SpaceModel,
+    half: Vector3,
 ) -> Option<DiskBounds> {
-    let half = model.half_extents;
     let position = planet.position();
     let world = planet.orientation() * Matrix::translate(position.x, position.y, position.z);
     let forward = (camera.target - camera.position).normalized();
@@ -156,7 +157,7 @@ fn projected_disk_bounds(
             half.z * angle.sin(),
         ).transform_with(world);
         if (corner - camera.position).dot(forward) <= 0.1 { continue; }
-        let screen = rl.get_world_to_screen(corner, camera);
+        let screen = camera.project(corner, rl.get_screen_width(), rl.get_screen_height());
         min_x = min_x.min(screen.x);
         max_x = max_x.max(screen.x);
         min_y = min_y.min(screen.y);
@@ -302,70 +303,158 @@ impl DemoPilot {
 /// niveles de detalle por planeta generados al cargar (`SoftMesh::decimate`) y el sol generado a mano.
 struct SoftScene {
     renderer: crate::graphics::software::SoftRenderer,
-    planets: Vec<(crate::graphics::software::SoftMesh, crate::graphics::software::SoftMesh)>,
-    ship: crate::graphics::software::SoftMesh,
-    station: crate::graphics::software::SoftMesh,
-    sun: crate::graphics::software::SoftMesh,
+    planets: Vec<(IndexedMesh, IndexedMesh)>,
+    ship: Option<SoftShip>,
+    station_fit: Matrix,
+    station_half: Vector3,
+    station: IndexedMesh,
+    sun: IndexedMesh,
 }
 
 /// Alto de la imagen del renderizador por software (el ancho sale de la ventana) y cuántos triángulos puede tener
 /// cada versión de un planeta.
 const SOFT_HEIGHT: i32 = 420;
-const SOFT_NEAR_TRIS: usize = 40_000;
+const SOFT_NEAR_TRIS: usize = 50_000;
 const SOFT_FAR_TRIS: usize = 5_000;
 
+struct SoftShip {
+    mesh: IndexedMesh,
+    half_extents: Vector3,
+}
+
 impl SoftScene {
-    fn load(rl: &mut RaylibHandle, thread: &RaylibThread, planets: &[(Option<SpaceModel>, Option<SpaceModel>)],
-            ship: Option<&SpaceModel>, station: &SpaceModel) -> Result<Self, Box<dyn std::error::Error>> {
-        use crate::graphics::software::{SoftMesh, SoftRenderer};
-        let planets = planets.iter().map(|(near, _)| {
-            let full = near.as_ref().map(SpaceModel::cpu_mesh).unwrap_or_else(|| SoftMesh::sphere(3, Vector3::new(0.6, 0.6, 0.65)));
-            let near = full.decimate(SOFT_NEAR_TRIS);
+    fn ship(root: &Path, s: &Session) -> Result<Option<SoftShip>, Box<dyn std::error::Error>> {
+        let m = &s.ships.ships[s.ship_index];
+        if m.model.is_empty() {
+            return Ok(None);
+        }
+        let mut asset = Asset::load(&root.join(&m.model), m.flight_rotation_degrees(), Fit::Length(m.length))?;
+        if asset.mesh.tris.len() > 25_000 {
+            asset.mesh = asset.mesh.decimate(25_000);
+        }
+        Ok(Some(SoftShip {
+            mesh: asset.mesh.indexed(),
+            half_extents: asset.half_extents,
+        }))
+    }
+
+    fn load(
+        rl: &mut RaylibHandle,
+        thread: &RaylibThread,
+        root: &Path,
+        s: &mut Session,
+    ) -> Result<Self, Box<dyn std::error::Error>> {
+        use crate::graphics::software::SoftRenderer;
+        let mut planets = Vec::new();
+        for p in &mut s.system.planets {
+            let c = &p.config;
+            let asset = c.model.as_ref().and_then(|path| {
+                Asset::load(&root.join(path), c.model_rotation_degrees, Fit::Radius(c.radius))
+                    .map_err(|e| eprintln!("Planeta {}: {e}", c.id))
+                    .ok()
+            });
+            let mesh = if let Some(asset) = asset {
+                p.collision_radii = asset.half_extents * 0.95;
+                asset.mesh
+            } else {
+                let [r, g, b] = hex_color(&c.color)?;
+                let mut sphere = SoftMesh::sphere(3, Vector3::new(r as f32, g as f32, b as f32) / 255.);
+                for v in sphere.tris.iter_mut().flat_map(|t| &mut t.v) {
+                    v.pos = v.pos * c.radius;
+                }
+                sphere
+            };
+            let near = if mesh.tris.len() > SOFT_NEAR_TRIS {
+                mesh.decimate(SOFT_NEAR_TRIS)
+            } else {
+                mesh
+            };
             let far = near.decimate(SOFT_FAR_TRIS);
-            (near, far)
-        }).collect();
+            planets.push((near.indexed(), far.indexed()));
+        }
+        let station = Asset::load(&root.join(&s.station.model_far), [0.; 3], Fit::Length(s.station.length))?;
         let (w, h) = (rl.get_screen_width().max(1), rl.get_screen_height().max(1));
         Ok(Self {
-            renderer: SoftRenderer::new(rl, thread, SOFT_HEIGHT * w / h, SOFT_HEIGHT)?,
+            renderer: SoftRenderer::new(rl, thread, (SOFT_HEIGHT * w / h).max(1), SOFT_HEIGHT)?,
             planets,
-            ship: ship.map(|m| m.cpu_mesh().decimate(15_000)).unwrap_or_default(),
-            station: station.cpu_mesh().decimate(6_000),
-            sun: SoftMesh::sphere(4, Vector3::one()),
+            ship: Self::ship(root, s)?,
+            station: station.mesh.decimate(12_000).indexed(),
+            station_fit: station.fit,
+            station_half: station.half_extents,
+            sun: SoftMesh::sphere(4, Vector3::one()).indexed(),
         })
     }
 
     /// Arma la lista de lo que se dibuja (con descarte y nivel de detalle, como con la GPU) y renderiza.
     #[allow(clippy::too_many_arguments)]
-    fn render(&mut self, rl: &mut RaylibHandle, thread: &RaylibThread, s: &Session, camera: Camera3D, center: Vector3,
-              time: f32, culling: bool, lod_on: bool, stats: &mut RenderStats) -> Result<(), Box<dyn std::error::Error>> {
+    fn render(
+        &mut self,
+        rl: &mut RaylibHandle,
+        thread: &RaylibThread,
+        s: &Session,
+        camera: FlightCamera,
+        center: Vector3,
+        time: f32,
+        culling: bool,
+        lod_on: bool,
+        stats: &mut RenderStats,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         use crate::graphics::software::{Draw, Shade, SoftRenderer};
         let (w, h) = (rl.get_screen_width().max(1), rl.get_screen_height().max(1));
-        if self.renderer.width != SOFT_HEIGHT * w / h {
-            self.renderer = SoftRenderer::new(rl, thread, SOFT_HEIGHT * w / h, SOFT_HEIGHT)?;
+        let width = (SOFT_HEIGHT * w / h).max(1);
+        if self.renderer.width != width {
+            self.renderer = SoftRenderer::new(rl, thread, width, SOFT_HEIGHT)?;
         }
         let aspect = w as f32 / h as f32;
         let mut draws = Vec::new();
         let r = s.system.sun.radius;
-        draws.push(Draw { mesh: &self.sun, world: Matrix::scale(r, r, r) * Matrix::rotate_y(s.system.sun_spin_angle)
-            * Matrix::translate(center.x, center.y, center.z), shade: Shade::Sun { center } });
+        if !culling || in_view(camera, aspect, center, r) {
+            draws.push(Draw {
+                mesh: &self.sun,
+                world: Matrix::scale(r, r, r)
+                    * Matrix::rotate_y(s.system.sun_spin_angle)
+                    * Matrix::translate(center.x, center.y, center.z),
+                shade: Shade::Sun { center },
+            });
+        }
         for (i, (p, (near, far))) in s.system.planets.iter().zip(&self.planets).enumerate() {
             let pos = p.position();
             if culling && !in_view(camera, aspect, pos, p.config.radius * 1.6) {
-                stats.planets[i] = PlanetRender::Culled(near.tris.len());
+                stats.planets[i] = PlanetRender::Culled(near.triangle_count());
                 continue;
             }
             let use_far = lod_on && (pos - camera.position).length() > p.config.radius * FAR_LOD;
             let mesh = if use_far { far } else { near };
-            stats.planets[i] = if use_far { PlanetRender::Far(far.tris.len(), near.tris.len()) } else { PlanetRender::Near(near.tris.len()) };
-            draws.push(Draw { mesh, world: p.orientation() * Matrix::translate(pos.x, pos.y, pos.z), shade: Shade::Lit });
+            stats.planets[i] = if use_far {
+                PlanetRender::Far(far.triangle_count(), near.triangle_count())
+            } else {
+                PlanetRender::Near(near.triangle_count())
+            };
+            draws.push(Draw {
+                mesh,
+                world: p.orientation() * Matrix::translate(pos.x, pos.y, pos.z),
+                shade: Shade::Lit,
+            });
         }
         let station = s.station.center();
         if !culling || in_view(camera, aspect, station, s.station.collision_radius) {
-            draws.push(Draw { mesh: &self.station, world: s.station.rotation() * Matrix::translate(station.x, station.y, station.z), shade: Shade::Lit });
+            draws.push(Draw {
+                mesh: &self.station,
+                world: s.station.rotation() * Matrix::translate(station.x, station.y, station.z),
+                shade: Shade::Lit,
+            });
         }
         let sp = &s.ship;
-        draws.push(Draw { mesh: &self.ship, world: Matrix::rotate_z(sp.bank) * Matrix::rotate_x(sp.pitch) * Matrix::rotate_y(sp.yaw)
-            * Matrix::translate(sp.position.x, sp.position.y, sp.position.z), shade: Shade::Lit });
+        if let Some(ship) = self.ship.as_ref().filter(|ship| !culling || in_view(camera, aspect, sp.position, ship.half_extents.length())) {
+            draws.push(Draw {
+                mesh: &ship.mesh,
+                world: Matrix::rotate_z(sp.bank)
+                    * Matrix::rotate_x(sp.pitch)
+                    * Matrix::rotate_y(sp.yaw)
+                    * Matrix::translate(sp.position.x, sp.position.y, sp.position.z),
+                shade: Shade::Lit,
+            });
+        }
         self.renderer.render(camera, center, &draws, time);
         Ok(())
     }
@@ -387,7 +476,7 @@ struct RenderStats {
 
 /// Si una esfera (centro y radio) entra en la pirámide de visión de la cámara: se compara su posición, en los ejes de
 /// la cámara, con los bordes de la pantalla (con el radio de margen).
-fn in_view(camera: Camera3D, aspect: f32, center: Vector3, radius: f32) -> bool {
+fn in_view(camera: FlightCamera, aspect: f32, center: Vector3, radius: f32) -> bool {
     let forward = (camera.target - camera.position).normalized();
     let right = forward.cross(camera.up).normalized();
     let up = right.cross(forward);
@@ -496,13 +585,13 @@ struct OrbitCamera {
 }
 
 impl OrbitCamera {
-    fn camera(&self, target: Vector3, aspect: f32) -> Camera3D {
+    fn camera(&self, target: Vector3, aspect: f32) -> FlightCamera {
         let offset = Vector3::new(
             self.pitch.cos() * self.yaw.cos(),
             self.pitch.sin(),
             self.pitch.cos() * self.yaw.sin(),
         ) * (self.distance / aspect.clamp(0.1, 1.0));
-        Camera3D::perspective(target + offset, target, Vector3::up(), 42.0)
+        FlightCamera::perspective(target + offset, target, Vector3::up(), 42.0)
     }
 }
 
@@ -528,6 +617,7 @@ struct Session {
     help_smoke: bool,
     /// `--demo-video`: vuelo automático para el video de entrega (ver `DemoPilot`), guardando cada cuadro.
     demo_video: bool,
+    smoke_f7: bool,
     /// `--software`: empieza con el renderizador por software (F7) encendido.
     software: bool,
     station_smoke: bool,
@@ -610,7 +700,7 @@ fn draw_planet_glow(
 }
 
 /// Project a fixed POI, falling back to a direction marker inside the HUD margins.
-fn rl_screen_marker(point: Vector3, camera: Camera3D, width: i32, height: i32) -> (Vector2, bool) {
+fn rl_screen_marker(point: Vector3, camera: FlightCamera, width: i32, height: i32) -> (Vector2, bool) {
     let forward = (camera.target - camera.position).normalized();
     let right = forward.cross(camera.up).normalized();
     let up = right.cross(forward);
@@ -703,6 +793,7 @@ fn run_session_with_progress(args: impl Iterator<Item = String>, game: Option<Ga
     let mut intro_smoke = false;
     let mut help_smoke = false;
     let mut demo_video = false;
+    let mut smoke_f7 = false;
     let mut software = false;
     let mut station_smoke = false;
     let mut ending_origin = None;
@@ -713,6 +804,7 @@ fn run_session_with_progress(args: impl Iterator<Item = String>, game: Option<Ga
     while let Some(arg) = args.next() {
         match arg.as_str() {
             "--smoke" => smoke = true,
+            "--smoke-f7" => { smoke = true; smoke_f7 = true; },
             "--smoke-ending" => { smoke = true; ending_origin = Some(args.next().ok_or("--smoke-ending necesita la franquicia inicial")?); }
             "--smoke-launch" => { smoke = true; launch_smoke = true; }
             "--smoke-intro" => { smoke = true; intro_smoke = true; }
@@ -738,6 +830,7 @@ fn run_session_with_progress(args: impl Iterator<Item = String>, game: Option<Ga
                 println!("cargo run --bin solarsystem -- [--overview] [--config PATH] [--ships PATH] [--smoke]");
                 println!("Nave:\n{HELP_SHIP}\nVista general:\n{HELP_OVERVIEW}");
                 println!("--smoke: recorrido automático sin ventana visible; guarda capturas en target/solarsystem/");
+                println!("--software inicia el vuelo en CPU. --smoke-f7 prueba F7, N y el regreso al modo inicial.");
                 println!("--smoke-ending FRANQUICIA: final completo sin modificar la partida; capturas en target/ending/");
                 println!("--smoke-visit: ida y vuelta a South Park (con su prueba de entrada) y captura al volver");
                 println!("--smoke-regularshow: interacción E, tres niveles, videos, derrota, abandono y regreso seguro");
@@ -810,6 +903,7 @@ fn run_session_with_progress(args: impl Iterator<Item = String>, game: Option<Ga
         intro_smoke,
         help_smoke,
         demo_video,
+        smoke_f7,
         software,
         station_smoke,
         ending_smoke: ending_origin.is_some(),
@@ -994,9 +1088,96 @@ fn load_ship_model(
         .ok()
 }
 
-fn station_ship_radius(s: &Session, model: &Option<SpaceModel>) -> f32 {
-    model.as_ref().map_or(s.ships.ships[s.ship_index].length * 0.5 * 3.0_f32.sqrt(),
-        |m| m.half_extents.length()).max(s.ships.flight.radius)
+struct GpuScene {
+    shader: SpaceShader,
+    sun_shader: SunShader,
+    sun: Model,
+    placeholder: Model,
+    planets: Vec<(Option<SpaceModel>, Option<SpaceModel>)>,
+    station_near: SpaceModel,
+    station_far: SpaceModel,
+    ship_model: Option<SpaceModel>,
+    sky: Sky,
+    nebula: NebulaSky,
+    bloom: crate::graphics::bloom::Bloom,
+}
+
+impl GpuScene {
+    fn load(
+        rl: &mut RaylibHandle,
+        thread: &RaylibThread,
+        root: &Path,
+        s: &mut Session,
+    ) -> Result<Self, Box<dyn std::error::Error>> {
+        let shader = SpaceShader::load(rl, thread)?;
+        let sun_shader = SunShader::load(rl, thread)?;
+        let mut sun = rl.load_model_from_mesh(thread, unsafe {
+            Mesh::gen_mesh_sphere(thread, 1.0, 48, 64).make_weak()
+        })?;
+        *sun.materials_mut()[0].shader_mut() = unsafe { WeakShader::from_raw(*sun_shader.shader.as_ref()) };
+        let placeholder = rl.load_model_from_mesh(thread, unsafe {
+            Mesh::gen_mesh_sphere(thread, 1.0, 24, 32).make_weak()
+        })?;
+        let planets = load_planet_models(rl, thread, root, &shader, &mut s.system);
+        let station_near = SpaceModel::load(
+            rl,
+            thread,
+            &root.join(&s.station.model),
+            &shader,
+            [0.0; 3],
+            Fit::Length(s.station.length),
+        )?;
+        let station_far = SpaceModel::load(
+            rl,
+            thread,
+            &root.join(&s.station.model_far),
+            &shader,
+            [0.0; 3],
+            Fit::Same(station_near.fit, station_near.half_extents),
+        )?;
+        let ship_model = load_ship_model(rl, thread, root, &shader, s);
+        let sky = Sky::new();
+        let nebula = NebulaSky::load(rl, thread)?;
+        let bloom = crate::graphics::bloom::Bloom::load(rl, thread, rl.get_screen_width(), rl.get_screen_height())?;
+        Ok(Self {
+            shader,
+            sun_shader,
+            sun,
+            placeholder,
+            planets,
+            station_near,
+            station_far,
+            ship_model,
+            sky,
+            nebula,
+            bloom,
+        })
+    }
+}
+
+fn refresh_ship(
+    rl: &mut RaylibHandle,
+    thread: &RaylibThread,
+    root: &Path,
+    s: &Session,
+    gpu: &mut Option<GpuScene>,
+    cpu: &mut Option<SoftScene>,
+) -> Result<Option<Vector3>, Box<dyn std::error::Error>> {
+    let mut half = None;
+    if let Some(g) = gpu {
+        g.ship_model = load_ship_model(rl, thread, root, &g.shader, s);
+        half = g.ship_model.as_ref().map(|m| m.half_extents);
+    }
+    if let Some(c) = cpu {
+        c.ship = SoftScene::ship(root, s)?;
+        half = c.ship.as_ref().map(|ship| ship.half_extents);
+    }
+    Ok(half)
+}
+
+fn station_ship_radius(s: &Session, half: Option<Vector3>) -> f32 {
+    half.map_or(s.ships.ships[s.ship_index].length * 0.5 * 3.0_f32.sqrt(),
+        |h| h.length()).max(s.ships.flight.radius)
 }
 
 /// Una ventana del sistema solar, hasta salir del juego o ir a un minijuego.
@@ -1026,18 +1207,31 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         d.draw_text("Cargando el sistema solar...", 40, 40, 24, Color::RAYWHITE);
     }
 
-    let mut shader = SpaceShader::load(&mut rl, &thread)?;
-    let mut sun_shader = SunShader::load(&mut rl, &thread)?;
-    let mut sun = rl.load_model_from_mesh(&thread, unsafe { Mesh::gen_mesh_sphere(&thread, 1.0, 48, 64).make_weak() })?;
-    *sun.materials_mut()[0].shader_mut() = unsafe { WeakShader::from_raw(*sun_shader.shader.as_ref()) };
-    let placeholder = rl.load_model_from_mesh(&thread, unsafe { Mesh::gen_mesh_sphere(&thread, 1.0, 24, 32).make_weak() })?;
-    let planets = load_planet_models(&mut rl, &thread, root, &shader, &mut s.system);
-    let station_near = SpaceModel::load(&mut rl, &thread, &root.join(&s.station.model), &shader,
-        [0.0;3], Fit::Length(s.station.length))?;
-    let station_far = SpaceModel::load(&mut rl, &thread, &root.join(&s.station.model_far), &shader,
-        [0.0;3], Fit::Same(station_near.fit, station_near.half_extents))?;
-    let mut ship_model = load_ship_model(&mut rl, &thread, root, &shader, s);
-    s.station.align_collision(station_near.fit);
+    let mut soft = if s.software {
+        Some(SoftScene::load(&mut rl, &thread, root, s)?)
+    } else {
+        None
+    };
+    let mut gpu = if s.software {
+        None
+    } else {
+        Some(GpuScene::load(&mut rl, &thread, root, s)?)
+    };
+    let (station_fit, station_half, mut ship_half) = match (&soft, &gpu) {
+        (Some(cpu), _) => (
+            cpu.station_fit,
+            cpu.station_half,
+            cpu.ship.as_ref().map(|ship| ship.half_extents),
+        ),
+        (_, Some(g)) => (
+            g.station_near.fit,
+            g.station_near.half_extents,
+            g.ship_model.as_ref().map(|m| m.half_extents),
+        ),
+        _ => unreachable!(),
+    };
+
+    s.station.align_collision(station_fit);
     if smoke {
         println!("COLLISION_HULL boxes={} cell={} offset_fraction={:?} world_limit=none",s.station.hull.rows.len(),s.station.hull.cell,s.station.hull.offset_fraction);
     }
@@ -1048,13 +1242,13 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
     s.intro_pending = false;
     let departure = if departing {
         let length = s.ships.ships[s.ship_index].length;
-        let half = ship_model.as_ref().map_or(Vector3::one() * length * 0.5, |m| m.half_extents);
+        let half = ship_half.unwrap_or(Vector3::one()*length*0.5);
         let aspect = rl.get_screen_width() as f32 / rl.get_screen_height().max(1) as f32;
         let near = NEAR_PLANE as f32;
         let camera_radius = (near * (1.0 + (30.0_f32.to_radians().tan()).powi(2)
             * (1.0 + aspect * aspect)).sqrt()).max(near * 2.0);
         let plan = s.station.departure(DepartureBounds {
-            station_half_extents: station_near.half_extents,
+            station_half_extents: station_half,
             ship_half_extents: half,
             ship_collision_radius: s.ships.flight.radius,
             ship_length: length,
@@ -1089,15 +1283,10 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
     let entry_start_pitch = s.ship.pitch;
     let mut entry_goal = s.ship.clone();
     entry_goal.look_at(s.system.planets[0].position());
-    let sky = Sky::new();
-    let mut nebula = NebulaSky::load(&mut rl, &thread)?;
-    let (bw, bh) = (rl.get_screen_width(), rl.get_screen_height());
-    let mut bloom = crate::graphics::bloom::Bloom::load(&mut rl, &thread, bw, bh)?;
     let ui_regular = load_solar_font(&root.join("assets/fonts/AdventPro-Regular.ttf"))?;
     let ui_bold = load_solar_font(&root.join("assets/fonts/AdventPro-Bold.ttf"))?;
     let token_textures = super::token_collection_ui::TokenTextures::load(&mut rl, &thread, root)?;
-    let mut abductions = super::abduction::AbductionRenderer::load(&mut rl, &thread, root,
-        &s.token_presentation.required_abductions())?;
+    let mut abductions = None;
     // La de Smiling Friends es un video, que solo se carga si va a hacer falta
     let mut abduction_video = if s.token_presentation.required_abductions().contains(&crate::gameplay::progress::Franchise::SmilingFriends) {
         Some(super::abduction::AbductionVideo::load(&mut rl, &thread, root, audio.as_ref())?)
@@ -1125,7 +1314,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
 
     if let Some(i) = s.returning_from.take() {
         if let Some(pose) = s.return_pose.take() {
-            let margin = station_ship_radius(s, &ship_model);
+            let margin = station_ship_radius(s, ship_half);
             pose.restore(&mut s.ship, &s.system, i, margin,
                 |point| s.station.push_out(point, point, margin).is_none())?;
             println!("PLANET_RETURN_POSE planet={} ship={} position={:?}", s.system.planets[i].config.id, s.ships.ships[s.ship_index].id, s.ship.position);
@@ -1149,8 +1338,10 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
     let mut discard_mouse_frames = 2u8;
     let mut notice: Option<(String, f32)> = None;
     let mut frame = 0u32;
+    let initial_mode = s.software;
+    let initial_ship = s.ship_index;
     let mut shake = 0.0_f32;
-    let mut side_camera: Option<Camera3D> = None; // Solo para las capturas de prueba
+    let mut side_camera: Option<FlightCamera> = None; // Solo para las capturas de prueba
     let mut help_open = s.help_smoke;
     let mut help_progress = if s.help_smoke { 1.0_f32 } else { 0.0_f32 };
     let mut help_restore_cursor = false;
@@ -1161,11 +1352,6 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
     let mut culling = true;
     let mut lod_on = true;
     // Renderizador por software (F7): se prepara la primera vez que se enciende
-    let mut software_on = s.software;
-    let mut soft: Option<SoftScene> = None;
-    if software_on {
-        soft = Some(SoftScene::load(&mut rl, &thread, &planets, ship_model.as_ref(), &station_far)?);
-    }
     let mut collection_open = false;
     let mut presentation_shortcut = crate::minigames::common::shortcuts::PresentationShortcut::default();
     let mut collection_progress = 0.0_f32;
@@ -1178,6 +1364,34 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         if crate::graphics::window::should_close(&rl) {
             return Ok(Exit::Quit);
         }
+        if s.smoke_f7 {
+            let key = match frame {
+                2 | 3 | 8 | 9 => Some(KeyboardKey::KEY_F7),
+                4 | 5 => Some(KeyboardKey::KEY_N),
+                _ => None,
+            };
+            if let Some(key) = key {
+                let event = if frame % 2 == 0 { 2 } else { 1 };
+                unsafe {
+                    ffi::PlayAutomationEvent(ffi::AutomationEvent {
+                        frame: 0,
+                        type_: event,
+                        params: [key as i32, 0, 0, 0],
+                    });
+                }
+            }
+            if frame == 7 && (s.software == initial_mode || s.ship_index == initial_ship) {
+                return Err("La prueba de F7 o del cambio de nave falló".into());
+            }
+            if frame == 10 {
+                if s.software != initial_mode {
+                    return Err("F7 no volvió al modo inicial".into());
+                }
+                println!("F7_SMOKE_PASS ship={}", s.ships.ships[s.ship_index].id);
+                return Ok(Exit::Quit);
+            }
+        }
+
         let ctrl = rl.is_key_down(KeyboardKey::KEY_LEFT_CONTROL) || rl.is_key_down(KeyboardKey::KEY_RIGHT_CONTROL);
         if presentation_shortcut.poll(&rl) {
             let catalog = ShipCatalog::load(&root.join("config/ship-selection.json"), &s.ships)?;
@@ -1296,7 +1510,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         token_was_blocking = tokens_blocking;
         // Sin teclado durante las pruebas ni mientras se sale hacia un minijuego
         let intro_controls_ready = intro_time.is_none_or(|elapsed| elapsed >= ENTRY_STATION_HOLD + ENTRY_CAMERA_MOVE - 0.15);
-        let accepts_input = (!smoke || s.launch_smoke || s.station_smoke || s.minecraft_smoke || s.regularshow_smoke || s.docking_smoke.is_some()) && !tokens_blocking && !cinematic_was_blocking && !token_toggle && !token_close && !help_open && !toggle_help && !close_help && intro_controls_ready && leaving.is_none() && !entering_station;
+        let accepts_input = (!smoke || s.smoke_f7 || s.launch_smoke || s.station_smoke || s.minecraft_smoke || s.regularshow_smoke || s.docking_smoke.is_some()) && !tokens_blocking && !cinematic_was_blocking && !token_toggle && !token_close && !help_open && !toggle_help && !close_help && intro_controls_ready && leaving.is_none() && !entering_station;
         let pressed = |rl: &RaylibHandle, k: KeyboardKey| accepts_input
             && !(ctrl && matches!(k, KeyboardKey::KEY_C | KeyboardKey::KEY_N | KeyboardKey::KEY_P))
             && rl.is_key_pressed(k);
@@ -1306,16 +1520,20 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         if pressed(&rl, KeyboardKey::KEY_F5) { culling = !culling; }
         if pressed(&rl, KeyboardKey::KEY_F6) { lod_on = !lod_on; }
         if pressed(&rl, KeyboardKey::KEY_F7) {
-            software_on = !software_on;
-            if software_on && soft.is_none() {
+            s.software = !s.software;
+            if s.software && soft.is_none() {
                 {
                     let mut d = crate::graphics::window::begin_drawing(&mut rl, &thread);
                     d.clear_background(SKY_BACKGROUND);
                     d.draw_text("Preparando el renderizador por software...", 40, 40, 24, Color::RAYWHITE);
                 }
-                soft = Some(SoftScene::load(&mut rl, &thread, &planets, ship_model.as_ref(), &station_far)?);
+                soft = Some(SoftScene::load(&mut rl, &thread, root, s)?);
             }
         }
+        if !s.software && gpu.is_none() {
+            gpu = Some(GpuScene::load(&mut rl, &thread, root, s)?);
+        }
+
         if pressed(&rl,KeyboardKey::KEY_O) { show_orbits = !show_orbits; }
         debug_camera="ninguna";
 
@@ -1334,7 +1552,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                     return Err("Despegue fuera de la salida o con una transformación insegura".into());
                 }
                 if s.game.as_ref().unwrap().active_ship()!=s.ships.ships[s.ship_index].id {return Err("Modelo de despegue incorrecto".into());}
-                if !s.ships.ships[s.ship_index].model.is_empty() && ship_model.is_none() {return Err("Fallo al cargar el modelo de despegue".into());}
+                if !s.ships.ships[s.ship_index].model.is_empty() && ship_half.is_none() {return Err("Fallo al cargar el modelo de despegue".into());}
             }
             if (2..=12).contains(&frame) { keys.push(KeyboardKey::KEY_W); }
             if frame==20 {capture=Some(format!("dock-launch-{cycles}.png"));}
@@ -1350,9 +1568,9 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 snap=true;
             }
             if frame>30 {
-                if s.station.in_reach(s.ship.position, station_ship_radius(s, &ship_model)) || entering_station {
+                if s.station.in_reach(s.ship.position, station_ship_radius(s, ship_half)) || entering_station {
                     if !entering_station {
-                        let radius=station_ship_radius(s,&ship_model);
+                        let radius=station_ship_radius(s,ship_half);
                         if s.station.push_out(s.ship.position,s.ship.position,radius).is_some() || s.ship.bumped {
                             return Err("La interacción no es accesible fuera del colisionador".into());
                         }
@@ -1412,7 +1630,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                     capture=Some("station-debug-side.png".into());
                 }
                 27 => {
-                    if s.ship.bumped || s.station.push_out(s.ship.position,s.ship.position,station_ship_radius(s,&ship_model)).is_some() {
+                    if s.ship.bumped || s.station.push_out(s.ship.position,s.ship.position,station_ship_radius(s,ship_half)).is_some() {
                         return Err("Recuperacion de colision inestable".into());
                     }
                     capture=Some("station-debug-recovery.png".into());
@@ -1446,9 +1664,9 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                     }
                     capture = Some("station-approach.png".into());
                 }
-                75 => {s.ship.position=s.station.entry_anchor(station_ship_radius(s, &ship_model));s.ship.speed=0.0;}
+                75 => {s.ship.position=s.station.entry_anchor(station_ship_radius(s, ship_half));s.ship.speed=0.0;}
                 85 => {
-                    if !s.station.in_reach(s.ship.position, station_ship_radius(s, &ship_model)) { return Err("Falta proximidad con la estación".into()); }
+                    if !s.station.in_reach(s.ship.position, station_ship_radius(s, ship_half)) { return Err("Falta proximidad con la estación".into()); }
                     capture = Some("station-contact.png".into());
                 }
                 90 => {
@@ -1475,7 +1693,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 (_, 0) => {
                     if visits > 0 {
                         if (!s.minecraft_smoke && s.system.planet_in_reach(s.ship.position).is_some()) || s.ship.speed != 0.0
-                            || s.system.planets[destination].push_out(s.ship.position, station_ship_radius(s, &ship_model)).is_some() {
+                            || s.system.planets[destination].push_out(s.ship.position, station_ship_radius(s, ship_half)).is_some() {
                             return Err("Retorno inseguro o dentro del alcance de exploración".into());
                         }
                         capture = Some(format!("after-return-{visits}.png"));
@@ -1485,7 +1703,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 }
                 (_, 1) if visits > 0 && visits < total => {
                     if s.game.is_none() && !s.regularshow_smoke { s.ship_index = visits as usize % s.ships.ships.len(); }
-                    ship_model = load_ship_model(&mut rl, &thread, root, &shader, s);
+                    ship_half = refresh_ship(&mut rl, &thread, root, s, &mut gpu, &mut soft)?;
                     park_ship(&mut s.ship, &s.system.planets[destination], 1.7, true);
                     snap = true;
                 }
@@ -1569,7 +1787,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             }
             if frame == 30 { capture = Some(format!("launch-{}.png", s.ships.ships[s.ship_index].id)); }
             if frame == 61 { println!("LAUNCH_SMOKE_PASS ship={}", s.ships.ships[s.ship_index].id); return Ok(Exit::Quit); }
-        } else if smoke {
+        } else if smoke && !s.smoke_f7 {
             let n = s.system.planets.len() as u32;
             let ships = s.ships.ships.len() as u32;
             match frame {
@@ -1622,14 +1840,14 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                     let k = ((f - 60 - n * 15) / 10) as usize;
                     if (f - 60 - n * 15) % 10 == 0 {
                         s.ship_index = k;
-                        ship_model = load_ship_model(&mut rl, &thread, root, &shader, s);
+                        ship_half = refresh_ship(&mut rl, &thread, root, s, &mut gpu, &mut soft)?;
                         // Por encima del Sol, lejos de su superficie (el Sol se escala con el mundo)
                         s.ship.position = Vector3::new(0.0, s.system.sun.radius * 2.5, 0.0);
                         s.ship.yaw = std::f32::consts::FRAC_PI_2; // nariz hacia -X
                         s.ship.pitch = 0.0;
                         s.ship.speed = 0.0;
                         let len = s.ships.ships[k].length;
-                        side_camera = Some(Camera3D::perspective(
+                        side_camera = Some(FlightCamera::perspective(
                             s.ship.position + Vector3::new(0.0, len * 0.4, len * 2.2),
                             s.ship.position,
                             Vector3::up(),
@@ -1640,7 +1858,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                     if s.ships.ships[k].id == "smilingfriends" && (phase == 4 || phase == 6) {
                         let direction = if phase == 4 { s.ship.forward() } else { -s.ship.forward() };
                         let len = s.ships.ships[k].length;
-                        side_camera = Some(Camera3D::perspective(
+                        side_camera = Some(FlightCamera::perspective(
                             s.ship.position + direction * (len * 1.30) + Vector3::up() * (len * 0.55),
                             s.ship.position + Vector3::up() * (len * 0.25),
                             Vector3::up(),
@@ -1650,7 +1868,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                     }
                     if phase == 8 {
                         let len = s.ships.ships[k].length;
-                        side_camera = Some(Camera3D::perspective(
+                        side_camera = Some(FlightCamera::perspective(
                             s.ship.position + Vector3::new(0.0, len * 0.4, len * 2.2),
                             s.ship.position,
                             Vector3::up(),
@@ -1665,7 +1883,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                     let k = (step / 15) as usize;
                     let (name, radii) = [("far", 14.0), ("medium", 4.0), ("near", 1.8)][k];
                     let center = s.system.center();
-                    side_camera = Some(Camera3D::perspective(
+                    side_camera = Some(FlightCamera::perspective(
                         center + Vector3::new(0.6, 0.25, 1.0).normalized() * s.system.sun.radius * radii,
                         center,
                         Vector3::up(),
@@ -1701,7 +1919,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 }
                 s.ship_index = next;
                 s.ships.active_ship = s.ships.ships[next].id.clone();
-                ship_model = load_ship_model(&mut rl, &thread, root, &shader, s);
+                ship_half = refresh_ship(&mut rl, &thread, root, s, &mut gpu, &mut soft)?;
                 notice = Some((s.ships.ships[next].name.clone(), 2.0));
             }
         }
@@ -1809,7 +2027,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                             .map(|p| p.config.name.as_str()).unwrap_or("Sol");
                         debug_last=format!("controlador: {body}");
                     }
-                    if let Some(out) = s.station.push_out(before, s.ship.position, station_ship_radius(s, &ship_model)) {
+                    if let Some(out) = s.station.push_out(before, s.ship.position, station_ship_radius(s, ship_half)) {
                         debug_last=format!("estacion: celdas/marco, desplazamiento {:.2}",(out-s.ship.position).length());
                         s.ship.position = out;
                         s.ship.speed = 0.0;
@@ -1847,7 +2065,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                         }
                     }
                 }
-                if station_reentry_delay<=0.0 && s.station.in_reach(s.ship.position, station_ship_radius(s, &ship_model)) && explore && in_reach.is_none() {
+                if station_reentry_delay<=0.0 && s.station.in_reach(s.ship.position, station_ship_radius(s, ship_half)) && explore && in_reach.is_none() {
                     interaction_armed=false;
                     entering_station=true;
                     s.ship.speed=0.0;
@@ -1936,7 +2154,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                     let next = elapsed + if fade <= 0.0 { dt } else { 0.0 };
                     intro_time = (next < ENTRY_STATION_HOLD + ENTRY_CAMERA_MOVE).then_some(next);
                     if intro_time.is_none() { chase = wanted; }
-                    Camera3D::perspective(position, target, Vector3::up(), 44.0)
+                    FlightCamera::perspective(position, target, Vector3::up(), 44.0)
                 } else if s.demo_video && demo.look() > 0.0 {
                     // El video, en la vuelta: la cámara se corre hacia afuera y mira en parte al planeta, para que se
                     // vea mientras la nave lo rodea
@@ -1946,9 +2164,9 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                     let len = s.ships.ships[s.ship_index].camera_length();
                     let position = chase + (out * len * 2.5 + Vector3::up() * len * 0.8) * k;
                     let target = flight_target + (c - flight_target) * (0.55 * k);
-                    Camera3D::perspective(position, target, Vector3::up(), 44.0 + 16.0 * k)
+                    FlightCamera::perspective(position, target, Vector3::up(), 44.0 + 16.0 * k)
                 } else {
-                    Camera3D::perspective(chase + jitter, flight_target, Vector3::up(), 44.0)
+                    FlightCamera::perspective(chase + jitter, flight_target, Vector3::up(), 44.0)
                 }
             }
         };
@@ -1979,26 +2197,32 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             if s.token_presentation.ending.elapsed == 0.0 {
                 if let Some(r) = &riser { r.play(); }
             }
+            if gpu.is_none() {
+                gpu = Some(GpuScene::load(&mut rl, &thread, root, s)?);
+            }
+            let g = gpu.as_mut().unwrap();
             let menu = super::ending::run(&mut rl, &thread, root, s.game.as_ref().unwrap(), &mut s.token_presentation,
-                &s.system, &s.ship, &sun, &mut sun_shader, &planets, ship_model.as_ref(), &mut shader,
-                &sky, &mut nebula, &mut bloom, &ui_bold, camera, s.ending_smoke)?;
+                &s.system, &s.ship, &g.sun, &mut g.sun_shader, &g.planets, g.ship_model.as_ref(), &mut g.shader,
+                &g.sky, &mut g.nebula, &mut g.bloom, &ui_bold, camera.raylib(), s.ending_smoke)?;
             return Ok(if menu { Exit::Menu } else { Exit::Quit });
         }
         // También cubre el sistema cuando la nave se aleja más allá de la última órbita.
         let far = far_plane.max(camera.position.length() + outer * 2.0);
-        unsafe { ffi::rlSetClipPlanes(NEAR_PLANE, far as f64) };
+        if !s.software {
+            unsafe { ffi::rlSetClipPlanes(NEAR_PLANE, far as f64) };
+        }
 
         // --- Proyecciones para el dibujo 2D (antes de empezar a dibujar) -------------------------------------
         let time = rl.get_time() as f32;
         let forward = (camera.target - camera.position).normalized();
         let right = forward.cross(Vector3::up()).normalized();
         let cam_up = right.cross(forward);
-        let sky_frame = sky.project(&rl, camera);
+        let sky_frame = gpu.as_ref().filter(|_| !s.software).map(|g|g.sky.project(&rl,camera.raylib()));
         let in_front = |p: Vector3| (p - camera.position).dot(forward) > 0.0;
         let center = s.system.center();
         let sun_glow = in_front(center).then(|| {
-            let at = rl.get_world_to_screen(center, camera);
-            let edge = rl.get_world_to_screen(center + cam_up * s.system.sun.radius, camera);
+            let at = camera.project(center, rl.get_screen_width(), rl.get_screen_height());
+            let edge = camera.project(center + cam_up * s.system.sun.radius, rl.get_screen_width(), rl.get_screen_height());
             (at, (at - edge).length())
         });
         // Por planeta: dónde cae en la pantalla, su radio en píxeles (None si está detrás de la cámara) y hacia qué
@@ -2010,8 +2234,8 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             .map(|p| {
                 let pos = p.position();
                 let rel = pos - camera.position;
-                let at = rl.get_world_to_screen(pos, camera);
-                let edge = rl.get_world_to_screen(pos + cam_up * p.config.radius, camera);
+                let at = camera.project(pos, rl.get_screen_width(), rl.get_screen_height());
+                let edge = camera.project(pos + cam_up * p.config.radius, rl.get_screen_width(), rl.get_screen_height());
                 Marker {
                     at,
                     radius: in_front(pos).then(|| (at - edge).length()),
@@ -2019,132 +2243,139 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 }
             })
             .collect();
-        let visual_bounds: Vec<Option<DiskBounds>> = s.system.planets.iter().zip(&planets)
-            .map(|(planet, (near, _))| {
-                (planet.config.id == "smilingfriends")
-                    .then(|| near.as_ref().and_then(|model| projected_disk_bounds(&rl, camera, planet, model)))
-                    .flatten()
-            })
-            .collect();
+        let visual_bounds:Vec<_> = s.system.planets.iter().map(|p| {
+            (p.config.id=="smilingfriends").then(||projected_disk_bounds(&rl,camera,p,p.collision_radii/0.95)).flatten()
+        }).collect();
         let (width, height) = (rl.get_screen_width(), rl.get_screen_height());
         let mut render_stats = RenderStats { planets: vec![PlanetRender::Culled(0); s.system.planets.len()] };
         let draw_mouse = rl.get_mouse_position();
 
-        shader.begin_frame(center, camera.position, 0.16);
-        sun_shader.begin_frame(center, camera.position, time);
-
-        if s.token_presentation.abduction().is_some() {
-            abductions.prepare(&mut rl, &thread)?;
+        if let Some(g) = gpu.as_mut().filter(|_| !s.software) {
+            g.shader.begin_frame(center, camera.position, 0.16);
+            g.sun_shader.begin_frame(center, camera.position, time);
+            g.bloom.prepare(&mut rl, &thread, width, height)?;
         }
-        bloom.prepare(&mut rl, &thread, width, height)?;
+        if let Some(franchise) = s.token_presentation.abduction() {
+            if abductions.as_ref().is_none_or(|(loaded, _)| *loaded != franchise) {
+                abductions = Some((
+                    franchise,
+                    super::abduction::AbductionRenderer::load(&mut rl, &thread, root, &[franchise])?,
+                ));
+            }
+            abductions.as_mut().unwrap().1.prepare(&mut rl, &thread)?;
+        } else {
+            abductions = None;
+        }
+
         // Con el renderizador por software, la escena 3D se arma en la CPU antes de empezar a dibujar
-        if let Some(scene) = soft.as_mut().filter(|_| software_on) {
+        if let Some(scene) = soft.as_mut().filter(|_| s.software) {
             scene.render(&mut rl, &thread, s, camera, center, time, culling, lod_on, &mut render_stats)?;
         }
         // --- Dibujo --------------------------------------------------------------------------------------------
         let mut d = crate::graphics::window::begin_drawing(&mut rl, &thread);
-        if let Some(scene) = soft.as_ref().filter(|_| software_on) {
+        if let Some(scene) = soft.as_ref().filter(|_| s.software) {
             d.clear_background(Color::BLACK);
             scene.renderer.draw(&mut d, width, height);
         } else {
-        // El cielo y la escena 3D van a una textura, para sumarles el bloom (la interfaz va después, sin bloom)
-        {
-        let mut d = d.begin_texture_mode(&thread, &mut bloom.scene);
-        d.clear_background(SKY_BACKGROUND);
-        nebula.draw(&mut d, camera, width, height);
-        sky.draw(&mut d, &sky_frame, time);
-        if let Some((at, radius)) = sun_glow {
-            draw_sun_glow(&mut d, at, radius, Vector2::new(width as f32, height as f32));
-        }
-        for (i, (planet, marker)) in s.system.planets.iter().zip(&markers).enumerate() {
-            draw_planet_glow(&mut d, &planet.config.id, marker, visual_bounds[i],
-                Vector2::new(width as f32, height as f32));
-        }
-        {
-            let mut d3 = d.begin_mode3D(camera);
-            if show_orbits {
-                for p in &s.system.planets {
-                    let radius = p.config.orbit_radius;
-                    let point = |k: usize| {
-                        let angle = k as f32 * std::f32::consts::TAU / ORBIT_SEGMENTS as f32;
-                        center + Vector3::new(radius * angle.cos(), 0.0, -radius * angle.sin())
-                    };
-                    for k in 0..ORBIT_SEGMENTS {
-                        d3.draw_line_3D(point(k), point(k + 1), Color::new(96, 139, 194, 64));
+            let GpuScene { shader, sun, placeholder, planets, station_near, station_far, ship_model, sky, nebula, bloom, .. } = gpu.as_mut().unwrap();
+            // El cielo y la escena 3D van a una textura, para sumarles el bloom (la interfaz va después, sin bloom)
+            {
+            let mut d = d.begin_texture_mode(&thread, &mut bloom.scene);
+            d.clear_background(SKY_BACKGROUND);
+            nebula.draw(&mut d, camera.raylib(), width, height);
+            sky.draw(&mut d, sky_frame.as_ref().unwrap(), time);
+            if let Some((at, radius)) = sun_glow {
+                draw_sun_glow(&mut d, at, radius, Vector2::new(width as f32, height as f32));
+            }
+            for (i, (planet, marker)) in s.system.planets.iter().zip(&markers).enumerate() {
+                draw_planet_glow(&mut d, &planet.config.id, marker, visual_bounds[i],
+                    Vector2::new(width as f32, height as f32));
+            }
+            {
+                let mut d3 = d.begin_mode3D(camera.raylib());
+                if show_orbits {
+                    for p in &s.system.planets {
+                        let radius = p.config.orbit_radius;
+                        let point = |k: usize| {
+                            let angle = k as f32 * std::f32::consts::TAU / ORBIT_SEGMENTS as f32;
+                            center + Vector3::new(radius * angle.cos(), 0.0, -radius * angle.sin())
+                        };
+                        for k in 0..ORBIT_SEGMENTS {
+                            d3.draw_line_3D(point(k), point(k + 1), Color::new(96, 139, 194, 64));
+                        }
                     }
                 }
-            }
-            d3.draw_model_ex(&sun, center, Vector3::up(), s.system.sun_spin_angle.to_degrees(), Vector3::one() * s.system.sun.radius, Color::WHITE);
-            let station_pos = s.station.center();
-            let station_model = if (camera.position - station_pos).length() > s.station.lod_distance {
-                &station_far
-            } else { &station_near };
-            if (station_pos - camera.position).dot(forward) > -s.station.collision_radius {
-                station_model.draw(&mut d3, &mut shader, s.station.rotation()*Matrix::translate(station_pos.x, station_pos.y, station_pos.z));
-                crate::graphics::station_dock::draw(&mut d3,&s.station);
-            }
-            for (i, (p, (near, far))) in s.system.planets.iter().zip(&planets).enumerate() {
-                let pos = p.position();
-                let to = pos - camera.position;
-                let full = near.as_ref().map_or(0, SpaceModel::triangles);
-                // Descarte: un planeta fuera de la vista (su esfera fuera de la pirámide de la cámara) no se manda a
-                // dibujar. Con F5 se apaga, para comparar
-                if culling && !in_view(camera, width as f32 / height as f32, pos, p.config.radius * 1.6) {
-                    render_stats.planets[i] = PlanetRender::Culled(full);
-                    continue;
+                d3.draw_model_ex(&*sun, center, Vector3::up(), s.system.sun_spin_angle.to_degrees(), Vector3::one() * s.system.sun.radius, Color::WHITE);
+                let station_pos = s.station.center();
+                let station_model = if (camera.position - station_pos).length() > s.station.lod_distance {
+                    &station_far
+                } else { &station_near };
+                if (station_pos - camera.position).dot(forward) > -s.station.collision_radius {
+                    station_model.draw(&mut d3, shader, s.station.rotation()*Matrix::translate(station_pos.x, station_pos.y, station_pos.z));
+                    crate::graphics::station_dock::draw(&mut d3,&s.station);
                 }
-                let world = p.orientation() * Matrix::translate(pos.x, pos.y, pos.z);
-                // Nivel de detalle: lejos, la versión liviana (si tiene); con F6 se apaga, para comparar
-                let lod = if lod_on && to.length() > p.config.radius * FAR_LOD { far.as_ref().or(near.as_ref()) } else { near.as_ref() };
-                let used = lod.map_or(0, SpaceModel::triangles);
-                render_stats.planets[i] = if used < full { PlanetRender::Far(used, full) } else { PlanetRender::Near(used) };
-                shader.set_planet_fill(planet_fill(&p.config.id));
-                shader.set_planet_toon(p.config.id == "smilingfriends");
-                // Smiling Friends no brilla en el bloom, salvo Satanás (sus ojos y su fuego)
-                shader.bloom_only = (p.config.id == "smilingfriends").then_some(&["Satan", "FireRed"][..]);
-                let radius = p.config.radius;
-                match p.config.id.as_str() {
-                    "regularshow" => {
-                        let up = Vector3::up().transform_with(p.orientation());
-                        shader.set_planet_key(pos + up * (radius * 0.75),
-                            Vector4::new(0.85, 0.95, 1.0, 0.38), radius * 1.35, false);
+                for (i, (p, (near, far))) in s.system.planets.iter().zip(planets.iter()).enumerate() {
+                    let pos = p.position();
+                    let to = pos - camera.position;
+                    let full = near.as_ref().map_or(0, SpaceModel::triangles);
+                    // Descarte: un planeta fuera de la vista (su esfera fuera de la pirámide de la cámara) no se manda a
+                    // dibujar. Con F5 se apaga, para comparar
+                    if culling && !in_view(camera, width as f32 / height as f32, pos, p.config.radius * 1.6) {
+                        render_stats.planets[i] = PlanetRender::Culled(full);
+                        continue;
                     }
-                    "halloween" => {
-                        let sunward = (center - pos).normalized();
-                        shader.set_planet_key(pos + (sunward + Vector3::up() * 0.65).normalized() * (radius * 1.6),
-                            Vector4::new(1.0, 0.45, 0.25, 0.38), radius * 2.0, true);
+                    let world = p.orientation() * Matrix::translate(pos.x, pos.y, pos.z);
+                    // Nivel de detalle: lejos, la versión liviana (si tiene); con F6 se apaga, para comparar
+                    let lod = if lod_on && to.length() > p.config.radius * FAR_LOD { far.as_ref().or(near.as_ref()) } else { near.as_ref() };
+                    let used = lod.map_or(0, SpaceModel::triangles);
+                    render_stats.planets[i] = if used < full { PlanetRender::Far(used, full) } else { PlanetRender::Near(used) };
+                    shader.set_planet_fill(planet_fill(&p.config.id));
+                    shader.set_planet_toon(p.config.id == "smilingfriends");
+                    // Smiling Friends no brilla en el bloom, salvo Satanás (sus ojos y su fuego)
+                    shader.bloom_only = (p.config.id == "smilingfriends").then_some(&["Satan", "FireRed"][..]);
+                    let radius = p.config.radius;
+                    match p.config.id.as_str() {
+                        "regularshow" => {
+                            let up = Vector3::up().transform_with(p.orientation());
+                            shader.set_planet_key(pos + up * (radius * 0.75),
+                                Vector4::new(0.85, 0.95, 1.0, 0.38), radius * 1.35, false);
+                        }
+                        "halloween" => {
+                            let sunward = (center - pos).normalized();
+                            shader.set_planet_key(pos + (sunward + Vector3::up() * 0.65).normalized() * (radius * 1.6),
+                                Vector4::new(1.0, 0.45, 0.25, 0.38), radius * 2.0, true);
+                        }
+                        _ => shader.set_planet_key(Vector3::zero(), Vector4::new(0.0, 0.0, 0.0, 0.0), 1.0, false),
                     }
-                    _ => shader.set_planet_key(Vector3::zero(), Vector4::new(0.0, 0.0, 0.0, 0.0), 1.0, false),
+                    match lod {
+                        Some(model) => model.draw(&mut d3, shader, world),
+                        None => d3.draw_model_ex(&*placeholder, pos, Vector3::up(), p.spin_angle.to_degrees(), Vector3::one() * p.config.radius, color(&p.config.color)),
+                    }
                 }
-                match lod {
-                    Some(model) => model.draw(&mut d3, &mut shader, world),
-                    None => d3.draw_model_ex(&placeholder, pos, Vector3::up(), p.spin_angle.to_degrees(), Vector3::one() * p.config.radius, color(&p.config.color)),
+                shader.set_planet_fill(Vector3::zero());
+                shader.set_planet_toon(false);
+                shader.bloom_only = None;
+                shader.set_planet_key(Vector3::zero(), Vector4::new(0.0, 0.0, 0.0, 0.0), 1.0, false);
+                let sp = &s.ship;
+                let ship_world = Matrix::rotate_z(sp.bank) * Matrix::rotate_x(sp.pitch) * Matrix::rotate_y(sp.yaw)
+                    * Matrix::translate(sp.position.x, sp.position.y, sp.position.z);
+                match &ship_model {
+                    Some(model) => model.draw(&mut d3, shader, ship_world),
+                    None if s.ships.ships[s.ship_index].model.is_empty() => crate::graphics::ship_placeholder::draw(&mut d3, sp.position, Vector3::new(sp.pitch.to_degrees(), sp.yaw.to_degrees(), sp.bank.to_degrees()), ship_len),
+                    None => d3.draw_sphere(sp.position, ship_len * 0.3, Color::new(220, 220, 230, 255)),
+                }
+                if s.collision_debug {
+                    crate::graphics::station_debug::draw(&mut d3,&s.station,sp.position,station_ship_radius(s,ship_half));
                 }
             }
-            shader.set_planet_fill(Vector3::zero());
-            shader.set_planet_toon(false);
-            shader.bloom_only = None;
-            shader.set_planet_key(Vector3::zero(), Vector4::new(0.0, 0.0, 0.0, 0.0), 1.0, false);
-            let sp = &s.ship;
-            let ship_world = Matrix::rotate_z(sp.bank) * Matrix::rotate_x(sp.pitch) * Matrix::rotate_y(sp.yaw)
-                * Matrix::translate(sp.position.x, sp.position.y, sp.position.z);
-            match &ship_model {
-                Some(model) => model.draw(&mut d3, &mut shader, ship_world),
-                None if s.ships.ships[s.ship_index].model.is_empty() => crate::graphics::ship_placeholder::draw(&mut d3, sp.position, Vector3::new(sp.pitch.to_degrees(), sp.yaw.to_degrees(), sp.bank.to_degrees()), ship_len),
-                None => d3.draw_sphere(sp.position, ship_len * 0.3, Color::new(220, 220, 230, 255)),
             }
-            if s.collision_debug {
-                crate::graphics::station_debug::draw(&mut d3,&s.station,sp.position,station_ship_radius(s,&ship_model));
-            }
+            bloom.composite(&mut d, &thread);
         }
-        }
-        bloom.composite(&mut d, &thread);
-        }
-        if let Some(scene) = soft.as_ref().filter(|_| software_on) {
+        if let Some(scene) = soft.as_ref().filter(|_| s.software) {
             let st = scene.renderer.stats;
             let label = format!("RENDER POR SOFTWARE (F7)  ·  {}x{}  ·  {} triángulos rasterizados de {}  ·  {:.1} ms",
                 scene.renderer.width, scene.renderer.height, st.rasterized, st.submitted, st.ms);
-            if s.demo_video && frame % 60 == 0 { println!("SOFT_FRAME_MS {:.1} tris={}", st.ms, st.rasterized); }
+            if (s.demo_video && frame % 60 == 0) || capture.as_ref().is_some_and(|name| name.starts_with("planet-")) { println!("SOFT_FRAME_MS {:.1} tris={}", st.ms, st.rasterized); }
             let w = text_width(&ui_bold, &label, 18.0);
             draw_ui(&mut d, &ui_bold, &label, (width - w) / 2, height - 34, 18.0, super::holo::CYAN);
         }
@@ -2250,7 +2481,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
                 super::holo::button(&mut d, &ui_bold, &ui_regular, button, "E", &title, Some(sub),
                     button.check_collision_point_rec(draw_mouse));
             }
-            if station_reentry_delay<=0.0 && s.station.in_reach(s.ship.position, station_ship_radius(s, &ship_model)) {
+            if station_reentry_delay<=0.0 && s.station.in_reach(s.ship.position, station_ship_radius(s, ship_half)) {
                 let button = Rectangle::new(width as f32 / 2.0 - 210.0, height as f32 - 150.0, 420.0, 60.0);
                 super::holo::button(&mut d, &ui_bold, &ui_regular, button, "E", "Entrar a la estación espacial", None, false);
             }
@@ -2296,6 +2527,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         if let Some(video) = abduction_video.as_ref().filter(|_| video_playing) {
             video.draw(&mut d, width, height);
         } else if let Some(franchise) = s.token_presentation.abduction() {
+            let (_,abductions)=abductions.as_mut().unwrap();
             abductions.set_hexbound_thanks(!s.token_presentation.abduction_is_initial());
             abductions.draw(&mut d, &thread, franchise, s.token_presentation.elapsed(), width, height);
         }
@@ -2306,7 +2538,7 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             draw_render_stats(&mut d, &ui_regular, &ui_bold, &render_stats, s, culling, lod_on, width);
         }
         if s.collision_debug && !s.token_presentation.is_busy() {
-            crate::graphics::station_debug::hud(&mut d,&s.station,s.ship.position,station_ship_radius(s,&ship_model),&debug_last,debug_camera);
+            crate::graphics::station_debug::hud(&mut d,&s.station,s.ship.position,station_ship_radius(s,ship_half),&debug_last,debug_camera);
         }
         if fade > 0.0 {
             d.draw_rectangle(0, 0, width, height, Color::new(0, 0, 0, (fade * 255.0) as u8));
