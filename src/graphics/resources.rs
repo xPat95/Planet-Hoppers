@@ -34,6 +34,24 @@ struct CpuBatch {
 /// Capture the current back buffer before swapping. raylib 5.5 TakeScreenshot
 /// strips directory components and multiplies by desktop DPI even without a
 /// HiDPI framebuffer, so use the actual drawing dimensions and explicit export.
+/// Carga una fuente con estos caracteres. Reemplaza a `load_font_ex(.., Some(chars))`: raylib-rs 5.5.1 le pasa a
+/// raylib la cantidad de BYTES del texto como si fuera la cantidad de caracteres, así que con letras acentuadas o
+/// comillas tipográficas raylib lee más allá de la lista y a veces se cierra el juego (STATUS_ACCESS_VIOLATION). Acá
+/// se pasa la lista de caracteres de verdad, con su largo de verdad.
+pub fn load_font_chars(path: &Path, size: i32, chars: &str) -> Result<Font, Box<dyn std::error::Error>> {
+    if !path.is_file() {
+        return Err(format!("No se encontró la fuente: {}", path.display()).into());
+    }
+    let filename = std::ffi::CString::new(path.to_string_lossy().as_bytes())?;
+    let mut codepoints: Vec<i32> = chars.chars().map(|c| c as i32).collect();
+    let raw = unsafe { ffi::LoadFontEx(filename.as_ptr(), size, codepoints.as_mut_ptr(), codepoints.len() as i32) };
+    if raw.glyphs.is_null() || raw.texture.id == 0 || raw.texture.id == unsafe { ffi::GetFontDefault().texture.id } {
+        return Err(format!("No se pudo cargar la fuente: {}", path.display()).into());
+    }
+    // LoadFontEx copió los caracteres y es dueña de los glifos y la textura: pasan a ser del Font una sola vez
+    Ok(unsafe { Font::from_raw(raw) })
+}
+
 pub fn save_frame(path: &Path, width: i32, height: i32) -> Result<(), Box<dyn std::error::Error>> {
     unsafe {
         ffi::rlDrawRenderBatchActive();

@@ -535,9 +535,9 @@ pub fn play_with_results(rl: &mut RaylibHandle, thread: &RaylibThread, root: &Pa
     let mut reward_shortcut = crate::minigames::common::shortcuts::RewardShortcut::default();
     let mut reporter = crate::minigames::common::host::AttemptReporter::default();
     let dialogue = Dialogue::load(&root.join(DIALOGUE))?;
-    let title = rl.load_font_ex(thread, &root.join("assets/fonts/Bungee-Regular.ttf").to_string_lossy(), 72, Some(CHARSET))?;
-    let body = rl.load_font_ex(thread, &root.join("assets/fonts/TitilliumWeb-Bold.ttf").to_string_lossy(), 64, Some(CHARSET))?;
-    let effects = rl.load_font_ex(thread, &root.join("assets/fonts/GloriaHallelujah.ttf").to_string_lossy(), 108, Some(CHARSET))?;
+    let title = crate::graphics::resources::load_font_chars(&root.join("assets/fonts/Bungee-Regular.ttf"), 72, CHARSET)?;
+    let body = crate::graphics::resources::load_font_chars(&root.join("assets/fonts/TitilliumWeb-Bold.ttf"), 64, CHARSET)?;
+    let effects = crate::graphics::resources::load_font_chars(&root.join("assets/fonts/GloriaHallelujah.ttf"), 108, CHARSET)?;
     for f in [&title, &body, &effects] {
         unsafe { raylib::ffi::SetTextureFilter(f.texture, TextureFilter::TEXTURE_FILTER_BILINEAR as i32) };
     }

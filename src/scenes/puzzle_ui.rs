@@ -183,22 +183,8 @@ impl PuzzleUi {
     ) -> Result<Self, Box<dyn std::error::Error>> {
         let mut chars: String = (32..=255).filter_map(char::from_u32).collect();
         chars.push_str("•“”’—");
-        let title = rl.load_font_ex(
-            thread,
-            &root
-                .join("assets/fonts/GloriaHallelujah.ttf")
-                .to_string_lossy(),
-            48,
-            Some(&chars),
-        )?;
-        let body = rl.load_font_ex(
-            thread,
-            &root
-                .join("assets/fonts/TitilliumWeb-Bold.ttf")
-                .to_string_lossy(),
-            32,
-            Some(&chars),
-        )?;
+        let title = crate::graphics::resources::load_font_chars(&root.join("assets/fonts/GloriaHallelujah.ttf"), 48, &chars)?;
+        let body = crate::graphics::resources::load_font_chars(&root.join("assets/fonts/TitilliumWeb-Bold.ttf"), 32, &chars)?;
         title
             .texture()
             .set_texture_filter(thread, TextureFilter::TEXTURE_FILTER_BILINEAR);
