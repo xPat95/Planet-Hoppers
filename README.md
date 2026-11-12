@@ -16,6 +16,14 @@ cargo run --release
 
 Requiere Rust, CMake y LLVM (ver [compilar en Windows](docs/solar-system.md#compilar-en-windows)). `cargo run --release --bin solarsystem` abre directo el sistema solar.
 
+### Probar el renderizador del proyecto de gráficas
+
+```powershell
+cargo run --release --locked --bin solarsystem -- --software
+```
+
+Este comando abre el vuelo con el renderizador propio. Durante el vuelo, **F7** alterna entre este modo y el aspecto original con raylib. La primera activación carga los recursos del otro modo. Al regresar de un minijuego se recupera el modo de vuelo seleccionado. **F4** muestra el descarte y el nivel de detalle por planeta.
+
 ## Controles
 
 W/S acelerar y frenar · mouse o A/D girar · R/F inclinar · Espacio subir · Shift turbo · Tab objetivo · B piloto automático · E explorar planeta · C vista general · H ayuda · T medallero · F4 contador de rendimiento · F5/F6 apagar descarte / nivel de detalle · F7 renderizador por software · Ctrl+X salir.
@@ -28,7 +36,7 @@ W/S acelerar y frenar · mouse o A/D girar · R/F inclinar · Espacio subir · S
 | Generación y subdivisión de geometría antes de rasterizar | el sol (icosaedro subdividido) y las versiones livianas de cada modelo (`SoftMesh::sphere`, `SoftMesh::decimate`) |
 | 6 planetas distinguibles que orbitan y rotan | sistema solar (`src/solarSystem/`, `config/solar-system.json`) |
 | Shaders propios: planetas, sol, cielo, bloom, agujero negro | `src/graphics/shaders/` |
-| Shader animado | el sol (`sun.fs`) |
+| Shader animado | el sol en F7 (`Shade::Sun` en `src/graphics/software.rs`) y en el modo original (`sun.fs`) |
 | Control local cerca de un planeta | la nave acompaña la órbita del planeta cercano (`src/ships/`) |
 | Aceleración, frenado y giro progresivos (con `dt`) | `src/ships/mod.rs` |
 | Colisión con los planetas | `Ship::resolve_collisions` |
@@ -38,7 +46,7 @@ W/S acelerar y frenar · mouse o A/D girar · R/F inclinar · Espacio subir · S
 
 ## Video y demostración
 
-[Video del recorrido](docs/video/recorrido.mp4) · [Guía para la demostración en vivo](docs/demo.md) · [Detalles del proyecto](docs/detalles.md)
+[Recorrido con el renderizador propio](docs/video/recorrido-software.webm) · [Recorrido original](docs/video/recorrido.mp4) · [Guía para la demostración en vivo](docs/demo.md) · [Detalles del proyecto](docs/detalles.md)
 
 ## Uso de IA
 

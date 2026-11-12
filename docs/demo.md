@@ -15,6 +15,17 @@ Cambios que el profesor puede pedir, dónde se hacen y qué se ve. Después de c
 
 **Descarte y nivel de detalle:** durante el vuelo, F4 muestra los triángulos dibujados, los ahorrados por descarte y por nivel de detalle, y qué versión de cada planeta se dibuja. F5 apaga el descarte y F6 el nivel de detalle: el contador muestra cuánto trabajo extra hace el renderizador.
 
-**Renderizador por software (F7):** el sistema solar entero dibujado en la CPU (`src/graphics/software.rs`): matrices de modelo, vista y proyección, recorte contra el plano cercano, rasterizado con baricéntricas y buffer de profundidad propio, y los "shaders de fragmentos" en Rust (luz del sol en los planetas; el sol animado con ruido), con los colores calculados lineales y pasados a la pantalla con gamma 2,2. Al cargar, la textura de cada material se lee en la coordenada de cada vértice y queda horneada en su color, y las versiones livianas solo juntan vértices del mismo material. Se reparte en franjas, una por núcleo. Arriba muestra la resolución (`SOFT_HEIGHT`, 420 de alto), los triángulos rasterizados y los milisegundos por cuadro (unos 6 a 22 ms). Para cambiar en vivo: `SOFT_HEIGHT` y `SOFT_NEAR_TRIS` / `SOFT_FAR_TRIS` (detalle de cada planeta) en `src/scenes/solar_system.rs`, o la luz ambiente y el borde frío en `fragment` (`software.rs`).
+### Renderizador por software
 
-**Video:** `docs/video/recorrido.mp4` se generó con `cargo run --release --bin solarsystem -- --demo-video` (vuelo automático hasta Smiling Friends, vuelta completa y alejamiento; cuadros en `target/solarsystem/demo-video/`) y ffmpeg a 30 cuadros por segundo.
+Ejecutar `cargo run --release --locked --bin solarsystem -- --software` para abrir el vuelo de evaluación. F7 alterna el renderizador durante el vuelo. Los minijuegos, el hangar y las cinemáticas usan su presentación original.
+
+- **Modelos.** `src/graphics/software_asset.rs` lee las escenas GLB, sus transformaciones, normales, coordenadas UV y materiales en memoria de la CPU. Las naves configuradas con OBJ usan su exportación GLB incluida en los recursos.
+- **Rasterización.** `src/graphics/software.rs` transforma los vértices compartidos una vez por objeto y cuadro. Recorta los triángulos que cruzan el plano cercano y descarta los que quedan fuera de los centros de píxel. Reparte los demás entre las franjas de pantalla que ocupan.
+- **Superficies.** Las coordenadas UV se interpolan con corrección de perspectiva. La textura se consulta por píxel. La prueba de profundidad resuelve los objetos sólidos y la mezcla ordenada permite ver el interior de la cúpula de Un Show Más. El sol tiene su propio shader animado en Rust.
+- **Rendimiento.** El rótulo de F7 muestra resolución interna, triángulos y tiempo del renderizador. F4 detalla el descarte y el nivel de detalle por planeta. Se pueden ajustar `SOFT_HEIGHT`, `SOFT_NEAR_TRIS` y `SOFT_FAR_TRIS` en `src/scenes/solar_system.rs` y recompilar.
+
+### Recorrido de entrega
+
+[Ver el vuelo con el renderizador por software](video/recorrido-software.webm). Incluye vuelo espacial, acercamiento a Smiling Friends, vuelta y alejamiento. Para reproducir la trayectoria y guardar sus cuadros en `target/solarsystem/demo-video/`, ejecutar `cargo run --release --locked --bin solarsystem -- --software --demo-video`. La simulación avanza a 60 pasos por segundo y guarda un cuadro cada dos pasos para el video de 30 FPS.
+
+[Ver el recorrido con la presentación original](video/recorrido.mp4).
