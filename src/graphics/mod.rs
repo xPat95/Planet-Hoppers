@@ -10,6 +10,7 @@ pub mod mining;
 pub mod resources;
 pub mod ship_placeholder;
 pub mod ship_presentation;
+pub mod software;
 pub mod space;
 pub mod threats;
 pub mod window;

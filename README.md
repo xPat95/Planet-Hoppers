@@ -18,12 +18,14 @@ Requiere Rust, CMake y LLVM (ver [compilar en Windows](docs/solar-system.md#comp
 
 ## Controles
 
-W/S acelerar y frenar · mouse o A/D girar · R/F inclinar · Espacio subir · Shift turbo · Tab objetivo · B piloto automático · E explorar planeta · C vista general · H ayuda · T medallero · F4 contador de rendimiento · F5/F6 apagar descarte / nivel de detalle · Ctrl+X salir.
+W/S acelerar y frenar · mouse o A/D girar · R/F inclinar · Espacio subir · Shift turbo · Tab objetivo · B piloto automático · E explorar planeta · C vista general · H ayuda · T medallero · F4 contador de rendimiento · F5/F6 apagar descarte / nivel de detalle · F7 renderizador por software · Ctrl+X salir.
 
 ## Características que pedimos evaluar
 
 | Característica | Dónde verla |
 | --- | --- |
+| Pipeline propio por software (modelo, vista, proyección, recorte, rasterizado, profundidad, shaders de fragmentos en la CPU) | F7 en el vuelo, o `cargo run --release --bin solarsystem -- --software` (`src/graphics/software.rs`) |
+| Generación y subdivisión de geometría antes de rasterizar | el sol (icosaedro subdividido) y las versiones livianas de cada modelo (`SoftMesh::sphere`, `SoftMesh::decimate`) |
 | 6 planetas distinguibles que orbitan y rotan | sistema solar (`src/solarSystem/`, `config/solar-system.json`) |
 | Shaders propios: planetas, sol, cielo, bloom, agujero negro | `src/graphics/shaders/` |
 | Shader animado | el sol (`sun.fs`) |

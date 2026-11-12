@@ -298,6 +298,79 @@ impl DemoPilot {
     }
 }
 
+/// Lo que usa el renderizador por software (F7): el renderizador y la geometría de la escena en la CPU, con dos
+/// niveles de detalle por planeta generados al cargar (`SoftMesh::decimate`) y el sol generado a mano.
+struct SoftScene {
+    renderer: crate::graphics::software::SoftRenderer,
+    planets: Vec<(crate::graphics::software::SoftMesh, crate::graphics::software::SoftMesh)>,
+    ship: crate::graphics::software::SoftMesh,
+    station: crate::graphics::software::SoftMesh,
+    sun: crate::graphics::software::SoftMesh,
+}
+
+/// Alto de la imagen del renderizador por software (el ancho sale de la ventana) y cuántos triángulos puede tener
+/// cada versión de un planeta.
+const SOFT_HEIGHT: i32 = 420;
+const SOFT_NEAR_TRIS: usize = 40_000;
+const SOFT_FAR_TRIS: usize = 5_000;
+
+impl SoftScene {
+    fn load(rl: &mut RaylibHandle, thread: &RaylibThread, planets: &[(Option<SpaceModel>, Option<SpaceModel>)],
+            ship: Option<&SpaceModel>, station: &SpaceModel) -> Result<Self, Box<dyn std::error::Error>> {
+        use crate::graphics::software::{SoftMesh, SoftRenderer};
+        let planets = planets.iter().map(|(near, _)| {
+            let full = near.as_ref().map(SpaceModel::cpu_mesh).unwrap_or_else(|| SoftMesh::sphere(3, Vector3::new(0.6, 0.6, 0.65)));
+            let near = full.decimate(SOFT_NEAR_TRIS);
+            let far = near.decimate(SOFT_FAR_TRIS);
+            (near, far)
+        }).collect();
+        let (w, h) = (rl.get_screen_width().max(1), rl.get_screen_height().max(1));
+        Ok(Self {
+            renderer: SoftRenderer::new(rl, thread, SOFT_HEIGHT * w / h, SOFT_HEIGHT)?,
+            planets,
+            ship: ship.map(|m| m.cpu_mesh().decimate(15_000)).unwrap_or_default(),
+            station: station.cpu_mesh().decimate(6_000),
+            sun: SoftMesh::sphere(4, Vector3::one()),
+        })
+    }
+
+    /// Arma la lista de lo que se dibuja (con descarte y nivel de detalle, como con la GPU) y renderiza.
+    #[allow(clippy::too_many_arguments)]
+    fn render(&mut self, rl: &mut RaylibHandle, thread: &RaylibThread, s: &Session, camera: Camera3D, center: Vector3,
+              time: f32, culling: bool, lod_on: bool, stats: &mut RenderStats) -> Result<(), Box<dyn std::error::Error>> {
+        use crate::graphics::software::{Draw, Shade, SoftRenderer};
+        let (w, h) = (rl.get_screen_width().max(1), rl.get_screen_height().max(1));
+        if self.renderer.width != SOFT_HEIGHT * w / h {
+            self.renderer = SoftRenderer::new(rl, thread, SOFT_HEIGHT * w / h, SOFT_HEIGHT)?;
+        }
+        let aspect = w as f32 / h as f32;
+        let mut draws = Vec::new();
+        let r = s.system.sun.radius;
+        draws.push(Draw { mesh: &self.sun, world: Matrix::scale(r, r, r) * Matrix::rotate_y(s.system.sun_spin_angle)
+            * Matrix::translate(center.x, center.y, center.z), shade: Shade::Sun { center } });
+        for (i, (p, (near, far))) in s.system.planets.iter().zip(&self.planets).enumerate() {
+            let pos = p.position();
+            if culling && !in_view(camera, aspect, pos, p.config.radius * 1.6) {
+                stats.planets[i] = PlanetRender::Culled(near.tris.len());
+                continue;
+            }
+            let use_far = lod_on && (pos - camera.position).length() > p.config.radius * FAR_LOD;
+            let mesh = if use_far { far } else { near };
+            stats.planets[i] = if use_far { PlanetRender::Far(far.tris.len(), near.tris.len()) } else { PlanetRender::Near(near.tris.len()) };
+            draws.push(Draw { mesh, world: p.orientation() * Matrix::translate(pos.x, pos.y, pos.z), shade: Shade::Lit });
+        }
+        let station = s.station.center();
+        if !culling || in_view(camera, aspect, station, s.station.collision_radius) {
+            draws.push(Draw { mesh: &self.station, world: s.station.rotation() * Matrix::translate(station.x, station.y, station.z), shade: Shade::Lit });
+        }
+        let sp = &s.ship;
+        draws.push(Draw { mesh: &self.ship, world: Matrix::rotate_z(sp.bank) * Matrix::rotate_x(sp.pitch) * Matrix::rotate_y(sp.yaw)
+            * Matrix::translate(sp.position.x, sp.position.y, sp.position.z), shade: Shade::Lit });
+        self.renderer.render(camera, center, &draws, time);
+        Ok(())
+    }
+}
+
 /// Qué pasó con cada planeta este cuadro: descartado (con los triángulos que se ahorró), dibujado entero, o dibujado
 /// con su versión liviana (los que dibujó y los que tendría la completa).
 #[derive(Clone, Copy)]
@@ -455,6 +528,8 @@ struct Session {
     help_smoke: bool,
     /// `--demo-video`: vuelo automático para el video de entrega (ver `DemoPilot`), guardando cada cuadro.
     demo_video: bool,
+    /// `--software`: empieza con el renderizador por software (F7) encendido.
+    software: bool,
     station_smoke: bool,
     ending_smoke: bool,
     collision_debug: bool,
@@ -628,6 +703,7 @@ fn run_session_with_progress(args: impl Iterator<Item = String>, game: Option<Ga
     let mut intro_smoke = false;
     let mut help_smoke = false;
     let mut demo_video = false;
+    let mut software = false;
     let mut station_smoke = false;
     let mut ending_origin = None;
     let mut collision_debug = false;
@@ -642,6 +718,7 @@ fn run_session_with_progress(args: impl Iterator<Item = String>, game: Option<Ga
             "--smoke-intro" => { smoke = true; intro_smoke = true; }
             "--smoke-help" => { smoke = true; help_smoke = true; overview = true; }
             "--demo-video" => { smoke = true; demo_video = true; }
+            "--software" => software = true,
             "--smoke-station" => { smoke = true; station_smoke = true; }
             "--debug-collisions" => collision_debug = true,
             "--smoke-docking" => { smoke = true; docking_smoke = true; }
@@ -733,6 +810,7 @@ fn run_session_with_progress(args: impl Iterator<Item = String>, game: Option<Ga
         intro_smoke,
         help_smoke,
         demo_video,
+        software,
         station_smoke,
         ending_smoke: ending_origin.is_some(),
         collision_debug,
@@ -1082,6 +1160,12 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
     let mut demo = DemoPilot::default();
     let mut culling = true;
     let mut lod_on = true;
+    // Renderizador por software (F7): se prepara la primera vez que se enciende
+    let mut software_on = s.software;
+    let mut soft: Option<SoftScene> = None;
+    if software_on {
+        soft = Some(SoftScene::load(&mut rl, &thread, &planets, ship_model.as_ref(), &station_far)?);
+    }
     let mut collection_open = false;
     let mut presentation_shortcut = crate::minigames::common::shortcuts::PresentationShortcut::default();
     let mut collection_progress = 0.0_f32;
@@ -1221,6 +1305,17 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         if pressed(&rl, KeyboardKey::KEY_F4) { show_stats = !show_stats; }
         if pressed(&rl, KeyboardKey::KEY_F5) { culling = !culling; }
         if pressed(&rl, KeyboardKey::KEY_F6) { lod_on = !lod_on; }
+        if pressed(&rl, KeyboardKey::KEY_F7) {
+            software_on = !software_on;
+            if software_on && soft.is_none() {
+                {
+                    let mut d = crate::graphics::window::begin_drawing(&mut rl, &thread);
+                    d.clear_background(SKY_BACKGROUND);
+                    d.draw_text("Preparando el renderizador por software...", 40, 40, 24, Color::RAYWHITE);
+                }
+                soft = Some(SoftScene::load(&mut rl, &thread, &planets, ship_model.as_ref(), &station_far)?);
+            }
+        }
         if pressed(&rl,KeyboardKey::KEY_O) { show_orbits = !show_orbits; }
         debug_camera="ninguna";
 
@@ -1942,8 +2037,16 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
             abductions.prepare(&mut rl, &thread)?;
         }
         bloom.prepare(&mut rl, &thread, width, height)?;
+        // Con el renderizador por software, la escena 3D se arma en la CPU antes de empezar a dibujar
+        if let Some(scene) = soft.as_mut().filter(|_| software_on) {
+            scene.render(&mut rl, &thread, s, camera, center, time, culling, lod_on, &mut render_stats)?;
+        }
         // --- Dibujo --------------------------------------------------------------------------------------------
         let mut d = crate::graphics::window::begin_drawing(&mut rl, &thread);
+        if let Some(scene) = soft.as_ref().filter(|_| software_on) {
+            d.clear_background(Color::BLACK);
+            scene.renderer.draw(&mut d, width, height);
+        } else {
         // El cielo y la escena 3D van a una textura, para sumarles el bloom (la interfaz va después, sin bloom)
         {
         let mut d = d.begin_texture_mode(&thread, &mut bloom.scene);
@@ -2036,6 +2139,15 @@ fn fly(root: &Path, s: &mut Session, smoke: bool) -> Result<Exit, Box<dyn std::e
         }
         }
         bloom.composite(&mut d, &thread);
+        }
+        if let Some(scene) = soft.as_ref().filter(|_| software_on) {
+            let st = scene.renderer.stats;
+            let label = format!("RENDER POR SOFTWARE (F7)  ·  {}x{}  ·  {} triángulos rasterizados de {}  ·  {:.1} ms",
+                scene.renderer.width, scene.renderer.height, st.rasterized, st.submitted, st.ms);
+            if s.demo_video && frame % 60 == 0 { println!("SOFT_FRAME_MS {:.1} tris={}", st.ms, st.rasterized); }
+            let w = text_width(&ui_bold, &label, 18.0);
+            draw_ui(&mut d, &ui_bold, &label, (width - w) / 2, 14, 18.0, super::holo::CYAN);
+        }
 
         // --- Interfaz ------------------------------------------------------------------------------------------
         let white = Color::new(230, 232, 245, 255);
